@@ -6,8 +6,8 @@
 Descreva o seu projeto em linhas gerais. 
 
 ## Integrantes
-João Pedro
-Bernardo Casanovas
+João Pedro<br>
+Bernardo Casanovas<br>
 Anderson
 
 ## Instalação 
