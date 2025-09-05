@@ -5,6 +5,11 @@
 ## Sobre 
 Descreva o seu projeto em linhas gerais. 
 
+## Integrantes
+João Pedro
+Bernardo Casanovas
+Anderson
+
 ## Instalação 
 **Linguagens**: Python, Django<br>
 **Tecnologias**: Github, Visual Studio Code<br>
