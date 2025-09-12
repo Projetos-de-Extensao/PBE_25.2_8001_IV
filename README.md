@@ -6,9 +6,10 @@
 Descreva o seu projeto em linhas gerais. 
 
 ## Integrantes
-João Pedro<br>
+João Pedro Campos<br>
 Bernardo Casanovas<br>
-Anderson
+Anderson Lima<br>
+Gabriel Caruzo<br>
 
 ## Instalação 
 **Linguagens**: Python, Django<br>
