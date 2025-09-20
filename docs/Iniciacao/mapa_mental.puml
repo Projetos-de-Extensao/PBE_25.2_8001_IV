@@ -1,0 +1,74 @@
+@startmindmap Mapa_Mental_Monitoria
+' Mapa Mental da Visão de Produto Idealizada
+' Sistema de Gestão de Monitorias IBMEC
+' Versão: 2.0 (Completa)
+' Ferramenta: PlantUML (https://plantuml.com)
+
+<style>
+mindmapDiagram {
+  .green {
+    BackgroundColor lightgreen
+  }
+  .blue {
+    BackgroundColor lightblue
+  }
+  .orange {
+    BackgroundColor orange
+  }
+  .red {
+    BackgroundColor tomato
+  }
+  .grey {
+    BackgroundColor lightgrey
+  }
+}
+</style>
+
+* **Plataforma de Monitorias IBMEC**
+
+' Lado Direito do Mapa
+** Área do Aluno <<blue>>
+*** Dashboard Personalizado e Proativo
+**** Visualizar Próximas Aulas <&calendar>
+**** (opcional) Sugestões de Monitores <&lightbulb>
+*** Minhas Monitorias
+**** Acessar Materiais das aulas <&download>
+**** Histórico Completo de aulas <&list>
+**** Avaliar Monitor <&star>
+***** Rating (1-5 estrelas)
+***** Comentários Anônimos
+**** (opcional) Sincronizar com Agenda Pessoal (Google, Outlook) <&cloud-upload>
+
+** Área do Monitor <<green>>
+*** Dashboard Profissional
+**** Definir Disponibilidade e Regras <&clock>
+**** (opcional) Sincronização com Agenda Pessoal <&sync>
+**** Notificar Ausência por Imprevisto <&warning>
+*** Ferramentas de Trabalho
+**** (opcional) Repositório Pessoal de Materiais <&folder>
+**** (opcional) Chat Interno com Alunos <&chat>
+**** Submeter Relatório de Horas com 1 clique <&send>
+
+' Lado Esquerdo do Mapa
+** Área do Professor <<orange>>
+*** Dashboard de Acompanhamento
+**** Ver Feedback dos Monitores da Disciplina <&thumb-up>
+*** Gestão e Mentoria
+**** Indicar Alunos para Monitoria <&user-plus>
+**** Aprovar/Reprovar Candidaturas <&check>
+**** (opcional) Canal de Comunicação com Monitores <&bullhorn>
+**** Disponibilizar Material de Apoio <&file-plus>
+
+** Área do Coordenador <<red>>
+*** Painel de Controle (Admin)
+**** Adicionar/Gerenciar Disciplinas <&cog>
+**** Aprovar Relatório de Horas complementares <&money-bill-wave>
+**** (opcional) Enviar Anúncios sobre novas monitorias/disciplinas <&broadcast-tower>
+
+** Funcionalidades Gerais <<grey>>
+*** Sistema de Login <&key>
+*** Página Inicial / Landing Page <&home>
+*** (opcional) Gamificação (Medalhas e Conquistas) <&trophy>
+*** Sistema de Notificações Completo (Email & Push) <&envelope>
+
+@endmadmap

@@ -16,6 +16,8 @@ Foi levantado um ponto importante sobre o app e, assim, foi produzido o mapa men
 </p>
  
 ## Mapa mental - Geral.
+
+
  
 ## Versão 1.0
  

@@ -10,7 +10,7 @@ O brainstorm é uma técnica de elicitação de requisitos que consiste em reuni
  
 ## Metodologia
 <p align = "justify">
-A equipe se reuniu para debater ideias gerais sobre o projeto via..., começou .... e terminou..., onde o XXXX XXXX foi o moderador, direcionando a equipe com questões pré-elaboradas, e transcrevendo as respostas para o documento.
+A equipe se reuniu para debater ideias gerais sobre o projeto via discord, a sessão começou às 19h do dia 20/09/2025 e terminou às 20h30
 </p>
  
 ## Brainstorm
@@ -22,97 +22,61 @@ A equipe se reuniu para debater ideias gerais sobre o projeto via..., começou .
 ### 1. Qual o objetivo principal da aplicação?
  
 <p align = "justify">
-<b>XXXX</b> - Deve ser uma plataforma onde qualquer pessoa possa...
+<b>XXXX</b> - Alunos que precisam de ajuda, monitores precisam de organização, equipe casas precisa de automatização de processos(muita planilha), e professores/coordenadores precisam de visibilidade do processo.
 </p>
  
-<b>ZZZ</b> - A plataforma deve fornece...
+<b>ZZZ</b> - A plataforma deve fornecer automatização de processos custosos...
  
-<b>YYYY</b> - O objetivo da aplicação é....
+<b>YYYY</b> - O objetivo da aplicação é centralizar as informaçoes das monitorias (servir como um guia para os alunos)....
  
-<b>WWWW</b> - O principal objetivo da aplicação é a...
+<b>WWWW</b> - O principal objetivo da aplicação é fazer com que a equipe casas possa ver o progresso dos alunos monitorados...
  
-<b>KKKK</b> - A plataforma deve gerenciar...
+<b>KKKK</b> - A plataforma deve gerenciar todo o processo burocratico de inscrição no processo...
 </p>
  
 ---
  
-### 2. Como será o processo para cadastrar um novo cliente?
+### 2. Como será o processo para cadastrar um novo monitor?
  
 <p align = "justify">
-<b>XXXX</b> - O moderador deverá fazer login e...
- 
-<b>YYYY</b> - O cliente...
- 
-<b>WWWW</b> - Com o usuário logado, ele deverá...
-
-<b>ZZZZ</b> - O cliente...
- 
-<b>KKK</b> - O cliente...
+<b>XXXX</b> - Será disponibilizado para o professor o historico completo do aluno e com base nas regras de negocio ele estará apto ou não...
  
 ---
  
-### 3. Como será a forma de adicionar produtos?
+### 3. Qual são as funcionalidades MAIS importante para ser entregue?
  
 <p align = "justify">
-<b>XXXX</b> - O cliente ao cadastrar...
+<b>XXXX</b> - Para o Aluno, deverá ter todas as informaçoes possiveis (sala da monitoria, horário e nome do monitor)
 </p>
  
 <p align = "justify">
-<b>YYYYY</b> - O produto tem...
+<b>YYYYY</b> - Para o Coordenador, um dashboard com os dados principais: matérias mais procuradas, monitores mais ativos, total de horas no semestre.
 </p>
  
-<b>ZZZZ</b> - O produto....
- 
-<b>XXXX</b> - O produto....
+<b>ZZZZ</b> - Uma notificação um dia antes e uma hora antes da monitoria para o aluno e o monitor. Isso vai diminuir muito os esquecimentos e faltas.
 
- 
+<p align = "justify">
+Para o Professor, um formulário simples para "Indicar Aluno para Monitoria", que envia uma recomendação direto para o coordenador.
+</p>
+
+<p align = "justify"> - Para o Coordenador, uma tela de "Aprovação de Horas", onde ele pode revisar e aprovar o pagamento dos monitores com um clique. </p>
+
+
 ---
- 
-### 4. Outras perguntas pertinentes ao contexto
-
-<p align = "justify">
-<b>XXXX</b> - Com a localização...
- 
-<b>YYYY</b> - O cliente...
- 
-<b>ZZZ</b> - O cliente...
- 
----
- 
-### 5. "Outras perguntas pertinentes ao contexto", Como seria a forma de adicionar do cliente adicionar os produtos ?
-<p align = "justify">
-<b>XXX</b> - O cliente....
-</p>
- 
-### 6. Quais informações seriam interessante para o cliente?
-<p align = "justify">
-   <b>XXX</b> - Informações...
-   
-   <b>ZZZZ</b> - O cliente usuário poderá acessar informações...
-
-   <b>WWWWs</b> - O usuário poderá ver scouts de partidas do torneio, ver as regras dos torneios, locais e data das partidas.
-   
-</p>
- 
+  
 ### Requisitos elicitados
  
 |ID|Descrição|
 |----|-------------|
-|BS01| O cliente...|
-|BS02| O cliente...|
-|BS03| O cliente...|
-|BS04| O cliente...|
-|BS05| O cliente...|
-|BS06| O cliente...|
-|BS07| O cliente...|
-|BS08| O cliente...|
-|BS09| O cliente...|
-|BS10| O produto...|
-|BS11| O produto...|
-|BS12| O produto...|
-|BS13| O produto...|
-|BS14| O produto...|
-|BS15| O produto...|
+|BS01| O sistema deve exibir para o aluno todas as informações da monitoria (sala, horário, nome do monitor).|
+|BS02| O sistema deve enviar notificações de lembrete 24h e 1h antes de cada monitoria agendada.|
+|BS03| O sistema deve permitir que um aluno se candidate para uma vaga de monitor.|
+|BS04| No processo de candidatura, o sistema deve validar se o CR geral do aluno é maior ou igual a 8.0 e tambem o CR do periodo deve ser maior ou igual a 7.0 ..|
+|BS05| O monitor deve ter uma interface para definir seus horários e dias de disponibilidade, deverá ter uma forma de avisar caso ocorrer algum inprevisto e tiver que se ausentar, sendo notificado automaticamente para todos os alunos..|
+|BS06| O professor deve poder enviar indicações de alunos para serem monitores através de um formulário.|
+|BS07| O coordenador deve ter um dashboard com estatísticas sobre as monitorias.(opcional)|
+|BS08| O coordenador deve ter uma funcionalidade para aprovar o relatório de horas dos monitores.|
+
  
 ## Conclusão
 <p align = "justify">
@@ -126,4 +90,4 @@ Através da aplicação da técnica, foi possível elicitar alguns dos primeiros
 ## Autor(es)
 | Data | Versão | Descrição | Autor(es) |
 | -- | -- | -- | -- |
-| DD/MM/YYYY | 1.0 | Criação do documento | XXX XXXX, XXXX XXXX, YYY YYYY e ZZZ XXXX |
+| 13/09/Y2025 | 1.0 | Criação do documento | XXX XXXX, XXXX XXXX, YYY YYYY e ZZZ XXXX |

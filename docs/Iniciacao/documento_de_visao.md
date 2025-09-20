@@ -20,11 +20,11 @@ Dificuldade em gerenciar e organizar...
 
 ### Impactados
 
-Usuários....
+Alunos do IBMEC
 
 ### Consequência
 
-A criação de novos....
+A criação de um site para gerenciar as monitorias
 
 ### Solução
 
