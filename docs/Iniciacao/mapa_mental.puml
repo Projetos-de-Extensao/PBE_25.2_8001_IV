@@ -1,8 +1,8 @@
-@startmindmap Mapa_Mental_Monitoria
+@startmindmap SistemaDeMonitoriasIBMEC
 ' Mapa Mental da Visão de Produto Idealizada
 ' Sistema de Gestão de Monitorias IBMEC
-' Versão: 2.0 (Completa)
-' Ferramenta: PlantUML (https://plantuml.com)
+' Versão Final
+title Plataforma de Monitorias IBMEC
 
 <style>
 mindmapDiagram {
@@ -24,7 +24,7 @@ mindmapDiagram {
 }
 </style>
 
-* **Plataforma de Monitorias IBMEC**
+* **Plataforma de Monitorias IBMEC** [#GoldenRod]
 
 ' Lado Direito do Mapa
 ** Área do Aluno <<blue>>
@@ -33,6 +33,7 @@ mindmapDiagram {
 **** (opcional) Sugestões de Monitores <&lightbulb>
 *** Minhas Monitorias
 **** Acessar Materiais das aulas <&download>
+**** Enviar Atividades <&upload>
 **** Histórico Completo de aulas <&list>
 **** Avaliar Monitor <&star>
 ***** Rating (1-5 estrelas)
@@ -41,34 +42,49 @@ mindmapDiagram {
 
 ** Área do Monitor <<green>>
 *** Dashboard Profissional
+**** Visualizar Horários e Dias Definidos <&calendar>
+**** Registro de Presença (Check-in/Check-out) <&map-marker>
+**** Notificar Ausência por Imprevisto <&warning>
+*** Gestão de Agenda
 **** Definir Disponibilidade e Regras <&clock>
 **** (opcional) Sincronização com Agenda Pessoal <&sync>
-**** Notificar Ausência por Imprevisto <&warning>
 *** Ferramentas de Trabalho
+**** Registro de Atividades e Anexos <&paperclip>
+**** Submeter Relatório de Horas com 1 clique <&send>
 **** (opcional) Repositório Pessoal de Materiais <&folder>
 **** (opcional) Chat Interno com Alunos <&chat>
-**** Submeter Relatório de Horas com 1 clique <&send>
+*** Relatórios
+**** Exportar Relatórios dos Alunos (CSV/PDF) <&file-pdf>
 
 ' Lado Esquerdo do Mapa
-** Área do Professor <<orange>>
-*** Dashboard de Acompanhamento
-**** Ver Feedback dos Monitores da Disciplina <&thumb-up>
+**_ Área do Professor <<orange>>
+*** Gestão de Escalas
+**** Criar e Gerenciar Escalas (evitando conflitos) <&calendar-alt>
 *** Gestão e Mentoria
 **** Indicar Alunos para Monitoria <&user-plus>
-**** Aprovar/Reprovar Candidaturas <&check>
+**** Aprovar/Reprovar Candidaturas <&check-square>
+**** Disponibilizar Material de Apoio Oficial <&file-plus>
 **** (opcional) Canal de Comunicação com Monitores <&bullhorn>
-**** Disponibilizar Material de Apoio <&file-plus>
+*** Acompanhamento
+**** Ver Feedback dos Monitores da Disciplina <&thumb-up>
 
-** Área do Coordenador <<red>>
+**_ Área do Coordenador <<red>>
 *** Painel de Controle (Admin)
-**** Adicionar/Gerenciar Disciplinas <&cog>
-**** Aprovar Relatório de Horas complementares <&money-bill-wave>
-**** (opcional) Enviar Anúncios sobre novas monitorias/disciplinas <&broadcast-tower>
+**** Adicionar/Gerenciar Monitorias e Disciplinas <&cog>
+**** Adicionar Escalas de Horários <&calendar-plus>
+**** Gerenciar Usuários <&users-cog>
+**** Aprovar Relatório de Horas Complementares <&money-bill-wave>
+**** (opcional) Enviar Anúncios <&broadcast-tower>
 
-** Funcionalidades Gerais <<grey>>
-*** Sistema de Login <&key>
-*** Página Inicial / Landing Page <&home>
-*** (opcional) Gamificação (Medalhas e Conquistas) <&trophy>
-*** Sistema de Notificações Completo (Email & Push) <&envelope>
+**_ Funcionalidades Gerais <<grey>>
+*** Acesso e Segurança
+**** Sistema de Login (com confirmação por email) <&key>
+**** Recuperação de Senha com link seguro <&lock>
+*** Conteúdo e Navegação
+**** Página Inicial / Landing Page <&home>
+**** Sistema de Notificações (Email & Push) <&envelope>
+*** Outras Funcionalidades
+**** Exportação de Dados (CSV / XLSX / PDF) <&file-export>
+**** (opcional) Gamificação (Medalhas e Conquistas) <&trophy>
 
-@endmadmap
+@endmindmap

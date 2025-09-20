@@ -30,7 +30,7 @@ O SCTM ficará disponível como aplicação web responsiva (desktop e mobile) e 
 - Painéis (dashboards) e relatórios (por monitor, disciplina, período).
 - Notificações por e-mail e alertas no sistema.
 - Exportação de dados (CSV / XLSX / PDF).
-- Logs e auditoria de ações (quem editou/validou).
+
 
 ### 2.3 Restrições gerais
 - Deve operar com navegadores modernos (Chrome, Firefox, Edge, Safari).
