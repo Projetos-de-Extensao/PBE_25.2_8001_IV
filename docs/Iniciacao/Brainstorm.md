@@ -44,9 +44,9 @@ A equipe se reuniu para debater ideias gerais sobre o projeto via Discord. A ses
 | BS03 | O sistema deve permitir que um aluno se candidate para uma vaga de monitor. |
 | BS04 | No processo de candidatura, o sistema deve validar se o CR geral do aluno é ≥ 8.0 e o CR do período é ≥ 7.0. |
 | BS05 | O monitor deve ter uma interface para definir seus horários e dias de disponibilidade e notificar ausências, sendo automaticamente informado a todos os alunos. |
-| BS06 | O professor deve poder enviar indicações de alunos para serem monitores através de um formulário. |
+| BS06 | O professor deve poder aprovar monitores, enviar materiais de apoio para as disciplinas |
 | BS07 | O coordenador deve ter um dashboard com estatísticas sobre as monitorias (opcional). |
-| BS08 | O coordenador deve ter funcionalidade para aprovar o relatório de horas dos monitores. |
+| BS08 | O coordenador deve ter funcionalidade para cadastar disciplinas, aprovar o relatório de horas dos monitores. |
 | BS09 | O sistema deve permitir que o monitor envie e receba atividades. |
 | BS10 | O sistema deve permitir que o aluno envie e receba atividades. |
 
