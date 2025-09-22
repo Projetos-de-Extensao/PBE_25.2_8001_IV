@@ -43,23 +43,23 @@ A equipe se reuniu para debater ideias gerais sobre o projeto via discord, a ses
  
 ---
  
-### 3. Qual são as funcionalidades MAIS importante para ser entregue?
+### 3. Qual são as funcionalidades MAIS importantes para serem entregues?
  
 <p align = "justify">
 <b>XXXX</b> - Para o Aluno, deverá ter todas as informaçoes possiveis (sala da monitoria, horário e nome do monitor)
 </p>
  
 <p align = "justify">
-<b>YYYYY</b> - Para o Coordenador, um dashboard com os dados principais: matérias mais procuradas, monitores mais ativos, total de horas no semestre.
+<b>YYYYY</b> - Para o Coordenador, cadastrar disciplinas, escalas de horarios, aprovar total de horas de cada monitor no semestre.
 </p>
  
-<b>ZZZZ</b> - Uma notificação um dia antes e uma hora antes da monitoria para o aluno e o monitor. Isso vai diminuir muito os esquecimentos e faltas.
+<b>ZZZZ</b> - Uma notificação um dia antes e outra uma hora antes da monitoria para o aluno e o monitor. Isso vai diminuir muito os esquecimentos e faltas.
 
 <p align = "justify">
 Para o Professor, um formulário simples para "Indicar Aluno para Monitoria", que envia uma recomendação direto para o coordenador.
 </p>
 
-<p align = "justify"> - Para o Coordenador, uma tela de "Aprovação de Horas", onde ele pode revisar e aprovar o pagamento dos monitores com um clique. </p>
+<p align = "justify"> - Para o monitor,visualizar horarios e dias das aulas, notificar ausencia e registro de presença. </p>
 
 
 ---
