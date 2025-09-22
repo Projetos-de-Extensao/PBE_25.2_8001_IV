@@ -24,7 +24,7 @@ mindmapDiagram {
 }
 </style>
 
-* **Plataforma de Monitorias IBMEC** [#GoldenRod]
+* **Plataforma de Monitorias IBMEC**
 
 ' Lado Direito do Mapa
 ** Área do Aluno <<blue>>
@@ -57,9 +57,9 @@ mindmapDiagram {
 **** Exportar Relatórios dos Alunos (CSV/PDF) <&file-pdf>
 
 ' Lado Esquerdo do Mapa
-**_ Área do Professor <<orange>>
+** Área do Professor <<orange>>
 *** Gestão de Escalas
-**** Criar e Gerenciar Escalas (evitando conflitos) <&calendar-alt>
+**** Gerenciar e editar Escalas (evitando conflitos) <&calendar-alt>
 *** Gestão e Mentoria
 **** Indicar Alunos para Monitoria <&user-plus>
 **** Aprovar/Reprovar Candidaturas <&check-square>
@@ -68,7 +68,7 @@ mindmapDiagram {
 *** Acompanhamento
 **** Ver Feedback dos Monitores da Disciplina <&thumb-up>
 
-**_ Área do Coordenador <<red>>
+** Área do Coordenador <<red>>
 *** Painel de Controle (Admin)
 **** Adicionar/Gerenciar Monitorias e Disciplinas <&cog>
 **** Adicionar Escalas de Horários <&calendar-plus>
@@ -76,7 +76,7 @@ mindmapDiagram {
 **** Aprovar Relatório de Horas Complementares <&money-bill-wave>
 **** (opcional) Enviar Anúncios <&broadcast-tower>
 
-**_ Funcionalidades Gerais <<grey>>
+** Funcionalidades Gerais <<grey>>
 *** Acesso e Segurança
 **** Sistema de Login (com confirmação por email) <&key>
 **** Recuperação de Senha com link seguro <&lock>
