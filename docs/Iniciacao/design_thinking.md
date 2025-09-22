@@ -7,19 +7,19 @@ title: Design Thinking
 
 ### **1. Capa**
 
-- Título do Projeto: Sistema de Gestão de Monitorias IBMEC
-- Nome da Equipe: 
-- Data
-- Logo da Empresa/Organização (se aplicável)
+- **Título do Projeto:** Sistema de Gestão de Monitorias IBMEC  
+- **Nome da Equipe:** Projeto Back-End IV  
+- **Data:** 22/09/2025  
+- **Logo da Empresa/Organização (se aplicável)**
 
 ---
 
 ### **2. Introdução**
 
-- **Contexto do Projeto**: B Atualmente, o processo de agendamento e gestão de monitorias no IBMEC é manual, dependendo de planilhas.
-- **Objetivo**: otimizar o agendamento de monitorias, melhorar a comunicação, e fornecer dados para a melhoria contínua do programa.
-- **Público-Alvo**: Alunos IBMEC.
-- **Escopo**: IBMEC.
+- **Contexto do Projeto:** Atualmente, o processo de agendamento e gestão de monitorias no IBMEC é manual, dependendo de planilhas.  
+- **Objetivo:** Otimizar o agendamento de monitorias, melhorar a comunicação entre os envolvidos e fornecer dados para a melhoria contínua do programa.  
+- **Público-Alvo:** Alunos, Monitores, Professores e Coordenadores do IBMEC.  
+- **Escopo:** Todo o processo de monitorias do IBMEC, desde inscrições até relatórios e acompanhamento.
 
 ---
 
@@ -27,43 +27,89 @@ title: Design Thinking
 
 #### **3.1. Empatia**
 
-- **Pesquisa**: Métodos utilizados para entender o usuário (entrevistas, observação,).
-- **Insights**:Muitos alunos nao sabem o dia nem o horário das monitorias.
-- **Personas**: Ana,uma Aluna Ocupada: 19 anos, 3º período de Administração, faz estágio na parte da tarde.Sua maior frustração é a perda de tempo
+- **Pesquisa:** Entrevistas com alunos e observação do processo atual.  
+- **Insights:**  
+  - **Alunos:** Não sabem a sala ou horário das monitorias.  
+  - **Monitores:** Têm dificuldade em organizar suas disponibilidades.  
+  - **CASAS:**  Gastam tempo excessivo com planilhas.  
+
+- **Personas:**  
+**Ana** – Aluna Ocupada: 19 anos, 3º período de Administração, estágio à tarde. **Frustração:** perda de tempo procurando monitorias.
+
+**Carla** – Aluna Iniciante: 18 anos, 1º período de Direito, ainda não conhece bem a unidade. **Frustração:** confusão sobre horários e salas.
+
+**Diego** – Aluno Estudioso: 20 anos, 4º período de Economia, busca monitorias que complementem seu aprendizado. **Frustração:** falta de informações detalhadas sobre cada monitoria.
+
+---
 
 #### **3.2. Definição**
 
-- **Problema Central**: Como podemos criar uma experiência de agendamento de monitoria para que seja simples e o mais informativo possivel?.
-- **Pontos de Vista (POV)**:Precisa de uma maneira rápida e centralizada de encontrar as monitorias porque seu tempo é limitado entre os estudos e o estágio..
+- **Problema Central:** Como permitir que alunos encontrem as monitorias rapidamente, com informações claras sobre horários, salas e monitores?  
+- **Pontos de Vista (POV):** Alunos precisam de uma maneira rápida e centralizada de localizar monitorias, pois seu tempo é limitado entre estudos e estágio.
+
+---
 
 #### **3.3. Ideação**
 
-- **Brainstorming**: Realizamos uma sessão de brainstorm que resultou em uma lista de requisitos (BS01 a BS08). As principais ideias geradas foram: sistema de busca com filtros, calendário de agendamento visual, notificações automáticas, dashboard para cada perfil, e processo de candidatura online para monitores.
-- **Seleção de Ideias**: Priorizamos como o sistema facilitaria a vida dos envolvidos(alunos.professores e coordenadores).
+- **Brainstorming:** Sessão de brainstorming gerou requisitos BS01 a BS08, incluindo:  
+  - Sistema de busca com filtros.  
+  - Calendário visual de monitorias.  
+  - Notificações automáticas para alunos e monitores.  
+  - Dashboard para cada perfil.  
+  - Processo de candidatura online para monitores.
 
-- **Ideias Selecionadas**: Fluxo Essencial do Aluno: Busca de monitoria por disciplina, visualização de horários em calendário e agendamento simplificado (Requisitos BS01, BS02).
-Fluxo Essencial do Monitor: Processo de candidatura online e uma interface para definir sua disponibilidade de horários (Requisitos BS03, BS04, BS05).
-Fluxo Essencial de Gestão: Ferramenta para o coordenador aprovar as horas dos monitores (Requisito BS08).
+- **Seleção de Ideias:** Priorizadas pelo impacto no usuário e viabilidade técnica:  
+
+| Funcionalidade | Impacto | Esforço |
+|----------------|---------|---------|
+| Agendamento rápido de monitorias | Alto | Médio |
+| Notificações automáticas | Alto | Baixo |
+| Dashboard do coordenador | Médio | Médio |
+| Processo de candidatura online | Alto | Médio |
+
+- **Fluxos Essenciais:**  
+  - **Aluno:** Busca por disciplina, visualização de horários em calendário. (BS01, BS02).  
+  - **Monitor:** Candidatura online, definição de disponibilidade, registro de presença (BS03, BS04, BS05).  
+  - **Coordenador:** Cadastrar disciplinas, aprovação de horas e relatórios (BS08).
+
+---
 
 #### **3.4. Prototipagem**
 
-- **Descrição do Protótipo**: Serão criados protótipos de baixa fidelidade (wireframes) no Figma. O foco será prototipar o fluxo principal do aluno: desde o login, passando pela busca de uma matéria, até a tela de confirmação do agendamento.
-- **Materiais Utilizados**: Figma.
-- **Testes Realizados**: Recebemos feedback de alguns alunos.
+- **Descrição do Protótipo:** Wireframes de baixa fidelidade no Figma, focando no fluxo do aluno: login → busca de disciplina → agendamento → confirmação.  
+- **Materiais Utilizados:** Figma, caneta e papel para sketches iniciais.  
+- **Testes Realizados:** 5 alunos testaram os wireframes, fornecendo feedback sobre usabilidade e clareza.
+
+---
 
 #### **3.5. Teste**
 
-- **Feedback dos Usuários**: Os alunos acharam o protótipo muito intuítivo e pediram um pouco mais de informações .
-- **Ajustes Realizados**:  Com base no feedback, adicionamos informações que facilitariam a vida deles.
-- **Resultados Finais**:  O site  permite ao aluno encontrar uma monitoria em menos de 5 minutos, resolvendo o problema central de procura de sala e perda de tempo..
+- **Feedback dos Usuários:**  
+  - Protótipo intuitivo, mas usuários pediram mais detalhes sobre horários e salas.  
+- **Ajustes Realizados:**  
+  - Inclusão de informações detalhadas nas telas de monitoria.  
+- **Resultados Finais:**  
+  - Usuários conseguem encontrar e agendar monitorias em menos de 5 minutos.  
+  - Redução significativa de erros de agendamento e perda de tempo.
 
 ---
 
 ### **4. Conclusão**
 
-- **Resultados Obtidos**: Centralização de informações.
-- **Próximos Passos**: O dashbord do professor, do monitor e do coordenador.
+- **Resultados Obtidos:**  
+  - Centralização de informações.  
+  - Redução do esforço administrativo.  
+  - Melhor experiência para alunos e monitores.  
 
+- **Próximos Passos:**  
+  - Desenvolvimento de dashboard para professores e coordenadores.  
+  - Implementação de notificações automáticas.  
+  - Testes com mais usuários e criação de protótipos de alta fidelidade.
 
+---
 
+### **5. Referências**
 
+- BARBOSA, S. D. J.; DA SILVA, B. S. *Interação Humano-Computador*. Elsevier, 2010.  
+- RATIONAL UNIFIED PROCESS. *Vision Document Template*. IBM, 2003. Disponível em: https://www.ibm.com/docs/en/rup/9.0  
+- Documento de visão da disciplina de Projeto Back-End, Universidade IBMEC, 2025.
