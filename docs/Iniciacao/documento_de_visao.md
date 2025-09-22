@@ -1,78 +1,79 @@
 ---
 id: documento_de_visao
+
 title: Documento de Visão
 ---
 ## Introdução
+O propósito deste documento é fornecer uma visão geral sobre o projeto. Sendo assim, nesse documento serão descritas de maneira resumida as principais funcionalidades, usabilidades, o problema que será abordado e os objetivos da equipe.
 
-<p align = "justify">
-O propósito deste documento é fornecer uma visão geral sobre o projeto que será realizado na disciplina Arquitetura e Desenho de Software 2020/1, na Universidade de Brasília. Sendo assim, Nesse documento serão descritas de maneira resumida as principais funcionalidades, usabilidades, o problema que será abordado e os objetivos da equipe.
-</p>
 
 ## Descrição do Problema 
-
-<p align = "justify">
-Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
-</p>
+Com o aumento da demanda, a equipe CASAS vem enfrentando dificuldades em gerenciar e organizar inscrições, salas, horários, relatórios e a comunicação entre os atores envolvidos no processo de monitoria.
 
 ### Problema
-
-Dificuldade em gerenciar e organizar...
+Dificuldade em gerenciar e organizar inscrições, salas, horários, relatórios e comunicação entre os usuários do processo de monitoria
 
 ### Impactados
 
-Alunos do IBMEC
+Alunos (não encontram as salas de monitoria facilmente).
+
+Monitores (organização de horários).
+
+Professores (indicação e acompanhamento).
+
+Coordenadores (aprovação de relatórios e visão geral).
+
+Equipe CASAS (processos administrativos).
 
 ### Consequência
 
-A criação de um site para gerenciar as monitorias
+Os alunos perdem um tempo desnecessário procurando as salas.
+
+A equipe casas tem um trabalho administrativo excessivo (muitas planilhas).
 
 ### Solução
 
-Utilizar a aplicação que será desenvolvida visando resolver...
+Criar uma aplicação web que centraliza o processo de gestão de monitorias, trazendo automação de processos administrativos, e localizando os alunos. 
 
 ## Objetivos
+Centralizar informações de monitorias.
 
-<p align = "justify">
-O objetivo da equipe de desenvolvimento é fornecer...
-</p>
+Melhorar a comunicação entre alunos, monitores, professores e coordenadores.
+
+Automatizar processos burocráticos (candidatura, relatórios, aprovações).
 
 ## Descrição do Usuário 
 
-<p align = "justify">
-Os usuários serão....
-</p>
+Aluno: procura, envia atividades, participa das monitorias e  avalia monitores.
 
-## Recursos do produto
+Monitor: Se candidata, define disponibilidade e registra presença.
 
-### Conta
+Professor: recomenda alunos, acompanha monitorias e gerencia/edita a escala de horários (se necessário).
 
-<p align = "justify">
-O cliente poderá realizar seu cadastro....
-</p>
+Coordenador: Adiciona disciplinas, define escalas de horários e aprova horas complementares.
 
-### Loja
+## Recursos do Produto
 
-<p align = "justify">
-O cliente poderá cadastrar uma loja única....
-</p>
+### Gerenciamento de Conta
+Cada usuário (Aluno, Monitor, Professor, Coordenador) terá um cadastro individual com login e senha. A autenticação permitirá acesso apenas às funcionalidades correspondentes ao seu perfil.
 
-### Produto
+### Gerenciamento de Monitorias
+O sistema permitirá visualizar todas as informações relacionadas às monitorias: disciplinas, horários, salas e monitores responsáveis. Os alunos poderão se inscrever diretamente.
 
-<p align = "justify">
-O cliente poderá cadastrar....
-</p>
+### Gestão de Monitores
+ O monitor poderá se candidatar a vagas de monitoria, definir disponibilidade de horários, registrar presença e notificar ausência. O sistema também validará os requisitos de CR para aprovação da candidatura.
 
-### Pesquisa sobre Lojas
+### Indicação de Professores
+ Professores poderão recomendar alunos para vagas de monitoria por meio de um formulário digital, enviando a indicação ao coordenador. 
 
-<p align = "justify">
-O cliente poderá pesquisar...
-</p>
+### Dashboard do Coordenador
+ O coordenador terá acesso a um painel de controle com visão geral das disciplinas, escalas de horário, relatórios de horas dos monitores e estatísticas de participação.
 
-## Restrições
+### Notificações Automáticas
+O sistema enviará lembretes para alunos e monitores 24h e 1h antes de cada monitoria agendada, a fim de reduzir faltas e esquecimentos. 
 
-<p align = "justify">
-A aplicação não será responsável...
-</p>
+### Relatórios e Estatísticas
+O sistema fornecerá relatórios para coordenadores e professores, com dados sobre frequência dos alunos, desempenho dos monitores e indicadores de efetividade das monitorias.
 
 ## Referências Bibliográficas
 
