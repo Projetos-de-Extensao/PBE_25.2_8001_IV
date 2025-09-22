@@ -34,14 +34,14 @@ title: Design Thinking
 #### **3.2. Definição**
 
 - **Problema Central**: Como podemos criar uma experiência de agendamento de monitoria para que seja simples e o mais informativo possivel?.
-- **Pontos de Vista (POV)**:Precisa de uma maneira rápida e centralizada de encontrar e agendar monitorias porque seu tempo é limitado entre os estudos e o estágio..
+- **Pontos de Vista (POV)**:Precisa de uma maneira rápida e centralizada de encontrar as monitorias porque seu tempo é limitado entre os estudos e o estágio..
 
 #### **3.3. Ideação**
 
 - **Brainstorming**: Realizamos uma sessão de brainstorm que resultou em uma lista de requisitos (BS01 a BS08). As principais ideias geradas foram: sistema de busca com filtros, calendário de agendamento visual, notificações automáticas, dashboard para cada perfil, e processo de candidatura online para monitores.
 - **Seleção de Ideias**: Priorizamos como o sistema facilitaria a vida dos envolvidos(alunos.professores e coordenadores).
 
-- **Ideias Selecionadas**: Fluxo Essencial do Aluno: Busca de monitoria por matéria, visualização de horários em calendário e agendamento simplificado (Requisitos BS01, BS02).
+- **Ideias Selecionadas**: Fluxo Essencial do Aluno: Busca de monitoria por disciplina, visualização de horários em calendário e agendamento simplificado (Requisitos BS01, BS02).
 Fluxo Essencial do Monitor: Processo de candidatura online e uma interface para definir sua disponibilidade de horários (Requisitos BS03, BS04, BS05).
 Fluxo Essencial de Gestão: Ferramenta para o coordenador aprovar as horas dos monitores (Requisito BS08).
 
@@ -55,7 +55,7 @@ Fluxo Essencial de Gestão: Ferramenta para o coordenador aprovar as horas dos m
 
 - **Feedback dos Usuários**: Os alunos acharam o protótipo muito intuítivo e pediram um pouco mais de informações .
 - **Ajustes Realizados**:  Com base no feedback, adicionamos informações que facilitariam a vida deles.
-- **Resultados Finais**:  O site  permite ao aluno encontrar e agendar uma monitoria em menos de 5 minutos, resolvendo o problema central de incerteza e perda de tempo..
+- **Resultados Finais**:  O site  permite ao aluno encontrar uma monitoria em menos de 5 minutos, resolvendo o problema central de procura de sala e perda de tempo..
 
 ---
 
