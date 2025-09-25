@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Consulta SQL - Plataforma Casa</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #222; color: #eee; }
+        h2 { margin-top: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th, td { border: 1px solid #444; padding: 6px 10px; }
+        th { background: #333; }
+        tr:nth-child(even) { background: #2a2a2a; }
+    </style>
+</head>
+<body>
+    <h1>Consulta SQL - Plataforma Casa</h1>
+
+    <h2>Usuários</h2>
+    <table>
+        <tr><th>ID</th><th>Nome</th><th>Email</th><th>Tipo</th></tr>
+        {% for usuario in usuarios %}
+        <tr>
+            <td>{{ usuario.id }}</td>
+            <td>{{ usuario.nome }}</td>
+            <td>{{ usuario.email }}</td>
+            <td>{{ usuario.tipo_usuario }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Nenhum usuário encontrado.</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Alunos</h2>
+    <table>
+        <tr><th>ID</th><th>Nome</th><th>Email</th><th>Curso</th></tr>
+        {% for aluno in alunos %}
+        <tr>
+            <td>{{ aluno.id }}</td>
+            <td>{{ aluno.nome }}</td>
+            <td>{{ aluno.email }}</td>
+            <td>{{ aluno.curso }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Nenhum aluno encontrado.</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Cursos</h2>
+    <table>
+        <tr><th>ID</th><th>Nome</th></tr>
+        {% for curso in cursos %}
+        <tr>
+            <td>{{ curso.id }}</td>
+            <td>{{ curso.nome }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="2">Nenhum curso encontrado.</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Funcionários</h2>
+    <table>
+        <tr><th>ID</th><th>Nome</th><th>Email</th><th>Matrícula</th></tr>
+        {% for funcionario in funcionarios %}
+        <tr>
+            <td>{{ funcionario.id }}</td>
+            <td>{{ funcionario.nome }}</td>
+            <td>{{ funcionario.email }}</td>
+            <td>{{ funcionario.matricula }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Nenhum funcionário encontrado.</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Inscrições</h2>
+    <table>
+        <tr><th>ID</th><th>Aluno</th><th>Vaga</th><th>Status</th></tr>
+        {% for inscricao in inscricoes %}
+        <tr>
+            <td>{{ inscricao.id }}</td>
+            <td>{{ inscricao.aluno }}</td>
+            <td>{{ inscricao.vaga }}</td>
+            <td>{{ inscricao.status }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Nenhuma inscrição encontrada.</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Turmas</h2>
+    <table>
+        <tr><th>ID</th><th>Nome</th><th>Monitor</th><th>Curso</th></tr>
+        {% for turma in turmas %}
+        <tr>
+            <td>{{ turma.id }}</td>
+            <td>{{ turma.nome }}</td>
+            <td>{{ turma.monitor }}</td>
+            <td>{{ turma.curso }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Nenhuma turma encontrada.</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Participações em Monitoria</h2>
+    <table>
+        <tr><th>ID</th><th>Aluno</th><th>Turma</th><th>AP1</th><th>AP2</th><th>CR</th></tr>
+        {% for p in participacoes_monitoria %}
+        <tr>
+            <td>{{ p.id }}</td>
+            <td>{{ p.aluno }}</td>
+            <td>{{ p.turma }}</td>
+            <td>{{ p.ap1 }}</td>
+            <td>{{ p.ap2 }}</td>
+            <td>{{ p.cr }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">Nenhuma participação encontrada.</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Presenças</h2>
+    <table>
+        <tr><th>ID</th><th>Aluno</th><th>Turma</th><th>Data</th><th>Presente</th></tr>
+        {% for presenca in presencas %}
+        <tr>
+            <td>{{ presenca.id }}</td>
+            <td>{{ presenca.aluno }}</td>
+            <td>{{ presenca.turma }}</td>
+            <td>{{ presenca.data }}</td>
+            <td>{{ presenca.presente|yesno:"Sim,Não" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">Nenhuma presença encontrada.</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Salas</h2>
+    <table>
+        <tr><th>ID</th><th>Número</th></tr>
+        {% for sala in salas %}
+        <tr>
+            <td>{{ sala.id }}</td>
+            <td>{{ sala.numero }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="2">Nenhuma sala encontrada.</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Tipos de Usuário</h2>
+    <table>
+        <tr><th>ID</th><th>Tipo</th></tr>
+        {% for tipo in tipos_usuario %}
+        <tr>
+            <td>{{ tipo.id }}</td>
+            <td>{{ tipo.tipo }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="2">Nenhum tipo encontrado.</td></tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
