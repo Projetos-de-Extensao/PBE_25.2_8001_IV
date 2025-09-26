@@ -1,0 +1,142 @@
+@startuml Arquitetura de Componentes - Gestão de Monitoria
+
+!theme cerulean-outline
+title Arquitetura de Componentes Detalhada
+
+skinparam backgroundColor #ffffff
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+
+package "Camada de Apresentação" {
+  package "React Frontend" {
+    [Dashboard] as Dashboard
+    [Autenticação] as AuthUI
+    [Gestão Usuários] as UserMgmt
+    [Agendamentos] as Schedule
+    [Relatórios] as Reports
+    [Notificações] as NotifyUI
+  }
+  
+  package "Componentes Compartilhados" {
+    [Layout Base] as Layout
+    [Formulários] as Forms
+    [Tabelas] as Tables
+    [Modais] as Modals
+    [Gráficos] as Charts
+  }
+}
+
+package "Camada de Serviços" {
+  package "API Gateway" {
+    [Roteamento] as Router
+    [Autenticação JWT] as JWTAuth
+    [Rate Limiting] as RateLimit
+    [Logging] as APILogging
+  }
+  
+  package "Serviços de Negócio" {
+    [Serviço Usuários] as UserService
+    [Serviço Monitorias] as MonitoringService
+    [Serviço Agendamentos] as ScheduleService
+    [Serviço Relatórios] as ReportService
+    [Serviço Notificações] as NotifyService
+  }
+}
+
+package "Camada de Dados" {
+  package "Django ORM" {
+    [Modelo Usuário] as UserModel
+    [Modelo Monitoria] as MonitorModel
+    [Modelo Agendamento] as ScheduleModel
+    [Modelo Relatório] as ReportModel
+  }
+  
+  package "Repositórios" {
+    [User Repository] as UserRepo
+    [Monitor Repository] as MonitorRepo
+    [Schedule Repository] as ScheduleRepo
+    [Report Repository] as ReportRepo
+  }
+}
+
+package "Camada de Persistência" {
+  database "PostgreSQL" {
+    [Tabela Users] as UsersTable
+    [Tabela Monitorings] as MonitorTable
+    [Tabela Schedules] as SchedulesTable
+    [Tabela Reports] as ReportsTable
+  }
+  
+  database "Redis Cache" {
+    [Session Cache] as SessionCache
+    [Query Cache] as QueryCache
+    [Rate Limit Cache] as RLCache
+  }
+}
+
+package "Serviços Externos" {
+  [SMTP Server] as SMTP
+  [File Storage (AWS S3)] as S3
+  [Push Notifications] as PushNotify
+}
+
+' Conexões da Camada de Apresentação
+Dashboard --> Layout
+AuthUI --> Forms
+UserMgmt --> Tables
+Schedule --> Modals
+Reports --> Charts
+NotifyUI --> Layout
+
+' Conexões com API Gateway
+Dashboard --> Router
+AuthUI --> JWTAuth
+UserMgmt --> Router
+Schedule --> Router
+Reports --> Router
+
+Router --> RateLimit
+RateLimit --> APILogging
+
+' Conexões com Serviços de Negócio
+Router --> UserService
+Router --> MonitoringService  
+Router --> ScheduleService
+Router --> ReportService
+Router --> NotifyService
+
+' Conexões com Modelos
+UserService --> UserModel
+MonitoringService --> MonitorModel
+ScheduleService --> ScheduleModel
+ReportService --> ReportModel
+
+' Conexões com Repositórios
+UserModel --> UserRepo
+MonitorModel --> MonitorRepo
+ScheduleModel --> ScheduleRepo
+ReportModel --> ReportRepo
+
+' Conexões com Banco de Dados
+UserRepo --> UsersTable
+MonitorRepo --> MonitorTable
+ScheduleRepo --> SchedulesTable
+ReportRepo --> ReportsTable
+
+' Conexões com Cache
+JWTAuth --> SessionCache
+Router --> QueryCache
+RateLimit --> RLCache
+
+' Conexões com Serviços Externos
+NotifyService --> SMTP
+ReportService --> S3
+NotifyService --> PushNotify
+
+' Notas explicativas
+note right of Dashboard : Interface principal\ncom widgets dinâmicos
+note right of JWTAuth : Autenticação stateless\ncom refresh tokens
+note right of PostgreSQL : ACID compliance\ncom índices otimizados
+note right of Redis : TTL automático\ne eviction policies
+
+@enduml

@@ -1,0 +1,156 @@
+@startuml Fluxo de Gestão de Monitoria
+
+!theme mars
+title Fluxo Completo de Gestão de Monitoria
+
+skinparam backgroundColor #fafafa
+skinparam actorStyle awesome
+
+actor "Estudante" as Student
+actor "Monitor" as Monitor
+actor "Professor" as Teacher
+participant "Frontend React" as Frontend
+participant "API REST" as API
+participant "Monitor Service" as MonitorService
+participant "Schedule Service" as ScheduleService
+participant "Notification Service" as NotifyService
+database "PostgreSQL" as DB
+queue "Celery Queue" as Queue
+
+== Cadastro de Monitoria ==
+Teacher -> Frontend : Acessa criação de monitoria
+Frontend -> API : GET /api/subjects/
+API -> DB : Lista disciplinas
+DB -> API : Retorna disciplinas
+API -> Frontend : Lista de disciplinas
+Frontend -> Teacher : Exibe formulário
+
+Teacher -> Frontend : Preenche dados da monitoria
+note right : Disciplina, horários,\ndescrição, pré-requisitos
+Frontend -> API : POST /api/monitorings/
+API -> MonitorService : Cria nova monitoria
+MonitorService -> DB : INSERT INTO monitorings
+DB -> MonitorService : Confirma criação
+MonitorService -> Queue : Envia notificação
+MonitorService -> API : Monitoria criada
+API -> Frontend : 201 Created
+Frontend -> Teacher : Confirma sucesso
+
+Queue -> NotifyService : Processa notificação
+NotifyService -> DB : Lista estudantes elegíveis
+NotifyService -> NotifyService : Envia email/push
+NotifyService -> DB : Log de notificação
+
+== Inscrição de Monitor ==
+Monitor -> Frontend : Visualiza monitorias disponíveis
+Frontend -> API : GET /api/monitorings/available/
+API -> MonitorService : Lista monitorias abertas
+MonitorService -> DB : SELECT com filtros
+DB -> MonitorService : Retorna monitorias
+MonitorService -> API : Lista filtrada
+API -> Frontend : Monitorias disponíveis
+Frontend -> Monitor : Exibe opções
+
+Monitor -> Frontend : Candidata-se à monitoria
+Frontend -> API : POST /api/monitorings/{id}/apply/
+API -> MonitorService : Processa candidatura
+MonitorService -> DB : INSERT INTO applications
+MonitorService -> Queue : Notifica professor
+MonitorService -> API : Candidatura enviada
+API -> Frontend : 201 Created
+Frontend -> Monitor : Confirma candidatura
+
+== Seleção de Monitor ==
+Teacher -> Frontend : Visualiza candidatos
+Frontend -> API : GET /api/monitorings/{id}/applications/
+API -> MonitorService : Lista candidatos
+MonitorService -> DB : SELECT applications with user data
+DB -> MonitorService : Dados dos candidatos
+MonitorService -> API : Lista de candidatos
+API -> Frontend : Candidatos e currículos
+Frontend -> Teacher : Exibe candidatos
+
+Teacher -> Frontend : Seleciona monitor
+Frontend -> API : PUT /api/applications/{id}/approve/
+API -> MonitorService : Aprova candidato
+MonitorService -> DB : UPDATE application status
+MonitorService -> DB : UPDATE monitoring with monitor
+MonitorService -> Queue : Notifica aprovação/rejeição
+MonitorService -> API : Monitor selecionado
+API -> Frontend : 200 Updated
+Frontend -> Teacher : Confirma seleção
+
+== Agendamento de Sessão ==
+Student -> Frontend : Busca monitorias disponíveis
+Frontend -> API : GET /api/monitorings/search?subject=X
+API -> MonitorService : Busca por filtros
+MonitorService -> DB : SELECT com joins
+DB -> MonitorService : Monitorias encontradas
+MonitorService -> API : Resultados da busca
+API -> Frontend : Lista de monitorias
+Frontend -> Student : Exibe opções
+
+Student -> Frontend : Visualiza horários disponíveis
+Frontend -> API : GET /api/monitorings/{id}/schedule/
+API -> ScheduleService : Consulta agenda
+ScheduleService -> DB : SELECT available slots
+DB -> ScheduleService : Horários livres
+ScheduleService -> API : Slots disponíveis
+API -> Frontend : Agenda do monitor
+Frontend -> Student : Exibe calendário
+
+Student -> Frontend : Agenda sessão de monitoria
+note right : Seleciona data, hora\ne tipo (presencial/online)
+Frontend -> API : POST /api/sessions/
+API -> ScheduleService : Cria agendamento
+ScheduleService -> DB : INSERT INTO sessions
+ScheduleService -> Queue : Notifica monitor e estudante
+ScheduleService -> API : Sessão agendada
+API -> Frontend : 201 Created
+Frontend -> Student : Confirma agendamento
+
+== Condução da Sessão ==
+Monitor -> Frontend : Visualiza sessões do dia
+Frontend -> API : GET /api/sessions/today/
+API -> ScheduleService : Lista sessões
+ScheduleService -> DB : SELECT sessions for today
+DB -> ScheduleService : Sessões agendadas
+ScheduleService -> API : Lista de sessões
+API -> Frontend : Agenda do dia
+Frontend -> Monitor : Exibe cronograma
+
+Monitor -> Frontend : Inicia sessão
+Frontend -> API : PUT /api/sessions/{id}/start/
+API -> ScheduleService : Marca início
+ScheduleService -> DB : UPDATE session status
+ScheduleService -> API : Sessão iniciada
+API -> Frontend : 200 Updated
+Frontend -> Monitor : Sessão em andamento
+
+Monitor -> Frontend : Finaliza e avalia sessão
+note right : Presença, desempenho,\nobservações, próximos passos
+Frontend -> API : PUT /api/sessions/{id}/complete/
+API -> ScheduleService : Finaliza sessão
+ScheduleService -> DB : UPDATE com avaliação
+ScheduleService -> Queue : Gera relatório
+ScheduleService -> API : Sessão finalizada
+API -> Frontend : 200 Updated
+Frontend -> Monitor : Confirma finalização
+
+== Geração de Relatórios ==
+Queue -> NotifyService : Processa relatório
+NotifyService -> DB : Compila dados da sessão
+NotifyService -> NotifyService : Gera PDF/email
+NotifyService -> DB : Salva relatório
+NotifyService -> NotifyService : Envia para participantes
+
+Teacher -> Frontend : Acessa relatórios
+Frontend -> API : GET /api/reports/monitoring/{id}/
+API -> MonitorService : Consulta métricas
+MonitorService -> DB : SELECT com agregações
+DB -> MonitorService : Dados estatísticos
+MonitorService -> API : Relatório compilado
+API -> Frontend : Dados e gráficos
+Frontend -> Teacher : Dashboard de métricas
+
+@enduml

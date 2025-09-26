@@ -1,0 +1,135 @@
+@startuml Diagrama de Implantação - Gestão de Monitoria
+
+!theme spacelab
+title Diagrama de Implantação - Infraestrutura Cloud
+
+skinparam backgroundColor #f5f5f5
+skinparam nodeStyle rectangle
+
+cloud "AWS Cloud" {
+  
+  node "Application Load Balancer" as ALB {
+    [Load Balancer] as LB
+  }
+  
+  node "ECS Fargate Cluster" as ECS {
+    node "Frontend Container" as FrontendNode {
+      [React App] as ReactApp
+      [Nginx] as Nginx
+    }
+    
+    node "Backend Container 1" as Backend1 {
+      [Django App] as Django1
+      [Gunicorn] as Gunicorn1
+    }
+    
+    node "Backend Container 2" as Backend2 {
+      [Django App] as Django2
+      [Gunicorn] as Gunicorn2
+    }
+    
+    node "Worker Container" as WorkerNode {
+      [Celery Workers] as CeleryWorkers
+    }
+  }
+  
+  node "RDS PostgreSQL" as RDS {
+    database "PostgreSQL 14" as PostgresDB
+    database "Read Replica" as ReadReplica
+  }
+  
+  node "ElastiCache Redis" as ElastiCache {
+    database "Redis Cluster" as RedisCluster
+  }
+  
+  node "S3 Bucket" as S3 {
+    [Static Files] as StaticFiles
+    [Media Files] as MediaFiles
+    [Reports] as ReportsFiles
+  }
+  
+  node "CloudWatch" as CW {
+    [Logs] as Logs
+    [Metrics] as Metrics
+    [Alarms] as Alarms
+  }
+  
+  node "SES" as SES {
+    [Email Service] as EmailSvc
+  }
+  
+  node "Route 53" as R53 {
+    [DNS] as DNS
+  }
+}
+
+node "CI/CD Pipeline" as CICD {
+  [GitHub Actions] as GHA
+  [ECR Registry] as ECR
+  [Deployment Scripts] as Deploy
+}
+
+node "Monitoring & Observability" as Monitoring {
+  [Prometheus] as Prometheus
+  [Grafana] as Grafana
+  [Sentry] as Sentry
+}
+
+actor "Usuários" as Users
+
+' Conexões de rede
+Users --> R53 : HTTPS requests
+R53 --> ALB : Route traffic
+ALB --> LB : Distribute load
+
+LB --> Nginx : Static content
+LB --> Django1 : API requests
+LB --> Django2 : API requests
+
+' Conexões internas
+Nginx --> ReactApp : Serve React app
+Django1 --> Gunicorn1 : WSGI
+Django2 --> Gunicorn2 : WSGI
+
+' Conexões com dados
+Django1 --> PostgresDB : Read/Write
+Django2 --> ReadReplica : Read only
+Django1 --> RedisCluster : Cache/Sessions
+Django2 --> RedisCluster : Cache/Sessions
+
+CeleryWorkers --> PostgresDB : Background tasks
+CeleryWorkers --> RedisCluster : Task queue
+
+' Conexões com storage
+ReactApp --> StaticFiles : Load assets
+Django1 --> MediaFiles : Upload/Download
+CeleryWorkers --> ReportsFiles : Generate reports
+
+' Conexões com serviços
+CeleryWorkers --> EmailSvc : Send emails
+Django1 --> Logs : Application logs
+Django2 --> Logs : Application logs
+CeleryWorkers --> Metrics : Performance metrics
+
+' CI/CD conexões
+GHA --> ECR : Push images
+GHA --> Deploy : Deploy to ECS
+ECR --> ECS : Pull images
+
+' Monitoring conexões
+ECS --> Prometheus : Metrics
+Prometheus --> Grafana : Visualization
+Django1 --> Sentry : Error tracking
+Django2 --> Sentry : Error tracking
+
+' Especificações técnicas
+note right of ECS : Auto Scaling Group\n2-10 instances\nCPU/Memory targets
+note right of PostgresDB : Multi-AZ deployment\nAutomated backups\nEncryption at rest
+note right of RedisCluster : 3 nodes cluster\nFailover enabled\n1GB memory per node
+note right of LB : SSL termination\nHealth checks\nSticky sessions
+
+' Especificações de segurança
+note left of ALB : WAF enabled\nDDoS protection\nSSL/TLS 1.2+
+note left of RDS : VPC private subnet\nSecurity groups\nIAM authentication
+
+@enduml

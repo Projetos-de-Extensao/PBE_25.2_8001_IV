@@ -1,0 +1,280 @@
+@startuml Endpoints da API REST
+
+!theme carbon-gray
+title Mapeamento Completo dos Endpoints da API REST
+
+skinparam backgroundColor #161616
+skinparam class {
+    BackgroundColor #262626
+    BorderColor #525252
+    ArrowColor #0f62fe
+    FontColor #f4f4f4
+}
+
+package "Authentication API" {
+    class "/api/auth/" {
+        +POST /login/
+        +POST /logout/
+        +POST /refresh/
+        +POST /register/
+        +POST /password-reset/
+        +POST /password-reset-confirm/
+        +POST /change-password/
+        +GET /me/
+        --
+        Autenticação JWT
+        Registro de usuários
+        Recuperação de senha
+    }
+}
+
+package "Users API" {
+    class "/api/users/" {
+        +GET / (list)
+        +POST / (create)
+        +GET /{id}/ (retrieve)
+        +PUT /{id}/ (update)
+        +PATCH /{id}/ (partial_update)
+        +DELETE /{id}/ (destroy)
+        --
+        +GET /{id}/profile/
+        +PUT /{id}/profile/
+        +GET /{id}/monitorings/
+        +GET /{id}/applications/
+        +GET /{id}/sessions/
+        +GET /{id}/evaluations/
+        --
+        Gestão de usuários
+        Perfis e relacionamentos
+    }
+}
+
+package "Subjects API" {
+    class "/api/subjects/" {
+        +GET / (list)
+        +POST / (create)
+        +GET /{id}/ (retrieve)
+        +PUT /{id}/ (update)
+        +PATCH /{id}/ (partial_update)
+        +DELETE /{id}/ (destroy)
+        --
+        +GET /{id}/monitorings/
+        +GET /{id}/statistics/
+        --
+        Disciplinas do curso
+        Pré-requisitos
+    }
+}
+
+package "Monitoring API" {
+    class "/api/monitorings/" {
+        +GET / (list, filter, search)
+        +POST / (create)
+        +GET /{id}/ (retrieve)
+        +PUT /{id}/ (update)
+        +PATCH /{id}/ (partial_update)
+        +DELETE /{id}/ (destroy)
+        --
+        +POST /{id}/apply/
+        +GET /{id}/applications/
+        +PUT /{id}/applications/{app_id}/approve/
+        +PUT /{id}/applications/{app_id}/reject/
+        +GET /{id}/schedule/
+        +POST /{id}/schedule/
+        +GET /{id}/sessions/
+        +GET /{id}/statistics/
+        +GET /{id}/reports/
+        --
+        Gestão de monitorias
+        Candidaturas e seleção
+        Agendamento e relatórios
+    }
+}
+
+package "Sessions API" {
+    class "/api/sessions/" {
+        +GET / (list, filter)
+        +POST / (create)
+        +GET /{id}/ (retrieve)
+        +PUT /{id}/ (update)
+        +PATCH /{id}/ (partial_update)
+        +DELETE /{id}/ (destroy)
+        --
+        +POST /{id}/register/
+        +DELETE /{id}/unregister/
+        +PUT /{id}/start/
+        +PUT /{id}/end/
+        +PUT /{id}/cancel/
+        +GET /{id}/participants/
+        +POST /{id}/attendance/
+        +GET /{id}/evaluations/
+        +POST /{id}/evaluate/
+        --
+        +GET /today/
+        +GET /upcoming/
+        +GET /available/
+        --
+        Sessões de monitoria
+        Participação e avaliação
+        Controle de presença
+    }
+}
+
+package "Evaluations API" {
+    class "/api/evaluations/" {
+        +GET / (list, filter)
+        +POST / (create)
+        +GET /{id}/ (retrieve)
+        +PUT /{id}/ (update)
+        +PATCH /{id}/ (partial_update)
+        +DELETE /{id}/ (destroy)
+        --
+        +GET /student/{student_id}/
+        +GET /session/{session_id}/
+        +GET /monitoring/{monitoring_id}/
+        +GET /statistics/
+        --
+        Avaliações de desempenho
+        Feedback e notas
+    }
+}
+
+package "Reports API" {
+    class "/api/reports/" {
+        +GET / (list)
+        +POST / (create)
+        +GET /{id}/ (retrieve)
+        +DELETE /{id}/ (destroy)
+        --
+        +POST /generate/
+        +GET /{id}/download/
+        +POST /{id}/schedule/
+        +GET /templates/
+        --
+        +GET /monitoring/{id}/
+        +GET /student/{id}/
+        +GET /institutional/
+        +POST /custom/
+        --
+        Relatórios personalizados
+        Agendamento automático
+        Métricas e analytics
+    }
+}
+
+package "Notifications API" {
+    class "/api/notifications/" {
+        +GET / (list)
+        +GET /{id}/ (retrieve)
+        +PUT /{id}/read/
+        +PUT /mark-all-read/
+        +DELETE /{id}/ (destroy)
+        --
+        +GET /unread-count/
+        +POST /send/
+        +GET /preferences/
+        +PUT /preferences/
+        --
+        Sistema de notificações
+        Preferências do usuário
+    }
+}
+
+package "Analytics API" {
+    class "/api/analytics/" {
+        +GET /dashboard/
+        +GET /monitoring/{id}/metrics/
+        +GET /student/{id}/progress/
+        +GET /attendance/stats/
+        +GET /performance/trends/
+        --
+        +POST /custom-query/
+        +GET /export/{format}/
+        --
+        Métricas em tempo real
+        Análises customizadas
+    }
+}
+
+package "Files API" {
+    class "/api/files/" {
+        +POST /upload/
+        +GET /{id}/
+        +DELETE /{id}/
+        --
+        +POST /bulk-upload/
+        +GET /presigned-url/
+        --
+        Upload de arquivos
+        Armazenamento S3
+    }
+}
+
+' Relacionamentos e dependências entre APIs
+"/api/auth/" --> "/api/users/" : Authentication
+"/api/users/" --> "/api/monitorings/" : Ownership
+"/api/subjects/" --> "/api/monitorings/" : Subject relation
+"/api/monitorings/" --> "/api/sessions/" : Sessions
+"/api/sessions/" --> "/api/evaluations/" : Performance
+"/api/sessions/" --> "/api/notifications/" : Alerts
+"/api/evaluations/" --> "/api/reports/" : Data source
+"/api/analytics/" --> "/api/reports/" : Metrics
+"/api/files/" --> "/api/users/" : Profile images
+"/api/files/" --> "/api/reports/" : Report files
+
+' Notas sobre autenticação
+note top of "/api/auth/" : JWT Authentication\nAccess token: 15min\nRefresh token: 7 days
+
+' Notas sobre permissões
+note right of "/api/users/" : Permissions:\n- Admin: full access\n- Professor: read students\n- Student: read own data
+
+note right of "/api/monitorings/" : Permissions:\n- Professor: CRUD own\n- Student: read + apply\n- Monitor: update assigned
+
+note right of "/api/sessions/" : Permissions:\n- Monitor: manage sessions\n- Student: register/participate\n- Professor: view reports
+
+' Notas sobre filtros e busca
+note bottom of "/api/monitorings/" : Filters:\n- subject, professor, status\n- date_range, location\nSearch: title, description
+
+note bottom of "/api/sessions/" : Filters:\n- date_range, status\n- monitoring, participant\nSearch: notes, location
+
+' Notas sobre formatos de resposta
+note left of "/api/reports/" : Response formats:\n- JSON (default)\n- PDF download\n- Excel export\n- CSV export
+
+' Notas sobre rate limiting
+note as RL
+  Rate Limiting:
+  - Authentication: 5 req/min
+  - General API: 100 req/min
+  - File upload: 10 req/min
+  - Reports: 20 req/hour
+end note
+
+RL .. "/api/auth/"
+RL .. "/api/files/"
+RL .. "/api/reports/"
+
+' Notas sobre paginação
+note as PG
+  Pagination (all list endpoints):
+  - page_size: 20 (default)
+  - max_page_size: 100
+  - Response includes:
+    * count, next, previous
+    * results array
+end note
+
+PG .. "/api/users/"
+PG .. "/api/monitorings/"
+PG .. "/api/sessions/"
+
+' Notas sobre versionamento
+note as VS
+  API Versioning:
+  - Header: Accept: application/json; version=1.0
+  - URL: /api/v1/ (current)
+  - Backward compatibility: 2 versions
+end note
+
+VS .. "/api/auth/"
+
+@enduml

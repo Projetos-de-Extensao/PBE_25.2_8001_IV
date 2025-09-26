@@ -1,0 +1,301 @@
+@startuml Componentes React - Frontend
+
+!theme cyborg-outline
+title Arquitetura de Componentes React - Frontend
+
+skinparam backgroundColor #0d1117
+skinparam component {
+    BackgroundColor #21262d
+    BorderColor #30363d
+    ArrowColor #58a6ff
+    FontColor #f0f6fc
+}
+skinparam package {
+    BackgroundColor #161b22
+    BorderColor #30363d
+    FontColor #f0f6fc
+}
+
+package "src" {
+    
+    package "components" {
+        package "layout" {
+            [Header] as HeaderComp
+            [Sidebar] as SidebarComp
+            [Footer] as FooterComp
+            [Navigation] as NavComp
+            [Breadcrumb] as BreadcrumbComp
+        }
+        
+        package "ui" {
+            [Button] as ButtonComp
+            [Input] as InputComp
+            [Modal] as ModalComp
+            [Table] as TableComp
+            [Card] as CardComp
+            [Form] as FormComp
+            [Loading] as LoadingComp
+            [Alert] as AlertComp
+        }
+        
+        package "charts" {
+            [BarChart] as BarChartComp
+            [LineChart] as LineChartComp
+            [PieChart] as PieChartComp
+            [Dashboard] as DashboardComp
+        }
+        
+        package "monitoring" {
+            [MonitoringList] as MonitoringListComp
+            [MonitoringCard] as MonitoringCardComp
+            [MonitoringForm] as MonitoringFormComp
+            [ApplicationForm] as ApplicationFormComp
+            [ApplicationsList] as ApplicationsListComp
+        }
+        
+        package "sessions" {
+            [SessionCalendar] as SessionCalendarComp
+            [SessionCard] as SessionCardComp
+            [SessionForm] as SessionFormComp
+            [ParticipantsList] as ParticipantsListComp
+            [AttendanceTracker] as AttendanceTrackerComp
+        }
+        
+        package "users" {
+            [UserProfile] as UserProfileComp
+            [UserList] as UserListComp
+            [UserForm] as UserFormComp
+            [RoleSelector] as RoleSelectorComp
+        }
+        
+        package "reports" {
+            [ReportBuilder] as ReportBuilderComp
+            [ReportViewer] as ReportViewerComp
+            [ReportsList] as ReportsListComp
+            [ExportOptions] as ExportOptionsComp
+        }
+    }
+    
+    package "pages" {
+        [Login] as LoginPage
+        [Dashboard] as DashboardPage
+        [Monitoring] as MonitoringPage
+        [Sessions] as SessionsPage
+        [Reports] as ReportsPage
+        [Profile] as ProfilePage
+        [Admin] as AdminPage
+        [NotFound] as NotFoundPage
+    }
+    
+    package "hooks" {
+        [useAuth] as useAuthHook
+        [useApi] as useApiHook
+        [useLocalStorage] as useLocalStorageHook
+        [useWebSocket] as useWebSocketHook
+        [usePermissions] as usePermissionsHook
+        [usePagination] as usePaginationHook
+    }
+    
+    package "contexts" {
+        [AuthContext] as AuthContextComp
+        [ThemeContext] as ThemeContextComp
+        [NotificationContext] as NotificationContextComp
+        [WebSocketContext] as WebSocketContextComp
+    }
+    
+    package "services" {
+        [ApiService] as ApiServiceComp
+        [AuthService] as AuthServiceComp
+        [WebSocketService] as WebSocketServiceComp
+        [StorageService] as StorageServiceComp
+        [NotificationService] as NotificationServiceComp
+    }
+    
+    package "store" {
+        package "slices" {
+            [authSlice] as AuthSlice
+            [monitoringSlice] as MonitoringSlice
+            [sessionsSlice] as SessionsSlice
+            [reportsSlice] as ReportsSlice
+            [uiSlice] as UISlice
+        }
+        
+        [store] as Store
+        [middleware] as Middleware
+    }
+    
+    package "utils" {
+        [validators] as Validators
+        [formatters] as Formatters
+        [constants] as Constants
+        [helpers] as Helpers
+        [dateUtils] as DateUtils
+    }
+    
+    package "types" {
+        [User] as UserType
+        [Monitoring] as MonitoringType
+        [Session] as SessionType
+        [Report] as ReportType
+        [ApiResponse] as ApiResponseType
+    }
+}
+
+' App principal
+[App] as MainApp
+
+' Roteamento
+[Router] as AppRouter
+
+' Relacionamentos principais
+MainApp --> AppRouter
+MainApp --> Store
+MainApp --> AuthContextComp
+MainApp --> ThemeContextComp
+MainApp --> NotificationContextComp
+MainApp --> WebSocketContextComp
+
+' Pages e Router
+AppRouter --> LoginPage
+AppRouter --> DashboardPage
+AppRouter --> MonitoringPage
+AppRouter --> SessionsPage
+AppRouter --> ReportsPage
+AppRouter --> ProfilePage
+AppRouter --> AdminPage
+AppRouter --> NotFoundPage
+
+' Layout Components
+DashboardPage --> HeaderComp
+DashboardPage --> SidebarComp
+DashboardPage --> FooterComp
+DashboardPage --> BreadcrumbComp
+
+' Dashboard específico
+DashboardPage --> DashboardComp
+DashboardPage --> CardComp
+DashboardComp --> BarChartComp
+DashboardComp --> LineChartComp
+DashboardComp --> PieChartComp
+
+' Monitoring Page
+MonitoringPage --> MonitoringListComp
+MonitoringPage --> MonitoringFormComp
+MonitoringListComp --> MonitoringCardComp
+MonitoringListComp --> TableComp
+MonitoringFormComp --> FormComp
+MonitoringFormComp --> ApplicationFormComp
+MonitoringPage --> ApplicationsListComp
+
+' Sessions Page
+SessionsPage --> SessionCalendarComp
+SessionsPage --> SessionFormComp
+SessionsPage --> ParticipantsListComp
+SessionCalendarComp --> SessionCardComp
+SessionsPage --> AttendanceTrackerComp
+
+' Reports Page
+ReportsPage --> ReportBuilderComp
+ReportsPage --> ReportViewerComp
+ReportsPage --> ReportsListComp
+ReportViewerComp --> ExportOptionsComp
+ReportViewerComp --> BarChartComp
+ReportViewerComp --> LineChartComp
+
+' Profile Page
+ProfilePage --> UserProfileComp
+ProfilePage --> UserFormComp
+
+' Admin Page
+AdminPage --> UserListComp
+AdminPage --> RoleSelectorComp
+UserListComp --> TableComp
+UserListComp --> ModalComp
+
+' UI Components utilizados em várias páginas
+MonitoringFormComp --> ButtonComp
+MonitoringFormComp --> InputComp
+SessionFormComp --> ButtonComp
+SessionFormComp --> InputComp
+UserFormComp --> ButtonComp
+UserFormComp --> InputComp
+
+' Hooks usage
+LoginPage --> useAuthHook
+DashboardPage --> useApiHook
+MonitoringPage --> useApiHook
+MonitoringPage --> usePaginationHook
+SessionsPage --> useWebSocketHook
+ReportsPage --> useApiHook
+ProfilePage --> useLocalStorageHook
+AdminPage --> usePermissionsHook
+
+' Context usage
+useAuthHook --> AuthContextComp
+LoginPage --> AuthContextComp
+HeaderComp --> ThemeContextComp
+HeaderComp --> NotificationContextComp
+SessionsPage --> WebSocketContextComp
+
+' Services
+useAuthHook --> AuthServiceComp
+useApiHook --> ApiServiceComp
+useWebSocketHook --> WebSocketServiceComp
+useLocalStorageHook --> StorageServiceComp
+NotificationContextComp --> NotificationServiceComp
+
+' Store connections
+AuthContextComp --> AuthSlice
+MonitoringPage --> MonitoringSlice
+SessionsPage --> SessionsSlice
+ReportsPage --> ReportsSlice
+HeaderComp --> UISlice
+
+Store --> AuthSlice
+Store --> MonitoringSlice
+Store --> SessionsSlice
+Store --> ReportsSlice
+Store --> UISlice
+Store --> Middleware
+
+' Utils usage
+FormComp --> Validators
+SessionCalendarComp --> DateUtils
+ReportViewerComp --> Formatters
+ApiServiceComp --> Constants
+SessionCardComp --> Helpers
+
+' Types usage
+AuthServiceComp --> UserType
+MonitoringFormComp --> MonitoringType
+SessionFormComp --> SessionType
+ReportBuilderComp --> ReportType
+ApiServiceComp --> ApiResponseType
+
+' Loading e Error states
+MainApp --> LoadingComp
+MainApp --> AlertComp
+NotFoundPage --> AlertComp
+
+note top of MainApp : Componente raiz que\ngerencia estado global\ne roteamento
+
+note right of Store : Redux Toolkit para\ngerenciamento de estado\ncom middleware personalizado
+
+note bottom of useAuthHook : Hook personalizado para\nautenticação com JWT\ne refresh automático
+
+note left of WebSocketContextComp : WebSocket para\nnotificações em tempo real\ne atualizações de estado
+
+' Componente funcional annotations
+note as N1
+  Componentes Funcionais com Hooks:
+  - useState para estado local
+  - useEffect para side effects
+  - useMemo para otimização
+  - useCallback para funções
+end note
+
+N1 .. MonitoringListComp
+N1 .. SessionCalendarComp
+N1 .. ReportViewerComp
+
+@enduml

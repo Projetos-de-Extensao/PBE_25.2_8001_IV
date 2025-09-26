@@ -1,0 +1,78 @@
+@startuml Visão Geral do Sistema - Gestão de Monitoria
+
+!theme aws-orange
+title Sistema de Gestão de Monitoria - Visão Geral da Arquitetura
+
+skinparam backgroundColor #f8f9fa
+skinparam componentStyle rectangle
+
+actor "Estudante" as Student
+actor "Monitor" as Monitor  
+actor "Professor" as Teacher
+actor "Administrador" as Admin
+
+package "Frontend - React" {
+  [Interface Web] as WebUI
+  [Componentes React] as ReactComponents
+  [Estado Global (Redux)] as GlobalState
+  [Roteamento] as Router
+}
+
+package "Backend - Django" {
+  [API REST] as RestAPI
+  [Autenticação JWT] as Auth
+  [Modelos Django] as Models
+  [Views & Serializers] as Views
+  [Middleware] as Middleware
+}
+
+package "Banco de Dados" {
+  database "PostgreSQL" as DB
+  database "Redis Cache" as Cache
+}
+
+package "Serviços Externos" {
+  [Email Service] as Email
+  [File Storage] as Storage
+  [Notification Service] as Notify
+}
+
+package "Processamento Assíncrono" {
+  [Celery Workers] as Workers
+  [Task Queue] as Queue
+}
+
+' Conexões dos usuários
+Student --> WebUI : Acessa sistema
+Monitor --> WebUI : Gerencia monitorias  
+Teacher --> WebUI : Supervisiona atividades
+Admin --> WebUI : Administra sistema
+
+' Conexões Frontend
+WebUI --> ReactComponents : Renderiza componentes
+ReactComponents --> GlobalState : Gerencia estado
+Router --> ReactComponents : Controla navegação
+WebUI --> RestAPI : Requisições HTTP/HTTPS
+
+' Conexões Backend
+RestAPI --> Auth : Valida tokens
+RestAPI --> Views : Processa requisições
+Views --> Models : Acessa dados
+Models --> DB : Persiste dados
+RestAPI --> Cache : Cache temporário
+Middleware --> Auth : Intercepta requisições
+
+' Conexões Assíncronas
+RestAPI --> Queue : Envia tarefas
+Queue --> Workers : Processa tarefas
+Workers --> Email : Envia emails
+Workers --> Notify : Notificações
+Workers --> Storage : Gerencia arquivos
+
+' Notas explicativas
+note right of WebUI : SPA (Single Page Application)\ncom React + TypeScript
+note right of RestAPI : API RESTful seguindo\npadrões OpenAPI
+note right of DB : Banco relacional principal\ncom migrations Django
+note right of Cache : Cache de sessões e\ndados temporários
+
+@enduml

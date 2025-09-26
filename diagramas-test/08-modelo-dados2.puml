@@ -1,0 +1,476 @@
+@startuml Modelo de Dados - Sistema de Gestão de Monitoria
+
+!theme superhero-outline
+title Modelo Conceitual de Dados - Sistema de Gestão de Monitoria
+
+skinparam backgroundColor #1a1a1a
+skinparam class {
+    BackgroundColor #2d3748
+    BorderColor #4a5568
+    ArrowColor #63b3ed
+    FontColor #f7fafc
+}
+
+' ============================================
+' ENTIDADES PRINCIPAIS
+' ============================================
+
+entity "Usuario" as usuario {
+    **id**: UUID (PK)
+    --
+    **Dados Pessoais:**
+    nome_completo: VARCHAR(200)
+    email: VARCHAR(254) (UNIQUE)
+    telefone: VARCHAR(15)
+    data_nascimento: DATE
+    cpf: VARCHAR(11) (UNIQUE)
+    --
+    **Dados Acadêmicos:**
+    matricula: VARCHAR(20) (UNIQUE)
+    curso: VARCHAR(100)
+    periodo: INTEGER
+    coeficiente_rendimento: DECIMAL(4,2)
+    --
+    **Dados do Sistema:**
+    tipo_usuario: ENUM (STUDENT, MONITOR, PROFESSOR, ADMIN)
+    foto_perfil: URL
+    biografia: TEXT
+    data_cadastro: DATETIME
+    ultimo_login: DATETIME
+    ativo: BOOLEAN
+    --
+    **Autenticação:**
+    password_hash: VARCHAR(255)
+    salt: VARCHAR(32)
+    tentativas_login: INTEGER
+    conta_bloqueada_ate: DATETIME
+    dois_fatores_habilitado: BOOLEAN
+}
+
+entity "Disciplina" as disciplina {
+    **id**: UUID (PK)
+    --
+    codigo: VARCHAR(20) (UNIQUE)
+    nome: VARCHAR(200)
+    descricao: TEXT
+    carga_horaria: INTEGER
+    creditos: INTEGER
+    periodo_recomendado: INTEGER
+    pre_requisitos: TEXT
+    ementa: TEXT
+    bibliografia: TEXT
+    --
+    coordenador_id: UUID (FK → Usuario)
+    departamento: VARCHAR(100)
+    ativa: BOOLEAN
+    data_criacao: DATETIME
+}
+
+entity "Monitoria" as monitoria {
+    **id**: UUID (PK)
+    --
+    titulo: VARCHAR(200)
+    descricao: TEXT
+    requisitos: TEXT
+    beneficios: TEXT
+    carga_horaria_semanal: INTEGER
+    vagas_disponiveis: INTEGER
+    salario_bolsa: DECIMAL(10,2)
+    modalidade: ENUM (PRESENCIAL, REMOTO, HIBRIDO)
+    --
+    disciplina_id: UUID (FK → Disciplina)
+    professor_supervisor_id: UUID (FK → Usuario)
+    --
+    **Período:**
+    data_inicio: DATE
+    data_fim: DATE
+    periodo_inscricoes_inicio: DATETIME
+    periodo_inscricoes_fim: DATETIME
+    --
+    **Status:**
+    status: ENUM (RASCUNHO, PUBLICADA, INSCRICOES_ABERTAS, 
+                  SELECAO, ATIVA, FINALIZADA, CANCELADA)
+    aprovada: BOOLEAN
+    data_aprovacao: DATETIME
+    aprovada_por_id: UUID (FK → Usuario)
+    --
+    **Configurações:**
+    permite_autoavaliacao: BOOLEAN
+    permite_avaliacao_pares: BOOLEAN
+    exige_relatorio_mensal: BOOLEAN
+    --
+    data_criacao: DATETIME
+    data_atualizacao: DATETIME
+}
+
+entity "Candidatura" as candidatura {
+    **id**: UUID (PK)
+    --
+    estudante_id: UUID (FK → Usuario)
+    monitoria_id: UUID (FK → Monitoria)
+    --
+    **Dados da Candidatura:**
+    carta_motivacao: TEXT
+    experiencia_previa: TEXT
+    disponibilidade: TEXT
+    expectativas: TEXT
+    --
+    **Documentos:**
+    historico_escolar: URL
+    curriculo: URL
+    carta_recomendacao: URL
+    certificados: JSON
+    --
+    **Avaliação:**
+    status: ENUM (PENDENTE, EM_ANALISE, APROVADA, 
+                  REJEITADA, LISTA_ESPERA)
+    pontuacao: DECIMAL(5,2)
+    feedback_selecao: TEXT
+    data_resultado: DATETIME
+    --
+    data_inscricao: DATETIME
+    data_atualizacao: DATETIME
+}
+
+entity "MonitorAssignado" as monitor_assignado {
+    **id**: UUID (PK)
+    --
+    monitoria_id: UUID (FK → Monitoria)
+    monitor_id: UUID (FK → Usuario)
+    --
+    **Período:**
+    data_inicio: DATE
+    data_fim: DATE
+    data_contratacao: DATETIME
+    --
+    **Status:**
+    status: ENUM (ATIVO, SUSPENSO, FINALIZADO, DESLIGADO)
+    motivo_desligamento: TEXT
+    data_desligamento: DATETIME
+    --
+    **Performance:**
+    avaliacao_geral: DECIMAL(3,2)
+    total_horas_trabalhadas: DECIMAL(6,2)
+    total_sessoes_realizadas: INTEGER
+    total_estudantes_atendidos: INTEGER
+    --
+    **Configurações:**
+    pode_agendar_sessoes: BOOLEAN
+    pode_cancelar_sessoes: BOOLEAN
+    limite_sessoes_por_dia: INTEGER
+    --
+    data_criacao: DATETIME
+    data_atualizacao: DATETIME
+}
+
+entity "SessaoMonitoria" as sessao_monitoria {
+    **id**: UUID (PK)
+    --
+    monitoria_id: UUID (FK → Monitoria)
+    monitor_id: UUID (FK → Usuario)
+    --
+    **Detalhes da Sessão:**
+    titulo: VARCHAR(200)
+    descricao: TEXT
+    topicos_abordados: TEXT
+    material_necessario: TEXT
+    observacoes: TEXT
+    --
+    **Agendamento:**
+    data_sessao: DATE
+    hora_inicio: TIME
+    hora_fim: TIME
+    duracao_minutos: INTEGER
+    --
+    **Local/Modalidade:**
+    modalidade: ENUM (PRESENCIAL, REMOTO, HIBRIDO)
+    local_presencial: VARCHAR(200)
+    link_remoto: URL
+    sala_virtual: VARCHAR(100)
+    --
+    **Capacidade:**
+    vagas_disponiveis: INTEGER
+    lista_espera_habilitada: BOOLEAN
+    confirmacao_obrigatoria: BOOLEAN
+    --
+    **Status:**
+    status: ENUM (AGENDADA, CONFIRMADA, EM_ANDAMENTO, 
+                  FINALIZADA, CANCELADA, REMARCADA)
+    cancelada_por_id: UUID (FK → Usuario)
+    motivo_cancelamento: TEXT
+    data_cancelamento: DATETIME
+    --
+    **Gravação/Material:**
+    gravacao_url: URL
+    material_apoio: JSON
+    slides_apresentacao: URL
+    exercicios_praticos: URL
+    --
+    data_criacao: DATETIME
+    data_atualizacao: DATETIME
+}
+
+entity "ParticipacaoSessao" as participacao_sessao {
+    **id**: UUID (PK)
+    --
+    sessao_id: UUID (FK → SessaoMonitoria)
+    estudante_id: UUID (FK → Usuario)
+    --
+    **Status da Participação:**
+    status: ENUM (INSCRITO, CONFIRMADO, PRESENTE, 
+                  AUSENTE, CANCELADO)
+    data_inscricao: DATETIME
+    data_confirmacao: DATETIME
+    data_checkin: DATETIME
+    data_checkout: DATETIME
+    --
+    **Avaliação:**
+    nota_participacao: DECIMAL(3,2)
+    feedback_estudante: TEXT
+    dificuldades_relatadas: TEXT
+    topicos_interesse: TEXT
+    --
+    **Dados de Presença:**
+    tempo_participacao_minutos: INTEGER
+    nivel_engajamento: ENUM (BAIXO, MEDIO, ALTO)
+    participou_discussoes: BOOLEAN
+    fez_perguntas: BOOLEAN
+    --
+    data_atualizacao: DATETIME
+}
+
+entity "Avaliacao" as avaliacao {
+    **id**: UUID (PK)
+    --
+    **Relacionamentos:**
+    avaliador_id: UUID (FK → Usuario)
+    avaliado_id: UUID (FK → Usuario)
+    sessao_id: UUID (FK → SessaoMonitoria) (NULLABLE)
+    monitoria_id: UUID (FK → Monitoria) (NULLABLE)
+    --
+    **Tipo de Avaliação:**
+    tipo: ENUM (MONITOR_POR_ESTUDANTE, ESTUDANTE_POR_MONITOR,
+                PROFESSOR_POR_MONITOR, AUTOAVALIACAO,
+                AVALIACAO_SESSAO, AVALIACAO_MONITORIA)
+    --
+    **Critérios de Avaliação:**
+    clareza_explicacao: DECIMAL(3,2)
+    dominio_conteudo: DECIMAL(3,2)
+    pontualidade: DECIMAL(3,2)
+    disponibilidade: DECIMAL(3,2)
+    metodologia: DECIMAL(3,2)
+    comunicacao: DECIMAL(3,2)
+    --
+    **Avaliação Geral:**
+    nota_geral: DECIMAL(3,2)
+    comentarios: TEXT
+    pontos_fortes: TEXT
+    pontos_melhoria: TEXT
+    recomendacoes: TEXT
+    --
+    **Perguntas Específicas:**
+    recomendaria_monitor: BOOLEAN
+    recomendaria_sessao: BOOLEAN
+    voltaria_participar: BOOLEAN
+    --
+    **Metadados:**
+    anonima: BOOLEAN
+    publica: BOOLEAN
+    data_avaliacao: DATETIME
+    ip_address: INET
+}
+
+entity "Relatorio" as relatorio {
+    **id**: UUID (PK)
+    --
+    **Identificação:**
+    titulo: VARCHAR(200)
+    descricao: TEXT
+    tipo: ENUM (MENSAL, SEMESTRAL, ANUAL, PERSONALIZADO,
+                FREQUENCIA, PERFORMANCE, FINANCEIRO)
+    --
+    **Escopo:**
+    monitoria_id: UUID (FK → Monitoria) (NULLABLE)
+    disciplina_id: UUID (FK → Disciplina) (NULLABLE)
+    gerado_por_id: UUID (FK → Usuario)
+    --
+    **Período:**
+    data_inicio: DATE
+    data_fim: DATE
+    --
+    **Dados Calculados:**
+    total_sessoes: INTEGER
+    total_participantes: INTEGER
+    media_avaliacao: DECIMAL(3,2)
+    taxa_presenca: DECIMAL(5,2)
+    horas_monitoria: DECIMAL(8,2)
+    --
+    **Métricas de Performance:**
+    estudantes_aprovados: INTEGER
+    melhoria_notas: JSON
+    feedback_qualitativo: TEXT
+    indicadores_sucesso: JSON
+    --
+    **Arquivo e Status:**
+    arquivo_pdf: URL
+    dados_json: JSON
+    status: ENUM (GERANDO, CONCLUIDO, ERRO)
+    --
+    data_geracao: DATETIME
+    data_atualizacao: DATETIME
+}
+
+entity "Notificacao" as notificacao {
+    **id**: UUID (PK)
+    --
+    **Destinatário:**
+    usuario_id: UUID (FK → Usuario)
+    --
+    **Conteúdo:**
+    titulo: VARCHAR(200)
+    mensagem: TEXT
+    tipo: ENUM (INFO, SUCESSO, AVISO, ERRO, LEMBRETE)
+    categoria: ENUM (SISTEMA, MONITORIA, SESSAO, AVALIACAO, PAGAMENTO)
+    --
+    **Dados Específicos:**
+    monitoria_id: UUID (FK → Monitoria) (NULLABLE)
+    sessao_id: UUID (FK → SessaoMonitoria) (NULLABLE)
+    dados_extras: JSON
+    --
+    **Entrega:**
+    canais: ENUM (EMAIL, PUSH, SMS, IN_APP)
+    enviada: BOOLEAN
+    lida: BOOLEAN
+    data_envio: DATETIME
+    data_leitura: DATETIME
+    --
+    **Configurações:**
+    prioridade: ENUM (BAIXA, NORMAL, ALTA, CRITICA)
+    expira_em: DATETIME
+    acao_requerida: BOOLEAN
+    link_acao: URL
+    --
+    data_criacao: DATETIME
+}
+
+entity "AuditLog" as audit_log {
+    **id**: UUID (PK)
+    --
+    **Identificação:**
+    usuario_id: UUID (FK → Usuario) (NULLABLE)
+    sessao_id: VARCHAR(64)
+    --
+    **Ação:**
+    acao: VARCHAR(100)
+    recurso: VARCHAR(100)
+    objeto_id: UUID (NULLABLE)
+    objeto_tipo: VARCHAR(50)
+    --
+    **Detalhes:**
+    valores_anteriores: JSON
+    valores_novos: JSON
+    resultado: ENUM (SUCESSO, ERRO, BLOQUEADO)
+    mensagem_erro: TEXT
+    --
+    **Contexto Técnico:**
+    ip_address: INET
+    user_agent: TEXT
+    metodo_http: VARCHAR(10)
+    url: TEXT
+    codigo_resposta: INTEGER
+    --
+    **Metadados:**
+    nivel_risco: ENUM (BAIXO, MEDIO, ALTO, CRITICO)
+    tags: VARCHAR[]
+    --
+    timestamp: TIMESTAMP
+}
+
+' ============================================
+' RELACIONAMENTOS
+' ============================================
+
+usuario ||--o{ candidatura : "estudante faz"
+usuario ||--o{ monitor_assignado : "monitor atribuído"
+usuario ||--o{ sessao_monitoria : "monitor realiza"
+usuario ||--o{ participacao_sessao : "estudante participa"
+usuario ||--o{ avaliacao : "avalia/é avaliado"
+usuario ||--o{ notificacao : "recebe"
+usuario ||--o{ audit_log : "realiza ações"
+
+disciplina ||--o{ monitoria : "possui"
+usuario ||--o{ monitoria : "professor supervisiona"
+
+monitoria ||--o{ candidatura : "recebe candidaturas"
+monitoria ||--o{ monitor_assignado : "tem monitores"
+monitoria ||--o{ sessao_monitoria : "possui sessões"
+monitoria ||--o{ relatorio : "gera relatórios"
+
+monitoria ||--o{ avaliacao : "é avaliada"
+sessao_monitoria ||--o{ participacao_sessao : "tem participantes"
+sessao_monitoria ||--o{ avaliacao : "é avaliada"
+
+' ============================================
+' ÍNDICES E PERFORMANCE
+' ============================================
+note as performance_indexes
+**Índices para Performance:**
+
+**Principais:**
+- usuario(email) UNIQUE
+- usuario(matricula) UNIQUE
+- disciplina(codigo) UNIQUE
+- monitoria(status, data_inicio)
+- sessao_monitoria(data_sessao, status)
+
+**Compostos:**
+- candidatura(monitoria_id, status)
+- participacao_sessao(estudante_id, status)
+- avaliacao(avaliado_id, tipo)
+- audit_log(usuario_id, timestamp)
+
+**Full-Text Search:**
+- monitoria(titulo, descricao)
+- disciplina(nome, ementa)
+- usuario(nome_completo)
+
+**Particionamento:**
+- audit_log por mês
+- notificacao por trimestre
+- relatorio por ano
+end note
+
+' ============================================
+' CONSTRAINTS E REGRAS
+' ============================================
+note as business_constraints
+**Constraints e Regras de Negócio:**
+
+**Integridade:**
+- Monitor deve ser estudante aprovado
+- CR mínimo para monitoria (7.0)
+- Máximo 2 monitorias simultâneas
+- Sessão não pode ser no passado
+
+**Validações:**
+- Email institucional obrigatório
+- CPF válido e único
+- Telefone formato brasileiro
+- Senha forte (8+ chars, maiúscula, número)
+
+**Triggers:**
+- Atualizar contador participantes
+- Notificar mudanças de status
+- Calcular médias automaticamente
+- Log de alterações sensíveis
+
+**Check Constraints:**
+- avaliacao.nota_geral BETWEEN 0 AND 10
+- usuario.coeficiente_rendimento BETWEEN 0 AND 10
+- monitoria.carga_horaria_semanal BETWEEN 4 AND 20
+end note
+
+performance_indexes .. disciplina
+business_constraints .. usuario
+
+@enduml

@@ -1,0 +1,138 @@
+@startuml Fluxo de Geração de Relatórios
+
+!theme sketchy-outline
+title Fluxo de Geração de Relatórios e Analytics
+
+skinparam backgroundColor #ffffff
+skinparam actorStyle awesome
+
+actor "Professor" as Teacher
+actor "Administrador" as Admin
+participant "Frontend React" as Frontend
+participant "Reports API" as ReportsAPI
+participant "Analytics Service" as AnalyticsService
+participant "Report Generator" as ReportGen
+participant "Email Service" as EmailService
+database "PostgreSQL" as DB
+database "Redis Cache" as Cache
+queue "Celery Queue" as Queue
+storage "S3 Storage" as S3
+
+== Relatório de Monitoria Individual ==
+Teacher -> Frontend : Acessa relatórios
+Frontend -> ReportsAPI : GET /api/reports/dashboard/
+ReportsAPI -> AnalyticsService : Busca métricas básicas
+AnalyticsService -> Cache : Verifica cache
+Cache -> AnalyticsService : Cache miss
+AnalyticsService -> DB : Consulta dados agregados
+note right : Sessões realizadas, estudantes atendidos,\nnotas médias, frequência, etc.
+DB -> AnalyticsService : Retorna métricas
+AnalyticsService -> Cache : Armazena no cache (TTL 1h)
+AnalyticsService -> ReportsAPI : Métricas compiladas
+ReportsAPI -> Frontend : Dashboard data
+Frontend -> Teacher : Exibe dashboard inicial
+
+Teacher -> Frontend : Seleciona monitoria específica
+Frontend -> ReportsAPI : GET /api/reports/monitoring/{id}/
+ReportsAPI -> AnalyticsService : Gera relatório detalhado
+AnalyticsService -> DB : Query complexa com joins
+note right : JOIN sessions, students, evaluations,\nattendance, performance metrics
+DB -> AnalyticsService : Dados completos
+AnalyticsService -> AnalyticsService : Calcula estatísticas
+note right : Médias, medianas, desvios,\ntendências, comparações
+AnalyticsService -> ReportsAPI : Relatório estruturado
+ReportsAPI -> Frontend : Dados formatados
+Frontend -> Teacher : Gráficos e tabelas
+
+== Relatório Consolidado Institucional ==
+Admin -> Frontend : Solicita relatório geral
+Frontend -> ReportsAPI : POST /api/reports/institutional/
+note right : Filtros: período, departamentos,\ncursos, tipos de monitoria
+ReportsAPI -> AnalyticsService : Inicia processamento
+AnalyticsService -> Queue : Enfileira tarefa pesada
+AnalyticsService -> ReportsAPI : Task ID gerado
+ReportsAPI -> Frontend : 202 Accepted + task_id
+Frontend -> Admin : "Relatório sendo gerado..."
+
+Queue -> ReportGen : Processa relatório institucional
+ReportGen -> DB : Múltiplas queries otimizadas
+note right : Dados por departamento, curso,\nperformance geral, ROI educacional
+
+loop Para cada departamento
+    ReportGen -> DB : Consulta métricas do departamento
+    DB -> ReportGen : Dados departamentais
+    ReportGen -> ReportGen : Processa estatísticas
+end
+
+ReportGen -> ReportGen : Compila dados finais
+note right : Gráficos, tabelas, insights,\nrecomendações baseadas em IA
+
+ReportGen -> S3 : Salva PDF gerado
+S3 -> ReportGen : URL do arquivo
+ReportGen -> DB : Salva metadados do relatório
+ReportGen -> EmailService : Envia notificação
+EmailService -> Admin : Email com link do relatório
+
+== Agendamento de Relatórios ==
+Admin -> Frontend : Configura relatório periódico
+Frontend -> ReportsAPI : POST /api/reports/schedule/
+note right : Frequência (semanal, mensal),\ndestinatários, filtros
+ReportsAPI -> AnalyticsService : Cria agendamento
+AnalyticsService -> DB : INSERT INTO scheduled_reports
+AnalyticsService -> Queue : Agenda tarefa recorrente
+AnalyticsService -> ReportsAPI : Agendamento confirmado
+ReportsAPI -> Frontend : 201 Created
+Frontend -> Admin : Confirma agendamento
+
+== Processamento Automático ==
+Queue -> ReportGen : Executa relatório agendado
+ReportGen -> DB : Consulta filtros salvos
+ReportGen -> DB : Executa queries do relatório
+DB -> ReportGen : Dados do período
+ReportGen -> ReportGen : Gera visualizações
+ReportGen -> S3 : Salva relatório
+ReportGen -> DB : Atualiza histórico
+ReportGen -> EmailService : Envia para destinatários
+EmailService -> EmailService : Dispara emails
+
+== Consulta de Status e Download ==
+Teacher -> Frontend : Verifica status do relatório
+Frontend -> ReportsAPI : GET /api/reports/task/{task_id}/
+ReportsAPI -> AnalyticsService : Consulta status
+AnalyticsService -> Cache : Busca status da tarefa
+Cache -> AnalyticsService : Status atual
+AnalyticsService -> ReportsAPI : Status + progresso
+ReportsAPI -> Frontend : Status da geração
+Frontend -> Teacher : Progress bar + ETA
+
+alt Relatório concluído
+    Teacher -> Frontend : Clica para download
+    Frontend -> ReportsAPI : GET /api/reports/{id}/download/
+    ReportsAPI -> S3 : Gera URL assinada
+    S3 -> ReportsAPI : Signed URL (TTL 1h)
+    ReportsAPI -> Frontend : Redirect para S3
+    Frontend -> Teacher : Download do PDF
+else Relatório em processamento
+    Frontend -> Teacher : Exibe progresso
+    Frontend -> Frontend : Auto-refresh a cada 30s
+end
+
+== Analytics em Tempo Real ==
+Teacher -> Frontend : Acessa dashboard ao vivo
+Frontend -> ReportsAPI : WebSocket connection
+ReportsAPI -> AnalyticsService : Stream de métricas
+AnalyticsService -> DB : Trigger em mudanças
+DB -> AnalyticsService : Dados atualizados
+AnalyticsService -> ReportsAPI : Push update
+ReportsAPI -> Frontend : Real-time data
+Frontend -> Teacher : Atualiza gráficos
+
+note over DB, Cache
+  Otimizações de Performance:
+  - Índices em colunas de data/filtro
+  - Materialized views para agregações
+  - Particionamento por período
+  - Cache de queries frequentes
+end note
+
+@enduml

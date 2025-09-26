@@ -1,0 +1,363 @@
+@startuml Modelo de Segurança - Sistema de Gestão de Monitoria
+
+!theme superhero-outline
+title Modelo de Segurança, Autenticação e Autorização
+
+skinparam backgroundColor #2b3e50
+skinparam class {
+    BackgroundColor #34495e
+    BorderColor #95a5a6
+    ArrowColor #3498db
+    FontColor #ecf0f1
+}
+
+package "Autenticação" {
+    class "JWT Authentication" {
+        +access_token: String (15min)
+        +refresh_token: String (7 days)
+        +token_type: "Bearer"
+        +expires_in: Integer
+        --
+        +validate_token()
+        +refresh_token()
+        +blacklist_token()
+        +decode_payload()
+    }
+
+    class "User Authentication" {
+        +email: String
+        +password: String (hashed)
+        +two_factor_enabled: Boolean
+        +last_login: DateTime
+        +failed_attempts: Integer
+        +locked_until: DateTime
+        --
+        +authenticate()
+        +check_password()
+        +set_password()
+        +lock_account()
+        +unlock_account()
+    }
+
+    class "OAuth Integration" {
+        +google_oauth: Boolean
+        +microsoft_oauth: Boolean
+        +provider_id: String
+        +provider_token: String
+        --
+        +authenticate_oauth()
+        +link_account()
+        +sync_profile()
+    }
+}
+
+package "Autorização" {
+    enum "UserRole" {
+        STUDENT
+        MONITOR  
+        PROFESSOR
+        ADMIN
+        SUPER_ADMIN
+    }
+
+    class "Permission" {
+        +id: UUID
+        +codename: String
+        +name: String
+        +content_type: String
+        +description: Text
+        --
+        +check_permission()
+    }
+
+    class "Role" {
+        +id: UUID
+        +name: String
+        +permissions: ManyToMany(Permission)
+        +is_active: Boolean
+        --
+        +add_permission()
+        +remove_permission()
+        +has_permission()
+    }
+
+    class "RoleBasedAccess" {
+        --
+        +can_create_monitoring()
+        +can_apply_monitoring()
+        +can_manage_sessions()
+        +can_view_reports()
+        +can_admin_users()
+    }
+}
+
+package "Controle de Acesso" {
+    class "ObjectPermission" {
+        +user: ForeignKey(User)
+        +object_id: UUID
+        +content_type: String
+        +permission: String
+        --
+        +has_object_perm()
+        +grant_permission()
+        +revoke_permission()
+    }
+
+    class "AccessControl" {
+        --
+        +check_monitoring_access()
+        +check_session_access()
+        +check_report_access()
+        +check_user_data_access()
+    }
+
+    class "ResourceOwnership" {
+        --
+        +is_owner()
+        +is_participant()
+        +is_supervisor()
+        +can_edit()
+        +can_delete()
+    }
+}
+
+package "Segurança de Dados" {
+    class "DataEncryption" {
+        +field_encryption: AES-256
+        +database_encryption: TDE
+        +backup_encryption: Boolean
+        --
+        +encrypt_field()
+        +decrypt_field()
+        +rotate_keys()
+    }
+
+    class "DataMasking" {
+        --
+        +mask_email()
+        +mask_phone()
+        +mask_sensitive_data()
+        +anonymize_user()
+    }
+
+    class "AuditTrail" {
+        +user_id: UUID
+        +action: String
+        +resource: String
+        +object_id: UUID
+        +changes: JSONField
+        +ip_address: String
+        +user_agent: String
+        +timestamp: DateTime
+        --
+        +log_action()
+        +get_user_activity()
+        +detect_anomalies()
+    }
+}
+
+package "Segurança de Rede" {
+    class "RateLimiting" {
+        +endpoint: String
+        +limit: Integer
+        +window: Integer (seconds)
+        +burst: Integer
+        --
+        +is_allowed()
+        +increment_counter()
+        +reset_counter()
+    }
+
+    class "CORS_Security" {
+        +allowed_origins: List
+        +allowed_methods: List  
+        +allowed_headers: List
+        +credentials: Boolean
+        --
+        +validate_origin()
+        +set_headers()
+    }
+
+    class "HTTPS_Security" {
+        +ssl_redirect: Boolean
+        +hsts_enabled: Boolean
+        +hsts_max_age: Integer
+        +secure_cookies: Boolean
+        --
+        +enforce_https()
+        +set_security_headers()
+    }
+}
+
+package "Validação e Sanitização" {
+    class "InputValidation" {
+        --
+        +validate_email()
+        +validate_password_strength()
+        +validate_file_upload()
+        +sanitize_html()
+        +prevent_sql_injection()
+        +prevent_xss()
+    }
+
+    class "FileUploadSecurity" {
+        +allowed_extensions: List
+        +max_file_size: Integer
+        +virus_scan: Boolean
+        +content_type_check: Boolean
+        --
+        +validate_file()
+        +scan_malware()
+        +quarantine_file()
+    }
+}
+
+package "Monitoramento de Segurança" {
+    class "SecurityAlerts" {
+        +alert_type: String
+        +severity: String
+        +description: Text
+        +user_id: UUID
+        +ip_address: String
+        +timestamp: DateTime
+        --
+        +create_alert()
+        +notify_admins()
+        +auto_respond()
+    }
+
+    class "IntrusionDetection" {
+        --
+        +detect_brute_force()
+        +detect_suspicious_activity()
+        +detect_privilege_escalation()
+        +block_malicious_ip()
+    }
+
+    class "SecurityMetrics" {
+        --
+        +failed_login_rate()
+        +permission_denials()
+        +data_access_patterns()
+        +threat_indicators()
+    }
+}
+
+' Relacionamentos
+"User Authentication" --> "JWT Authentication" : generates
+"User Authentication" --> UserRole : has
+UserRole --> Role : implements
+Role --> Permission : contains
+"ObjectPermission" --> Permission : uses
+"AccessControl" --> "ObjectPermission" : checks
+"AccessControl" --> "ResourceOwnership" : validates
+
+"JWT Authentication" --> "RateLimiting" : subject_to
+"User Authentication" --> "InputValidation" : requires
+"FileUploadSecurity" --> "InputValidation" : extends
+
+"AuditTrail" --> "SecurityAlerts" : triggers
+"IntrusionDetection" --> "SecurityAlerts" : creates
+"SecurityMetrics" --> "IntrusionDetection" : feeds
+
+' Matriz de Permissões
+note as PermissionMatrix
+**Matriz de Permissões por Papel:**
+
+**STUDENT:**
+- Visualizar monitorias disponíveis
+- Candidatar-se a monitorias
+- Agendar sessões
+- Participar de sessões
+- Visualizar próprio perfil
+- Receber notificações
+
+**MONITOR:**
+- Todas permissões de STUDENT
+- Gerenciar sessões atribuídas
+- Avaliar participantes
+- Gerar relatórios básicos
+- Editar agenda
+
+**PROFESSOR:**
+- Criar/editar monitorias
+- Selecionar monitores
+- Supervisionar sessões
+- Gerar relatórios avançados
+- Visualizar dados dos estudantes
+
+**ADMIN:**
+- Gerenciar usuários
+- Configurar sistema
+- Visualizar todos os dados
+- Gerar relatórios institucionais
+- Configurar permissões
+
+**SUPER_ADMIN:**
+- Todas as permissões
+- Gerenciar outros admins
+- Configurações de segurança
+- Backup/restore de dados
+end note
+
+PermissionMatrix .. Role
+
+' Fluxo de Autenticação
+note as AuthFlow
+**Fluxo de Autenticação Segura:**
+
+1. Login → Validação credenciais
+2. 2FA (se habilitado)
+3. Geração JWT tokens
+4. Rate limiting aplicado
+5. Sessão ativa criada
+6. Audit log registrado
+
+**Renovação de Token:**
+1. Access token expira (15min)
+2. Frontend usa refresh token
+3. Novo access token gerado
+4. Refresh token rotacionado
+5. Cliente atualizado
+end note
+
+AuthFlow .. "JWT Authentication"
+
+' Controles de Segurança
+note as SecurityControls
+**Controles de Segurança Implementados:**
+
+**Autenticação:**
+- Senhas com hash bcrypt
+- Tokens JWT com RS256
+- Refresh token rotation
+- Account lockout (5 tentativas)
+
+**Autorização:**
+- RBAC (Role-Based Access Control)
+- ABAC (Attribute-Based Access Control)
+- Object-level permissions
+- Resource ownership validation
+
+**Dados:**
+- Encryption at rest (AES-256)
+- Encryption in transit (TLS 1.3)
+- Field-level encryption (PII)
+- Backup encryption
+
+**Rede:**
+- Rate limiting por endpoint
+- CORS políticas restritivas  
+- HTTPS obrigatório
+- Security headers (HSTS, CSP)
+
+**Monitoramento:**
+- Audit trail completo
+- Detecção de intrusão
+- Alertas em tempo real
+- Métricas de segurança
+end note
+
+SecurityControls .. "DataEncryption"
+
+@enduml

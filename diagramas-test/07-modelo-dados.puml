@@ -1,0 +1,246 @@
+@startuml Modelo de Dados - Gestão de Monitoria
+
+!theme blueprint
+title Modelo de Dados - Sistema de Gestão de Monitoria
+
+skinparam backgroundColor #f8f9fa
+skinparam class {
+    BackgroundColor #ffffff
+    BorderColor #2c3e50
+    ArrowColor #34495e
+}
+
+' Entidades principais
+class User {
+    +id: UUID (PK)
+    +email: String (Unique)
+    +username: String (Unique)
+    +first_name: String
+    +last_name: String
+    +password_hash: String
+    +is_active: Boolean
+    +is_staff: Boolean
+    +user_type: Enum
+    +registration_number: String
+    +phone: String
+    +avatar: String (URL)
+    +created_at: DateTime
+    +updated_at: DateTime
+    --
+    +get_full_name(): String
+    +check_password(pwd): Boolean
+    +has_permission(perm): Boolean
+}
+
+class Profile {
+    +id: UUID (PK)
+    +user_id: UUID (FK)
+    +course: String
+    +semester: Integer
+    +academic_level: Enum
+    +bio: Text
+    +skills: JSONField
+    +availability: JSONField
+    +preferred_subjects: JSONField
+    +rating: Float
+    +total_sessions: Integer
+    +created_at: DateTime
+    +updated_at: DateTime
+}
+
+class Subject {
+    +id: UUID (PK)
+    +code: String (Unique)
+    +name: String
+    +description: Text
+    +department: String
+    +credits: Integer
+    +prerequisites: JSONField
+    +is_active: Boolean
+    +created_at: DateTime
+    +updated_at: DateTime
+}
+
+class Monitoring {
+    +id: UUID (PK)
+    +subject_id: UUID (FK)
+    +professor_id: UUID (FK)
+    +monitor_id: UUID (FK) [NULL]
+    +title: String
+    +description: Text
+    +requirements: Text
+    +max_students_per_session: Integer
+    +session_duration: Integer (minutes)
+    +total_hours_per_week: Integer
+    +is_remote_available: Boolean
+    +status: Enum
+    +start_date: Date
+    +end_date: Date
+    +created_at: DateTime
+    +updated_at: DateTime
+}
+
+class MonitorApplication {
+    +id: UUID (PK)
+    +monitoring_id: UUID (FK)
+    +student_id: UUID (FK)
+    +cover_letter: Text
+    +resume: String (URL)
+    +status: Enum
+    +applied_at: DateTime
+    +reviewed_at: DateTime
+    +reviewed_by: UUID (FK)
+    +feedback: Text
+}
+
+class Session {
+    +id: UUID (PK)
+    +monitoring_id: UUID (FK)
+    +monitor_id: UUID (FK)
+    +scheduled_date: DateTime
+    +duration: Integer (minutes)
+    +session_type: Enum
+    +location: String
+    +meeting_link: String
+    +max_participants: Integer
+    +status: Enum
+    +notes: Text
+    +materials: JSONField
+    +created_at: DateTime
+    +updated_at: DateTime
+}
+
+class SessionParticipant {
+    +id: UUID (PK)
+    +session_id: UUID (FK)
+    +student_id: UUID (FK)
+    +registered_at: DateTime
+    +attended: Boolean
+    +attendance_time: DateTime
+    +left_time: DateTime
+    +status: Enum
+}
+
+class Evaluation {
+    +id: UUID (PK)
+    +session_id: UUID (FK)
+    +student_id: UUID (FK)
+    +evaluator_id: UUID (FK)
+    +rating: Float (1-5)
+    +feedback: Text
+    +strengths: Text
+    +improvement_areas: Text
+    +next_steps: Text
+    +is_public: Boolean
+    +created_at: DateTime
+}
+
+class Attendance {
+    +id: UUID (PK)
+    +session_id: UUID (FK)
+    +student_id: UUID (FK)
+    +check_in_time: DateTime
+    +check_out_time: DateTime
+    +duration_minutes: Integer
+    +ip_address: String
+    +device_info: JSONField
+    +location_data: JSONField
+    +verified: Boolean
+}
+
+class Schedule {
+    +id: UUID (PK)
+    +monitoring_id: UUID (FK)
+    +day_of_week: Integer (0-6)
+    +start_time: Time
+    +end_time: Time
+    +location: String
+    +is_recurring: Boolean
+    +exceptions: JSONField
+    +created_at: DateTime
+}
+
+class Report {
+    +id: UUID (PK)
+    +title: String
+    +report_type: Enum
+    +generated_by: UUID (FK)
+    +parameters: JSONField
+    +data: JSONField
+    +file_path: String (URL)
+    +status: Enum
+    +scheduled: Boolean
+    +schedule_frequency: String
+    +next_run: DateTime
+    +created_at: DateTime
+    +completed_at: DateTime
+}
+
+class Notification {
+    +id: UUID (PK)
+    +recipient_id: UUID (FK)
+    +sender_id: UUID (FK)
+    +title: String
+    +message: Text
+    +notification_type: Enum
+    +channel: Enum
+    +read: Boolean
+    +read_at: DateTime
+    +metadata: JSONField
+    +created_at: DateTime
+}
+
+class AuditLog {
+    +id: UUID (PK)
+    +user_id: UUID (FK)
+    +action: String
+    +table_name: String
+    +record_id: UUID
+    +changes: JSONField
+    +ip_address: String
+    +user_agent: String
+    +timestamp: DateTime
+}
+
+' Relacionamentos
+User ||--|| Profile : has
+User ||--o{ MonitorApplication : applies
+User ||--o{ Monitoring : supervises (professor)
+User ||--o{ Monitoring : monitors (student)
+User ||--o{ Session : conducts (monitor)
+User ||--o{ SessionParticipant : participates
+User ||--o{ Evaluation : evaluates
+User ||--o{ Evaluation : receives
+User ||--o{ Attendance : attends
+User ||--o{ Report : generates
+User ||--o{ Notification : receives
+User ||--o{ Notification : sends
+User ||--o{ AuditLog : performs_actions
+
+Subject ||--o{ Monitoring : has_monitorings
+
+Monitoring ||--o{ MonitorApplication : has_applications
+Monitoring ||--o{ Session : has_sessions
+Monitoring ||--o{ Schedule : has_schedule
+
+Session ||--o{ SessionParticipant : has_participants
+Session ||--o{ Evaluation : has_evaluations
+Session ||--o{ Attendance : has_attendance
+
+' Índices importantes (comentários)
+note top of User : Índices:\n- email (unique)\n- user_type\n- is_active
+note top of Monitoring : Índices:\n- subject_id, professor_id\n- status, start_date
+note top of Session : Índices:\n- monitoring_id\n- scheduled_date\n- status
+note top of SessionParticipant : Índices:\n- session_id, student_id\n- registered_at
+note top of Evaluation : Índices:\n- session_id\n- student_id, rating
+
+' Enums
+note right of User : user_type:\n- STUDENT\n- MONITOR\n- PROFESSOR\n- ADMIN
+
+note right of Monitoring : status:\n- DRAFT\n- OPEN\n- IN_PROGRESS\n- COMPLETED\n- CANCELLED
+
+note right of Session : status:\n- SCHEDULED\n- IN_PROGRESS\n- COMPLETED\n- CANCELLED\n\nsession_type:\n- INDIVIDUAL\n- GROUP\n- WORKSHOP
+
+note right of MonitorApplication : status:\n- PENDING\n- APPROVED\n- REJECTED\n- WITHDRAWN
+
+@enduml

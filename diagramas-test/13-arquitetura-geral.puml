@@ -1,0 +1,339 @@
+@startuml Sistema de Gestão de Monitoria - Arquitetura Geral
+
+!theme superhero-outline
+title Sistema de Gestão de Monitoria - Visão Arquitetural Completa
+
+skinparam backgroundColor #1e1e1e
+skinparam class {
+    BackgroundColor #2d3748
+    BorderColor #4a5568
+    ArrowColor #63b3ed
+    FontColor #f7fafc
+}
+
+skinparam note {
+    BackgroundColor #2b6cb0
+    BorderColor #3182ce
+    FontColor #ffffff
+}
+
+' ============================================
+' CAMADA DE APRESENTAÇÃO (FRONTEND)
+' ============================================
+package "Camada de Apresentação - React SPA" as frontend_layer {
+    
+    component "Aplicação React" as react_app {
+        [Componentes de Interface] as ui_components
+        [Gerenciamento de Estado (Redux)] as state_management
+        [Roteamento (React Router)] as routing
+        [Hooks Customizados] as custom_hooks
+    }
+    
+    component "Módulos Funcionais" as functional_modules {
+        [Módulo de Autenticação] as auth_module
+        [Módulo de Monitorias] as monitoring_module
+        [Módulo de Sessões] as sessions_module
+        [Módulo de Relatórios] as reports_module
+        [Módulo de Perfil] as profile_module
+        [Módulo de Administração] as admin_module
+    }
+    
+    component "Serviços de Frontend" as frontend_services {
+        [Cliente HTTP (Axios)] as http_client
+        [Gerenciamento de Cache] as cache_service
+        [Validação de Formulários] as form_validation
+        [Notificações] as notification_service
+        [Websocket Client] as websocket_client
+    }
+}
+
+' ============================================
+' CAMADA DE API (BACKEND)
+' ============================================
+package "Camada de API - Django REST Framework" as api_layer {
+    
+    component "Controladores REST" as rest_controllers {
+        [API de Autenticação] as auth_api
+        [API de Usuários] as users_api
+        [API de Monitorias] as monitoring_api
+        [API de Sessões] as sessions_api
+        [API de Relatórios] as reports_api
+        [API de Notificações] as notifications_api
+    }
+    
+    component "Middleware e Segurança" as middleware {
+        [Autenticação JWT] as jwt_auth
+        [Autorização RBAC] as rbac_auth
+        [Rate Limiting] as rate_limiting
+        [CORS] as cors_middleware
+        [Logging/Audit] as audit_logging
+    }
+    
+    component "Serializers e Validadores" as serializers {
+        [Serializers DRF] as drf_serializers
+        [Validadores Customizados] as custom_validators
+        [Transformadores de Dados] as data_transformers
+    }
+}
+
+' ============================================
+' CAMADA DE NEGÓCIO (SERVICES)
+' ============================================
+package "Camada de Lógica de Negócio" as business_layer {
+    
+    component "Serviços de Domínio" as domain_services {
+        [Serviço de Monitorias] as monitoring_service
+        [Serviço de Agendamento] as scheduling_service
+        [Serviço de Avaliações] as evaluation_service
+        [Serviço de Relatórios] as reporting_service
+        [Serviço de Notificações] as notification_service_biz
+    }
+    
+    component "Casos de Uso" as use_cases {
+        [Criar Monitoria] as create_monitoring
+        [Candidatar-se à Monitoria] as apply_monitoring
+        [Agendar Sessão] as schedule_session
+        [Realizar Avaliação] as conduct_evaluation
+        [Gerar Relatório] as generate_report
+    }
+    
+    component "Regras de Negócio" as business_rules {
+        [Validação de Elegibilidade] as eligibility_validation
+        [Cálculo de Notas] as grade_calculation
+        [Algoritmo de Matching] as matching_algorithm
+        [Políticas de Agendamento] as scheduling_policies
+    }
+}
+
+' ============================================
+' CAMADA DE DADOS (MODELS)
+' ============================================
+package "Camada de Dados - Django ORM" as data_layer {
+    
+    component "Modelos Django" as django_models {
+        [Modelo de Usuário] as user_model
+        [Modelo de Monitoria] as monitoring_model
+        [Modelo de Sessão] as session_model
+        [Modelo de Avaliação] as evaluation_model
+        [Modelo de Notificação] as notification_model
+    }
+    
+    component "Repositórios" as repositories {
+        [Repository de Usuários] as user_repository
+        [Repository de Monitorias] as monitoring_repository
+        [Repository de Sessões] as session_repository
+        [Repository de Relatórios] as report_repository
+    }
+    
+    component "Migrations e Schema" as database_schema {
+        [Migrations Django] as django_migrations
+        [Índices de Performance] as db_indexes
+        [Constraints e Triggers] as db_constraints
+    }
+}
+
+' ============================================
+' CAMADA DE PERSISTÊNCIA (DATABASE)
+' ============================================
+package "Camada de Persistência" as persistence_layer {
+    
+    database "PostgreSQL" as postgres_db {
+        [Tabelas de Usuários] as user_tables
+        [Tabelas de Monitorias] as monitoring_tables
+        [Tabelas de Sessões] as session_tables
+        [Tabelas de Auditoria] as audit_tables
+    }
+    
+    database "Redis Cache" as redis_cache {
+        [Cache de Sessão] as session_cache
+        [Cache de Queries] as query_cache
+        [Cache de Relatórios] as report_cache
+    }
+    
+    component "Sistema de Arquivos" as file_system {
+        [Upload de Documentos] as document_uploads
+        [Relatórios Gerados] as generated_reports
+        [Logs do Sistema] as system_logs
+    }
+}
+
+' ============================================
+' SERVIÇOS EXTERNOS E INTEGRAÇÃO
+' ============================================
+package "Serviços Externos e Integrações" as external_services {
+    
+    cloud "Serviços de Email" as email_service {
+        [SMTP Server] as smtp_server
+        [Templates de Email] as email_templates
+    }
+    
+    cloud "Serviços de Autenticação" as external_auth {
+        [Google OAuth] as google_oauth
+        [Microsoft Azure AD] as azure_ad
+    }
+    
+    cloud "Serviços de Notificação" as push_services {
+        [WebPush Notifications] as web_push
+        [Email Notifications] as email_notifications
+    }
+    
+    cloud "Serviços de Monitoramento" as monitoring_services {
+        [Application Monitoring] as app_monitoring
+        [Error Tracking] as error_tracking
+        [Performance Metrics] as performance_metrics
+    }
+}
+
+' ============================================
+' INFRAESTRUTURA
+' ============================================
+package "Infraestrutura e DevOps" as infrastructure {
+    
+    component "Servidor de Aplicação" as app_server {
+        [Gunicorn/uWSGI] as wsgi_server
+        [Nginx Proxy] as nginx_proxy
+        [SSL/TLS] as ssl_tls
+    }
+    
+    component "Containerização" as containerization {
+        [Docker Containers] as docker_containers
+        [Docker Compose] as docker_compose
+        [Kubernetes (Produção)] as kubernetes
+    }
+    
+    component "CI/CD Pipeline" as cicd {
+        [GitHub Actions] as github_actions
+        [Automated Tests] as automated_tests
+        [Deployment Scripts] as deployment_scripts
+    }
+}
+
+' ============================================
+' RELACIONAMENTOS E FLUXOS
+' ============================================
+
+' Frontend para API
+react_app --> rest_controllers : "HTTP/HTTPS Requests"
+frontend_services --> middleware : "Authentication & CORS"
+websocket_client --> notifications_api : "Real-time Updates"
+
+' API para Business Layer
+rest_controllers --> domain_services : "Service Calls"
+serializers --> use_cases : "Data Validation"
+middleware --> business_rules : "Authorization Check"
+
+' Business Layer para Data Layer
+domain_services --> repositories : "Data Operations"
+use_cases --> django_models : "ORM Operations"
+business_rules --> database_schema : "Schema Constraints"
+
+' Data Layer para Persistence
+repositories --> postgres_db : "SQL Queries"
+django_models --> redis_cache : "Caching Operations"
+database_schema --> file_system : "File Operations"
+
+' External Services
+domain_services --> email_service : "Send Notifications"
+auth_module --> external_auth : "OAuth Integration"
+notification_service_biz --> push_services : "Push Notifications"
+app_server --> monitoring_services : "Metrics & Logs"
+
+' Infrastructure
+app_server --> containerization : "Deployment"
+cicd --> app_server : "Automated Deployment"
+nginx_proxy --> react_app : "Static File Serving"
+
+' ============================================
+' NOTAS EXPLICATIVAS
+' ============================================
+
+note as architecture_principles
+**Princípios Arquiteturais:**
+
+**1. Separação de Responsabilidades**
+- Frontend: Apresentação e UX
+- API: Interface e validação
+- Business: Lógica de negócio
+- Data: Persistência e acesso
+
+**2. Padrões Utilizados**
+- MVC/MVP no Django
+- Repository Pattern
+- Service Layer Pattern
+- Observer Pattern (WebSockets)
+
+**3. Qualidade e Performance**
+- Cache em múltiplas camadas
+- Lazy loading de dados
+- Paginação de resultados
+- Otimização de queries (select_related)
+
+**4. Segurança**
+- JWT Authentication
+- RBAC Authorization
+- Input validation
+- SQL Injection prevention
+- XSS protection
+end note
+
+note as technology_stack
+**Stack Tecnológica:**
+
+**Frontend:**
+- React 18+ com TypeScript
+- Redux Toolkit (Estado)
+- Material-UI (Componentes)
+- React Router (Navegação)
+- Axios (HTTP Client)
+
+**Backend:**
+- Django 4.2+ com Python 3.11+
+- Django REST Framework
+- Celery (Tasks Assíncronas)
+- Channels (WebSockets)
+
+**Banco de Dados:**
+- PostgreSQL 15+ (Principal)
+- Redis 7+ (Cache/Sessions)
+
+**DevOps:**
+- Docker & Docker Compose
+- Nginx (Proxy/Static Files)
+- GitHub Actions (CI/CD)
+- Kubernetes (Produção)
+end note
+
+note as scalability_considerations
+**Considerações de Escalabilidade:**
+
+**Horizontal Scaling:**
+- Load balancer (Nginx)
+- Multiple app instances
+- Database read replicas
+- CDN para assets estáticos
+
+**Performance Optimizations:**
+- Database connection pooling
+- Query optimization
+- Response compression
+- Static file caching
+
+**Monitoring & Observability:**
+- Application metrics
+- Database performance
+- Error tracking
+- User analytics
+
+**Backup & Recovery:**
+- Automated database backups
+- Point-in-time recovery
+- Data replication
+- Disaster recovery plan
+end note
+
+' Posicionamento das notas
+architecture_principles .. frontend_layer
+technology_stack .. api_layer
+scalability_considerations .. persistence_layer
+
+@enduml

@@ -1,0 +1,107 @@
+@startuml Fluxo de Autenticação - Gestão de Monitoria
+
+!theme vibrant
+title Fluxo de Autenticação e Autorização
+
+skinparam backgroundColor #ffffff
+skinparam actorStyle awesome
+
+actor "Usuário" as User
+participant "React Frontend" as Frontend
+participant "API Gateway" as Gateway
+participant "Auth Service" as AuthService
+participant "JWT Token" as JWT
+participant "User Service" as UserService
+database "PostgreSQL" as DB
+database "Redis Cache" as Cache
+
+== Login ==
+User -> Frontend : Insere credenciais
+Frontend -> Gateway : POST /api/auth/login
+Gateway -> AuthService : Valida credenciais
+AuthService -> DB : SELECT user WHERE email=?
+DB -> AuthService : Retorna dados do usuário
+AuthService -> AuthService : Verifica senha (bcrypt)
+
+alt Credenciais válidas
+    AuthService -> JWT : Gera access_token (15min)
+    AuthService -> JWT : Gera refresh_token (7 dias)
+    AuthService -> Cache : Armazena refresh_token
+    AuthService -> Gateway : 200 + tokens + user_data
+    Gateway -> Frontend : Resposta de sucesso
+    Frontend -> Frontend : Armazena tokens (localStorage)
+    Frontend -> User : Redireciona para dashboard
+else Credenciais inválidas
+    AuthService -> Gateway : 401 Unauthorized
+    Gateway -> Frontend : Erro de autenticação
+    Frontend -> User : Exibe mensagem de erro
+end
+
+== Requisições Autenticadas ==
+User -> Frontend : Acessa recurso protegido
+Frontend -> Gateway : GET /api/resource\nAuthorization: Bearer {access_token}
+Gateway -> AuthService : Valida token
+AuthService -> JWT : Decodifica e verifica token
+
+alt Token válido
+    AuthService -> Gateway : Token OK + user_id
+    Gateway -> UserService : Processa requisição
+    UserService -> DB : Executa operação
+    DB -> UserService : Retorna dados
+    UserService -> Gateway : Resposta
+    Gateway -> Frontend : Dados solicitados
+    Frontend -> User : Exibe conteúdo
+else Token expirado
+    AuthService -> Gateway : 401 Token expired
+    Gateway -> Frontend : 401 Unauthorized
+    Frontend -> Frontend : Inicia refresh automático
+    Frontend -> Gateway : POST /api/auth/refresh\nrefresh_token
+    Gateway -> AuthService : Valida refresh token
+    AuthService -> Cache : Verifica refresh token
+    
+    alt Refresh token válido
+        AuthService -> JWT : Gera novo access_token
+        AuthService -> Gateway : 200 + novo access_token
+        Gateway -> Frontend : Novo token
+        Frontend -> Frontend : Atualiza token armazenado
+        Frontend -> Gateway : Repete requisição original
+    else Refresh token inválido
+        AuthService -> Gateway : 401 Invalid refresh token
+        Gateway -> Frontend : Erro de autenticação
+        Frontend -> Frontend : Remove tokens
+        Frontend -> User : Redireciona para login
+    end
+end
+
+== Logout ==
+User -> Frontend : Clica em logout
+Frontend -> Gateway : POST /api/auth/logout\nrefresh_token
+Gateway -> AuthService : Invalida tokens
+AuthService -> Cache : Remove refresh_token
+AuthService -> Gateway : 200 Logout success
+Gateway -> Frontend : Confirmação
+Frontend -> Frontend : Remove tokens locais
+Frontend -> User : Redireciona para login
+
+== Autorização por Perfil ==
+note over Gateway, UserService
+  Middleware de autorização verifica:
+  - Token JWT válido
+  - Permissões do usuário (roles)
+  - Acesso ao recurso específico
+end note
+
+Gateway -> UserService : Verifica permissões
+UserService -> DB : SELECT permissions WHERE user_id=?
+DB -> UserService : Lista de permissões
+UserService -> UserService : Verifica acesso ao recurso
+
+alt Permissão concedida
+    UserService -> Gateway : Acesso autorizado
+else Permissão negada
+    UserService -> Gateway : 403 Forbidden
+    Gateway -> Frontend : Acesso negado
+    Frontend -> User : Mensagem de acesso negado
+end
+
+@enduml

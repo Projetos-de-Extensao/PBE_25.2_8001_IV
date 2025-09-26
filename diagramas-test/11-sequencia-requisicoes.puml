@@ -1,0 +1,188 @@
+@startuml Sequência de Requisições API
+
+!theme plain
+title Sequência Completa de Requisições - Agendamento de Monitoria
+
+skinparam backgroundColor #ffffff
+skinparam sequence {
+    ArrowColor #2563eb
+    LifeLineBorderColor #1e40af
+    LifeLineBackgroundColor #dbeafe
+    ParticipantBorderColor #1e40af
+    ParticipantBackgroundColor #eff6ff
+}
+
+actor "Estudante" as Student
+participant "React App" as Frontend
+participant "API Gateway" as Gateway
+participant "Auth Service" as AuthSvc
+participant "Monitoring Service" as MonitorSvc
+participant "Session Service" as SessionSvc
+participant "Notification Service" as NotifySvc
+database "PostgreSQL" as DB
+database "Redis Cache" as Cache
+
+== 1. Autenticação ==
+Student -> Frontend : Acessa aplicação
+Frontend -> Gateway : GET /api/auth/me
+note right : Header: Authorization Bearer {token}
+
+Gateway -> AuthSvc : Valida token JWT
+AuthSvc -> Cache : Verifica token blacklist
+Cache -> AuthSvc : Token válido
+AuthSvc -> DB : SELECT user WHERE id=decoded_id
+DB -> AuthSvc : Dados do usuário
+AuthSvc -> Gateway : User authenticated
+Gateway -> Frontend : 200 OK + user_data
+
+alt Token expirado
+    AuthSvc -> Gateway : 401 Token expired
+    Gateway -> Frontend : 401 Unauthorized
+    Frontend -> Gateway : POST /api/auth/refresh
+    note right : Body: {"refresh_token": "..."}
+    Gateway -> AuthSvc : Renova tokens
+    AuthSvc -> Cache : Valida refresh token
+    AuthSvc -> Gateway : 200 OK + new_tokens
+    Gateway -> Frontend : Novos tokens
+    Frontend -> Frontend : Atualiza localStorage
+end
+
+== 2. Busca de Monitorias Disponíveis ==
+Student -> Frontend : Navega para /monitorias
+Frontend -> Gateway : GET /api/monitorings/?status=OPEN&subject=python
+note right : Query params para filtros
+
+Gateway -> AuthSvc : Valida autorização
+Gateway -> MonitorSvc : Lista monitorias
+MonitorSvc -> Cache : Verifica cache da query
+Cache -> MonitorSvc : Cache miss
+
+MonitorSvc -> DB : SELECT monitorings com joins
+note right : JOIN subjects, users (professor)\nWHERE status='OPEN' AND subject LIKE '%python%'
+DB -> MonitorSvc : Lista de monitorias
+
+MonitorSvc -> MonitorSvc : Serializa dados
+MonitorSvc -> Cache : Armazena resultado (TTL: 10min)
+MonitorSvc -> Gateway : Lista paginada
+Gateway -> Frontend : 200 OK + monitorings_data
+
+Frontend -> Frontend : Renderiza MonitoringList
+Frontend -> Student : Exibe cards de monitorias
+
+== 3. Visualização de Detalhes ==
+Student -> Frontend : Clica em monitoria específica
+Frontend -> Gateway : GET /api/monitorings/uuid-123/
+Gateway -> MonitorSvc : Busca detalhes
+MonitorSvc -> DB : SELECT com relacionamentos
+note right : Inclui: professor, disciplina, horários,\nestatísticas, avaliações
+
+DB -> MonitorSvc : Dados completos
+MonitorSvc -> Gateway : Dados detalhados
+Gateway -> Frontend : 200 OK + detailed_data
+
+Frontend -> Gateway : GET /api/monitorings/uuid-123/schedule/
+Gateway -> SessionSvc : Consulta agenda
+SessionSvc -> DB : SELECT available_slots
+note right : Considera conflitos, capacidade máxima,\nhorários já agendados
+
+DB -> SessionSvc : Slots disponíveis
+SessionSvc -> Gateway : Horários livres
+Gateway -> Frontend : 200 OK + available_times
+
+Frontend -> Student : Exibe detalhes + calendário
+
+== 4. Agendamento de Sessão ==
+Student -> Frontend : Seleciona data/hora
+Student -> Frontend : Preenche formulário
+note right : Tipo de sessão, tópicos,\nobjetivos, observações
+
+Frontend -> Frontend : Valida dados localmente
+Frontend -> Gateway : POST /api/sessions/
+note right : Body: {\n  "monitoring": "uuid-123",\n  "scheduled_date": "2025-09-30T14:00:00Z",\n  "session_type": "INDIVIDUAL",\n  "topics": ["loops", "functions"],\n  "notes": "Dificuldade com estruturas de repetição"\n}
+
+Gateway -> AuthSvc : Verifica permissões
+Gateway -> SessionSvc : Processa agendamento
+
+SessionSvc -> DB : BEGIN TRANSACTION
+SessionSvc -> DB : Verifica conflitos
+note right : SELECT para detectar overlaps\nna agenda do monitor
+
+alt Conflito detectado
+    DB -> SessionSvc : Horário ocupado
+    SessionSvc -> DB : ROLLBACK
+    SessionSvc -> Gateway : 409 Conflict
+    Gateway -> Frontend : Erro de conflito
+    Frontend -> Student : "Horário indisponível"
+else Sem conflitos
+    SessionSvc -> DB : INSERT INTO sessions
+    SessionSvc -> DB : INSERT INTO session_participants
+    SessionSvc -> DB : UPDATE monitoring statistics
+    SessionSvc -> DB : COMMIT TRANSACTION
+    
+    DB -> SessionSvc : Sessão criada
+    SessionSvc -> SessionSvc : Prepara notificações
+    SessionSvc -> NotifySvc : Envia para fila
+    note right : Notifica: monitor, estudante,\nprofessor (se configurado)
+    
+    SessionSvc -> Gateway : 201 Created + session_data
+    Gateway -> Frontend : Sessão agendada com sucesso
+    Frontend -> Student : Confirmação + detalhes
+end
+
+== 5. Processamento de Notificações (Assíncrono) ==
+NotifySvc -> DB : Busca dados dos participantes
+DB -> NotifySvc : Emails e preferências
+NotifySvc -> NotifySvc : Gera conteúdo personalizado
+
+par Notificação Email
+    NotifySvc -> NotifySvc : Template de email
+    NotifySvc -> External : SMTP send
+    External -> NotifySvc : Email enviado
+and Notificação Push
+    NotifySvc -> External : Push notification API
+    External -> NotifySvc : Push enviado
+and Notificação In-App
+    NotifySvc -> DB : INSERT notification record
+    NotifySvc -> Cache : Atualiza contadores
+end
+
+NotifySvc -> DB : Log de notificações enviadas
+
+== 6. Atualização em Tempo Real (WebSocket) ==
+NotifySvc -> Gateway : WebSocket broadcast
+Gateway -> Frontend : Notificação real-time
+Frontend -> Frontend : Atualiza badge de notificações
+Frontend -> Student : Toast notification
+
+== 7. Confirmação e Lembretes ==
+loop 24h antes da sessão
+    NotifySvc -> DB : SELECT sessions próximas
+    NotifySvc -> NotifySvc : Gera lembretes
+    NotifySvc -> External : Envia lembretes
+end
+
+loop 1h antes da sessão
+    NotifySvc -> DB : SELECT sessions iminentes  
+    NotifySvc -> NotifySvc : Última notificação
+    NotifySvc -> External : Lembrete final
+end
+
+== 8. Verificação Final ==
+Student -> Frontend : Consulta "Minhas Sessões"
+Frontend -> Gateway : GET /api/sessions/?participant=me&status=SCHEDULED
+Gateway -> SessionSvc : Lista sessões do usuário
+SessionSvc -> DB : SELECT user sessions
+DB -> SessionSvc : Sessões agendadas
+SessionSvc -> Gateway : Lista de sessões
+Gateway -> Frontend : 200 OK + my_sessions
+Frontend -> Student : Exibe agenda pessoal
+
+note over Student, DB
+  Métricas de Performance:
+  - Tempo médio de resposta: < 200ms
+  - Cache hit ratio: > 85%
+  - Disponibilidade: 99.9%
+  - Throughput: 1000 req/min
+end note
+
+@enduml
