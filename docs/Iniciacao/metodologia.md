@@ -1,95 +1,63 @@
----
-id: metodologia
-title: Metodologia
----
- 
- 
-## Introdução
- 
-<p align = "justify">
-A metodologia pode ser definida como a sistematização de métodos e técnicas com o intuito de se alcançar um objetivo. Este documento aborda os métodos e técnica de metodologias, processos e práticas (Scrum, XP, Kanban, RUP) de acordo com o objetivo da equipe e da disciplina.
-</p>
- 
-## Metodologia
-A equipe utiliza vários métodos e técnicas de diversas metodologias, processos e práticas, para o desenvolvimento. Com o estudo e  experiência da equipe sobre as metodologias ágeis, foi possível identificar aspectos das diversas metodologias, que a equipe utiliza para o desenvolvimento do projeto.
- 
-Metodologias, processos e práticas identificados:
- 
- 
-- [RUP/UP](https://www.../):<p align = "justify">
-RUP/UP é uma metodologia....
-</p>
- 
-- [POO (OOP Oriented Object Programming)](https://www....):<p align = "justify">
-POO (OOP) é uma...
-</p>
- 
-- [RUP (Rational Unified Process)](https://www....):<p align = "justify">
-O Rational Unified Process é um Processo de Engenharia de Software. Ele fornece....
-<p>
- 
-- [Kanban](https://www...):</p>
-   O sistema kanban é uma metodologia ágil....
-<p align = "justify">
- 
- 
-## Metodologias de desenvolvimento:
- 
-### Versão 1.0
- 
-### RUP (Rational Unified Process)
- 
-#### Práticas:
- 
-- **Desenvolvimento iterativo**: A
-abordagem iterativa é necessária para....
- 
-- **Verificação da qualidade de software**: A qualidade deve ser revista com
-respeito aos requisitos com base...
- 
- 
-### Kanban
- 
-<p align = "justify">
-O Kanban é técnica que propõe a utilização de cartões em um quadro...
-</p>
- 
-- **Lista de Tarefas**: Contém todas as tarefas do projeto.
-- **Incremento**: Contém as tarefas a serem executadas durante a Sprint.
-- **Em andamento**: Contém as tarefas que estão em andamento.
-- **Revisão**: Contém as tarefas que precisam ser revisadas para conclusão.
-- **Concluido**: Contém as tarefas que já foram revisadas e concluídas.
- 
- 
-## Conclusão
- 
-<p align = "justify">
- 
-Com o estudo das metodologias.....
- 
-</p>
- 
-## Referências
- 
-> [1] SCRUM, Disponivel em: https://www....
- 
-> [2] Sistema Kanban, Disponivel em: https://www...
- 
-> [3] Extreme Programming, Disponivel em: http://www...
+# Metodologia de Desenvolvimento - Projeto SGM Ibmec
 
-> [5] Rational Unified Process, Disponivel em: https://www...
- 
-> [6] EXTREME PROGRAMMING, Disponivel em: https://www...
- 
- 
-## Autor(es)
- 
-| Data | Versão | Descrição | Autor(es) |
-| -- | -- | -- | -- |
-| 05/mm/xx | 1.0 | Criação  | xxx xxx e xxxxx xxxxx |
-| 06/mm/xx | 1.1 | Adicionado  | xxx xxxx e xxxxx xxxx |
-| 06/mm/XX | 1.2 | Adicionado  | xxx xxxx e xxxxxx xxxxxx |
-| 06/mm/xx | 1.3 | Adicionado xxxx | xxx xxxx e xxxx xxxxx |
-| 06/mm/xx | 1.4 | Adicionadoxxxx | xxxx xxxxx e xxxx xxxxx |
-| mm/mm/xx | 1.5 | Revisão do documento | xxxx xxxxx |
-| mm/mm/xx | 1.6 | Ajuste no topico Scrum | xxxx xxxx e xxxx xxxx |
+## 1. Introdução
+
+Este documento descreve a metodologia de desenvolvimento de software adotada pela equipe do projeto **SGM Ibmec**. O objetivo é definir um processo de trabalho claro e eficiente, que promova a colaboração, a qualidade do código e a entrega de valor contínua ao longo do semestre.
+
+A abordagem escolhida é um **híbrido de práticas ágeis**, combinando os pontos fortes do Scrum, Kanban e Extreme Programming (XP) para se adequar à natureza acadêmica e ao escopo do projeto.
+
+## 2. Metodologia Híbrida Adotada
+
+A equipe optou por não seguir uma única metodologia de forma rígida, mas sim por adotar um conjunto de práticas de diferentes frameworks ágeis que melhor se adaptam a uma equipe pequena com um prazo fixo. Nossa abordagem se baseia em três pilares:
+
+-   **Scrum (para Gestão do Tempo e Rituais):** Usaremos o conceito de Sprints para organizar nosso trabalho em ciclos curtos e focados, garantindo entregas incrementais e previsibilidade.
+-   **Kanban (para Visualização do Fluxo de Trabalho):** Utilizaremos um quadro Kanban para tornar o progresso de todas as tarefas visível para toda a equipe, identificando gargalos e gerenciando o fluxo de trabalho de forma contínua.
+-   **Extreme Programming (XP) (para Qualidade Técnica):** Adotaremos práticas de XP para garantir que o software que construímos seja robusto, testável e de fácil manutenção.
+
+---
+
+## 3. Detalhamento das Práticas
+
+### 3.1. Práticas de Scrum
+
+Para organizar o projeto no tempo, adotaremos os seguintes elementos do Scrum:
+
+-   **Sprints:** Nosso trabalho será dividido em **Sprints de 2 semanas**. Cada Sprint começará com um planejamento (Sprint Planning) e terminará com a entrega de um incremento funcional do software.
+-   **Sprint Planning:** No início de cada Sprint, a equipe se reunirá para selecionar as Histórias de Usuário (User Stories) do backlog que serão desenvolvidas nas próximas duas semanas.
+-   **Daily Stand-ups:** Faremos reuniões rápidas (15 minutos) três vezes por semana para sincronizar o trabalho, onde cada membro responde: "O que eu fiz desde a última reunião?", "O que vou fazer até a próxima?" e "Há algum impedimento?".
+-   **Product Backlog:** Manteremos um backlog priorizado de todas as Histérias de Usuário (Épicos e User Stories) que precisam ser desenvolvidas.
+
+### 3.2. Práticas de Kanban
+
+Para gerenciar o fluxo de trabalho de forma visual, usaremos um quadro Kanban (no Trello, GitHub Projects ou similar) com as seguintes colunas:
+
+| Coluna         | Descrição                                                                         |
+| :------------- | :---------------------------------------------------------------------------------- |
+| **Backlog** | Todas as tarefas e Histórias de Usuário do projeto, priorizadas.                    |
+| **To Do** | Tarefas selecionadas para o Sprint atual.                                           |
+| **In Progress**| A tarefa que um membro da equipe está desenvolvendo ativamente. (Limite: 1 por pessoa). |
+| **In Review** | A tarefa foi concluída e precisa que outro membro da equipe a revise (Code Review).  |
+| **Done** | A tarefa foi revisada, testada e integrada à branch principal do projeto.            |
+
+### 3.3. Práticas de Extreme Programming (XP)
+
+Para garantir a qualidade técnica do nosso código, adotaremos as seguintes práticas de XP:
+
+-   **Test-Driven Development (TDD):** Sempre que possível, escreveremos os testes antes de escrever o código da funcionalidade, garantindo que nosso código seja testável e que os requisitos sejam atendidos.
+-   **Pair Programming (Programação em Par):** Em tarefas complexas ou quando um membro da equipe estiver com dificuldades, trabalharemos em duplas no mesmo código para compartilhar conhecimento e melhorar a qualidade da solução.
+-   **Continuous Integration (Integração Contínua):** Usaremos o Git de forma disciplinada, com branches para cada nova funcionalidade e pull requests para revisão. O código só será integrado à branch `main` após a revisão (Code Review) por outro membro da equipe.
+-   **Código Coletivo:** Todo membro da equipe tem permissão para melhorar qualquer parte do código a qualquer momento, garantindo que o conhecimento sobre o sistema seja compartilhado.
+
+## 4. Conclusão
+
+A adoção desta metodologia híbrida permite que a equipe se beneficie da estrutura temporal do Scrum, da clareza visual do Kanban e da excelência técnica do XP. Este processo de trabalho foi desenhado para maximizar a produtividade, a qualidade e a colaboração, garantindo que o projeto SGM Ibmec seja entregue com sucesso dentro do prazo acadêmico.
+
+## 5. Referências
+
+> FARLEY, David. **Engenharia de Software Moderna: Uma Abordagem de Engenharia para o Desenvolvimento de Software**. Pearson, 2021.
+
+## 6. Autores
+
+| Data       | Versão | Descrição                                                       | Autor(es)                      |
+| :--------- | :----- | :---------------------------------------------------------------- | :----------------------------- |
+| 26/09/2025 | 1.0    | Criação do documento com a definição da metodologia híbrida ágil. | João Pedro |
