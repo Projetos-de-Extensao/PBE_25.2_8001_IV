@@ -2,49 +2,42 @@
 id: Modelo_de_documento
 title: Modelo de Documento
 ---
-## Introdução
+## 1. Introdução
 
-<p align = "justify">
-<!-- Escreva uma introdução simples e concisa, explicando do que se trata o documento e como ele será usado no projeto (qual o objetivo do documento). -->
-</p>
+Este documento apresenta a visão geral do projeto **Sistema de Gestão de Monitorias Ibmec**. Seu objetivo é alinhar a equipe sobre os problemas a serem resolvidos, os objetivos de negócio, o público-alvo e o escopo da solução proposta, servindo como guia estratégico para todas as fases do projeto.
 
-## Metodologia
+## 2. Metodologia
 
-<p align = "justify">
-<!-- Descreva como o documento foi feito, como a técnica foi utilizada no projeto. -->
-</p>
+A visão do projeto foi definida através de discussões iniciais da equipe, baseadas em uma análise preliminar do problema e entrevistas com os alunos.
 
-## Desenvolvimento (Renomeie este tópico)
+## 3. Visão do Produto
 
-<!-- Mude o título do tópico de desenvolvimento para outros individuais de cada artefato. Adicione quantos subtópicos precisar. -->
+### 3.1. O Problema
 
-### Versão 1.0
+O processo atual de monitorias no Ibmec é descentralizado, manual e ineficiente. Alunos têm dificuldade em encontrar horários de aula e as salas. Monitores não tem um sistema de organização efetivo para seus materiais e nem um sistema de comunicação com os alunos. Coordenação e equipe CASAS não possuem dados para avaliar a eficácia do programa. A comunicação via WhatsApp e o controle via planilhas são propensos a erros e não escaláveis.
 
-<p align = "justify">
-<!-- Desenvolva o documento propriamente neste tópico. Para cada mudança relevante ou impactante, crie um novo subtópico com a versão correspondente (Exemplo: Versão 1.0, Versão 1.1, Versão 1.2) -->
-</p>
+### 3.2. A Solução Proposta
 
-<p align = "justify">
-<!-- Escreva aqui a primeira versão do documento. -->
-</p>
+Desenvolver uma **plataforma web centralizada** que automatize o ciclo de vida da monitoria. O sistema permitirá que alunos busquem e agendem sessões de forma autônoma, que monitores gerenciem sua disponibilidade e registrem horas de trabalho eficientemente, e que professores e coordenadores acompanhem o processo e extraiam dados estratégicos.
 
-## Conclusão
+### 3.3. Principais Funcionalidades (MVP)
 
-<p align = "justify">
-<!-- Descreva neste tópico como a aplicação da técnica e a criação do documento foi útil para o projeto. -->
-</p>
+- Busca e Agendamento de Monitorias (Aluno)
+- Gestão de Disponibilidade e Horas (Monitor)
+- Aprovação de Candidaturas (Professor)
+- Aprovação de Horas, Gestão de Disciplinas e Escalas (Coordenador)
+- Exportação de dados para stakeholders ( Equipe CASAS)
 
-## Referências
+## 4. Conclusão
 
-<!-- Insira referências relevantes do projeto (com um sinal de '>' antes), se possível priorize por livros e artigos, depois sites, blogs e outros projetos parecidos.
-Exemplo:
-> Referência
- -->
+A criação deste Documento de Visão foi fundamental para estabelecer um entendimento comum e um propósito claro para o projeto. Ele garante que toda a equipe trabalhe com os mesmos objetivos em mente, focando na entrega de valor para os alunos Ibmec.
 
-## Autor(es)
+## 5. Referências
 
-<!-- Para cada alteração no documento, lembre-se de descrever as mudanças, a versão, a data e creditar os autores. -->
+> CLEMENTS, Paul et al. **Documenting software architectures: views and beyond**. Addison-Wesley Professional, 2010.
 
-| Data     | Versão | Descrição            | Autor(es) |
-| -------- | ------- | ---------------------- | --------- |
-| dd/mm/aa | 1.0     | Criação do documento | Autores   |
+## 6. Autores
+
+| Data       | Versão | Descrição            | Autor(es)                      |
+| :--------- | :----- | :------------------- | :----------------------------- |
+| 01/08/2025 | 1.0    | Criação do documento | João Pedro |
