@@ -4,26 +4,19 @@ hide:
   - toc
 ---  
 
-# PBE_25.2_8003
+# PBE_25.2_8001_IV - Projeto de Extensão
 
 <div class="grid cards" markdown>
 
--   :material-github:{ .lg .right } __PBE_25.21_8003_I__
+-   :material-github:{ .lg .middle } __PBE_25.2_8001_IV__
 
     ---
 
-    Lorem Ipsum     Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum
+    Projeto de Extensão desenvolvido como parte do curso de Sistemas de Informação do IBMEC. 
+    
+    Este repositório contém toda a documentação do projeto, incluindo análise, design, implementação e entrega.
 
-    [:octicons-arrow-right-24: Repositório](https://github.com/Projetos-de-Extensao/PBE_25.2_8003_I)
-
--   :material-github:{ .lg .middle } __PBE_25.2_8003_II__
-
-    ---
-
-    Lorem Ipsum Lorem Ipsum Lorem Ipsum
-
-    [:octicons-arrow-right-24: Repositório](https://github.com/Projetos-de-Extensao/PBE_25.2_8003_II)
-
+    [:octicons-arrow-right-24: Repositório](https://github.com/Projetos-de-Extensao/PBE_25.2_8001_IV.git)
 
 </div>
 

@@ -155,7 +155,6 @@ theme:
     - content.tabs.link
     - content.tooltips
     - navigation.expand
-    - navigation.footer
     - navigation.indexes
     - navigation.instant
     - navigation.instant.prefetch
