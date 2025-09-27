@@ -1,8 +1,8 @@
 ---
-repo_url: https://github.com/jonh-carvalho/PBE_25.2_8003
+repo_url: https://github.com/Projetos-de-Extensao/PBE_25.2_8001_IV
 site_author: Jonh Carvalho
-site_name: PBE_25.2_8003
-copyright: Copyright ©️ 2025, Jonh Carvalho
+site_name: PBE_25.2_8001_IV - Projeto de Extensão
+copyright: Copyright ©️ 2025, Jonh Carvalho - IBMEC
 
 nav: 
   - Home: index.md
@@ -28,6 +28,29 @@ nav:
       - CodeSpace: Construcao/codespace.md
   - Transição:
       - Index: Transicao/index.md
+
+extra:
+  homepage: https://projetos-de-extensao.github.io/PBE_25.2_8001_IV
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Projetos-de-Extensao/PBE_25.2_8001_IV
+      name: Repositório no GitHub
+    - icon: fontawesome/solid/graduation-cap
+      link: https://ibmec.br
+      name: IBMEC
+  consent:
+    title: Consentimento de cookies
+    description: >- 
+      Usamos cookies para reconhecer suas visitas repetidas e preferências, bem como
+      para medir a eficácia de nossa documentação e se os usuários
+      encontram o que estão procurando. Com seu consentimento, você nos ajuda a
+      melhorar nossa documentação.
+    actions:
+      - accept
+      - reject
+      - manage
+  version:
+    provider: mike
 
 extra_css:
   - css/extra.css
@@ -84,45 +107,62 @@ markdown_extensions:
       permalink: true
 
 plugins:
+  - search:
+      lang: 
+        - pt
+        - en
   - minify:
       minify_html: true
-  - search
+      minify_js: true
+      minify_css: true
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: datetime
+      locale: pt_BR
+  - git-committers:
+      repository: Projetos-de-Extensao/PBE_25.2_8001_IV
+      branch: main
 
 theme:
   name: material
-  logo: assets/ibmec_logo.png
+  language: pt-BR
+  logo: assets/Ibmec_logo.png
+  favicon: assets/Ibmec_logo.png
   palette:
-    
-    - media: "(prefers-color-scheme)"
-      toggle:
-        icon: material/toggle-switch
-        name: Switch to light mode
+    # Paleta para modo claro
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: indigo
-      accent: black
+      primary: blue
+      accent: light blue
       toggle:
-        icon: material/toggle-switch-off
-        name: Switch to dark mode
+        icon: material/brightness-7
+        name: Alternar para modo escuro
+    # Paleta para modo escuro
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: deep orange
-      accent: amber
+      primary: blue
+      accent: light blue
       toggle:
-        icon: material/toggle-switch-off
-        name: Switch to system preference
-      color_mode: dark
-      language: pt-BR
-      favicon: images/favicon.png
-      user_color_mode_toggle: true
+        icon: material/brightness-4
+        name: Alternar para modo claro
   
   features:
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
     - content.code.copy
+    - content.tabs.link
+    - content.tooltips
+    - navigation.expand
+    - navigation.footer
     - navigation.indexes
     - navigation.instant
+    - navigation.instant.prefetch
     - navigation.instant.progress
     - navigation.path
-    - navigation.tabs
+    - navigation.prune
+    - navigation.sections
     - navigation.top
     - navigation.tracking
     - search.highlight
@@ -131,9 +171,10 @@ theme:
     - toc.follow
     - toc.integrate
   font:
-    text: Roboto
-    code: Roboto Mono
+    text: Inter
+    code: Fira Code
   icon:
     repo: fontawesome/brands/github
-    logo: simple/react
-    favicon: simple/react
+    edit: material/pencil
+    view: material/eye
+    logo: material/school
