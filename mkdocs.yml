@@ -172,6 +172,7 @@ theme:
     - search.suggest
     - toc.follow
     - toc.integrate
+    - navigation.tabs
   font:
     text: Inter
     code: Fira Code
