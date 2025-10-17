@@ -1,0 +1,14 @@
+-- Script para renomear tabelas de plataforma_Casa para gestao_monitoria
+
+ALTER TABLE plataforma_Casa_tipousuario RENAME TO gestao_monitoria_tipousuario;
+ALTER TABLE plataforma_Casa_curso RENAME TO gestao_monitoria_curso;
+ALTER TABLE plataforma_Casa_sala RENAME TO gestao_monitoria_sala;
+ALTER TABLE plataforma_Casa_usuario RENAME TO gestao_monitoria_usuario;
+ALTER TABLE plataforma_Casa_funcionario RENAME TO gestao_monitoria_funcionario;
+ALTER TABLE plataforma_Casa_aluno RENAME TO gestao_monitoria_aluno;
+ALTER TABLE plataforma_Casa_vaga RENAME TO gestao_monitoria_vaga;
+ALTER TABLE plataforma_Casa_vaga_monitores RENAME TO gestao_monitoria_vaga_monitores;
+ALTER TABLE plataforma_Casa_turma RENAME TO gestao_monitoria_turma;
+ALTER TABLE plataforma_Casa_participacaomonitoria RENAME TO gestao_monitoria_participacaomonitoria;
+ALTER TABLE plataforma_Casa_presenca RENAME TO gestao_monitoria_presenca;
+ALTER TABLE plataforma_Casa_inscricao RENAME TO gestao_monitoria_inscricao;

@@ -1,0 +1,9 @@
+{
+  "short_name": "Monitorias",
+  "name": "Sistema de Gestão de Monitorias",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#002555",
+  "background_color": "#ffffff"
+}
