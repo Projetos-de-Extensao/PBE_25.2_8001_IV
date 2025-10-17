@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registrar Nova Vaga</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            background: #fff;
+            max-width: 480px;
+            margin: 48px auto;
+            padding: 32px 36px 28px 36px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(40, 40, 80, 0.18);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 28px;
+            font-weight: 700;
+            color: #2575fc;
+            letter-spacing: 1px;
+        }
+        label {
+            display: block;
+            margin-top: 18px;
+            margin-bottom: 7px;
+            font-weight: 500;
+            color: #333;
+        }
+        input[type="text"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            box-sizing: border-box;
+            font-size: 15px;
+            background: #f8fafc;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #2575fc;
+            outline: none;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+        .checkbox-group {
+            margin-top: 18px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-group input[type="checkbox"] {
+            accent-color: #2575fc;
+            width: 18px;
+            height: 18px;
+        }
+        .checkbox-group label {
+            margin-left: 8px;
+            font-weight: 400;
+            color: #444;
+        }
+        button {
+            background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+            color: #fff;
+            border: none;
+            padding: 12px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: 700;
+            margin-top: 18px;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(40, 40, 80, 0.10);
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: linear-gradient(90deg, #2575fc 0%, #6a11cb 100%);
+        }
+        .success-message {
+            color: #fff;
+            background: #2575fc;
+            border-radius: 8px;
+            padding: 10px 0;
+            text-align: center;
+            margin-bottom: 18px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(40, 40, 80, 0.10);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Registrar Nova Vaga</h1>
+        {% if mensagem %}
+            <div class="success-message">
+                {{ mensagem }}
+            </div>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <label for="nome">Nome:</label>
+            <input type="text" name="nome" id="nome" required>
+
+            <label for="curso">Curso:</label>
+            <select name="curso" id="curso" required>
+                <option value="">Selecione...</option>
+                {% for curso in cursos %}
+                    <option value="{{ curso.id }}">{{ curso.nome }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="coordenador">Coordenador:</label>
+            <select name="coordenador" id="coordenador" required>
+                <option value="">Selecione...</option>
+                {% for coord in coordenadores %}
+                    <option value="{{ coord.id }}">{{ coord.nome }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="descricao">Descrição:</label>
+            <textarea name="descricao" id="descricao" required></textarea>
+
+            <label for="requisitos">Requisitos:</label>
+            <textarea name="requisitos" id="requisitos" required></textarea>
+
+            <div class="checkbox-group">
+                <input type="checkbox" name="ativo" id="ativo" checked>
+                <label for="ativo">Ativo</label>
+            </div>
+
+            <button type="submit">Registrar</button>
+        </form>
+    </div>
+</body>
+</html>

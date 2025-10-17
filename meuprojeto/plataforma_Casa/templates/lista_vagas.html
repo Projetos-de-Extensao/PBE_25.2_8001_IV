@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Vagas</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #245FFF 0%, #fac400 100%);
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            background: #fff;
+            max-width: 900px;
+            margin: 48px auto;
+            padding: 32px 36px 28px 36px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(40, 40, 80, 0.18);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 28px;
+            font-weight: 700;
+            color: #245FFF;
+            letter-spacing: 1px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 24px;
+        }
+        th, td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #d1d3d4;
+            text-align: left;
+        }
+        th {
+            background: #f4f8fb;
+            color: #245FFF;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background: #f4f8fb;
+        }
+        tr:hover {
+            background: #d1d3d4;
+        }
+        .ativo {
+            background: #fac400;
+            color: #005555;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        .inativo {
+            background: #6d6e71;
+            color: #fff;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        .pantone {
+            background: #245FFF;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        td, th {
+            border-bottom: 1px solid #d1d3d4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lista de Vagas</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Curso</th>
+                    <th>Coordenador</th>
+                    <th>Descrição</th>
+                    <th>Requisitos</th>
+                    <th>Status</th>
+                    <th>Criado em</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vaga in vagas %}
+                <tr>
+                    <td><span class="pantone">{{ vaga.nome }}</span></td>
+                    <td>{{ vaga.curso.nome }}</td>
+                    <td>{{ vaga.coordenador.nome }}</td>
+                    <td>{{ vaga.descricao }}</td>
+                    <td>{{ vaga.requisitos }}</td>
+                    <td>
+                        {% if vaga.ativo %}
+                            <span class="ativo">Ativo</span>
+                        {% else %}
+                            <span class="inativo">Inativo</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ vaga.criado_em|date:"d/m/Y H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align:center;">Nenhuma vaga encontrada.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

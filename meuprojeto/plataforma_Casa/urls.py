@@ -1,6 +1,8 @@
 from django.urls import path
-from .views import sql_view
+from .views import  registrar_vaga, lista_vaga
+
 
 urlpatterns = [
-    path('sql/', sql_view, name='sql_view'),
-    ]
+    path('registrar-vaga/', registrar_vaga, name='registrar_vaga'),
+    path('listar-vagas/', lista_vaga, name='lista_vagas'),
+]
