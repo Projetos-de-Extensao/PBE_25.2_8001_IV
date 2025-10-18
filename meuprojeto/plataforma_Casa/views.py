@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.http import JsonResponse
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, Avg
 from .models import (
     Usuario, Aluno, Funcionario, Curso, Sala, Vaga, Turma, 
@@ -14,7 +16,39 @@ from .repository import (
 )
 
 
+# ==================== AUTENTICAÇÃO ====================
+def login_view(request):
+    """
+    View de Login - Autentica usuários
+    """
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        # Autenticar usuário
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            messages.success(request, f'Bem-vindo, {user.first_name or user.username}!')
+            return redirect('dashboard')
+        else:
+            messages.error(request, 'Usuário ou senha inválidos!')
+    
+    return render(request, 'login.html')
+
+
+def logout_view(request):
+    """
+    View de Logout - Faz logout do usuário
+    """
+    logout(request)
+    messages.success(request, 'Você foi desconectado com sucesso!')
+    return redirect('login')
+
+
 # ==================== DASHBOARD ====================
+@login_required(login_url='login')
 def dashboard(request):
     """
     View do Dashboard - Página inicial com resumo geral

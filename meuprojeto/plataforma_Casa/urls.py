@@ -25,7 +25,20 @@ from . import views
 urlpatterns = [
     
     # ============================================================================
-    # 1. DASHBOARD - PÁGINA INICIAL
+    # 1. AUTENTICAÇÃO - LOGIN E LOGOUT
+    # ============================================================================
+    # Rota para página de login
+    # Método HTTP: GET (exibe formulário), POST (autentica usuário)
+    # URL: http://localhost:8000/login/
+    path('login/', views.login_view, name='login'),
+    
+    # Rota para logout
+    # Método HTTP: GET (faz logout e redireciona para login)
+    # URL: http://localhost:8000/logout/
+    path('logout/', views.logout_view, name='logout'),
+    
+    # ============================================================================
+    # 2. DASHBOARD - PÁGINA INICIAL
     # ============================================================================
     # Rota raiz da aplicação - exibe o dashboard com resumo geral
     # Método HTTP: GET
