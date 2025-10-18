@@ -28,22 +28,27 @@
         }
         
         /* Estilos específicos do layout (não inclusos no arquivo de cores) */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+        
         .sidebar {
             background-color: #002555;
-            min-height: 100vh;
+            height: calc(100vh - 60px);
             padding: 2rem 0;
             position: fixed;
             left: 0;
             top: 60px;
             width: 250px;
             z-index: 999;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
             overflow-y: auto;
             border-right: 4px solid #F5AC00;
         }
         
         .sidebar.collapsed {
-            transform: translateX(-100%);
+            transform: translateX(-250px);
         }
         
         .sidebar-item {
@@ -81,24 +86,29 @@
         }
         
         .sidebar-toggle-btn {
-            display: none;
             background: none;
             border: none;
             color: #ffffff;
             font-size: 1.5rem;
             cursor: pointer;
             margin-right: 1rem;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-toggle-btn:hover {
+            color: #F5AC00;
         }
         
         .main-content {
             padding: 2rem;
             background-color: #fafaf8;
             margin-left: 250px;
-            transition: all 0.3s ease;
+            transition: margin-left 0.3s ease;
             min-height: calc(100vh - 60px);
         }
         
-        .main-content.expanded {
+        .main-content.sidebar-collapsed {
             margin-left: 0;
         }
         
@@ -125,10 +135,10 @@
             margin-top: 3rem;
             border-top: 4px solid #F5AC00;
             margin-left: 250px;
-            transition: all 0.3s ease;
+            transition: margin-left 0.3s ease;
         }
         
-        .footer.expanded {
+        .footer.sidebar-collapsed {
             margin-left: 0;
         }
         
@@ -136,13 +146,10 @@
         @media (max-width: 768px) {
             .sidebar {
                 width: 250px;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.3);
             }
             
             .sidebar-close-btn {
-                display: block;
-            }
-            
-            .sidebar-toggle-btn {
                 display: block;
             }
             
@@ -150,12 +157,22 @@
                 margin-left: 0;
             }
             
-            .main-content.expanded {
-                margin-left: 0;
-            }
-            
             .footer {
                 margin-left: 0;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .sidebar-toggle-btn {
+                display: none !important;
+            }
+            
+            .sidebar-close-btn {
+                display: none !important;
+            }
+            
+            .sidebar {
+                transform: none !important;
             }
         }
         
@@ -317,14 +334,16 @@
             const footer = document.getElementById('footer');
             
             if (sidebar.classList.contains('collapsed')) {
+                // Abrir sidebar
                 sidebar.classList.remove('collapsed');
-                mainContent.classList.remove('expanded');
-                footer.classList.remove('expanded');
+                mainContent.classList.remove('sidebar-collapsed');
+                footer.classList.remove('sidebar-collapsed');
                 localStorage.setItem('sidebarOpen', 'true');
             } else {
+                // Fechar sidebar
                 sidebar.classList.add('collapsed');
-                mainContent.classList.add('expanded');
-                footer.classList.add('expanded');
+                mainContent.classList.add('sidebar-collapsed');
+                footer.classList.add('sidebar-collapsed');
                 localStorage.setItem('sidebarOpen', 'false');
             }
         }
@@ -335,8 +354,8 @@
             const footer = document.getElementById('footer');
             
             sidebar.classList.add('collapsed');
-            mainContent.classList.add('expanded');
-            footer.classList.add('expanded');
+            mainContent.classList.add('sidebar-collapsed');
+            footer.classList.add('sidebar-collapsed');
             localStorage.setItem('sidebarOpen', 'false');
         }
         
@@ -346,8 +365,8 @@
             const footer = document.getElementById('footer');
             
             sidebar.classList.remove('collapsed');
-            mainContent.classList.remove('expanded');
-            footer.classList.remove('expanded');
+            mainContent.classList.remove('sidebar-collapsed');
+            footer.classList.remove('sidebar-collapsed');
             localStorage.setItem('sidebarOpen', 'true');
         }
         
@@ -361,23 +380,15 @@
             // Em mobile, o sidebar começa fechado
             if (window.innerWidth <= 768) {
                 if (sidebarOpen === null) {
-                    sidebar.classList.add('collapsed');
-                    mainContent.classList.add('expanded');
-                    footer.classList.add('expanded');
+                    closeSidebar();
                 } else if (sidebarOpen === 'false') {
-                    sidebar.classList.add('collapsed');
-                    mainContent.classList.add('expanded');
-                    footer.classList.add('expanded');
+                    closeSidebar();
                 } else {
-                    sidebar.classList.remove('collapsed');
-                    mainContent.classList.remove('expanded');
-                    footer.classList.remove('expanded');
+                    openSidebar();
                 }
             } else {
                 // Em desktop, o sidebar fica sempre aberto
-                sidebar.classList.remove('collapsed');
-                mainContent.classList.remove('expanded');
-                footer.classList.remove('expanded');
+                openSidebar();
             }
             
             // Fechar sidebar ao clicar em um link de navegação
@@ -394,14 +405,10 @@
         // Responsividade: ajustar quando a janela é redimensionada
         window.addEventListener('resize', function() {
             const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            const footer = document.getElementById('footer');
             
             if (window.innerWidth > 768) {
                 // Desktop: sidebar sempre visível
-                sidebar.classList.remove('collapsed');
-                mainContent.classList.remove('expanded');
-                footer.classList.remove('expanded');
+                openSidebar();
             }
         });
     </script>
