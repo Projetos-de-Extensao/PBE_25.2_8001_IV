@@ -696,24 +696,127 @@ TECNOLOGIAS
 ## 🎨 Design e Interface
 
 ### Componentes
-- ✅ Navbar com gradiente
-- ✅ Sidebar responsivo
-- ✅ Cards interativos
-- ✅ Tabelas hover effects
-- ✅ Formulários validados
-- ✅ Alertas coloridos
+- ✅ Navbar com gradiente institucional
+- ✅ Sidebar responsivo com cores corporativas
+- ✅ Cards interativos com borders coloridas
+- ✅ Tabelas com headers em gradiente
+- ✅ Formulários com focus em cores institucionais
+- ✅ Alertas coloridos por tipo
 - ✅ Badges de status
-- ✅ Modais
+- ✅ Modais com headers gradiente
 
-### Cores
-```css
-Primária:       #667eea (Roxo)
-Secundária:     #764ba2 (Roxo Escuro)
-Sucesso:        #d4edda (Verde)
-Erro:           #f8d7da (Vermelho)
-Aviso:          #fff3cd (Amarelo)
-Info:           #d1ecf1 (Azul)
+### 🎨 Paleta de Cores Institucionais
+
+A Plataforma Casa utiliza paleta de cores oficial, padronizada e consistente:
+
+#### Cores Primárias
 ```
+🟨 Amarelo Institucional:  #F5AC00 (Pantone 1235 C)
+   - Destaque, acentos, botões importantes
+
+🔵 Azul Escuro Principal:  #002555 (Pantone 655 C)
+   - Navbar, sidebar, headers, textos principais
+
+🔷 Azul Auxiliar:          #1245FF (Pantone 2387 C)
+   - Gradientes, links secundários, hovers
+```
+
+#### Cores de Apoio (Cinzas)
+```
+🟤 Cinza Escuro:    #6d6e71 (Texto principal)
+⚪ Cinza Médio:     #a7a9ab (Texto secundário)
+🩶 Cinza Claro:     #d1d3d4 (Bordas/divisores)
+⚫ Branco:           #ffffff (Fundo principal)
+```
+
+#### Cores de Status
+```
+✅ Sucesso:  #27ae60 (Verde)
+❌ Erro:     #e74c3c (Vermelho)
+⚠️  Aviso:    #f39c12 (Laranja)
+ℹ️  Info:     #3498db (Azul)
+```
+
+### Implementação
+
+O arquivo CSS centralizado contém todas as cores:
+```
+plataforma_Casa/templates/css/cores-institucionais.css
+```
+
+**Variáveis CSS Disponíveis:**
+```css
+--cor-amarelo-institucional
+--cor-azul-escuro-principal
+--cor-azul-auxiliar
+--cor-cinza-escuro
+--cor-cinza-medio
+--cor-cinza-claro
+--cor-branco
+--cor-sucesso
+--cor-erro
+--cor-aviso
+--cor-info
+```
+
+**Classes Utilitárias:**
+```html
+<!-- Backgrounds -->
+<div class="bg-accent">Fundo amarelo</div>
+<div class="bg-primary-dark">Fundo azul escuro</div>
+
+<!-- Textos -->
+<p class="text-accent">Texto amarelo</p>
+<p class="text-primary-dark">Texto azul escuro</p>
+
+<!-- Borders -->
+<div class="border-accent">Border amarela</div>
+```
+
+### Componentes com Cores Institucionais
+
+**Navbar:**
+- Gradiente: Azul escuro → Azul auxiliar
+- Border inferior: Amarelo institucional
+- Texto: Branco
+- Hover: Amarelo institucional
+
+**Sidebar:**
+- Fundo: Azul escuro
+- Border direito: Amarelo institucional
+- Items ativos: Fundo amarelo, texto azul
+- Texto: Branco
+
+**Cards:**
+- Border superior: Azul escuro (4px)
+- Header: Gradiente azul
+- Header border: Amarelo institucional
+
+**Tabelas:**
+- Header: Gradiente azul
+- Header border: Amarelo institucional
+- Hover row: Azul com 5% opacidade
+
+**Botões:**
+- Primário: Azul escuro (#002555)
+- Hover: Azul auxiliar (#1245FF)
+- Ativo: Amarelo institucional (#F5AC00)
+
+---
+
+## 📚 Documentação de Cores
+
+Para mais detalhes sobre a paleta de cores institucional, consulte:
+```
+CORES-INSTITUCIONAIS.md
+```
+
+Este arquivo contém:
+- Guia completo de cores
+- Casos de uso para cada cor
+- Classes CSS disponíveis
+- Recomendações de design
+- Gradientes utilizados
 
 ---
 
@@ -801,17 +904,30 @@ Controller (rota)   ←→     URL Config
 ## 📝 Arquivos Criados/Modificados
 
 ```
-✅ CRIADOS
-├─ plataforma_Casa/views.py (novo - completo)
-├─ plataforma_Casa/urls.py (renovado - comentado)
-├─ 21 templates HTML (nova estrutura)
-├─ FRONTEND_MVT.md (documentação)
+✅ CRIADOS (Backend & MVT)
+├─ plataforma_Casa/views.py (novo - 31 views + 1 legada)
+├─ plataforma_Casa/urls.py (renovado - 34 rotas comentadas)
+├─ 21 templates HTML (nova estrutura responsiva)
+├─ FRONTEND_MVT.md (documentação técnica)
 ├─ anderson.md (este arquivo)
-└─ 14-arquitetura-mvt.puml (diagrama)
+├─ 14-arquitetura-mvt.puml (diagrama arquitetura)
+
+✅ CRIADOS (Design & Cores)
+├─ plataforma_Casa/templates/css/cores-institucionais.css (paleta oficial)
+└─ CORES-INSTITUCIONAIS.md (guia completo de cores)
 
 📝 MODIFICADOS
-├─ plataforma_Casa/urls.py (adicionados comentários)
+├─ plataforma_Casa/templates/base.html (integração CSS institucional)
 └─ meuprojeto/urls.py (inclui rotas da app)
+
+🎨 PALETA DE CORES ATUALIZADA
+├─ #F5AC00 - Amarelo institucional (Pantone 1235 C)
+├─ #002555 - Azul escuro principal (Pantone 655 C)
+├─ #1245FF - Azul auxiliar (Pantone 2387 C)
+├─ #6d6e71 - Cinza escuro
+├─ #a7a9ab - Cinza médio
+├─ #d1d3d4 - Cinza claro
+└─ #ffffff - Branco
 ```
 
 ---
