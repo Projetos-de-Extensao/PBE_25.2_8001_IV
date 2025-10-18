@@ -1,0 +1,640 @@
+/**
+ * ================================================================================
+ * PALETA DE CORES INSTITUCIONAIS - PLATAFORMA CASA
+ * ================================================================================
+ * 
+ * Cores oficiais definidas para manter identidade visual consistente
+ * Seguindo padrão Pantone para garantir reprodutibilidade
+ * 
+ * Data: 18 de outubro de 2025
+ * Versão: 1.0
+ */
+
+/* ================================================================================
+   VARIÁVEIS CSS - CORES INSTITUCIONAIS
+   ================================================================================ */
+
+:root {
+    /* Cores Primárias */
+    --cor-amarelo-institucional: #F5AC00;      /* Pantone 1235 C - Amarelo vibrante */
+    --cor-azul-escuro-principal: #002555;      /* Pantone 655 C - Azul escuro/marinho */
+    
+    /* Cores Auxiliares */
+    --cor-azul-auxiliar: #1245FF;              /* Pantone 2387 C - Azul brilhante */
+    
+    /* Cores de Apoio (Cinzas) */
+    --cor-cinza-escuro: #6d6e71;               /* Tonalidade de apoio - Texto principal */
+    --cor-cinza-medio: #a7a9ab;                /* Cinza médio - Texto secundário */
+    --cor-cinza-claro: #d1d3d4;                /* Cinza claro - Bordas/Divisores */
+    
+    /* Cores Neutras */
+    --cor-branco: #ffffff;                     /* Branco - Fundo principal */
+    --cor-preto: #000000;                      /* Preto - Texto escuro */
+    
+    /* Cores de Status (Complementares) */
+    --cor-sucesso: #27ae60;                    /* Verde - Sucesso/Confirmação */
+    --cor-erro: #e74c3c;                       /* Vermelho - Erro/Aviso crítico */
+    --cor-aviso: #f39c12;                      /* Laranja - Aviso/Atenção */
+    --cor-info: #3498db;                       /* Azul claro - Informação */
+    
+    /* Sombras e Destaques */
+    --sombra-leve: rgba(0, 37, 85, 0.1);       /* Sombra com azul escuro */
+    --sombra-media: rgba(0, 37, 85, 0.2);      /* Sombra média */
+    --sombra-forte: rgba(0, 37, 85, 0.3);      /* Sombra forte */
+}
+
+/* ================================================================================
+   ESTILOS GLOBAIS - APLICANDO PALETA
+   ================================================================================ */
+
+html, body {
+    background-color: var(--cor-branco);
+    color: var(--cor-cinza-escuro);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ================================================================================
+   NAVBAR - BARRA DE NAVEGAÇÃO
+   ================================================================================ */
+
+.navbar {
+    background: linear-gradient(135deg, var(--cor-azul-escuro-principal) 0%, var(--cor-azul-auxiliar) 100%);
+    box-shadow: 0 2px 8px var(--sombra-media);
+    border-bottom: 4px solid var(--cor-amarelo-institucional);
+}
+
+.navbar-brand {
+    color: var(--cor-branco) !important;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+}
+
+.navbar-brand:hover {
+    color: var(--cor-amarelo-institucional) !important;
+    transition: color 0.3s ease;
+}
+
+.nav-link {
+    color: var(--cor-branco) !important;
+    margin: 0 0.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: var(--cor-amarelo-institucional) !important;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background-color: var(--cor-amarelo-institucional);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-link:hover::after {
+    width: 90%;
+}
+
+.navbar-toggler {
+    border-color: var(--cor-amarelo-institucional);
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23F5AC00' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.dropdown-menu {
+    background-color: var(--cor-azul-escuro-principal);
+    border: 1px solid var(--cor-amarelo-institucional);
+}
+
+.dropdown-item {
+    color: var(--cor-branco);
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover,
+.dropdown-item:active {
+    background-color: var(--cor-amarelo-institucional);
+    color: var(--cor-azul-escuro-principal);
+}
+
+/* ================================================================================
+   SIDEBAR - MENU LATERAL
+   ================================================================================ */
+
+.sidebar {
+    background-color: var(--cor-azul-escuro-principal);
+    color: var(--cor-branco);
+    box-shadow: 2px 0 8px var(--sombra-media);
+    border-right: 4px solid var(--cor-amarelo-institucional);
+}
+
+.sidebar-title {
+    color: var(--cor-amarelo-institucional);
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 1rem 0.5rem;
+    border-bottom: 2px solid var(--cor-cinza-claro);
+    margin-bottom: 1rem;
+}
+
+.sidebar-nav-item {
+    color: var(--cor-branco);
+    padding: 0.75rem 1rem;
+    margin: 0.25rem 0;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: block;
+}
+
+.sidebar-nav-item:hover {
+    background-color: rgba(245, 172, 0, 0.1);
+    border-left-color: var(--cor-amarelo-institucional);
+    color: var(--cor-amarelo-institucional);
+}
+
+.sidebar-nav-item.active {
+    background-color: var(--cor-amarelo-institucional);
+    color: var(--cor-azul-escuro-principal);
+    border-left-color: var(--cor-azul-escuro-principal);
+    font-weight: 600;
+}
+
+/* ================================================================================
+   CARDS E CONTAINERS
+   ================================================================================ */
+
+.card {
+    border: 1px solid var(--cor-cinza-claro);
+    border-top: 4px solid var(--cor-azul-escuro-principal);
+    box-shadow: 0 2px 8px var(--sombra-leve);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 16px var(--sombra-media);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--cor-azul-escuro-principal) 0%, var(--cor-azul-auxiliar) 100%);
+    color: var(--cor-branco);
+    border-bottom: 2px solid var(--cor-amarelo-institucional);
+    font-weight: 600;
+}
+
+.card-title {
+    color: var(--cor-azul-escuro-principal);
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.card-text {
+    color: var(--cor-cinza-escuro);
+}
+
+.card-footer {
+    background-color: var(--cor-cinza-claro);
+    border-top: 1px solid var(--cor-cinza-claro);
+}
+
+/* ================================================================================
+   BOTÕES
+   ================================================================================ */
+
+.btn-primary {
+    background-color: var(--cor-azul-escuro-principal);
+    border-color: var(--cor-azul-escuro-principal);
+    color: var(--cor-branco);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--cor-azul-auxiliar);
+    border-color: var(--cor-azul-auxiliar);
+    box-shadow: 0 4px 12px rgba(18, 69, 255, 0.3);
+}
+
+.btn-primary:active,
+.btn-primary.active {
+    background-color: var(--cor-amarelo-institucional);
+    border-color: var(--cor-amarelo-institucional);
+    color: var(--cor-azul-escuro-principal);
+}
+
+.btn-secondary {
+    background-color: var(--cor-cinza-medio);
+    border-color: var(--cor-cinza-medio);
+    color: var(--cor-branco);
+    font-weight: 600;
+}
+
+.btn-secondary:hover {
+    background-color: var(--cor-cinza-escuro);
+    border-color: var(--cor-cinza-escuro);
+}
+
+.btn-success {
+    background-color: var(--cor-sucesso);
+    border-color: var(--cor-sucesso);
+    color: var(--cor-branco);
+}
+
+.btn-success:hover {
+    background-color: #229954;
+    border-color: #229954;
+}
+
+.btn-danger {
+    background-color: var(--cor-erro);
+    border-color: var(--cor-erro);
+    color: var(--cor-branco);
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+    border-color: #c0392b;
+}
+
+.btn-warning {
+    background-color: var(--cor-aviso);
+    border-color: var(--cor-aviso);
+    color: var(--cor-branco);
+}
+
+.btn-warning:hover {
+    background-color: #e67e22;
+    border-color: #e67e22;
+}
+
+.btn-info {
+    background-color: var(--cor-info);
+    border-color: var(--cor-info);
+    color: var(--cor-branco);
+}
+
+.btn-info:hover {
+    background-color: #2980b9;
+    border-color: #2980b9;
+}
+
+.btn-outline-primary {
+    color: var(--cor-azul-escuro-principal);
+    border-color: var(--cor-azul-escuro-principal);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--cor-azul-escuro-principal);
+    border-color: var(--cor-azul-escuro-principal);
+    color: var(--cor-branco);
+}
+
+/* ================================================================================
+   FORMULÁRIOS
+   ================================================================================ */
+
+.form-label {
+    color: var(--cor-cinza-escuro);
+    font-weight: 600;
+}
+
+.form-control {
+    border: 1px solid var(--cor-cinza-claro);
+    color: var(--cor-cinza-escuro);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--cor-azul-escuro-principal);
+    box-shadow: 0 0 0 0.2rem rgba(0, 37, 85, 0.25);
+    color: var(--cor-cinza-escuro);
+}
+
+.form-control::placeholder {
+    color: var(--cor-cinza-medio);
+}
+
+.input-group-text {
+    background-color: var(--cor-cinza-claro);
+    border-color: var(--cor-cinza-claro);
+    color: var(--cor-cinza-escuro);
+}
+
+.form-check-input:checked {
+    background-color: var(--cor-azul-escuro-principal);
+    border-color: var(--cor-azul-escuro-principal);
+}
+
+.form-check-input:focus {
+    border-color: var(--cor-azul-escuro-principal);
+    box-shadow: 0 0 0 0.2rem rgba(0, 37, 85, 0.25);
+}
+
+/* ================================================================================
+   TABELAS
+   ================================================================================ */
+
+.table {
+    color: var(--cor-cinza-escuro);
+    border-color: var(--cor-cinza-claro);
+}
+
+.table thead {
+    background: linear-gradient(135deg, var(--cor-azul-escuro-principal) 0%, var(--cor-azul-auxiliar) 100%);
+    color: var(--cor-branco);
+    font-weight: 600;
+    border-bottom: 2px solid var(--cor-amarelo-institucional);
+}
+
+.table thead th {
+    border-color: var(--cor-amarelo-institucional);
+}
+
+.table tbody tr {
+    border-bottom-color: var(--cor-cinza-claro);
+    transition: all 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 37, 85, 0.05);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(245, 172, 0, 0.02);
+}
+
+.table-bordered {
+    border-color: var(--cor-cinza-claro);
+}
+
+/* ================================================================================
+   ALERTAS E MENSAGENS
+   ================================================================================ */
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+    color: #856404;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+.alert-primary {
+    background-color: rgba(0, 37, 85, 0.1);
+    border-color: var(--cor-azul-escuro-principal);
+    color: var(--cor-azul-escuro-principal);
+}
+
+/* ================================================================================
+   BADGES
+   ================================================================================ */
+
+.badge-primary {
+    background-color: var(--cor-azul-escuro-principal);
+    color: var(--cor-branco);
+}
+
+.badge-secondary {
+    background-color: var(--cor-cinza-medio);
+    color: var(--cor-branco);
+}
+
+.badge-success {
+    background-color: var(--cor-sucesso);
+    color: var(--cor-branco);
+}
+
+.badge-danger {
+    background-color: var(--cor-erro);
+    color: var(--cor-branco);
+}
+
+.badge-warning {
+    background-color: var(--cor-aviso);
+    color: var(--cor-branco);
+}
+
+.badge-info {
+    background-color: var(--cor-info);
+    color: var(--cor-branco);
+}
+
+.badge-light {
+    background-color: var(--cor-cinza-claro);
+    color: var(--cor-cinza-escuro);
+}
+
+.badge-dark {
+    background-color: var(--cor-azul-escuro-principal);
+    color: var(--cor-branco);
+}
+
+/* ================================================================================
+   TÍTULOS E HEADINGS
+   ================================================================================ */
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--cor-azul-escuro-principal);
+    font-weight: 700;
+}
+
+h1 {
+    border-bottom: 3px solid var(--cor-amarelo-institucional);
+    padding-bottom: 0.5rem;
+}
+
+h2 {
+    border-left: 4px solid var(--cor-amarelo-institucional);
+    padding-left: 1rem;
+}
+
+/* ================================================================================
+   LINKS
+   ================================================================================ */
+
+a {
+    color: var(--cor-azul-escuro-principal);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: var(--cor-amarelo-institucional);
+    text-decoration: underline;
+}
+
+.link-secondary {
+    color: var(--cor-cinza-medio);
+}
+
+.link-secondary:hover {
+    color: var(--cor-cinza-escuro);
+}
+
+/* ================================================================================
+   PAGINAÇÃO
+   ================================================================================ */
+
+.pagination .page-link {
+    color: var(--cor-azul-escuro-principal);
+    border-color: var(--cor-cinza-claro);
+    background-color: var(--cor-branco);
+}
+
+.pagination .page-link:hover {
+    color: var(--cor-branco);
+    background-color: var(--cor-azul-escuro-principal);
+    border-color: var(--cor-azul-escuro-principal);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--cor-amarelo-institucional);
+    border-color: var(--cor-amarelo-institucional);
+    color: var(--cor-azul-escuro-principal);
+}
+
+/* ================================================================================
+   MODAIS
+   ================================================================================ */
+
+.modal-header {
+    background: linear-gradient(135deg, var(--cor-azul-escuro-principal) 0%, var(--cor-azul-auxiliar) 100%);
+    color: var(--cor-branco);
+    border-bottom: 2px solid var(--cor-amarelo-institucional);
+}
+
+.modal-header .btn-close {
+    filter: invert(1);
+}
+
+.modal-title {
+    font-weight: 700;
+}
+
+/* ================================================================================
+   RODAPÉ
+   ================================================================================ */
+
+footer {
+    background-color: var(--cor-azul-escuro-principal);
+    color: var(--cor-branco);
+    border-top: 4px solid var(--cor-amarelo-institucional);
+    margin-top: 3rem;
+    padding: 2rem 0;
+}
+
+footer a {
+    color: var(--cor-amarelo-institucional);
+}
+
+footer a:hover {
+    color: var(--cor-branco);
+    text-decoration: underline;
+}
+
+/* ================================================================================
+   UTILITÁRIOS ADICIONAIS
+   ================================================================================ */
+
+.bg-primary-dark {
+    background-color: var(--cor-azul-escuro-principal) !important;
+    color: var(--cor-branco);
+}
+
+.bg-primary-light {
+    background-color: rgba(0, 37, 85, 0.1) !important;
+}
+
+.bg-accent {
+    background-color: var(--cor-amarelo-institucional) !important;
+}
+
+.bg-accent-dark {
+    background-color: var(--cor-azul-escuro-principal) !important;
+}
+
+.text-primary-dark {
+    color: var(--cor-azul-escuro-principal) !important;
+}
+
+.text-accent {
+    color: var(--cor-amarelo-institucional) !important;
+}
+
+.text-muted {
+    color: var(--cor-cinza-medio) !important;
+}
+
+.border-accent {
+    border-color: var(--cor-amarelo-institucional) !important;
+}
+
+.border-primary-dark {
+    border-color: var(--cor-azul-escuro-principal) !important;
+}
+
+/* ================================================================================
+   DIVIDERS E SEPARADORES
+   ================================================================================ */
+
+hr {
+    border-top-color: var(--cor-cinza-claro);
+}
+
+.divider-accent {
+    border-top: 3px solid var(--cor-amarelo-institucional);
+    margin: 2rem 0;
+}
+
+.divider-primary {
+    border-top: 2px solid var(--cor-azul-escuro-principal);
+    margin: 1.5rem 0;
+}
+
+/* ================================================================================
+   RESPONSIVE
+   ================================================================================ */
+
+@media (max-width: 768px) {
+    .sidebar {
+        border-right: none;
+        border-bottom: 4px solid var(--cor-amarelo-institucional);
+    }
+    
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+}
+
+/* ================================================================================
+   FIM DO ARQUIVO - CORES INSTITUCIONAIS
+   ================================================================================ */
