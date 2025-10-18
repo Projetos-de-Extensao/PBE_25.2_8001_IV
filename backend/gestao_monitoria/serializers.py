@@ -4,7 +4,7 @@ from rest_framework import serializers
 from .models import (AgendamentoMonitoria, AlunoProfile, Curso,
                      FuncionarioProfile, HorarioDisponivel, Inscricao,
                      ParticipacaoMonitoria, Presenca, Sala, SubmissaoHoras,
-                     Turma, Vaga)
+                     Turma, TurmaDiaSemana, Vaga)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -64,6 +64,17 @@ class VagaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TurmaDiaSemanaSerializer(serializers.ModelSerializer):
+    dia_display = serializers.CharField(
+        source='get_dia_display',
+        read_only=True,
+    )
+    
+    class Meta:
+        model = TurmaDiaSemana
+        fields = ['id', 'dia', 'dia_display']
+
+
 class TurmaSerializer(serializers.ModelSerializer):
     vaga_nome = serializers.CharField(source='vaga.nome', read_only=True)
     sala_numero = serializers.CharField(source='sala.numero', read_only=True)
@@ -71,10 +82,43 @@ class TurmaSerializer(serializers.ModelSerializer):
         source='monitor.user.get_full_name', read_only=True
     )
     curso_nome = serializers.CharField(source='curso.nome', read_only=True)
+    dias_semana = TurmaDiaSemanaSerializer(many=True, read_only=True)
+    dias_semana_list = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+        required=False,
+        help_text="Lista de dias da semana (0=Segunda, 1=Terça, etc)"
+    )
     
     class Meta:
         model = Turma
         fields = '__all__'
+    
+    def create(self, validated_data):
+        dias_list = validated_data.pop('dias_semana_list', [])
+        turma = Turma.objects.create(**validated_data)
+        
+        # Criar os dias da semana
+        for dia in dias_list:
+            TurmaDiaSemana.objects.create(turma=turma, dia=dia)
+        
+        return turma
+    
+    def update(self, instance, validated_data):
+        dias_list = validated_data.pop('dias_semana_list', None)
+        
+        # Atualizar campos da turma
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        
+        # Atualizar dias da semana se fornecido
+        if dias_list is not None:
+            instance.dias_semana.all().delete()
+            for dia in dias_list:
+                TurmaDiaSemana.objects.create(turma=instance, dia=dia)
+        
+        return instance
 
 
 class ParticipacaoMonitoriaSerializer(serializers.ModelSerializer):
@@ -143,7 +187,9 @@ class SubmissaoHorasSerializer(serializers.ModelSerializer):
     )
     turma_nome = serializers.CharField(source='turma.nome', read_only=True)
     aprovado_por_nome = serializers.CharField(
-        source='aprovado_por.user.get_full_name', read_only=True, allow_null=True
+        source='aprovado_por.user.get_full_name',
+        read_only=True,
+        allow_null=True,
     )
     
     class Meta:
@@ -159,11 +205,16 @@ class RegisterSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'password2', 'first_name', 'last_name']
+        fields = [
+            'username', 'email', 'password', 'password2',
+            'first_name', 'last_name'
+        ]
     
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({"password": "As senhas não coincidem."})
+            raise serializers.ValidationError({
+                "password": "As senhas não coincidem."
+            })
         return attrs
     
     def create(self, validated_data):

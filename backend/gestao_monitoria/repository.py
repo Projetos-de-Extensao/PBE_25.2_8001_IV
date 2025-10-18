@@ -61,7 +61,11 @@ def listar_vagas():
 
 
 def listar_turmas():
-    return Turma.objects.all().select_related('vaga', 'sala', 'monitor', 'curso')
+    return (
+        Turma.objects.all()
+        .select_related('vaga', 'sala', 'monitor', 'curso')
+        .prefetch_related('dias_semana')
+    )
 
 
 def listar_inscricoes():
@@ -89,11 +93,17 @@ def listar_horarios_disponiveis():
 
 
 def listar_agendamentos():
-    return AgendamentoMonitoria.objects.all().select_related('aluno', 'turma', 'monitor')
+    return (
+        AgendamentoMonitoria.objects.all()
+        .select_related('aluno', 'turma', 'monitor')
+    )
 
 
 def listar_submissoes_horas():
-    return SubmissaoHoras.objects.all().select_related('monitor', 'turma', 'aprovado_por')
+    return (
+        SubmissaoHoras.objects.all()
+        .select_related('monitor', 'turma', 'aprovado_por')
+    )
 
 
 
