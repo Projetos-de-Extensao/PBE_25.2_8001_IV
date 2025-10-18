@@ -625,17 +625,22 @@ def alterar_senha(request):
 def sql_view(request):
     """
     View original - Exibe dados SQL em template
+    Importa dados do repository.py que utiliza Django ORM para queries
     """
-    usuarios = listar_usuarios()
-    alunos = listar_alunos()
-    cursos = listar_cursos()
-    funcionarios = listar_funcionarios()
-    inscricoes = listar_inscricoes()
-    turmas = listar_turmas()
-    participacoes_monitoria = listar_participacoes_monitoria()
-    presencas = listar_presencas()
-    salas = listar_salas()
-    tipos_usuario = listar_tipos_usuario()
+    # Importar as funções do repository para evitar conflito com views de mesmo nome
+    from . import repository as repo
+    
+    # Chamar as funções do repository (que retornam QuerySets)
+    usuarios = repo.listar_usuarios()
+    alunos = repo.listar_alunos()
+    cursos = repo.listar_cursos()
+    funcionarios = repo.listar_funcionarios()
+    inscricoes = repo.listar_inscricoes()
+    turmas = repo.listar_turmas()
+    participacoes_monitoria = repo.listar_participacoes_monitoria()
+    presencas = repo.listar_presencas()
+    salas = repo.listar_salas()
+    tipos_usuario = repo.listar_tipos_usuario()
     
     return render(request, 'sql_template.html', {
         'usuarios': usuarios, 
