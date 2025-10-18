@@ -1,14 +1,6 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser
 from django.conf import settings
-
-
-class TipoUsuario(models.Model):
-    tipo = models.CharField(max_length=50)  # Ex: admin, professor, coordenador, aluno(ideal é ser por código(id))
-    ativo = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.tipo
+from django.contrib.auth.models import User
+from django.db import models
 
 
 class Curso(models.Model):
@@ -27,34 +19,35 @@ class Sala(models.Model):
         return self.numero
 
 
-class Usuario(models.Model):
-    nome = models.CharField(max_length=100)
-    email = models.EmailField(max_length=100)
-    tipo_usuario = models.ForeignKey(TipoUsuario, on_delete=models.CASCADE)
-    ativo = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.nome
-
-
-class Funcionario(Usuario):
+class FuncionarioProfile(models.Model):
+    """Perfil de funcionário vinculado ao User do Django"""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='funcionario')
     matricula = models.CharField(max_length=20, unique=True)
     departamento = models.CharField(max_length=100, blank=True, null=True)
     coordenador = models.BooleanField(default=False)
+    ativo = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.nome} (Funcionário)"
+        return f"{self.user.get_full_name() or self.user.username} (Funcionário)"
 
 
-class Aluno(Usuario):
+class AlunoProfile(models.Model):
+    """Perfil de aluno vinculado ao User do Django"""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='aluno')
     matricula = models.CharField(max_length=20, unique=True)
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
     data_ingresso = models.DateField()
     periodo = models.IntegerField()
     cr_geral = models.FloatField()
+    ativo = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.nome} (Aluno)"
+        return f"{self.user.get_full_name() or self.user.username} (Aluno)"
+
+
+# Aliases para compatibilidade (opcional - remover depois)
+Aluno = AlunoProfile
+Funcionario = FuncionarioProfile
 
 
 class Vaga(models.Model):

@@ -1,12 +1,16 @@
-from .models import Usuario, Funcionario, Aluno, Vaga, Turma, Inscricao, Curso, TipoUsuario, Sala, ParticipacaoMonitoria, Presenca
+from django.contrib.auth.models import User
 
+from .models import (AgendamentoMonitoria, AlunoProfile, Curso,
+                     FuncionarioProfile, HorarioDisponivel, Inscricao,
+                     ParticipacaoMonitoria, Presenca, Sala, SubmissaoHoras,
+                     Turma, Vaga)
 
 
 class VagaRepository:
     
     @staticmethod
     def listar_vagas_ativas():
-        return Vaga.objects.filter(ativo=True)
+        return Vaga.objects.filter(ativo=True).select_related('curso', 'coordenador__user')
 
     @staticmethod
     def criar_vaga(dados_vaga):
@@ -26,7 +30,7 @@ class VagaRepository:
 class InscricaoRepository:
     @staticmethod
     def listar_inscricoes():
-        return Inscricao.objects.all()
+        return Inscricao.objects.all().select_related('aluno__user', 'vaga')
 
     @staticmethod
     def criar_inscricao(dados_inscricao):
@@ -42,41 +46,55 @@ class InscricaoRepository:
     def deletar_inscricao(id_inscricao):
         Inscricao.objects.filter(id=id_inscricao).delete()
 
-        
 
-
-def listar_usuarios():
-    return Usuario.objects.all()
-
+# Funções auxiliares para compatibilidade
 def listar_funcionarios():
-    return Funcionario.objects.all()
+    return FuncionarioProfile.objects.all().select_related('user')
+
 
 def listar_alunos():
-    return Aluno.objects.all()
+    return AlunoProfile.objects.all().select_related('user', 'curso')
+
 
 def listar_vagas():
-    return Vaga.objects.all()
+    return Vaga.objects.all().select_related('curso', 'coordenador')
+
 
 def listar_turmas():
-    return Turma.objects.all()
+    return Turma.objects.all().select_related('vaga', 'sala', 'monitor', 'curso')
+
 
 def listar_inscricoes():
-    return Inscricao.objects.all()
+    return Inscricao.objects.all().select_related('aluno', 'vaga')
+
 
 def listar_cursos():
     return Curso.objects.all()
 
-def listar_tipos_usuario():
-    return TipoUsuario.objects.all()
 
 def listar_salas():
     return Sala.objects.all()
 
+
 def listar_participacoes_monitoria():
-    return ParticipacaoMonitoria.objects.all()
+    return ParticipacaoMonitoria.objects.all().select_related('aluno', 'turma')
+
 
 def listar_presencas():
-    return Presenca.objects.all()
+    return Presenca.objects.all().select_related('turma', 'aluno')
+
+
+def listar_horarios_disponiveis():
+    return HorarioDisponivel.objects.all().select_related('monitor', 'turma')
+
+
+def listar_agendamentos():
+    return AgendamentoMonitoria.objects.all().select_related('aluno', 'turma', 'monitor')
+
+
+def listar_submissoes_horas():
+    return SubmissaoHoras.objects.all().select_related('monitor', 'turma', 'aprovado_por')
+
 
 
 

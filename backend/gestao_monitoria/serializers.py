@@ -1,18 +1,16 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
-from .models import (
-    TipoUsuario, Curso, Sala, Usuario, Funcionario, Aluno,
-    Vaga, Turma, ParticipacaoMonitoria, Presenca, Inscricao,
-    HorarioDisponivel, AgendamentoMonitoria, SubmissaoHoras
-)
 
-User = get_user_model()
+from .models import (AgendamentoMonitoria, AlunoProfile, Curso,
+                     FuncionarioProfile, HorarioDisponivel, Inscricao,
+                     ParticipacaoMonitoria, Presenca, Sala, SubmissaoHoras,
+                     Turma, Vaga)
 
 
-class TipoUsuarioSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TipoUsuario
-        fields = '__all__'
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_staff', 'is_active']
 
 
 class CursoSerializer(serializers.ModelSerializer):
@@ -27,34 +25,38 @@ class SalaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class UsuarioSerializer(serializers.ModelSerializer):
-    tipo_usuario_nome = serializers.CharField(source='tipo_usuario.tipo', read_only=True)
-    
-    class Meta:
-        model = Usuario
-        fields = '__all__'
-
-
 class FuncionarioSerializer(serializers.ModelSerializer):
-    tipo_usuario_nome = serializers.CharField(source='tipo_usuario.tipo', read_only=True)
+    user = UserSerializer(read_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), source='user', write_only=True
+    )
+    username = serializers.CharField(source='user.username', read_only=True)
+    email = serializers.CharField(source='user.email', read_only=True)
     
     class Meta:
-        model = Funcionario
+        model = FuncionarioProfile
         fields = '__all__'
 
 
 class AlunoSerializer(serializers.ModelSerializer):
-    tipo_usuario_nome = serializers.CharField(source='tipo_usuario.tipo', read_only=True)
+    user = UserSerializer(read_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), source='user', write_only=True
+    )
+    username = serializers.CharField(source='user.username', read_only=True)
+    email = serializers.CharField(source='user.email', read_only=True)
     curso_nome = serializers.CharField(source='curso.nome', read_only=True)
     
     class Meta:
-        model = Aluno
+        model = AlunoProfile
         fields = '__all__'
 
 
 class VagaSerializer(serializers.ModelSerializer):
     curso_nome = serializers.CharField(source='curso.nome', read_only=True)
-    coordenador_nome = serializers.CharField(source='coordenador.nome', read_only=True)
+    coordenador_nome = serializers.CharField(
+        source='coordenador.user.get_full_name', read_only=True
+    )
     monitores_detalhes = AlunoSerializer(source='monitores', many=True, read_only=True)
     
     class Meta:
@@ -65,7 +67,9 @@ class VagaSerializer(serializers.ModelSerializer):
 class TurmaSerializer(serializers.ModelSerializer):
     vaga_nome = serializers.CharField(source='vaga.nome', read_only=True)
     sala_numero = serializers.CharField(source='sala.numero', read_only=True)
-    monitor_nome = serializers.CharField(source='monitor.nome', read_only=True)
+    monitor_nome = serializers.CharField(
+        source='monitor.user.get_full_name', read_only=True
+    )
     curso_nome = serializers.CharField(source='curso.nome', read_only=True)
     
     class Meta:
@@ -74,7 +78,9 @@ class TurmaSerializer(serializers.ModelSerializer):
 
 
 class ParticipacaoMonitoriaSerializer(serializers.ModelSerializer):
-    aluno_nome = serializers.CharField(source='aluno.nome', read_only=True)
+    aluno_nome = serializers.CharField(
+        source='aluno.user.get_full_name', read_only=True
+    )
     turma_nome = serializers.CharField(source='turma.nome', read_only=True)
     
     class Meta:
@@ -83,7 +89,9 @@ class ParticipacaoMonitoriaSerializer(serializers.ModelSerializer):
 
 
 class PresencaSerializer(serializers.ModelSerializer):
-    aluno_nome = serializers.CharField(source='aluno.nome', read_only=True)
+    aluno_nome = serializers.CharField(
+        source='aluno.user.get_full_name', read_only=True
+    )
     turma_nome = serializers.CharField(source='turma.nome', read_only=True)
     
     class Meta:
@@ -92,47 +100,58 @@ class PresencaSerializer(serializers.ModelSerializer):
 
 
 class InscricaoSerializer(serializers.ModelSerializer):
-    aluno_nome = serializers.CharField(source='aluno.nome', read_only=True)
+    aluno_nome = serializers.CharField(
+        source='aluno.user.get_full_name', read_only=True
+    )
     vaga_nome = serializers.CharField(source='vaga.nome', read_only=True)
     
     class Meta:
         model = Inscricao
         fields = '__all__'
 
+
 # Novos serializers para o sistema de monitorias
 
 class HorarioDisponivelSerializer(serializers.ModelSerializer):
-    monitor_nome = serializers.CharField(source='monitor.nome', read_only=True)
+    monitor_nome = serializers.CharField(
+        source='monitor.user.get_full_name', read_only=True
+    )
     turma_nome = serializers.CharField(source='turma.nome', read_only=True)
     
     class Meta:
         model = HorarioDisponivel
         fields = '__all__'
 
+
 class AgendamentoMonitoriaSerializer(serializers.ModelSerializer):
-    aluno_nome = serializers.CharField(source='aluno.nome', read_only=True)
-    monitor_nome = serializers.CharField(source='monitor.nome', read_only=True)
+    aluno_nome = serializers.CharField(
+        source='aluno.user.get_full_name', read_only=True
+    )
+    monitor_nome = serializers.CharField(
+        source='monitor.user.get_full_name', read_only=True
+    )
     turma_nome = serializers.CharField(source='turma.nome', read_only=True)
     
     class Meta:
         model = AgendamentoMonitoria
         fields = '__all__'
 
+
 class SubmissaoHorasSerializer(serializers.ModelSerializer):
-    monitor_nome = serializers.CharField(source='monitor.nome', read_only=True)
+    monitor_nome = serializers.CharField(
+        source='monitor.user.get_full_name', read_only=True
+    )
     turma_nome = serializers.CharField(source='turma.nome', read_only=True)
-    aprovado_por_nome = serializers.CharField(source='aprovado_por.nome', read_only=True, allow_null=True)
+    aprovado_por_nome = serializers.CharField(
+        source='aprovado_por.user.get_full_name', read_only=True, allow_null=True
+    )
     
     class Meta:
         model = SubmissaoHoras
         fields = '__all__'
 
-# Serializers para autenticação
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_staff', 'is_active']
+# Serializers para autenticação
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -151,3 +170,4 @@ class RegisterSerializer(serializers.ModelSerializer):
         validated_data.pop('password2')
         user = User.objects.create_user(**validated_data)
         return user
+

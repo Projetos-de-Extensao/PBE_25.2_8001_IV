@@ -1,39 +1,38 @@
-from django.shortcuts import render
-from django.contrib.auth import get_user_model
-from django.http import HttpResponse
-from django.db.models import Count, Q
-from rest_framework import viewsets, status, generics
-from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework_simplejwt.tokens import RefreshToken
 from datetime import datetime, timedelta
-import openpyxl
-from openpyxl.styles import Font, Alignment
-from .models import (
-    TipoUsuario, Curso, Sala, Usuario, Funcionario, Aluno,
-    Vaga, Turma, ParticipacaoMonitoria, Presenca, Inscricao,
-    HorarioDisponivel, AgendamentoMonitoria, SubmissaoHoras
-)
-from .serializers import (
-    TipoUsuarioSerializer, CursoSerializer, SalaSerializer,
-    UsuarioSerializer, FuncionarioSerializer, AlunoSerializer,
-    VagaSerializer, TurmaSerializer, ParticipacaoMonitoriaSerializer,
-    PresencaSerializer, InscricaoSerializer,
-    HorarioDisponivelSerializer, AgendamentoMonitoriaSerializer, SubmissaoHorasSerializer,
-    UserSerializer, RegisterSerializer
-)
-from .repository import listar_usuarios, listar_alunos, listar_cursos, listar_funcionarios, listar_inscricoes, listar_turmas, listar_participacoes_monitoria, listar_presencas, listar_salas, listar_tipos_usuario
 
-User = get_user_model()
+import openpyxl
+from django.contrib.auth.models import User
+from django.db.models import Count, Q
+from django.http import HttpResponse
+from django.shortcuts import render
+from openpyxl.styles import Alignment, Font
+from rest_framework import generics, status, viewsets
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from .models import (AgendamentoMonitoria, AlunoProfile, Curso,
+                     FuncionarioProfile, HorarioDisponivel, Inscricao,
+                     ParticipacaoMonitoria, Presenca, Sala, SubmissaoHoras,
+                     Turma, Vaga)
+from .repository import (listar_alunos, listar_cursos, listar_funcionarios,
+                         listar_inscricoes, listar_participacoes_monitoria,
+                         listar_presencas, listar_salas, listar_turmas)
+from .serializers import (AgendamentoMonitoriaSerializer, AlunoSerializer,
+                          CursoSerializer, FuncionarioSerializer,
+                          HorarioDisponivelSerializer, InscricaoSerializer,
+                          ParticipacaoMonitoriaSerializer, PresencaSerializer,
+                          RegisterSerializer, SalaSerializer,
+                          SubmissaoHorasSerializer, TurmaSerializer,
+                          UserSerializer, VagaSerializer)
+
+# Aliases para compatibilidade
+Aluno = AlunoProfile
+Funcionario = FuncionarioProfile
 
 
 # ViewSets para API REST
-class TipoUsuarioViewSet(viewsets.ModelViewSet):
-    queryset = TipoUsuario.objects.all()
-    serializer_class = TipoUsuarioSerializer
-
-
 class CursoViewSet(viewsets.ModelViewSet):
     queryset = Curso.objects.all()
     serializer_class = CursoSerializer
@@ -44,50 +43,45 @@ class SalaViewSet(viewsets.ModelViewSet):
     serializer_class = SalaSerializer
 
 
-class UsuarioViewSet(viewsets.ModelViewSet):
-    queryset = Usuario.objects.all()
-    serializer_class = UsuarioSerializer
-
-
 class FuncionarioViewSet(viewsets.ModelViewSet):
-    queryset = Funcionario.objects.all()
+    queryset = FuncionarioProfile.objects.all().select_related('user')
     serializer_class = FuncionarioSerializer
 
 
 class AlunoViewSet(viewsets.ModelViewSet):
-    queryset = Aluno.objects.all()
+    queryset = AlunoProfile.objects.all().select_related('user', 'curso')
     serializer_class = AlunoSerializer
 
 
 class VagaViewSet(viewsets.ModelViewSet):
-    queryset = Vaga.objects.all()
+    queryset = Vaga.objects.all().select_related('curso', 'coordenador')
     serializer_class = VagaSerializer
 
 
 class TurmaViewSet(viewsets.ModelViewSet):
-    queryset = Turma.objects.all()
+    queryset = Turma.objects.all().select_related('vaga', 'sala', 'monitor', 'curso')
     serializer_class = TurmaSerializer
 
 
 class ParticipacaoMonitoriaViewSet(viewsets.ModelViewSet):
-    queryset = ParticipacaoMonitoria.objects.all()
+    queryset = ParticipacaoMonitoria.objects.all().select_related('aluno', 'turma')
     serializer_class = ParticipacaoMonitoriaSerializer
 
 
 class PresencaViewSet(viewsets.ModelViewSet):
-    queryset = Presenca.objects.all()
+    queryset = Presenca.objects.all().select_related('turma', 'aluno')
     serializer_class = PresencaSerializer
 
 
 class InscricaoViewSet(viewsets.ModelViewSet):
-    queryset = Inscricao.objects.all()
+    queryset = Inscricao.objects.all().select_related('aluno', 'vaga')
     serializer_class = InscricaoSerializer
 
 
 # Novas ViewSets para o sistema de monitorias
 
 class HorarioDisponivelViewSet(viewsets.ModelViewSet):
-    queryset = HorarioDisponivel.objects.all()
+    queryset = HorarioDisponivel.objects.all().select_related('monitor', 'turma')
     serializer_class = HorarioDisponivelSerializer
     
     @action(detail=False, methods=['get'])
