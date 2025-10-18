@@ -2,12 +2,14 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 
+
 class TipoUsuario(models.Model):
     tipo = models.CharField(max_length=50)  # Ex: admin, professor, coordenador, aluno(ideal é ser por código(id))
     ativo = models.BooleanField(default=True)
 
     def __str__(self):
         return self.tipo
+
 
 class Curso(models.Model):
     nome = models.CharField(max_length=50)
@@ -16,12 +18,14 @@ class Curso(models.Model):
     def __str__(self):
         return self.nome
 
+
 class Sala(models.Model):
     numero = models.CharField(max_length=50)
     ativo = models.BooleanField(default=True)
 
     def __str__(self):
         return self.numero
+
 
 class Usuario(models.Model):
     nome = models.CharField(max_length=100)
@@ -32,6 +36,7 @@ class Usuario(models.Model):
     def __str__(self):
         return self.nome
 
+
 class Funcionario(Usuario):
     matricula = models.CharField(max_length=20, unique=True)
     departamento = models.CharField(max_length=100, blank=True, null=True)
@@ -39,6 +44,7 @@ class Funcionario(Usuario):
 
     def __str__(self):
         return f"{self.nome} (Funcionário)"
+
 
 class Aluno(Usuario):
     matricula = models.CharField(max_length=20, unique=True)
@@ -49,6 +55,7 @@ class Aluno(Usuario):
 
     def __str__(self):
         return f"{self.nome} (Aluno)"
+
 
 class Vaga(models.Model):
     nome = models.CharField(max_length=100)
@@ -62,6 +69,7 @@ class Vaga(models.Model):
 
     def __str__(self):
         return self.nome
+
 
 class Turma(models.Model):
     nome = models.CharField(max_length=100)
@@ -80,6 +88,7 @@ class Turma(models.Model):
     def __str__(self):
         return self.nome
 
+
 class ParticipacaoMonitoria(models.Model):
     aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE)
     turma = models.ForeignKey(Turma, on_delete=models.CASCADE)
@@ -90,15 +99,16 @@ class ParticipacaoMonitoria(models.Model):
     def __str__(self):
         return f"{self.aluno} - {self.turma} - ( AP1: {self.ap1}, AP2: {self.ap2}, CR: {self.cr})"
 
+
 class Presenca(models.Model):
     turma = models.ForeignKey(Turma, on_delete=models.CASCADE)
     aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE)
     data = models.DateField()
     presente = models.BooleanField(default=False)
-    
 
     def __str__(self):
         return f"{self.aluno} - {self.turma} ({self.data}) - {'Presente' if self.presente else 'Ausente'}"
+
 
 class Inscricao(models.Model):
     aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE)
@@ -108,6 +118,7 @@ class Inscricao(models.Model):
 
     def __str__(self):
         return f"{self.aluno} - {self.vaga} ({self.status})"
+
 
 class HorarioDisponivel(models.Model):
     """Horários disponíveis dos monitores para agendamento"""
@@ -121,6 +132,7 @@ class HorarioDisponivel(models.Model):
     def __str__(self):
         return f"{self.monitor} - {self.dia_semana} {self.horario_inicio}-{self.horario_fim}"
 
+
 class AgendamentoMonitoria(models.Model):
     """Sistema de agendamento de monitorias pelos alunos"""
     STATUS_CHOICES = [
@@ -129,7 +141,7 @@ class AgendamentoMonitoria(models.Model):
         ('cancelado', 'Cancelado'),
         ('concluido', 'Concluído'),
     ]
-    
+
     aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name='agendamentos')
     turma = models.ForeignKey(Turma, on_delete=models.CASCADE, related_name='agendamentos')
     monitor = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name='monitorias_agendadas')
@@ -145,6 +157,7 @@ class AgendamentoMonitoria(models.Model):
     def __str__(self):
         return f"{self.aluno} - {self.monitor} ({self.data} {self.horario_inicio})"
 
+
 class SubmissaoHoras(models.Model):
     """Submissão automática de horas pelos monitores"""
     STATUS_CHOICES = [
@@ -152,7 +165,7 @@ class SubmissaoHoras(models.Model):
         ('aprovado', 'Aprovado'),
         ('rejeitado', 'Rejeitado'),
     ]
-    
+
     monitor = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name='submissoes_horas')
     turma = models.ForeignKey(Turma, on_delete=models.CASCADE)
     mes_referencia = models.DateField()
@@ -172,6 +185,6 @@ class SubmissaoHoras(models.Model):
 #     tipo_usuario = models.ForeignKey(TipoUsuario, on_delete=models.SET_NULL, null=True, blank=True)
 #     aluno_profile = models.OneToOneField(Aluno, on_delete=models.CASCADE, null=True, blank=True, related_name='user')
 #     funcionario_profile = models.OneToOneField(Funcionario, on_delete=models.CASCADE, null=True, blank=True, related_name='user')
-    
+
 #     def __str__(self):
 #         return self.username
