@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Relatórios - Plataforma Casa{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item active">Relatórios</li>
+    </ol>
+</nav>
+
+<div class="page-title">
+    <h1><i class="fas fa-file-alt"></i> Relatórios</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-bar"></i> Relatório de Desempenho
+            </div>
+            <div class="card-body">
+                <p>Acompanhe o desempenho geral dos alunos nas monitorias.</p>
+                <a href="{% url 'relatorio_desempenho' %}" class="btn btn-primary w-100">
+                    <i class="fas fa-arrow-right"></i> Gerar Relatório
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-users-class"></i> Relatório de Frequência
+            </div>
+            <div class="card-body">
+                <p>Consulte a frequência de alunos nas monitorias.</p>
+                <a href="{% url 'relatorio_frequencia' %}" class="btn btn-primary w-100">
+                    <i class="fas fa-arrow-right"></i> Gerar Relatório
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mt-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-clipboard-list"></i> Relatório de Inscrições
+            </div>
+            <div class="card-body">
+                <p>Analise as inscrições nas vagas de monitoria.</p>
+                <a href="{% url 'relatorio_inscricoes' %}" class="btn btn-primary w-100">
+                    <i class="fas fa-arrow-right"></i> Gerar Relatório
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mt-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-pie"></i> Relatório Geral
+            </div>
+            <div class="card-body">
+                <p>Visualize dados consolidados do sistema.</p>
+                <a href="{% url 'relatorio_geral' %}" class="btn btn-primary w-100">
+                    <i class="fas fa-arrow-right"></i> Gerar Relatório
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}Participações - Plataforma Casa{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item active">Monitorias</li>
+    </ol>
+</nav>
+
+<div class="page-title">
+    <h1><i class="fas fa-book"></i> Participações em Monitorias</h1>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h5 class="mb-0">Desempenho dos Alunos</h5>
+            </div>
+            <div class="col-md-4">
+                <select class="form-select" id="filtroTurma" onchange="filtrarPorTurma()">
+                    <option value="">-- Filtrar por Turma --</option>
+                    {% for turma in turmas %}
+                        <option value="{{ turma.id }}">{{ turma.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Aluno</th>
+                        <th>Turma</th>
+                        <th>AP1</th>
+                        <th>AP2</th>
+                        <th>CR</th>
+                        <th>Média</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for participacao in participacoes %}
+                        <tr>
+                            <td>{{ participacao.id }}</td>
+                            <td>{{ participacao.aluno.nome }}</td>
+                            <td>{{ participacao.turma.nome }}</td>
+                            <td>
+                                {% if participacao.ap1 %}
+                                    <span class="badge bg-info">{{ participacao.ap1 }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if participacao.ap2 %}
+                                    <span class="badge bg-info">{{ participacao.ap2 }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if participacao.cr %}
+                                    <span class="badge bg-success">{{ participacao.cr }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if participacao.ap1 and participacao.ap2 %}
+                                    <strong>{{ media }}</strong>
+                                {% else %}
+                                    <span class="text-muted">Pendente</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'editar_participacao' participacao.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                Nenhuma participação encontrada.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filtrarPorTurma() {
+    const turmaId = document.getElementById('filtroTurma').value;
+    if (turmaId) {
+        window.location.href = `?turma=${turmaId}`;
+    }
+}
+</script>
+{% endblock %}

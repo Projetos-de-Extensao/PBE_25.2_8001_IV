@@ -1,0 +1,93 @@
+@startuml MVT_Architecture
+!theme plain
+skinparam backgroundColor #ffffff
+skinparam classBackgroundColor #667eea
+skinparam classBorderColor #764ba2
+skinparam arrowColor #667eea
+skinparam nodesep 50
+skinparam ranksep 60
+
+title Arquitetura MVT - Plataforma Casa
+
+package "Camada de Apresentação" {
+    component [Web Browser\n(Cliente)] as browser
+    component [HTML/CSS/JS\n(Frontend)] as frontend
+}
+
+package "Camada de Aplicação Django" {
+    component [URLs (Roteamento)\nurls.py] as urls
+    
+    package "Views (Lógica de Negócio)" {
+        component [Views Functions\nviews.py] as views
+        note right of views
+            - dashboard()
+            - listar_usuarios()
+            - criar_aluno()
+            - editar_participacao()
+            - relatorio_desempenho()
+        end note
+    }
+    
+    package "Templates (Apresentação)" {
+        component [Template HTML\ntemplates/] as templates
+        note right of templates
+            - base.html
+            - dashboard.html
+            - usuarios/listar.html
+            - alunos/criar.html
+            - relatorios/geral.html
+        end note
+    }
+}
+
+package "Camada de Dados" {
+    component [Models (Estrutura)\nmodels.py] as models
+    note right of models
+        - Usuario
+        - Aluno
+        - Funcionario
+        - Vaga
+        - Turma
+        - ParticipacaoMonitoria
+        - Presenca
+        - Inscricao
+    end note
+    
+    database [Banco de Dados\nSQLite] as db
+}
+
+package "Camada de Utilitários" {
+    component [Repository\nrepository.py] as repo
+    note right of repo
+        - listar_usuarios()
+        - listar_alunos()
+        - listar_turmas()
+    end note
+}
+
+' Fluxo de Requisições
+browser -->|HTTP Request| frontend : 1. Formulário/Link
+frontend -->|POST/GET| urls : 2. Requisição
+urls -->|Router| views : 3. Chamar View
+
+' Lógica da View
+views -->|Query| models : 4. Acessar Dados
+models -->|SQL| db : 5. Banco de Dados
+db -->|Resultado| models : 6. Retorna Dados
+models -->|Objetos Python| views : 7. Dados do Modelo
+views -->|Contexto| templates : 8. Renderizar Template
+
+' Resposta
+templates -->|HTML Renderizado| frontend : 9. HTML
+frontend -->|HTTP Response| browser : 10. Página Renderizada
+
+' Estilos e JavaScript
+frontend -->|CSS/JS| browser : Estilização
+
+legend
+    left
+    |<#667eea> Requisição|
+    |<#764ba2> Resposta|
+end legend
+
+@enduml

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Vagas - Plataforma Casa{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item active">Vagas</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-title">
+        <h1><i class="fas fa-briefcase"></i> Vagas de Monitoria</h1>
+    </div>
+    <a href="{% url 'criar_vaga' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nova Vaga
+    </a>
+</div>
+
+<div class="row">
+    {% for vaga in vagas %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="mb-0">{{ vaga.nome }}</h5>
+                            <small>{{ vaga.curso.nome }}</small>
+                        </div>
+                        <span class="badge {% if vaga.ativo %}status-active{% else %}status-inactive{% endif %}">
+                            {% if vaga.ativo %}Ativa{% else %}Inativa{% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6><i class="fas fa-user"></i> Coordenador</h6>
+                        <p>{{ vaga.coordenador.nome }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6><i class="fas fa-list"></i> Descrição</h6>
+                        <p>{{ vaga.descricao|truncatewords:20 }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6><i class="fas fa-check-circle"></i> Requisitos</h6>
+                        <p>{{ vaga.requisitos|truncatewords:15 }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6><i class="fas fa-user-graduate"></i> Inscritos</h6>
+                        <p><strong>{{ vaga.monitores.count }}</strong> alunos</p>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <a href="{% url 'editar_vaga' vaga.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a href="{% url 'detalhe_vaga' vaga.id %}" class="btn btn-sm btn-outline-info">
+                        <i class="fas fa-eye"></i> Detalhes
+                    </a>
+                    <a href="{% url 'deletar_vaga' vaga.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Tem certeza?')">
+                        <i class="fas fa-trash"></i> Deletar
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Nenhuma vaga encontrada.
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block title %}Perfil do Usuário - Plataforma Casa{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item active">Perfil</li>
+    </ol>
+</nav>
+
+<div class="page-title">
+    <h1><i class="fas fa-user-circle"></i> Meu Perfil</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Informações Pessoais</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="nome" class="form-label">Nome</label>
+                            <input type="text" class="form-control" id="nome" name="nome" value="{{ usuario.nome }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ usuario.email }}" required>
+                        </div>
+                    </div>
+
+                    {% if usuario.funcionario %}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="matricula" class="form-label">Matrícula</label>
+                                <input type="text" class="form-control" id="matricula" name="matricula" value="{{ usuario.funcionario.matricula }}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="departamento" class="form-label">Departamento</label>
+                                <input type="text" class="form-control" id="departamento" name="departamento" value="{{ usuario.funcionario.departamento }}">
+                            </div>
+                        </div>
+                    {% elif usuario.aluno %}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="matricula" class="form-label">Matrícula</label>
+                                <input type="text" class="form-control" id="matricula" name="matricula" value="{{ usuario.aluno.matricula }}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="periodo" class="form-label">Período</label>
+                                <input type="number" class="form-control" id="periodo" name="periodo" value="{{ usuario.aluno.periodo }}" readonly>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="cr" class="form-label">CR Geral</label>
+                                <input type="number" class="form-control" id="cr" name="cr" value="{{ usuario.aluno.cr_geral }}" step="0.01" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="curso" class="form-label">Curso</label>
+                                <input type="text" class="form-control" id="curso" name="curso" value="{{ usuario.aluno.curso.nome }}" readonly>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Informações da Conta</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Tipo de Usuário</label>
+                    <p class="form-control-plaintext"><strong>{{ usuario.tipo_usuario.tipo }}</strong></p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Status</label>
+                    <p class="form-control-plaintext">
+                        <span class="badge {% if usuario.ativo %}status-active{% else %}status-inactive{% endif %}">
+                            {% if usuario.ativo %}Ativo{% else %}Inativo{% endif %}
+                        </span>
+                    </p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">ID de Usuário</label>
+                    <p class="form-control-plaintext">{{ usuario.id }}</p>
+                </div>
+                <hr>
+                <button class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#modalSenha">
+                    <i class="fas fa-key"></i> Alterar Senha
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Alterar Senha -->
+<div class="modal fade" id="modalSenha" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Alterar Senha</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'alterar_senha' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="senhaAtual" class="form-label">Senha Atual</label>
+                        <input type="password" class="form-control" id="senhaAtual" name="senha_atual" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="senhaNova" class="form-label">Nova Senha</label>
+                        <input type="password" class="form-control" id="senhaNova" name="senha_nova" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="senhaConfirmar" class="form-label">Confirmar Nova Senha</label>
+                        <input type="password" class="form-control" id="senhaConfirmar" name="senha_confirmar" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Alterar Senha</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

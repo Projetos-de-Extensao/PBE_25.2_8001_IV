@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Alunos - Plataforma Casa{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item active">Alunos</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-title">
+        <h1><i class="fas fa-user-graduate"></i> Alunos</h1>
+    </div>
+    <a href="{% url 'criar_aluno' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Novo Aluno
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nome</th>
+                        <th>Matrícula</th>
+                        <th>Email</th>
+                        <th>Curso</th>
+                        <th>Período</th>
+                        <th>CR</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for aluno in alunos %}
+                        <tr>
+                            <td>{{ aluno.id }}</td>
+                            <td>{{ aluno.nome }}</td>
+                            <td>{{ aluno.matricula }}</td>
+                            <td>{{ aluno.email }}</td>
+                            <td>{{ aluno.curso.nome }}</td>
+                            <td>{{ aluno.periodo }}º</td>
+                            <td>{{ aluno.cr_geral }}</td>
+                            <td>
+                                <span class="badge {% if aluno.ativo %}status-active{% else %}status-inactive{% endif %}">
+                                    {% if aluno.ativo %}Ativo{% else %}Inativo{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'editar_aluno' aluno.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'deletar_aluno' aluno.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Tem certeza?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-4">
+                                Nenhum aluno encontrado.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

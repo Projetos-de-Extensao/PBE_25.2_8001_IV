@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - Plataforma Casa{% endblock %}
+
+{% block content %}
+<div class="page-title">
+    <h1><i class="fas fa-chart-line"></i> Dashboard</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="dashboard-card">
+            <i class="fas fa-users"></i>
+            <h3>{{ total_usuarios }}</h3>
+            <p>Usuários</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="dashboard-card">
+            <i class="fas fa-user-graduate"></i>
+            <h3>{{ total_alunos }}</h3>
+            <p>Alunos</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="dashboard-card">
+            <i class="fas fa-chalkboard"></i>
+            <h3>{{ total_turmas }}</h3>
+            <p>Turmas Ativas</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="dashboard-card">
+            <i class="fas fa-briefcase"></i>
+            <h3>{{ total_vagas }}</h3>
+            <p>Vagas Abertas</p>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-clock"></i> Últimas Monitorias
+            </div>
+            <div class="card-body">
+                {% if ultimas_monitorias %}
+                    <div class="list-group">
+                        {% for monitoria in ultimas_monitorias %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between">
+                                    <h6>{{ monitoria.nome }}</h6>
+                                    <span class="badge {% if monitoria.ativo %}status-active{% else %}status-inactive{% endif %}">
+                                        {% if monitoria.ativo %}Ativa{% else %}Inativa{% endif %}
+                                    </span>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="fas fa-user"></i> {{ monitoria.monitor.nome }} | 
+                                    <i class="fas fa-calendar"></i> {{ monitoria.data_inicio }}
+                                </small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">Nenhuma monitoria encontrada.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-calendar-check"></i> Inscrições Pendentes
+            </div>
+            <div class="card-body">
+                {% if inscricoes_pendentes %}
+                    <div class="list-group">
+                        {% for inscricao in inscricoes_pendentes %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6>{{ inscricao.aluno.nome }}</h6>
+                                        <small class="text-muted">{{ inscricao.vaga.nome }}</small>
+                                    </div>
+                                    <span class="badge status-pending">{{ inscricao.status }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">Nenhuma inscrição pendente.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

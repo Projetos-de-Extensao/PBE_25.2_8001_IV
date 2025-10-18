@@ -1,0 +1,82 @@
+Metadata-Version: 2.1
+Name: mkdocs_puml
+Version: 2.3.0
+Summary: Package that brings PlantUML to MkDocs
+Home-page: https://github.com/MikhailKravets/mkdocs_puml
+License: MIT
+Keywords: markdown,mkdocs,plantuml,puml,uml,documentation,diagram,uml-diagrams,plugin,mkdocs-plugin
+Author: Mikhail Kravets
+Author-email: michkravets@gmail.com
+Requires-Python: >=3.9,<4.0
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Framework :: MkDocs
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Documentation
+Classifier: Topic :: Software Development :: Documentation
+Classifier: Topic :: Text Processing :: Markup :: Markdown
+Requires-Dist: httpx (>=0.27,<0.28)
+Requires-Dist: markdown (>=3.2,<4.0)
+Requires-Dist: mkdocs (>=1.4,<2.0)
+Requires-Dist: msgpack (>=1.1,<2.0)
+Requires-Dist: rich (>=13.9,<14.0)
+Project-URL: Documentation, https://mikhailkravets.github.io/mkdocs_puml/
+Project-URL: Repository, https://github.com/MikhailKravets/mkdocs_puml
+Description-Content-Type: text/markdown
+
+![logo](https://mikhailkravets.github.io/mkdocs_puml/assets/logos/logo.svg)
+
+<h3 align="center">
+
+<a href="https://pypi.org/project/mkdocs_puml/" target="_blank"><img src="https://img.shields.io/pypi/v/mkdocs-puml?style=for-the-badge" /></a>
+<a href="https://pypistats.org/packages/mkdocs-puml" target="_blank"><img src="https://img.shields.io/pypi/dm/mkdocs_puml?style=for-the-badge" /></a>
+<br />
+<a href="https://mikhailkravets.github.io/mkdocs_puml/" target="_blank"><img src="https://img.shields.io/badge/Documentation-gray?style=for-the-badge&color=9D3058"></a>
+<a href="https://mikhailkravets.github.io/mkdocs_puml/themes/" target="_blank"><img src="https://img.shields.io/badge/Themes%20Hub-449C90?style=for-the-badge&" /></a>
+
+</h3>
+
+`mkdocs_puml` is a fast and simple package that brings plantuml diagrams to MkDocs
+documentation.
+
+## Quick Start
+
+Run the following command to install the package
+
+```shell
+pip install mkdocs_puml
+```
+
+After that, add `plantuml` plugin into `plugins` section of your `mkdocs.yml` file,
+in order to use PlantUML with MkDocs.
+
+```yaml
+plugins:
+  - plantuml:
+      puml_url: https://www.plantuml.com/plantuml/
+```
+
+Not include PlantUML code fences with `puml` keyword to your documentation, such as
+
+~~~
+```puml
+@startuml
+Bob -> Alice : hello
+@enduml
+```
+~~~
+
+That's it, `mkdocs_puml` will automatically build `SVG` diagrams from the code 🎉
+
+For more information, please refer to the [**documentation**](https://mikhailkravets.github.io/mkdocs_puml/).
+
+## License
+
+This project is licensed under MIT license.
+

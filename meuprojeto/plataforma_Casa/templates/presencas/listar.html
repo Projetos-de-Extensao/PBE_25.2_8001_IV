@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}Presenças - Plataforma Casa{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item active">Presenças</li>
+    </ol>
+</nav>
+
+<div class="page-title">
+    <h1><i class="fas fa-clipboard-check"></i> Controle de Presenças</h1>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Filtrar Presenças</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="filtroTurma" class="form-label">Turma</label>
+                        <select name="turma" id="filtroTurma" class="form-select">
+                            <option value="">-- Selecione uma turma --</option>
+                            {% for turma in turmas %}
+                                <option value="{{ turma.id }}" {% if request.GET.turma == turma.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ turma.nome }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="filtroData" class="form-label">Data</label>
+                        <input type="date" name="data" id="filtroData" class="form-control" value="{{ request.GET.data }}">
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Filtrar
+                        </button>
+                        <a href="{% url 'listar_presencas' %}" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Limpar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Aluno</th>
+                        <th>Turma</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for presenca in presencas %}
+                        <tr>
+                            <td>{{ presenca.id }}</td>
+                            <td>{{ presenca.aluno.nome }}</td>
+                            <td>{{ presenca.turma.nome }}</td>
+                            <td>{{ presenca.data|date:"d/m/Y" }}</td>
+                            <td>
+                                <span class="badge {% if presenca.presente %}status-active{% else %}status-inactive{% endif %}">
+                                    {% if presenca.presente %}
+                                        <i class="fas fa-check"></i> Presente
+                                    {% else %}
+                                        <i class="fas fa-times"></i> Ausente
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'editar_presenca' presenca.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                Nenhuma presença registrada.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
