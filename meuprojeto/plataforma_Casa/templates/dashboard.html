@@ -1,98 +1,317 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}Dashboard - Plataforma Casa{% endblock %}
 
+{% block extra_css %}
+<style>
+    .dashboard-container { padding: 2rem 0; }
+    .dashboard-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1); margin-bottom: 1.5rem; transition: all 0.3s ease; }
+    .dashboard-card:hover { transform: translateY(-3px); box-shadow: 0 8px 16px rgba(0, 37, 85, 0.15); }
+    .stat-item { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f0f0f0; }
+    .stat-item:last-child { border-bottom: none; }
+    .stat-number { font-size: 1.75rem; font-weight: 700; color: #002555; }
+    .stat-label { font-size: 0.875rem; color: #6c757d; font-weight: 600; text-transform: uppercase; }
+    .card-title { font-size: 1.25rem; font-weight: 700; color: #002555; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #f5f5f5; }
+    .alert-badge { display: inline-block; background-color: #dc3545; color: white; border-radius: 20px; padding: 0.25rem 0.75rem; font-size: 0.875rem; font-weight: 600; }
+    .info-badge { display: inline-block; background-color: #1245FF; color: white; border-radius: 20px; padding: 0.25rem 0.75rem; font-size: 0.875rem; font-weight: 600; }
+    .table-custom { font-size: 0.875rem; }
+    .table-custom th { background-color: #f8f9fa; color: #002555; font-weight: 700; border-bottom: 2px solid #dee2e6; }
+    .table-custom td { vertical-align: middle; }
+    .status-badge { display: inline-block; padding: 0.35rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    .status-pendente { background-color: #fff3cd; color: #856404; }
+    .status-aprovado { background-color: #d4edda; color: #155724; }
+    .status-rejeitado { background-color: #f8d7da; color: #721c24; }
+    .icon-stat { font-size: 2.5rem; color: #d0d0d0; text-align: center; }
+    .grid-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    @media (max-width: 768px) {
+        .grid-dashboard { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="page-title">
-    <h1><i class="fas fa-chart-line"></i> Dashboard</h1>
-</div>
+<div class="container-fluid dashboard-container">
+    
+    {% if is_professor_dashboard %}
+    <!-- ========== DASHBOARD DO PROFESSOR ========== -->
+    
+    <div style="margin-bottom: 2rem;">
+        <h1 style="color: #002555; font-weight: 700; margin-bottom: 0.5rem;">
+            <i class="fas fa-chart-bar"></i> Dashboard do Professor
+        </h1>
+        <p style="color: #6c757d; margin: 0;">
+            <small><i class="fas fa-clock"></i> Painel de controle de suas vagas e inscrições</small>
+        </p>
+    </div>
 
-<div class="row">
-    <div class="col-md-3">
+    <!-- KPIs Principais -->
+    <div class="grid-dashboard">
         <div class="dashboard-card">
-            <i class="fas fa-users"></i>
-            <h3>{{ total_usuarios }}</h3>
-            <p>Usuários</p>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="dashboard-card">
-            <i class="fas fa-user-graduate"></i>
-            <h3>{{ total_alunos }}</h3>
-            <p>Alunos</p>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="dashboard-card">
-            <i class="fas fa-chalkboard"></i>
-            <h3>{{ total_turmas }}</h3>
-            <p>Turmas Ativas</p>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="dashboard-card">
-            <i class="fas fa-briefcase"></i>
-            <h3>{{ total_vagas }}</h3>
-            <p>Vagas Abertas</p>
-        </div>
-    </div>
-</div>
-
-<div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-clock"></i> Últimas Monitorias
+            <div class="stat-item">
+                <div>
+                    <div class="stat-label">Minhas Vagas Ativas</div>
+                    <div class="stat-number">{{ total_minhas_vagas }}</div>
+                </div>
+                <div class="icon-stat"><i class="fas fa-briefcase"></i></div>
             </div>
-            <div class="card-body">
-                {% if ultimas_monitorias %}
-                    <div class="list-group">
-                        {% for monitoria in ultimas_monitorias %}
-                            <div class="list-group-item">
-                                <div class="d-flex justify-content-between">
-                                    <h6>{{ monitoria.nome }}</h6>
-                                    <span class="badge {% if monitoria.ativo %}status-active{% else %}status-inactive{% endif %}">
-                                        {% if monitoria.ativo %}Ativa{% else %}Inativa{% endif %}
-                                    </span>
-                                </div>
-                                <small class="text-muted">
-                                    <i class="fas fa-user"></i> {{ monitoria.monitor.nome }} | 
-                                    <i class="fas fa-calendar"></i> {{ monitoria.data_inicio }}
-                                </small>
-                            </div>
-                        {% endfor %}
+        </div>
+
+        <div class="dashboard-card">
+            <div class="stat-item">
+                <div>
+                    <div class="stat-label">Total de Candidatos</div>
+                    <div class="stat-number">{{ total_candidatos }}</div>
+                </div>
+                <div class="icon-stat"><i class="fas fa-users"></i></div>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="stat-item">
+                <div>
+                    <div class="stat-label">Monitores Aprovados</div>
+                    <div class="stat-number">{{ monitores_aprovados }}</div>
+                </div>
+                <div class="icon-stat"><i class="fas fa-check-circle"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas Pendentes -->
+    <div class="grid-dashboard" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+        <div class="dashboard-card" style="border-left: 4px solid #ffc107;">
+            <div class="card-title"><i class="fas fa-exclamation-triangle"></i> Candidatos Pendentes</div>
+            <div style="font-size: 2.5rem; font-weight: 700; color: #ffc107; text-align: center;">
+                {{ candidatos_pendentes }}
+            </div>
+        </div>
+
+        <div class="dashboard-card" style="border-left: 4px solid #17a2b8;">
+            <div class="card-title"><i class="fas fa-hourglass-half"></i> Horas Pendentes</div>
+            <div style="font-size: 2.5rem; font-weight: 700; color: #17a2b8; text-align: center;">
+                {{ horas_pendentes }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Últimas Inscrições -->
+    <div class="dashboard-card">
+        <div class="card-title" style="display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-list"></i>
+            <span>Últimas Inscrições</span>
+        </div>
+        {% if ultimas_inscricoes %}
+        <div class="table-responsive">
+            <table class="table table-custom table-hover">
+                <thead>
+                    <tr>
+                        <th>Candidato</th>
+                        <th>Vaga</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inscricao in ultimas_inscricoes %}
+                    <tr>
+                        <td>
+                            <strong>{{ inscricao.aluno.nome }}</strong><br>
+                            <small style="color: #6c757d;">{{ inscricao.aluno.matricula }}</small>
+                        </td>
+                        <td>{{ inscricao.vaga.disciplina }}</td>
+                        <td>{{ inscricao.data_inscricao|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <span class="status-badge status-{{ inscricao.status|lower }}">
+                                {{ inscricao.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 2rem; color: #6c757d;">
+            <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+            <p>Nenhuma inscrição ainda</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Vagas Populares -->
+    <div class="grid-dashboard" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
+        <div class="dashboard-card">
+            <div class="card-title"><i class="fas fa-star"></i> Vagas Mais Procuradas</div>
+            {% if vagas_populares %}
+            <div>
+                {% for vaga in vagas_populares %}
+                <div class="stat-item">
+                    <div>
+                        <strong>{{ vaga.disciplina }}</strong><br>
+                        <small style="color: #6c757d;">Curso: {{ vaga.curso.nome }}</small>
                     </div>
-                {% else %}
-                    <p class="text-muted">Nenhuma monitoria encontrada.</p>
-                {% endif %}
+                    <span class="info-badge">{{ vaga.num_candidatos }} cand.</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 2rem; color: #6c757d;">
+                <p>Nenhuma vaga ativa</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-title"><i class="fas fa-book"></i> Minhas Turmas Ativas</div>
+            {% if minhas_turmas %}
+            <div>
+                {% for turma in minhas_turmas %}
+                <div class="stat-item">
+                    <div>
+                        <strong>{{ turma.disciplina }}</strong><br>
+                        <small style="color: #6c757d;">{{ turma.horario }}</small>
+                    </div>
+                    <span style="background: #e7f3ff; color: #1245FF; padding: 0.35rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
+                        {{ turma.semestre }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 2rem; color: #6c757d;">
+                <p>Nenhuma turma ativa</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% else %}
+    <!-- ========== DASHBOARD GERAL (ADMIN) ========== -->
+    
+    <div style="margin-bottom: 2rem;">
+        <h1 style="color: #002555; font-weight: 700; margin-bottom: 0.5rem;">
+            <i class="fas fa-tachometer-alt"></i> Dashboard Geral
+        </h1>
+        <p style="color: #6c757d; margin: 0;">
+            <small><i class="fas fa-clock"></i> Visão geral do sistema</small>
+        </p>
+    </div>
+
+    <!-- KPIs -->
+    <div class="grid-dashboard">
+        <div class="dashboard-card">
+            <div class="stat-item">
+                <div>
+                    <div class="stat-label">Total de Usuários</div>
+                    <div class="stat-number">{{ total_usuarios }}</div>
+                </div>
+                <div class="icon-stat"><i class="fas fa-users"></i></div>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="stat-item">
+                <div>
+                    <div class="stat-label">Total de Alunos</div>
+                    <div class="stat-number">{{ total_alunos }}</div>
+                </div>
+                <div class="icon-stat"><i class="fas fa-user-graduate"></i></div>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="stat-item">
+                <div>
+                    <div class="stat-label">Turmas Ativas</div>
+                    <div class="stat-number">{{ total_turmas }}</div>
+                </div>
+                <div class="icon-stat"><i class="fas fa-book"></i></div>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="stat-item">
+                <div>
+                    <div class="stat-label">Vagas Ativas</div>
+                    <div class="stat-number">{{ total_vagas }}</div>
+                </div>
+                <div class="icon-stat"><i class="fas fa-briefcase"></i></div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-calendar-check"></i> Inscrições Pendentes
-            </div>
-            <div class="card-body">
-                {% if inscricoes_pendentes %}
-                    <div class="list-group">
-                        {% for inscricao in inscricoes_pendentes %}
-                            <div class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6>{{ inscricao.aluno.nome }}</h6>
-                                        <small class="text-muted">{{ inscricao.vaga.nome }}</small>
-                                    </div>
-                                    <span class="badge status-pending">{{ inscricao.status }}</span>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p class="text-muted">Nenhuma inscrição pendente.</p>
-                {% endif %}
-            </div>
+    <!-- Últimas Monitorias -->
+    <div class="dashboard-card">
+        <div class="card-title"><i class="fas fa-list"></i> Últimas Monitorias</div>
+        {% if ultimas_monitorias %}
+        <div class="table-responsive">
+            <table class="table table-custom table-hover">
+                <thead>
+                    <tr>
+                        <th>Disciplina</th>
+                        <th>Semestre</th>
+                        <th>Horário</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for monitoria in ultimas_monitorias %}
+                    <tr>
+                        <td><strong>{{ monitoria.disciplina }}</strong></td>
+                        <td>{{ monitoria.semestre }}</td>
+                        <td>{{ monitoria.horario }}</td>
+                        <td>
+                            {% if monitoria.ativo %}
+                            <span class="status-badge status-aprovado">Ativa</span>
+                            {% else %}
+                            <span class="status-badge status-rejeitado">Inativa</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+        {% else %}
+        <div style="text-align: center; padding: 2rem; color: #6c757d;">
+            <p>Nenhuma monitoria registrada</p>
+        </div>
+        {% endif %}
     </div>
+
+    <!-- Inscrições Pendentes -->
+    <div class="dashboard-card">
+        <div class="card-title"><i class="fas fa-hourglass-half"></i> Inscrições Pendentes</div>
+        {% if inscricoes_pendentes %}
+        <div class="table-responsive">
+            <table class="table table-custom table-hover">
+                <thead>
+                    <tr>
+                        <th>Candidato</th>
+                        <th>Vaga</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inscricao in inscricoes_pendentes %}
+                    <tr>
+                        <td><strong>{{ inscricao.aluno.nome }}</strong></td>
+                        <td>{{ inscricao.vaga.disciplina }}</td>
+                        <td>{{ inscricao.data_inscricao|date:"d/m/Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 2rem; color: #6c757d;">
+            <p>Nenhuma inscrição pendente</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% endif %}
+
 </div>
 {% endblock %}
