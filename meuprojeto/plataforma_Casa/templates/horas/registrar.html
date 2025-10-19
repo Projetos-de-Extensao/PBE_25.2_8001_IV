@@ -1,0 +1,387 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar Horas - Monitor{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-dark: #002555;
+        --primary-light: #1245FF;
+        --accent-gold: #F5AC00;
+        --success-green: #28a745;
+        --gray-light: #f5f5f5;
+    }
+
+    .form-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: none; /* flat */
+        border: 1px solid #e9edf5;
+        padding: 2rem;
+    }
+
+    .form-header {
+        /* Cabeçalho minimalista usando as cores institucionais */
+        background: linear-gradient(135deg, #0b2f5c 0%, var(--primary-light) 100%);
+        color: #fafaf8; /* off-white */
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        margin: -2rem -2rem 2rem -2rem;
+        box-shadow: none;
+    }
+
+    .form-header h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        color: #fafaf8; /* off-white */
+    }
+
+    .form-header p {
+        font-size: 0.95rem;
+        opacity: 0.95;
+        margin-bottom: 0;
+        color: #fafaf8; /* off-white */
+    }
+
+    .form-group-divider {
+        padding: 1.5rem 0;
+        border-top: 2px solid var(--gray-light);
+        margin-top: 1.5rem;
+    }
+
+    .form-group-divider:first-of-type {
+        border-top: none;
+        padding-top: 0;
+        margin-top: 0;
+    }
+
+    .form-section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-section-icon {
+        color: var(--accent-gold);
+        font-size: 1.2rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--primary-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #e0e6ef;
+        border-radius: 8px;
+        padding: 0.7rem 0.9rem;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-light);
+        box-shadow: 0 0 0 3px rgba(18, 69, 255, 0.08);
+        outline: none;
+    }
+
+    .alert {
+        border-radius: 6px;
+        border: none;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-info {
+        background: rgba(23, 162, 184, 0.1);
+        color: #0c5460;
+        border-left: 4px solid #17a2b8;
+    }
+
+    .time-inputs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .btn-group-form {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        padding: 0.7rem 1.5rem;
+        font-weight: 600;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #0b2f5c 0%, var(--primary-light) 100%);
+        color: #fafaf8;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(0, 37, 85, 0.15);
+    }
+
+    .btn-outline-secondary {
+        background: white;
+        color: var(--primary-dark);
+        border: 1px solid #e0e6ef;
+    }
+
+    .btn-outline-secondary:hover {
+        background: #f9fbff;
+        border-color: var(--primary-dark);
+    }
+
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 1rem;
+        }
+
+        .form-header {
+            margin: -1rem -1rem 1.5rem -1rem;
+            padding: 1rem;
+        }
+
+        .time-inputs {
+            grid-template-columns: 1fr;
+        }
+
+        .btn-group-form {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 1.5rem 0;">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            
+            {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="form-container">
+                <div class="form-header">
+                    <h1>
+                        <i class="fas fa-clock"></i> Registrar Horas de Monitoria
+                    </h1>
+                    <p>
+                        <i class="fas fa-info-circle"></i> Registre suas horas para validação do professor supervisor
+                    </p>
+                </div>
+
+                <form method="post" id="formRegistrarHoras">
+                    {% csrf_token %}
+
+                    <!-- SEÇÃO 1: SELEÇÃO DE TURMA -->
+                    <div class="form-group-divider">
+                        <div class="form-section-title">
+                            <i class="fas fa-chalkboard form-section-icon"></i>
+                            Turma
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="turma" class="form-label">
+                                Selecione uma turma *
+                            </label>
+                            <select name="turma" id="turma" class="form-select" required>
+                                <option value="">-- Escolha uma turma --</option>
+                                {% for turma in turmas %}
+                                <option value="{{ turma.id }}">
+                                    📚 {{ turma.nome }} - {{ turma.vaga.disciplina }}
+                                    ({{ turma.dias_da_semana }} • {{ turma.horario }})
+                                </option>
+                                {% empty %}
+                                <option value="" disabled>Nenhuma turma disponível</option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">
+                                Apenas suas turmas ativas aparecem aqui
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO 2: DATA E HORÁRIO -->
+                    <div class="form-group-divider">
+                        <div class="form-section-title">
+                            <i class="fas fa-calendar form-section-icon"></i>
+                            Data e Horário
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="data" class="form-label">
+                                Data *
+                            </label>
+                            <input type="date" class="form-control" id="data" name="data" required>
+                            <small class="form-text text-muted">
+                                Máximo até hoje
+                            </small>
+                        </div>
+
+                        <div class="time-inputs">
+                            <div class="mb-3">
+                                <label for="hora_inicio" class="form-label">
+                                    <i class="fas fa-hourglass-start"></i> Hora de Início *
+                                </label>
+                                <input type="time" class="form-control" id="hora_inicio" name="hora_inicio" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="hora_fim" class="form-label">
+                                    <i class="fas fa-hourglass-end"></i> Hora de Término *
+                                </label>
+                                <input type="time" class="form-control" id="hora_fim" name="hora_fim" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO 3: DESCRIÇÃO DE ATIVIDADES -->
+                    <div class="form-group-divider">
+                        <div class="form-section-title">
+                            <i class="fas fa-tasks form-section-icon"></i>
+                            Descrição das Atividades
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descricao_atividade" class="form-label">
+                                Descreva o que foi realizado *
+                            </label>
+                            <textarea class="form-control" 
+                                      id="descricao_atividade" 
+                                      name="descricao_atividade" 
+                                      rows="5" 
+                                      placeholder="Ex: Auxílio em dúvidas sobre cálculo, resolução de exercícios propostos, discussão de casos práticos, etc."
+                                      required></textarea>
+                            <small class="form-text text-muted">
+                                Seja específico e detalhado sobre as atividades desenvolvidas
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- ALERTA IMPORTANTE -->
+                    <div class="alert alert-info">
+                        <div style="display: flex; gap: 0.8rem;">
+                            <i class="fas fa-info-circle" style="margin-top: 0.2rem; flex-shrink: 0;"></i>
+                            <div>
+                                <strong>Processamento:</strong> Seu registro será enviado para validação do professor supervisor. Após aprovação, as horas serão contabilizadas no seu histórico.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOTÕES DE AÇÃO -->
+                    <div class="btn-group-form">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Registrar Horas
+                        </button>
+                        <a href="{% url 'meus_registros_horas' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-list"></i> Meus Registros
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Validações e comportamentos
+    const form = document.getElementById('formRegistrarHoras');
+    const dataInput = document.getElementById('data');
+    const horaInicio = document.getElementById('hora_inicio');
+    const horaFim = document.getElementById('hora_fim');
+    const turmaSelect = document.getElementById('turma');
+
+    // Definir data máxima como hoje
+    const hoje = new Date().toISOString().split('T')[0];
+    dataInput.max = hoje;
+
+    // Validação ao submeter
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Validar se turma foi selecionada
+        if (!turmaSelect.value) {
+            alert('❌ Selecione uma turma!');
+            turmaSelect.focus();
+            return false;
+        }
+
+        // Validar se data foi preenchida
+        if (!dataInput.value) {
+            alert('❌ Selecione uma data!');
+            dataInput.focus();
+            return false;
+        }
+
+        // Validar hora de início
+        if (!horaInicio.value) {
+            alert('❌ Informe a hora de início!');
+            horaInicio.focus();
+            return false;
+        }
+
+        // Validar hora de término
+        if (!horaFim.value) {
+            alert('❌ Informe a hora de término!');
+            horaFim.focus();
+            return false;
+        }
+
+        // Validar se hora de término é posterior à hora de início
+        if (horaInicio.value >= horaFim.value) {
+            alert('❌ A hora de término deve ser posterior à hora de início!');
+            horaFim.focus();
+            return false;
+        }
+
+        // Calcular e exibir total de horas
+        const [hInicio, mInicio] = horaInicio.value.split(':').map(Number);
+        const [hFim, mFim] = horaFim.value.split(':').map(Number);
+        const minutosInicio = hInicio * 60 + mInicio;
+        const minutosFim = hFim * 60 + mFim;
+        const totalMinutos = minutosFim - minutosInicio;
+        const horas = Math.floor(totalMinutos / 60);
+        const minutos = totalMinutos % 60;
+
+        const confirmacao = `✅ Confirma o registro?\n\n` +
+            `Turma: ${turmaSelect.options[turmaSelect.selectedIndex].text}\n` +
+            `Data: ${new Date(dataInput.value).toLocaleDateString('pt-BR')}\n` +
+            `Horário: ${horaInicio.value} - ${horaFim.value}\n` +
+            `Total: ${horas}h${minutos > 0 ? ' ' + minutos + 'min' : ''}`;
+
+        if (confirm(confirmacao)) {
+            form.submit();
+        }
+    });
+</script>
+{% endblock %}
