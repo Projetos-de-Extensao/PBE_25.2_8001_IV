@@ -819,7 +819,6 @@
                         <i class="fas fa-users"></i>
                         <span class="sidebar-text">Participando</span>
                     </a>
-                    {% endif %}
                     
                     <!-- 
                         ====================================================================
@@ -839,7 +838,7 @@
                         Herda: Permissões do grupo Aluno
                         ====================================================================
                     -->
-                    {% if is_monitor %}
+                    {% elif is_monitor %}
                     <!-- Link: Dashboard do Monitor -->
                     <!-- Painel com KPIs e estatísticas personalizadas -->
                     <!-- Monitorias ativas, horas, alunos, etc -->
@@ -907,7 +906,6 @@
                         <i class="fas fa-file-signature"></i>
                         <span class="sidebar-text">Minhas Inscrições</span>
                     </a>
-                    {% endif %}
                     
                     <!-- 
                         ====================================================================
@@ -929,7 +927,7 @@
                         Herda: Permissões dos grupos Aluno e Monitor
                         ====================================================================
                     -->
-                    {% if is_professor %}
+                    {% elif is_professor %}
                     <!-- Link: Dashboard do Professor -->
                     <!-- Painel com KPIs e estatísticas personalizadas -->
                     <!-- Últimas inscrições, vagas populares, turmas ativas -->
@@ -976,7 +974,6 @@
                         <i class="fas fa-chalkboard"></i>
                         <span class="sidebar-text">Turmas</span>
                     </a>
-                    {% endif %}
                     
                     <!-- 
                         ====================================================================
@@ -998,7 +995,7 @@
                         Permissões: TODAS (sem restrições)
                         ====================================================================
                     -->
-                    {% if is_admin %}
+                    {% elif is_admin %}
                     <!-- Link: Dashboard de Gestão -->
                     <!-- Métricas globais, KPIs, relatórios executivos -->
                     <a href="{% url 'dashboard_gestao' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard_gestao' %}active{% endif %}">
