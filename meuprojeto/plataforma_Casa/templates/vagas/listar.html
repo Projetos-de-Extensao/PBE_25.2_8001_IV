@@ -1,6 +1,322 @@
 {% extends 'base.html' %}
 {% block title %}Vagas - Plataforma Casa{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Header da Página */
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #002555;
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .page-header p {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+    
+    .breadcrumb {
+        background: transparent;
+        padding: 0 0 1rem 0;
+        margin: 0;
+        font-size: 0.875rem;
+    }
+    
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "/";
+        color: #6c757d;
+    }
+    
+    .breadcrumb-item a {
+        color: #002555;
+        text-decoration: none;
+    }
+    
+    .breadcrumb-item.active {
+        color: #6c757d;
+        font-weight: 600;
+    }
+    
+    /* Botão Nova Vaga */
+    .btn-nova-vaga {
+        background: #002555;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.15);
+    }
+    
+    .btn-nova-vaga:hover {
+        background: #003d7a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.25);
+        color: white;
+    }
+    
+    /* Grid de Vagas */
+    .vagas-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    /* Card de Vaga */
+    .vaga-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.08);
+        border: 1px solid rgba(0, 37, 85, 0.06);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        cursor: pointer;
+        position: relative;
+    }
+    
+    .vaga-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 37, 85, 0.15);
+    }
+    
+    /* Link que cobre todo o card */
+    .vaga-card-link {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+    }
+    
+    /* Botões devem ficar acima do link */
+    .vaga-card-footer {
+        position: relative;
+        z-index: 2;
+    }
+    
+    /* Header do Card */
+    .vaga-card-header {
+        background: linear-gradient(135deg, #002555, #003d7a);
+        padding: 1.5rem;
+        position: relative;
+        min-height: 120px;
+    }
+    
+    .vaga-card-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: white;
+        margin: 0 0 0.5rem 0;
+        line-height: 1.4;
+        padding-right: 80px;
+    }
+    
+    .vaga-card-curso {
+        font-size: 0.85rem;
+        color: #F5AC00;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    /* Badge de Status */
+    .vaga-badge {
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        padding: 0.4rem 0.85rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .vaga-badge.active {
+        background: #28a745;
+        color: white;
+    }
+    
+    .vaga-badge.inactive {
+        background: #dc3545;
+        color: white;
+    }
+    
+    /* Body do Card */
+    .vaga-card-body {
+        padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Informações da Vaga */
+    .vaga-info {
+        flex-grow: 1;
+    }
+    
+    .vaga-info-item {
+        margin-bottom: 1.25rem;
+    }
+    
+    .vaga-info-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .vaga-info-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #002555;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.4rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .vaga-info-label i {
+        color: #F5AC00;
+        font-size: 0.85rem;
+    }
+    
+    .vaga-info-value {
+        font-size: 0.875rem;
+        color: #495057;
+        line-height: 1.5;
+        margin: 0;
+    }
+    
+    /* Badge de Inscritos */
+    .inscritos-section {
+        margin-top: 1.5rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .inscritos-badge {
+        background: #002555;
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .inscritos-badge .number {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #F5AC00;
+        line-height: 1;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+    
+    .inscritos-badge .label {
+        font-size: 0.7rem;
+        color: white;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+    
+    /* Footer do Card */
+    .vaga-card-footer {
+        padding: 1rem 1.5rem;
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        gap: 0.5rem;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .vaga-btn {
+        flex: 1;
+        padding: 0.6rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.2s ease;
+        background: white;
+        border: 1.5px solid #002555;
+        color: #002555;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .vaga-btn:hover {
+        background: #002555;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.2);
+        text-decoration: none;
+    }
+    
+    .vaga-btn i {
+        margin-right: 0.25rem;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.08);
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #002555;
+        opacity: 0.2;
+        margin-bottom: 1.5rem;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.25rem;
+        color: #002555;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .vagas-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .btn-nova-vaga {
+            width: 100%;
+            margin-top: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -9,67 +325,91 @@
     </ol>
 </nav>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div class="page-title">
-        <h1><i class="fas fa-briefcase"></i> Vagas de Monitoria</h1>
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap">
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-briefcase"></i>
+            Vagas de Monitoria
+        </h1>
+        <p>Gerencie as vagas de monitoria disponíveis</p>
     </div>
-    <a href="{% url 'criar_vaga' %}" class="btn btn-primary">
+    <a href="{% url 'criar_vaga' %}" class="btn-nova-vaga">
         <i class="fas fa-plus"></i> Nova Vaga
     </a>
 </div>
 
-<div class="row">
-    {% for vaga in vagas %}
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h5 class="mb-0">{{ vaga.nome }}</h5>
-                            <small>{{ vaga.curso.nome }}</small>
+{% if vagas %}
+    <div class="vagas-grid">
+        {% for vaga in vagas %}
+            <div class="vaga-card">
+                <!-- Link invisível que cobre todo o card -->
+                <a href="{% url 'detalhe_vaga' vaga.id %}" class="vaga-card-link" aria-label="Ver detalhes da vaga {{ vaga.nome }}"></a>
+                
+                <div class="vaga-card-header">
+                    <h3 class="vaga-card-title">{{ vaga.nome }}</h3>
+                    <p class="vaga-card-curso">{{ vaga.curso.nome }}</p>
+                    <span class="vaga-badge {% if vaga.ativo %}active{% else %}inactive{% endif %}">
+                        {% if vaga.ativo %}Ativa{% else %}Inativa{% endif %}
+                    </span>
+                </div>
+                
+                <div class="vaga-card-body">
+                    <div class="vaga-info">
+                        <div class="vaga-info-item">
+                            <div class="vaga-info-label">
+                                <i class="fas fa-user"></i>
+                                Coordenador
+                            </div>
+                            <p class="vaga-info-value">{{ vaga.coordenador.nome }}</p>
                         </div>
-                        <span class="badge {% if vaga.ativo %}status-active{% else %}status-inactive{% endif %}">
-                            {% if vaga.ativo %}Ativa{% else %}Inativa{% endif %}
-                        </span>
+                        
+                        <div class="vaga-info-item">
+                            <div class="vaga-info-label">
+                                <i class="fas fa-align-left"></i>
+                                Descrição
+                            </div>
+                            <p class="vaga-info-value">{{ vaga.descricao|truncatewords:15 }}</p>
+                        </div>
+                        
+                        <div class="vaga-info-item">
+                            <div class="vaga-info-label">
+                                <i class="fas fa-check-circle"></i>
+                                Requisitos
+                            </div>
+                            <p class="vaga-info-value">{{ vaga.requisitos|truncatewords:12 }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="inscritos-section">
+                        <div class="inscritos-badge">
+                            <span class="number">{{ vaga.inscricao_set.count }}</span>
+                            <span class="label">Inscritos</span>
+                        </div>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <h6><i class="fas fa-user"></i> Coordenador</h6>
-                        <p>{{ vaga.coordenador.nome }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <h6><i class="fas fa-list"></i> Descrição</h6>
-                        <p>{{ vaga.descricao|truncatewords:20 }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <h6><i class="fas fa-check-circle"></i> Requisitos</h6>
-                        <p>{{ vaga.requisitos|truncatewords:15 }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <h6><i class="fas fa-user-graduate"></i> Inscritos</h6>
-                        <p><strong>{{ vaga.monitores.count }}</strong> alunos</p>
-                    </div>
-                </div>
-                <div class="card-footer bg-light">
-                    <a href="{% url 'editar_vaga' vaga.id %}" class="btn btn-sm btn-outline-primary">
+                
+                <div class="vaga-card-footer">
+                    <a href="{% url 'detalhe_vaga' vaga.id %}" class="vaga-btn">
+                        <i class="fas fa-eye"></i> Ver
+                    </a>
+                    <a href="{% url 'editar_vaga' vaga.id %}" class="vaga-btn">
                         <i class="fas fa-edit"></i> Editar
                     </a>
-                    <a href="{% url 'detalhe_vaga' vaga.id %}" class="btn btn-sm btn-outline-info">
-                        <i class="fas fa-eye"></i> Detalhes
-                    </a>
-                    <a href="{% url 'deletar_vaga' vaga.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Tem certeza?')">
-                        <i class="fas fa-trash"></i> Deletar
+                    <a href="{% url 'deletar_vaga' vaga.id %}" class="vaga-btn" onclick="return confirm('Tem certeza que deseja deletar esta vaga?')">
+                        <i class="fas fa-trash"></i> Del
                     </a>
                 </div>
             </div>
-        </div>
-    {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle"></i> Nenhuma vaga encontrada.
-            </div>
-        </div>
-    {% endfor %}
-</div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <i class="fas fa-briefcase"></i>
+        <h3>Nenhuma Vaga Encontrada</h3>
+        <p>Ainda não há vagas cadastradas no sistema.</p>
+        <a href="{% url 'criar_vaga' %}" class="btn-nova-vaga">
+            <i class="fas fa-plus"></i> Criar Primeira Vaga
+        </a>
+    </div>
+{% endif %}
 {% endblock %}

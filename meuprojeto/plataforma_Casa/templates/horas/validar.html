@@ -1,0 +1,441 @@
+{% extends 'base.html' %}
+
+{% block title %}Validar Horas dos Monitores{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Header da Página */
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #002555;
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .page-header p {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+    
+    /* Card de Estatísticas */
+    .stats-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.08);
+        border: 1px solid rgba(0, 37, 85, 0.06);
+        margin-bottom: 2rem;
+    }
+    
+    .stats-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .stats-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(245, 172, 0, 0.1), rgba(245, 172, 0, 0.05));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #F5AC00;
+    }
+    
+    .stats-content h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #002555;
+        margin: 0;
+        line-height: 1;
+    }
+    
+    .stats-content p {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0.5rem 0 0 0;
+    }
+    
+    /* Tabela de Registros */
+    .registros-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.08);
+        border: 1px solid rgba(0, 37, 85, 0.06);
+    }
+    
+    .registros-header {
+        background: linear-gradient(135deg, #002555, #003d7a);
+        color: white;
+        padding: 1.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .table-wrapper {
+        overflow-x: auto;
+    }
+    
+    .registros-table {
+        width: 100%;
+        margin: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .registros-table thead {
+        background: #f8f9fa;
+    }
+    
+    .registros-table th {
+        padding: 1rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #002555;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e9ecef;
+        white-space: nowrap;
+    }
+    
+    .registros-table td {
+        padding: 1.25rem 1rem;
+        font-size: 0.875rem;
+        color: #495057;
+        border-bottom: 1px solid #e9ecef;
+        vertical-align: middle;
+    }
+    
+    .registros-table tbody tr {
+        transition: all 0.2s ease;
+    }
+    
+    .registros-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    /* Monitor Info */
+    .monitor-info strong {
+        color: #002555;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+    
+    .monitor-info small {
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+    
+    /* Badges */
+    .badge-custom {
+        padding: 0.45rem 0.85rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+    
+    .badge-horas {
+        background: #002555;
+        color: #F5AC00;
+    }
+    
+    .badge-valor {
+        background: #d4edda;
+        color: #155724;
+        font-size: 0.9rem;
+        padding: 0.5rem 0.9rem;
+    }
+    
+    /* Botões */
+    .btn-detalhes {
+        background: #002555;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-detalhes:hover {
+        background: #003d7a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 37, 85, 0.2);
+        color: white;
+    }
+    
+    .btn-validar {
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 0.5rem 1.25rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-validar:hover {
+        background: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    /* Modal */
+    .modal-header {
+        background: linear-gradient(135deg, #002555, #003d7a);
+        color: white;
+        border-bottom: none;
+    }
+    
+    .modal-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .modal-body {
+        padding: 2rem;
+    }
+    
+    .modal-body p {
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .modal-body strong {
+        color: #002555;
+        font-weight: 600;
+    }
+    
+    .modal-body hr {
+        margin: 1.5rem 0;
+        border-color: #e9ecef;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #002555;
+        opacity: 0.2;
+        margin-bottom: 1.5rem;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.25rem;
+        color: #002555;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    /* Card de Instruções */
+    .instrucoes-card {
+        background: linear-gradient(135deg, rgba(0, 37, 85, 0.03), rgba(0, 37, 85, 0.01));
+        border-radius: 12px;
+        padding: 1.5rem;
+        border-left: 4px solid #002555;
+        margin-top: 2rem;
+    }
+    
+    .instrucoes-card h5 {
+        color: #002555;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .instrucoes-card ul {
+        margin: 0;
+        padding-left: 1.5rem;
+    }
+    
+    .instrucoes-card li {
+        color: #495057;
+        font-size: 0.875rem;
+        margin-bottom: 0.75rem;
+        line-height: 1.6;
+    }
+    
+    .instrucoes-card li:last-child {
+        margin-bottom: 0;
+    }
+    
+    .instrucoes-card strong {
+        color: #002555;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>
+        <i class="fas fa-check-circle"></i>
+        Validar Horas dos Monitores
+    </h1>
+    <p>Aprove ou rejeite registros de horas trabalhadas pelos monitores</p>
+</div>
+
+<!-- Card de Estatísticas -->
+<div class="stats-card">
+    <div class="stats-card-header">
+        <div class="stats-content">
+            <h2>{{ registros.count }}</h2>
+            <p>Registros Pendentes</p>
+        </div>
+        <div class="stats-icon">
+            <i class="fas fa-hourglass-half"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Tabela de Registros -->
+<div class="registros-container">
+    <div class="registros-header">
+        <i class="fas fa-list"></i>
+        Registros Aguardando Validação
+    </div>
+    
+    {% if registros %}
+    <div class="table-wrapper">
+        <table class="registros-table">
+            <thead>
+                <tr>
+                    <th style="width: 60px;">#</th>
+                    <th>Monitor</th>
+                    <th>Data</th>
+                    <th>Horário</th>
+                    <th style="text-align: center;">Horas</th>
+                    <th>Atividades</th>
+                    <th style="text-align: right;">Valor</th>
+                    <th style="text-align: center;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registro in registros %}
+                <tr>
+                    <td style="text-align: center; font-weight: 600; color: #6c757d;">
+                        {{ forloop.counter }}
+                    </td>
+                    <td>
+                        <div class="monitor-info">
+                            <strong>{{ registro.monitor.nome }}</strong>
+                            <small>{{ registro.monitor.curso.nome }}</small>
+                        </div>
+                    </td>
+                    <td style="white-space: nowrap;">
+                        {{ registro.data|date:"d/m/Y" }}
+                    </td>
+                    <td style="text-align: center; white-space: nowrap;">
+                        {{ registro.hora_inicio|time:"H:i" }} - {{ registro.hora_fim|time:"H:i" }}
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="badge-custom badge-horas">
+                            {{ registro.total_horas|floatformat:1 }}h
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn-detalhes" data-bs-toggle="modal" data-bs-target="#modalAtividades{{ registro.id }}">
+                            <i class="fas fa-eye"></i> Ver Detalhes
+                        </button>
+                        
+                        <!-- Modal de Atividades -->
+                        <div class="modal fade" id="modalAtividades{{ registro.id }}" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">
+                                            <i class="fas fa-tasks"></i>
+                                            Atividades Realizadas
+                                        </h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p><strong>Monitor:</strong> {{ registro.monitor.nome }}</p>
+                                        <p><strong>Data:</strong> {{ registro.data|date:"d/m/Y" }}</p>
+                                        <p><strong>Horário:</strong> {{ registro.hora_inicio|time:"H:i" }} - {{ registro.hora_fim|time:"H:i" }}</p>
+                                        <p><strong>Total de Horas:</strong> {{ registro.total_horas|floatformat:1 }}h</p>
+                                        <hr>
+                                        <p><strong>Descrição das Atividades:</strong></p>
+                                        <p style="background: #f8f9fa; padding: 1rem; border-radius: 8px; line-height: 1.6;">
+                                            {{ registro.atividades_realizadas }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="text-align: right;">
+                        <span class="badge-custom badge-valor">
+                            R$ {{ registro.valor_total|floatformat:2 }}
+                        </span>
+                    </td>
+                    <td style="text-align: center;">
+                        <a href="{% url 'aprovar_horas' registro.id %}" class="btn-validar">
+                            <i class="fas fa-check"></i> Validar
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-check-circle"></i>
+        <h3>Nenhum Registro Pendente</h3>
+        <p>Não há registros de horas aguardando validação no momento.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Card de Instruções -->
+<div class="instrucoes-card">
+    <h5>
+        <i class="fas fa-info-circle"></i>
+        Instruções de Validação
+    </h5>
+    <ul>
+        <li>Clique em <strong>"Ver Detalhes"</strong> para visualizar a descrição completa das atividades realizadas pelo monitor</li>
+        <li>Clique em <strong>"Validar"</strong> para acessar a página de aprovação ou rejeição do registro de horas</li>
+        <li>Registros <strong>aprovados</strong> serão contabilizados automaticamente para o pagamento do monitor</li>
+        <li>Registros <strong>rejeitados</strong> precisarão ser corrigidos e reenviados pelo monitor</li>
+    </ul>
+</div>
+{% endblock %}

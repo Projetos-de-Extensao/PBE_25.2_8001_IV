@@ -778,12 +778,16 @@ def listar_vagas(request):
     
     # Admin vê todas as vagas
     if user.is_staff or user.is_superuser:
-        vagas = Vaga.objects.all().select_related('curso', 'coordenador').prefetch_related('monitores')
+        vagas = Vaga.objects.all().select_related('curso', 'coordenador').prefetch_related('monitores').annotate(
+            total_inscritos=Count('inscricao')
+        )
     else:
         # Professor/Coordenador vê apenas suas vagas
         try:
             funcionario = Funcionario.objects.get(email=user.email)
-            vagas = Vaga.objects.filter(coordenador=funcionario).select_related('curso', 'coordenador').prefetch_related('monitores')
+            vagas = Vaga.objects.filter(coordenador=funcionario).select_related('curso', 'coordenador').prefetch_related('monitores').annotate(
+                total_inscritos=Count('inscricao')
+            )
         except Funcionario.DoesNotExist:
             # Se não encontrar funcionário, retorna vazio
             vagas = Vaga.objects.none()

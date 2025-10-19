@@ -1,0 +1,536 @@
+{% extends 'base.html' %}
+{% block title %}{{ aluno.nome }} - Perfil do Candidato{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Header da Página */
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    
+    .page-header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #002555;
+        margin: 0 0 0.5rem 0;
+    }
+    
+    .page-header p {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+    
+    .breadcrumb {
+        background: transparent;
+        padding: 0 0 1rem 0;
+        margin: 0;
+        font-size: 0.875rem;
+    }
+    
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "/";
+        color: #6c757d;
+    }
+    
+    .breadcrumb-item a {
+        color: #002555;
+        text-decoration: none;
+    }
+    
+    .breadcrumb-item.active {
+        color: #6c757d;
+        font-weight: 600;
+    }
+    
+    /* Botões */
+    .btn-voltar {
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.65rem 1.25rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-voltar:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.25);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-avaliar {
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.65rem 1.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-avaliar:hover {
+        background: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    /* Layout em Grid */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    @media (max-width: 968px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Cards */
+    .info-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.08);
+        border: 1px solid rgba(0, 37, 85, 0.06);
+    }
+    
+    .info-card-header {
+        background: linear-gradient(135deg, #002555, #003d7a);
+        color: white;
+        padding: 1.25rem 1.5rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .info-card-body {
+        padding: 1.5rem;
+    }
+    
+    /* Informações do Aluno */
+    .info-item {
+        margin-bottom: 1.25rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .info-item:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #002555;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .info-label i {
+        color: #F5AC00;
+    }
+    
+    .info-value {
+        font-size: 0.95rem;
+        color: #495057;
+        font-weight: 500;
+    }
+    
+    /* Status Badge */
+    .status-badge {
+        padding: 0.6rem 1.25rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-block;
+    }
+    
+    .status-badge.pendente {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-badge.aprovado {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-badge.rejeitado {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .status-badge.espera {
+        background: #e2e3e5;
+        color: #383d41;
+    }
+    
+    /* Lista de Documentos */
+    .documentos-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .documento-item {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .documento-item:hover {
+        background: white;
+        border-color: #002555;
+        transform: translateX(4px);
+    }
+    
+    .documento-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .documento-tipo {
+        font-weight: 700;
+        color: #002555;
+        font-size: 0.95rem;
+    }
+    
+    .documento-data {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .documento-nome {
+        font-size: 0.875rem;
+        color: #495057;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .documento-nome i {
+        color: #F5AC00;
+    }
+    
+    .btn-download {
+        background: #002555;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-download:hover {
+        background: #003d7a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 37, 85, 0.2);
+        color: white;
+        text-decoration: none;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: #002555;
+        opacity: 0.2;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state p {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+    
+    /* Nota de Avaliação */
+    .nota-badge {
+        background: #002555;
+        color: #F5AC00;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Comentário de Avaliação */
+    .comentario-box {
+        background: #f8f9fa;
+        border-left: 4px solid #002555;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+    }
+    
+    .comentario-box p {
+        margin: 0;
+        color: #495057;
+        line-height: 1.6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'listar_vagas' %}">Vagas</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'detalhe_vaga' vaga.id %}">{{ vaga.nome }}</a></li>
+        <li class="breadcrumb-item active">{{ aluno.nome }}</li>
+    </ol>
+</nav>
+
+<div class="page-header">
+    <div class="page-header-top">
+        <div>
+            <h1>{{ aluno.nome }}</h1>
+            <p>Candidato à vaga: {{ vaga.nome }}</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+            {% if inscricao.status == 'Pendente' %}
+            <a href="{% url 'avaliar_candidato' inscricao.id %}" class="btn-avaliar">
+                <i class="fas fa-check-circle"></i> Avaliar Candidato
+            </a>
+            {% endif %}
+            <a href="{% url 'detalhe_vaga' vaga.id %}" class="btn-voltar">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="content-grid">
+    <!-- Informações Pessoais -->
+    <div class="info-card">
+        <div class="info-card-header">
+            <i class="fas fa-user"></i>
+            Informações Pessoais
+        </div>
+        <div class="info-card-body">
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-id-card"></i>
+                    Matrícula
+                </div>
+                <div class="info-value">{{ aluno.matricula }}</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-envelope"></i>
+                    E-mail
+                </div>
+                <div class="info-value">{{ aluno.email }}</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-graduation-cap"></i>
+                    Curso
+                </div>
+                <div class="info-value">{{ aluno.curso.nome }}</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-calendar-alt"></i>
+                    Período
+                </div>
+                <div class="info-value">{{ aluno.periodo }}º período</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-chart-line"></i>
+                    Coeficiente de Rendimento (CR)
+                </div>
+                <div class="info-value">{{ aluno.cr_geral }}</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Data de Ingresso
+                </div>
+                <div class="info-value">{{ aluno.data_ingresso|date:"d/m/Y" }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Status da Inscrição -->
+    <div class="info-card">
+        <div class="info-card-header">
+            <i class="fas fa-clipboard-check"></i>
+            Status da Inscrição
+        </div>
+        <div class="info-card-body">
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-info-circle"></i>
+                    Status Atual
+                </div>
+                <div class="info-value">
+                    <span class="status-badge {% if inscricao.status == 'Pendente' %}pendente{% elif inscricao.status == 'Aprovado' %}aprovado{% elif inscricao.status == 'Rejeitado' %}rejeitado{% else %}espera{% endif %}">
+                        {{ inscricao.status }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-calendar"></i>
+                    Data da Inscrição
+                </div>
+                <div class="info-value">{{ inscricao.data_inscricao|date:"d/m/Y às H:i" }}</div>
+            </div>
+            
+            {% if inscricao.nota_avaliacao %}
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-star"></i>
+                    Nota de Avaliação
+                </div>
+                <div class="info-value">
+                    <span class="nota-badge">
+                        <i class="fas fa-star"></i>
+                        {{ inscricao.nota_avaliacao }}
+                    </span>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if inscricao.data_avaliacao %}
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-clock"></i>
+                    Data da Avaliação
+                </div>
+                <div class="info-value">{{ inscricao.data_avaliacao|date:"d/m/Y às H:i" }}</div>
+            </div>
+            {% endif %}
+            
+            {% if inscricao.avaliado_por %}
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-user-tie"></i>
+                    Avaliado Por
+                </div>
+                <div class="info-value">{{ inscricao.avaliado_por.nome }}</div>
+            </div>
+            {% endif %}
+            
+            {% if inscricao.comentario_avaliacao %}
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-comment-alt"></i>
+                    Comentário da Avaliação
+                </div>
+                <div class="comentario-box">
+                    <p>{{ inscricao.comentario_avaliacao }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Documentos Enviados -->
+<div class="info-card">
+    <div class="info-card-header">
+        <i class="fas fa-file-alt"></i>
+        Documentos Enviados ({{ documentos.count }})
+    </div>
+    <div class="info-card-body">
+        {% if documentos %}
+        <div class="documentos-list">
+            {% for documento in documentos %}
+            <div class="documento-item">
+                <div class="documento-header">
+                    <div class="documento-tipo">
+                        {{ documento.tipo }}
+                    </div>
+                    <div class="documento-data">
+                        {{ documento.enviado_em|date:"d/m/Y" }}
+                    </div>
+                </div>
+                <div class="documento-nome">
+                    <i class="fas fa-file-pdf"></i>
+                    {{ documento.nome_arquivo }}
+                </div>
+                {% if documento.observacao %}
+                <p style="font-size: 0.85rem; color: #6c757d; margin-bottom: 0.75rem;">
+                    <strong>Observação:</strong> {{ documento.observacao }}
+                </p>
+                {% endif %}
+                <a href="{{ documento.arquivo.url }}" target="_blank" class="btn-download">
+                    <i class="fas fa-download"></i> Baixar Documento
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-file-alt"></i>
+            <p>Nenhum documento foi enviado por este candidato.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

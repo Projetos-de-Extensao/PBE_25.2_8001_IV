@@ -189,10 +189,17 @@ html, body {
 }
 
 .card-header {
-    background: linear-gradient(135deg, var(--cor-azul-escuro-principal) 0%, var(--cor-azul-auxiliar) 100%);
-    color: var(--cor-branco);
-    border-bottom: 2px solid var(--cor-amarelo-institucional);
-    font-weight: 600;
+    background-color: #fafaf8; /* Off-white */
+    color: var(--cor-azul-escuro-principal);
+    border-bottom: 3px solid var(--cor-amarelo-institucional);
+    font-weight: 700;
+    padding: 1rem 1.5rem;
+}
+
+.card-header h5 {
+    color: var(--cor-azul-escuro-principal);
+    font-weight: 700;
+    margin: 0;
 }
 
 .card-title {

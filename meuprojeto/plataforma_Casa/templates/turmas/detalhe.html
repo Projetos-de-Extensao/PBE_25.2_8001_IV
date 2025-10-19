@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% block title %}Detalhes da Turma - Plataforma Casa{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'listar_turmas' %}">Turmas</a></li>
+        <li class="breadcrumb-item active">Detalhes</li>
+    </ol>
+</nav>
+
+<div class="page-title">
+    <h1><i class="fas fa-users-class"></i> Detalhes da Turma</h1>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{ turma.nome }}</h5>
+        <span class="badge {% if turma.ativo %}bg-success{% else %}bg-secondary{% endif %}">
+            {% if turma.ativo %}Ativa{% else %}Inativa{% endif %}
+        </span>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h6><i class="fas fa-graduation-cap"></i> Curso</h6>
+                <p>{{ turma.curso.nome }}</p>
+            </div>
+            <div class="col-md-6">
+                <h6><i class="fas fa-chalkboard-teacher"></i> Professor Responsável</h6>
+                <p>{{ turma.professor.nome }}</p>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <h6><i class="fas fa-clock"></i> Horário</h6>
+                <p class="fs-6 text-primary">{{ turma.horario }}</p>
+            </div>
+            <div class="col-md-4">
+                <h6><i class="fas fa-calendar-week"></i> Dias da Semana</h6>
+                <p class="fs-6">{{ turma.dias_da_semana }}</p>
+            </div>
+            <div class="col-md-4">
+                <h6><i class="fas fa-door-open"></i> Sala</h6>
+                <p class="fs-6">{{ turma.sala.numero }}</p>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <h6><i class="fas fa-calendar-alt"></i> Data de Início</h6>
+                <p>{{ turma.data_inicio|date:"d/m/Y" }}</p>
+            </div>
+            <div class="col-md-4">
+                <h6><i class="fas fa-calendar-check"></i> Data de Término</h6>
+                <p>{{ turma.data_fim|date:"d/m/Y" }}</p>
+            </div>
+            <div class="col-md-4">
+                <h6><i class="fas fa-user-graduate"></i> Monitor</h6>
+                <p>{{ turma.monitor.nome }}</p>
+            </div>
+        </div>
+
+        {% if turma.descricao %}
+        <div class="mb-4">
+            <h6><i class="fas fa-info-circle"></i> Descrição</h6>
+            <p class="text-muted">{{ turma.descricao }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Lista de Participações (se houver) -->
+        {% if turma.participacaomonitoria_set.all %}
+        <div class="mb-4">
+            <h6><i class="fas fa-users"></i> Alunos Participantes</h6>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Matrícula</th>
+                            <th>Nome</th>
+                            <th>AP1</th>
+                            <th>AP2</th>
+                            <th>CR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for participacao in turma.participacaomonitoria_set.all %}
+                        <tr>
+                            <td>{{ participacao.aluno.matricula }}</td>
+                            <td>{{ participacao.aluno.nome }}</td>
+                            <td>{{ participacao.ap1|default:"-" }}</td>
+                            <td>{{ participacao.ap2|default:"-" }}</td>
+                            <td><strong>{{ participacao.cr|default:"-" }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> Nenhum aluno participante cadastrado ainda.
+        </div>
+        {% endif %}
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'listar_turmas' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+            <div>
+                <a href="{% url 'editar_turma' turma.id %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <i class="fas fa-trash"></i> Excluir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir a turma <strong>{{ turma.nome }}</strong>?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Esta ação não pode ser desfeita!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" action="{% url 'deletar_turma' turma.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

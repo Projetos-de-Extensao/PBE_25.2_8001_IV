@@ -37,6 +37,12 @@ urlpatterns = [
     # URL: http://localhost:8000/logout/
     path('logout/', views.logout_view, name='logout'),
     
+    # Rota para cadastro/registro de novo usuário
+    # Método HTTP: GET (exibe formulário), POST (cria novo usuário)
+    # URL: http://localhost:8000/register/
+    # Todo novo usuário recebe automaticamente o role "Aluno"
+    path('register/', views.register_view, name='register'),
+    
     # ============================================================================
     # 2. DASHBOARD - PÁGINA INICIAL
     # ============================================================================
@@ -130,6 +136,24 @@ urlpatterns = [
     # Método HTTP: GET
     # URL: http://localhost:8000/vagas/2/
     path('vagas/<int:vaga_id>/', views.detalhe_vaga, name='detalhe_vaga'),
+    
+    # --- Detalhe do Candidato ---
+    # Ver informações completas do candidato e documentos
+    # Método HTTP: GET
+    # URL: http://localhost:8000/candidatos/1/
+    path('candidatos/<int:inscricao_id>/', views.detalhe_candidato, name='detalhe_candidato'),
+    
+    # --- Avaliar Candidato ---
+    # Aprovar, reprovar ou colocar em lista de espera
+    # Método HTTP: GET / POST
+    # URL: http://localhost:8000/candidatos/1/avaliar/
+    path('candidatos/<int:inscricao_id>/avaliar/', views.avaliar_candidato, name='avaliar_candidato'),
+    
+    # --- Mudar Status do Candidato (AJAX) ---
+    # Mudar status rapidamente com um clique
+    # Método HTTP: POST
+    # URL: http://localhost:8000/candidatos/1/status/
+    path('candidatos/<int:inscricao_id>/status/', views.mudar_status_candidato, name='mudar_status_candidato'),
     
     # --- Criar Nova Vaga ---
     # Formulário para criação de vaga de monitoria
@@ -294,6 +318,109 @@ urlpatterns = [
     # URL: http://localhost:8000/sql/
     # Nota: Este é um endpoint de desenvolvimento, não deve ser exposto em produção
     path('sql/', views.sql_view, name='sql_view'),
+    
+    # ============================================================================
+    # 11. PORTAL DE VAGAS E CANDIDATURAS
+    # ============================================================================
+    
+    # --- Portal Público de Vagas ---
+    # Portal para visualização e candidatura às vagas de monitoria
+    path('portal-vagas/', views.portal_vagas, name='portal_vagas'),
+    
+    # --- API: Detalhes da Vaga (JSON) ---
+    # Endpoint para carregar detalhes de uma vaga em modal
+    path('api/vagas/<int:vaga_id>/detalhes/', views.api_detalhes_vaga, name='api_detalhes_vaga'),
+    
+    # --- Candidatar-se a uma Vaga ---
+    # Formulário de candidatura com upload de documentos
+    path('vagas/<int:vaga_id>/candidatar/', views.candidatar_vaga, name='candidatar_vaga'),
+    
+    # --- Minhas Inscrições ---
+    # Visualizar status das candidaturas do aluno
+    path('minhas-inscricoes/', views.minhas_inscricoes, name='minhas_inscricoes'),
+    
+    # --- Participando de Monitorias (ALUNO) ---
+    # Listar monitorias que o aluno está participando
+    path('monitorias/participando/', views.participando_monitorias, name='participando_monitorias'),
+    
+    # --- Monitorias Disponíveis (ALUNO) ---
+    # Listar todas as monitorias disponíveis para o aluno participar
+    path('monitorias/disponiveis/', views.monitorias_disponiveis, name='monitorias_disponiveis'),
+    
+    # --- Participar de uma Monitoria (ALUNO) ---
+    # Inscrição/participação em uma turma específica
+    path('monitorias/<int:turma_id>/participar/', views.participar_monitoria, name='participar_monitoria'),
+    
+    # --- Meus Alunos (MONITOR) ---
+    # Listar alunos que estão participando das monitorias do monitor
+    path('monitorias/meus-alunos/', views.meus_alunos_monitoria, name='meus_alunos_monitoria'),
+    
+    # ============================================================================
+    # 12. SELEÇÃO E AVALIAÇÃO DE CANDIDATOS
+    # ============================================================================
+    
+    # --- Avaliar Candidatos de uma Vaga ---
+    # Lista de candidatos para avaliação do professor/coordenador
+    path('vagas/<int:vaga_id>/avaliar/', views.avaliar_candidatos, name='avaliar_candidatos'),
+    
+    # --- Avaliar Inscrição Específica ---
+    # Formulário de avaliação com notas e comentários
+    path('inscricoes/<int:inscricao_id>/avaliar/', views.avaliar_inscricao, name='avaliar_inscricao'),
+    
+    # --- Comunicar Resultado ---
+    # Comunicar resultado da seleção ao candidato
+    path('inscricoes/<int:inscricao_id>/comunicar/', views.comunicar_resultado, name='comunicar_resultado'),
+    
+    # ============================================================================
+    # 13. REGISTRO E VALIDAÇÃO DE HORAS
+    # ============================================================================
+    
+    # --- Registrar Horas (Monitor) ---
+    # Monitor registra suas horas trabalhadas
+    path('horas/registrar/', views.registrar_horas, name='registrar_horas'),
+    
+    # --- Meus Registros de Horas ---
+    # Monitor visualiza seus registros
+    path('horas/meus-registros/', views.meus_registros_horas, name='meus_registros_horas'),
+    
+    # --- Detalhes do Registro (Monitor) ---
+    # Monitor visualiza detalhes seguro de seu registro SEM acessar página de aprovação
+    # ⚠️ SEGURANÇA: Validação de ownership - monitor só vê seus registros
+    path('horas/detalhes/<int:registro_id>/', views.detalhes_registro, name='detalhes_registro'),
+    
+    # --- Validar Horas (Professor) ---
+    # Professor valida horas registradas pelos monitores
+    path('horas/validar/', views.validar_horas, name='validar_horas'),
+    
+    # --- Aprovar Registro de Horas ---
+    # Aprovar ou rejeitar registro específico
+    path('horas/<int:registro_id>/aprovar/', views.aprovar_horas, name='aprovar_horas'),
+    
+    # ============================================================================
+    # 14. DASHBOARD DE GESTÃO
+    # ============================================================================
+    
+    # --- Dashboard de Gestão ---
+    # Painel de controle para o departamento
+    path('gestao/dashboard/', views.dashboard_gestao, name='dashboard_gestao'),
+    
+    # --- Gerenciar Pagamentos ---
+    # Listagem e controle de pagamentos
+    path('gestao/pagamentos/', views.gerenciar_pagamentos, name='gerenciar_pagamentos'),
+    
+    # --- Processar Pagamento ---
+    # Processar pagamento específico
+    path('gestao/pagamentos/<int:pagamento_id>/processar/', views.processar_pagamento, name='processar_pagamento'),
+    
+    # ============================================================================
+    # 15. RELATÓRIOS APRIMORADOS
+    # ============================================================================
+    
+    # --- Relatório de Candidatos por Vaga ---
+    path('relatorios/candidatos-vaga/', views.relatorio_candidatos_por_vaga, name='relatorio_candidatos_vaga'),
+    
+    # --- Relatório de Monitores Selecionados ---
+    path('relatorios/monitores-selecionados/', views.relatorio_monitores_selecionados, name='relatorio_monitores_selecionados'),
 ]
 
 # ================================================================================

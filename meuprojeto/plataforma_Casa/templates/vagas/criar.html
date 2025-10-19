@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% block title %}Nova Vaga - Plataforma Casa{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'listar_vagas' %}">Vagas</a></li>
+        <li class="breadcrumb-item active">Nova Vaga</li>
+    </ol>
+</nav>
+
+<div class="page-title">
+    <h1><i class="fas fa-plus-circle"></i> Criar Nova Vaga de Monitoria</h1>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Informações da Vaga</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="nome" class="form-label">Nome da Vaga *</label>
+                    <input type="text" class="form-control" id="nome" name="nome" 
+                           value="{{ form.nome.value|default:'' }}" required>
+                    {% if form.nome.errors %}
+                        <div class="text-danger small">{{ form.nome.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="curso" class="form-label">Curso *</label>
+                    <select class="form-select" id="curso" name="curso" required>
+                        <option value="">-- Selecione um curso --</option>
+                        {% for curso in cursos %}
+                            <option value="{{ curso.id }}" 
+                                {% if form.curso.value == curso.id|stringformat:"s" %}selected{% endif %}>
+                                {{ curso.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.curso.errors %}
+                        <div class="text-danger small">{{ form.curso.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="coordenador" class="form-label">Coordenador *</label>
+                    <select class="form-select" id="coordenador" name="coordenador" required>
+                        <option value="">-- Selecione um coordenador --</option>
+                        {% for coordenador in coordenadores %}
+                            <option value="{{ coordenador.id }}" 
+                                {% if form.coordenador.value == coordenador.id|stringformat:"s" %}selected{% endif %}>
+                                {{ coordenador.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.coordenador.errors %}
+                        <div class="text-danger small">{{ form.coordenador.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="vagas_disponiveis" class="form-label">Vagas Disponíveis *</label>
+                    <input type="number" class="form-control" id="vagas_disponiveis" 
+                           name="vagas_disponiveis" min="1" 
+                           value="{{ form.vagas_disponiveis.value|default:'' }}" required>
+                    {% if form.vagas_disponiveis.errors %}
+                        <div class="text-danger small">{{ form.vagas_disponiveis.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="descricao" class="form-label">Descrição *</label>
+                <textarea class="form-control" id="descricao" name="descricao" 
+                          rows="4" required>{{ form.descricao.value|default:'' }}</textarea>
+                {% if form.descricao.errors %}
+                    <div class="text-danger small">{{ form.descricao.errors }}</div>
+                {% endif %}
+                <small class="form-text text-muted">
+                    Descreva as atividades e objetivos da monitoria
+                </small>
+            </div>
+            
+            <div class="mb-3">
+                <label for="requisitos" class="form-label">Requisitos *</label>
+                <textarea class="form-control" id="requisitos" name="requisitos" 
+                          rows="3" required>{{ form.requisitos.value|default:'' }}</textarea>
+                {% if form.requisitos.errors %}
+                    <div class="text-danger small">{{ form.requisitos.errors }}</div>
+                {% endif %}
+                <small class="form-text text-muted">
+                    Liste os requisitos necessários para a vaga (conhecimentos, período cursado, etc.)
+                </small>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="data_inicio" class="form-label">Data de Início *</label>
+                    <input type="date" class="form-control" id="data_inicio" 
+                           name="data_inicio" value="{{ form.data_inicio.value|default:'' }}" required>
+                    {% if form.data_inicio.errors %}
+                        <div class="text-danger small">{{ form.data_inicio.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <label for="data_fim" class="form-label">Data de Término</label>
+                    <input type="date" class="form-control" id="data_fim" 
+                           name="data_fim" value="{{ form.data_fim.value|default:'' }}">
+                    {% if form.data_fim.errors %}
+                        <div class="text-danger small">{{ form.data_fim.errors }}</div>
+                    {% endif %}
+                    <small class="form-text text-muted">Opcional</small>
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <label for="ativo" class="form-label">Status</label>
+                    <select class="form-select" id="ativo" name="ativo">
+                        <option value="True" {% if form.ativo.value == True or form.ativo.value == 'True' %}selected{% endif %}>
+                            Ativa
+                        </option>
+                        <option value="False" {% if form.ativo.value == False or form.ativo.value == 'False' %}selected{% endif %}>
+                            Inativa
+                        </option>
+                    </select>
+                    {% if form.ativo.errors %}
+                        <div class="text-danger small">{{ form.ativo.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'listar_vagas' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvar Vaga
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

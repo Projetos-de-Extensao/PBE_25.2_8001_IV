@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% block title %}Editar Turma - Plataforma Casa{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'listar_turmas' %}">Turmas</a></li>
+        <li class="breadcrumb-item active">Editar Turma</li>
+    </ol>
+</nav>
+
+<div class="page-title">
+    <h1><i class="fas fa-edit"></i> Editar Turma</h1>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Informações da Turma</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="nome" class="form-label">Nome da Turma *</label>
+                    <input type="text" class="form-control" id="nome" name="nome" 
+                           value="{{ turma.nome }}" required>
+                    {% if form.nome.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.nome.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="curso" class="form-label">Curso *</label>
+                    <select class="form-select" id="curso" name="curso" required>
+                        <option value="">-- Selecione um curso --</option>
+                        {% for curso in cursos %}
+                            <option value="{{ curso.id }}" 
+                                {% if turma.curso.id == curso.id %}selected{% endif %}>
+                                {{ curso.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.curso.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.curso.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="vaga" class="form-label">Vaga *</label>
+                    <select class="form-select" id="vaga" name="vaga" required>
+                        <option value="">-- Selecione uma vaga --</option>
+                        {% for vaga in vagas %}
+                            <option value="{{ vaga.id }}" 
+                                {% if turma.vaga.id == vaga.id %}selected{% endif %}>
+                                {{ vaga.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.vaga.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.vaga.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="monitor" class="form-label">Monitor *</label>
+                    <select class="form-select" id="monitor" name="monitor" required>
+                        <option value="">-- Selecione um monitor --</option>
+                        {% for monitor in monitores %}
+                            <option value="{{ monitor.id }}" 
+                                {% if turma.monitor.id == monitor.id %}selected{% endif %}>
+                                {{ monitor.nome }} - {{ monitor.matricula }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.monitor.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.monitor.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="sala" class="form-label">Sala *</label>
+                    <select class="form-select" id="sala" name="sala" required>
+                        <option value="">-- Selecione uma sala --</option>
+                        {% for sala in salas %}
+                            <option value="{{ sala.id }}" 
+                                {% if turma.sala.id == sala.id %}selected{% endif %}>
+                                {{ sala.numero }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.sala.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.sala.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="horario" class="form-label">Horário *</label>
+                    <input type="text" class="form-control" id="horario" name="horario" 
+                           value="{{ turma.horario }}" placeholder="Ex: 18:00 - 21:00" required>
+                    {% if form.horario.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.horario.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="dias_da_semana" class="form-label">Dias da Semana *</label>
+                    <input type="text" class="form-control" id="dias_da_semana" name="dias_da_semana" 
+                           value="{{ turma.dias_da_semana }}" placeholder="Ex: Segunda, Quarta, Sexta" required>
+                    {% if form.dias_da_semana.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.dias_da_semana.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="ativo" class="form-label">Status</label>
+                    <select class="form-select" id="ativo" name="ativo">
+                        <option value="True" {% if turma.ativo %}selected{% endif %}>Ativa</option>
+                        <option value="False" {% if not turma.ativo %}selected{% endif %}>Inativa</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="data_inicio" class="form-label">Data de Início *</label>
+                    <input type="date" class="form-control" id="data_inicio" name="data_inicio" 
+                           value="{{ turma.data_inicio|date:'Y-m-d' }}" required>
+                    {% if form.data_inicio.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.data_inicio.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="data_fim" class="form-label">Data de Término *</label>
+                    <input type="date" class="form-control" id="data_fim" name="data_fim" 
+                           value="{{ turma.data_fim|date:'Y-m-d' }}" required>
+                    {% if form.data_fim.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.data_fim.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="descricao" class="form-label">Descrição *</label>
+                <textarea class="form-control" id="descricao" name="descricao" 
+                          rows="3" required>{{ turma.descricao }}</textarea>
+                <small class="form-text text-muted">
+                    Adicione informações relevantes sobre a turma
+                </small>
+                {% if form.descricao.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.descricao.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'listar_turmas' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvar Alterações
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

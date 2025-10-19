@@ -1,0 +1,402 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard de Gestão - Plataforma Casa{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-container { padding: 2rem 0; }
+    .kpi-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1); border-left: 4px solid; transition: all 0.3s ease; }
+    .kpi-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0, 37, 85, 0.15); }
+    .kpi-card.primary { border-left-color: #002555; }
+    .kpi-card.success { border-left-color: #28a745; }
+    .kpi-card.info { border-left-color: #1245FF; }
+    .kpi-card.warning { border-left-color: #F5AC00; }
+    .kpi-number { font-size: 2.5rem; font-weight: 700; color: #002555; margin: 0.5rem 0; }
+    .kpi-label { font-size: 0.875rem; color: #6c757d; font-weight: 600; text-transform: uppercase; }
+    .kpi-icon { font-size: 2.5rem; color: #d0d0d0; float: right; }
+    .chart-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1); margin-bottom: 2rem; }
+    .chart-title { font-size: 1.125rem; font-weight: 600; color: #002555; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #f5f5f5; }
+    .chart-container { position: relative; height: 300px; margin-bottom: 1rem; }
+    .chart-container-large { position: relative; height: 400px; margin-bottom: 1rem; }
+    .alert-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1); margin-bottom: 1.5rem; border-left: 4px solid #dc3545; }
+    .alert-title { font-size: 1rem; font-weight: 600; color: #002555; margin-bottom: 0.5rem; }
+    .alert-count { font-size: 2rem; font-weight: 700; color: #dc3545; }
+    .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .header-info h1 { font-size: 2rem; color: #002555; margin: 0; font-weight: 700; }
+    .header-info p { color: #6c757d; margin: 0.5rem 0 0 0; }
+    .export-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .btn-export { background: transparent; border: 2px solid #1245FF; color: #1245FF; font-weight: 500; padding: 0.5rem 1.25rem; transition: all 0.3s ease; }
+    .btn-export:hover { background-color: #1245FF; color: white; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    @media (max-width: 768px) {
+        .header-section { flex-direction: column; align-items: flex-start; }
+        .grid-2, .grid-3 { grid-template-columns: 1fr; }
+        .chart-container, .chart-container-large { height: 250px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid dashboard-container">
+    <div class="header-section">
+        <div class="header-info">
+            <h1><i class="fas fa-chart-line"></i> Dashboard de Gestão</h1>
+            <p>Painel de controle completo do programa de monitoria</p>
+            <small><i class="fas fa-clock"></i> Atualizado em: {{ now|date:"d/m/Y H:i" }}</small>
+        </div>
+        <div class="export-buttons">
+            <button type="button" class="btn btn-export" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> Excel</button>
+            <button type="button" class="btn btn-export" onclick="exportarPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
+            <button type="button" class="btn btn-export" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
+        </div>
+    </div>
+
+    <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+        <div class="kpi-card primary">
+            <div class="kpi-icon"><i class="fas fa-user-graduate"></i></div>
+            <div class="kpi-label">Monitores Ativos</div>
+            <div class="kpi-number">{{ total_monitores }}</div>
+        </div>
+        <div class="kpi-card success">
+            <div class="kpi-icon"><i class="fas fa-users"></i></div>
+            <div class="kpi-label">Total de Alunos</div>
+            <div class="kpi-number">{{ total_alunos }}</div>
+        </div>
+        <div class="kpi-card info">
+            <div class="kpi-icon"><i class="fas fa-briefcase"></i></div>
+            <div class="kpi-label">Vagas Ativas</div>
+            <div class="kpi-number">{{ total_vagas }}</div>
+        </div>
+        <div class="kpi-card warning">
+            <div class="kpi-icon"><i class="fas fa-percentage"></i></div>
+            <div class="kpi-label">Taxa de Aprovação</div>
+            <div class="kpi-number">{{ taxa_aprovacao }}%</div>
+        </div>
+    </div>
+
+    <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+        <div class="kpi-card primary">
+            <div class="kpi-icon"><i class="fas fa-clock"></i></div>
+            <div class="kpi-label">Horas no Mês</div>
+            <div class="kpi-number">{{ total_horas_mes }}</div>
+        </div>
+        <div class="kpi-card success">
+            <div class="kpi-icon"><i class="fas fa-dollar-sign"></i></div>
+            <div class="kpi-label">Pagamentos do Mês</div>
+            <div class="kpi-number">R$ {{ valor_total_mes }}</div>
+        </div>
+        <div class="kpi-card info">
+            <div class="kpi-icon"><i class="fas fa-book"></i></div>
+            <div class="kpi-label">Monitorias Ativas</div>
+            <div class="kpi-number">{{ total_turmas }}</div>
+        </div>
+        <div class="kpi-card warning">
+            <div class="kpi-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+            <div class="kpi-label">Total de Inscrições</div>
+            <div class="kpi-number">{{ total_inscricoes }}</div>
+        </div>
+    </div>
+
+    <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+        <div class="alert-card">
+            <div class="alert-title"><i class="fas fa-exclamation-triangle"></i> Pagamentos Pendentes</div>
+            <div class="alert-count">{{ pagamentos_pendentes }}</div>
+        </div>
+        <div class="alert-card">
+            <div class="alert-title"><i class="fas fa-clock"></i> Avaliações Pendentes</div>
+            <div class="alert-count">{{ avaliacoes_pendentes }}</div>
+        </div>
+        <div class="alert-card">
+            <div class="alert-title"><i class="fas fa-hourglass-half"></i> Horas Pendentes</div>
+            <div class="alert-count">{{ horas_pendentes }}</div>
+        </div>
+        <div class="alert-card">
+            <div class="alert-title"><i class="fas fa-file"></i> Documentos Pendentes</div>
+            <div class="alert-count">{{ documentos_pendentes }}</div>
+        </div>
+    </div>
+
+    <div class="grid-3" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
+        <div class="chart-card">
+            <h3 class="chart-title"><i class="fas fa-chart-pie"></i> Status de Inscrições</h3>
+            <div class="chart-container"><canvas id="chartInscricoes"></canvas></div>
+        </div>
+        <div class="chart-card">
+            <h3 class="chart-title"><i class="fas fa-chart-doughnut"></i> Monitores por Curso</h3>
+            <div class="chart-container"><canvas id="chartCursos"></canvas></div>
+        </div>
+        <div class="chart-card">
+            <h3 class="chart-title"><i class="fas fa-chart-bar"></i> Status de Horas</h3>
+            <div class="chart-container"><canvas id="chartHorasStatus"></canvas></div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="chart-card">
+            <h3 class="chart-title"><i class="fas fa-chart-line"></i> Evolução de Inscrições (6 meses)</h3>
+            <div class="chart-container-large"><canvas id="chartTimelineInscricoes"></canvas></div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="chart-card">
+            <h3 class="chart-title"><i class="fas fa-coins"></i> Análise Financeira</h3>
+            <div style="padding: 1rem;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; text-align: center;">
+                        <small style="color: #6c757d;">Total Pago (Ano)</small>
+                        <div style="font-size: 1.75rem; font-weight: 700; color: #28a745;">R$ {{ total_pago_ano }}</div>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; text-align: center;">
+                        <small style="color: #6c757d;">Média Mensal</small>
+                        <div style="font-size: 1.75rem; font-weight: 700; color: #1245FF;">R$ {{ media_mensal }}</div>
+                    </div>
+                </div>
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; text-align: center;">
+                    <small style="color: #6c757d;">Desempenho Médio</small>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.5rem;">
+                        <div><strong>CR Médio:</strong> {{ cr_medio_monitores }}</div>
+                        <div><strong>Horas/Monitor:</strong> {{ media_horas_monitor }}h</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+
+<script>
+const CORES = { 
+    primario: '#002555', 
+    secundo: '#1245FF', 
+    amarelo: '#F5AC00', 
+    sucesso: '#28a745', 
+    perigo: '#dc3545', 
+    cinza: '#6c757d',
+    info: '#17a2b8'
+};
+
+// 1️⃣ Status de Inscrições - Doughnut interativo
+new Chart(document.getElementById('chartInscricoes').getContext('2d'), {
+    type: 'doughnut',
+    data: { 
+        labels: {{ status_labels|safe }}, 
+        datasets: [{ 
+            data: {{ status_values|safe }}, 
+            backgroundColor: [CORES.sucesso, CORES.amarelo, CORES.perigo, CORES.cinza],
+            borderColor: 'white', 
+            borderWidth: 2,
+            hoverOffset: 10
+        }] 
+    },
+    options: { 
+        responsive: true, 
+        maintainAspectRatio: false,
+        interaction: { mode: 'point', intersect: false },
+        plugins: { 
+            legend: { 
+                position: 'bottom', 
+                labels: { font: { size: 11 }, padding: 15, usePointStyle: true }
+            },
+            tooltip: { 
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                titleFont: { size: 12 },
+                bodyFont: { size: 11 },
+                padding: 12,
+                displayColors: true
+            }
+        }
+    }
+});
+
+// 2️⃣ Monitores por Curso - Doughnut interativo com cores variadas
+new Chart(document.getElementById('chartCursos').getContext('2d'), {
+    type: 'doughnut',
+    data: { 
+        labels: {{ curso_labels|safe }}, 
+        datasets: [{ 
+            data: {{ curso_values|safe }}, 
+            backgroundColor: [CORES.primario, CORES.secundo, CORES.amarelo, CORES.sucesso, CORES.info, '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7'],
+            borderColor: 'white', 
+            borderWidth: 2,
+            hoverOffset: 10
+        }] 
+    },
+    options: { 
+        responsive: true, 
+        maintainAspectRatio: false,
+        interaction: { mode: 'point', intersect: false },
+        plugins: { 
+            legend: { 
+                position: 'bottom', 
+                labels: { font: { size: 11 }, padding: 15, usePointStyle: true }
+            },
+            tooltip: { 
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                titleFont: { size: 12 },
+                bodyFont: { size: 11 },
+                padding: 12,
+                displayColors: true
+            }
+        }
+    }
+});
+
+// 3️⃣ Status de Horas - Horizontal Bar com interatividade
+new Chart(document.getElementById('chartHorasStatus').getContext('2d'), {
+    type: 'bar',
+    data: { 
+        labels: {{ horas_status_labels|safe }}, 
+        datasets: [{ 
+            label: 'Quantidade de Horas',
+            data: {{ horas_status_values|safe }}, 
+            backgroundColor: [CORES.sucesso, CORES.amarelo, CORES.perigo, CORES.cinza],
+            borderColor: 'rgba(0,0,0,0.1)',
+            borderWidth: 1,
+            hoverBackgroundColor: [CORES.sucesso, CORES.amarelo, CORES.perigo, CORES.cinza],
+            hoverBorderWidth: 2,
+            hoverBorderColor: '#000'
+        }] 
+    },
+    options: { 
+        indexAxis: 'y', 
+        responsive: true, 
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: { 
+            legend: { display: true, labels: { padding: 15 } },
+            tooltip: { 
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                padding: 12,
+                titleFont: { size: 12 },
+                bodyFont: { size: 11 }
+            }
+        },
+        scales: { 
+            x: { beginAtZero: true, ticks: { callback: function(v){ return v.toLocaleString('pt-BR'); } } }
+        }
+    }
+});
+
+// 4️⃣ Evolução de Inscrições - Line chart com area e animação
+new Chart(document.getElementById('chartTimelineInscricoes').getContext('2d'), {
+    type: 'line',
+    data: { 
+        labels: {{ timeline_labels|safe }}, 
+        datasets: [{ 
+            label: 'Inscrições Acumuladas',
+            data: {{ timeline_values|safe }}, 
+            borderColor: CORES.secundo, 
+            backgroundColor: 'rgba(18, 69, 255, 0.1)', 
+            borderWidth: 3, 
+            tension: 0.4, 
+            fill: true, 
+            pointRadius: 6,
+            pointBackgroundColor: CORES.secundo,
+            pointBorderColor: 'white',
+            pointBorderWidth: 2,
+            hoverPointRadius: 8,
+            pointHoverBackgroundColor: CORES.amarelo
+        }] 
+    },
+    options: { 
+        responsive: true, 
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+            tooltip: { 
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                padding: 12,
+                titleFont: { size: 12 },
+                bodyFont: { size: 11 },
+                callbacks: {
+                    label: function(ctx) { return 'Inscrições: ' + ctx.parsed.y.toLocaleString('pt-BR'); }
+                }
+            }
+        },
+        scales: { 
+            y: { beginAtZero: true, ticks: { callback: function(v){ return v.toLocaleString('pt-BR'); } } }
+        }
+    }
+});
+
+function exportarExcel() {
+    const wb = XLSX.utils.book_new();
+    const wsData = [
+        ['DASHBOARD DE GESTÃO - PLATAFORMA CASA'],
+        ['Relatório Gerado:', new Date().toLocaleString('pt-BR')],
+        [],
+        ['INDICADORES PRINCIPAIS'],
+        ['Monitores Ativos', {{ total_monitores }}],
+        ['Total de Alunos', {{ total_alunos }}],
+        ['Vagas Ativas', {{ total_vagas }}],
+        ['Taxa de Aprovação', '{{ taxa_aprovacao }}%'],
+        [],
+        ['ESTATÍSTICAS MENSAIS'],
+        ['Horas Trabalhadas', {{ total_horas_mes }}],
+        ['Valor de Pagamentos', 'R$ {{ valor_total_mes }}'],
+        ['Monitorias Ativas', {{ total_turmas }}],
+        ['Total de Inscrições', {{ total_inscricoes }}],
+        [],
+        ['PENDÊNCIAS'],
+        ['Pagamentos Pendentes', {{ pagamentos_pendentes }}],
+        ['Avaliações Pendentes', {{ avaliacoes_pendentes }}],
+        ['Horas Pendentes', {{ horas_pendentes }}],
+        ['Documentos Pendentes', {{ documentos_pendentes }}],
+        [],
+        ['ANÁLISE FINANCEIRA'],
+        ['Total Pago (Ano)', 'R$ {{ total_pago_ano }}'],
+        ['Média Mensal', 'R$ {{ media_mensal }}'],
+        ['CR Médio', {{ cr_medio_monitores }}],
+        ['Horas/Monitor', '{{ media_horas_monitor }}h']
+    ];
+    
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols'] = [{ wch: 25 }, { wch: 15 }];
+    XLSX.utils.book_append_sheet(wb, ws, 'Dashboard');
+    XLSX.writeFile(wb, `dashboard-gestao-{{ now|date:"Y-m-d-His" }}.xlsx`);
+}
+
+function exportarPDF() {
+    const element = document.querySelector('.dashboard-container');
+    const opt = {
+        margin: 10,
+        filename: `dashboard-gestao-{{ now|date:"Y-m-d-His" }}.pdf`,
+        image: { type: 'png', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+    };
+    
+    html2canvas(element).then(canvas => {
+        const { jsPDF } = window.jspdf;
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 190;
+        const pageHeight = 277;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        let heightLeft = imgHeight;
+        let position = 0;
+        
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+        
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
+        
+        pdf.save(opt.filename);
+    }).catch(err => alert('Erro ao gerar PDF: ' + err));
+}
+
+</script>
+{% endblock %}

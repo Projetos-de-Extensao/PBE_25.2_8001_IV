@@ -12,6 +12,8 @@ Documentação: https://docs.djangoproject.com/en/5.2/topics/http/urls/
 
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 # ================================================================================
 # PADRÕES DE URL - URL PATTERNS
@@ -46,3 +48,7 @@ urlpatterns = [
     # - http://localhost:8000/sql/          (view sql legado)
     path('', include('plataforma_Casa.urls')),
 ]
+
+# Servir arquivos de media em desenvolvimento
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

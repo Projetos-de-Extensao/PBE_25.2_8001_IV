@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% block title %}Editar Monitoria - Plataforma Casa{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'listar_monitorias' %}">Monitorias</a></li>
+        <li class="breadcrumb-item active">Editar Monitoria</li>
+    </ol>
+</nav>
+
+<div class="page-title">
+    <h1><i class="fas fa-edit"></i> Editar Participação em Monitoria</h1>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Informações da Monitoria</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="aluno" class="form-label">Aluno *</label>
+                    <select class="form-select" id="aluno" name="aluno" required>
+                        <option value="">-- Selecione um aluno --</option>
+                        {% for aluno in alunos %}
+                            <option value="{{ aluno.id }}" 
+                                {% if monitoria.aluno.id == aluno.id %}selected{% endif %}>
+                                {{ aluno.nome }} - {{ aluno.matricula }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.aluno.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.aluno.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="vaga" class="form-label">Vaga *</label>
+                    <select class="form-select" id="vaga" name="vaga" required>
+                        <option value="">-- Selecione uma vaga --</option>
+                        {% for vaga in vagas %}
+                            <option value="{{ vaga.id }}" 
+                                {% if monitoria.vaga.id == vaga.id %}selected{% endif %}>
+                                {{ vaga.nome }} - {{ vaga.curso.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.vaga.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.vaga.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="turma" class="form-label">Turma *</label>
+                    <select class="form-select" id="turma" name="turma" required>
+                        <option value="">-- Selecione uma turma --</option>
+                        {% for turma in turmas %}
+                            <option value="{{ turma.id }}" 
+                                {% if monitoria.turma.id == turma.id %}selected{% endif %}>
+                                {{ turma.nome }} - {{ turma.curso.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.turma.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.turma.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="data_inicio" class="form-label">Data de Início *</label>
+                    <input type="date" class="form-control" id="data_inicio" 
+                           name="data_inicio" value="{{ monitoria.data_inicio|date:'Y-m-d' }}" required>
+                    {% if form.data_inicio.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.data_inicio.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="data_fim" class="form-label">Data de Término</label>
+                    <input type="date" class="form-control" id="data_fim" 
+                           name="data_fim" value="{% if monitoria.data_fim %}{{ monitoria.data_fim|date:'Y-m-d' }}{% endif %}">
+                    <small class="form-text text-muted">Opcional - deixe em branco se ainda estiver em andamento</small>
+                    {% if form.data_fim.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.data_fim.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="status" class="form-label">Status *</label>
+                    <select class="form-select" id="status" name="status" required>
+                        <option value="ativa" {% if monitoria.status == 'ativa' %}selected{% endif %}>Ativa</option>
+                        <option value="concluida" {% if monitoria.status == 'concluida' %}selected{% endif %}>Concluída</option>
+                        <option value="cancelada" {% if monitoria.status == 'cancelada' %}selected{% endif %}>Cancelada</option>
+                    </select>
+                    {% if form.status.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.status.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="observacoes" class="form-label">Observações</label>
+                <textarea class="form-control" id="observacoes" name="observacoes" 
+                          rows="4">{% if monitoria.observacoes %}{{ monitoria.observacoes }}{% endif %}</textarea>
+                <small class="form-text text-muted">
+                    Adicione informações relevantes sobre a monitoria
+                </small>
+                {% if form.observacoes.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.observacoes.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'listar_monitorias' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvar Alterações
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,546 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Gerenciar Pagamentos - Plataforma Casa{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Core Colors */
+    :root {
+        --color-primary-dark: #002555;
+        --color-primary-light: #1245FF;
+        --color-accent: #F5AC00;
+        --color-success: #28a745;
+        --color-danger: #dc3545;
+        --color-gray-light: #f8f9fa;
+        --color-gray-border: #e9ecef;
+        --color-text-muted: #6c757d;
+    }
+
+    /* Page Header */
+    .page-header {
+        border-bottom: 2px solid var(--color-accent);
+        padding-bottom: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Stats Cards */
+    .stats-card {
+        background: white;
+        border: 1px solid var(--color-gray-border);
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .stats-card:hover {
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1);
+        border-color: var(--color-primary-light);
+    }
+
+    .stats-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--color-primary-dark);
+        margin: 0.5rem 0;
+    }
+
+    .stats-label {
+        color: var(--color-text-muted);
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Filter Section */
+    .filter-section {
+        background: white;
+        border: 1px solid var(--color-gray-border);
+        border-top: 3px solid var(--color-primary-light);
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+
+    .filter-section .form-label {
+        color: var(--color-primary-dark);
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .filter-section .form-select {
+        border: 1px solid var(--color-gray-border);
+        border-radius: 6px;
+        padding: 0.75rem;
+        color: var(--color-primary-dark);
+        font-weight: 500;
+    }
+
+    .filter-section .form-select:focus {
+        border-color: var(--color-primary-light);
+        box-shadow: 0 0 0 0.2rem rgba(18, 69, 255, 0.15);
+    }
+
+    /* Buttons */
+    .btn-filter {
+        background: white;
+        border: 2px solid var(--color-primary-light);
+        color: var(--color-primary-light);
+        font-weight: 600;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-filter:hover {
+        background: var(--color-primary-light);
+        color: white;
+    }
+
+    .btn-clear {
+        background: white;
+        border: 2px solid var(--color-gray-border);
+        color: var(--color-text-muted);
+        font-weight: 600;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-clear:hover {
+        border-color: var(--color-primary-light);
+        color: var(--color-primary-light);
+    }
+
+    /* Payment Card */
+    .payment-card {
+        background: white;
+        border: 1px solid var(--color-gray-border);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .payment-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.12);
+        border-color: var(--color-primary-light);
+        transform: translateY(-2px);
+    }
+
+    .payment-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .payment-card .card-title {
+        color: var(--color-primary-dark);
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .payment-card .text-muted {
+        color: var(--color-text-muted) !important;
+        font-size: 0.875rem;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: 1px solid;
+        display: inline-block;
+    }
+
+    .status-pendente {
+        background: #fff9e6;
+        color: #f5ac00;
+        border-color: #ffd966;
+    }
+
+    .status-pago {
+        background: #e8f5e9;
+        color: #28a745;
+        border-color: #a8d5a8;
+    }
+
+    .status-processando {
+        background: #e3f2fd;
+        color: #1245FF;
+        border-color: #64b5f6;
+    }
+
+    .status-cancelado {
+        background: #ffebee;
+        color: #dc3545;
+        border-color: #ef9a9a;
+    }
+
+    /* Card Details */
+    .card-detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--color-gray-border);
+        align-items: center;
+    }
+
+    .card-detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        color: var(--color-text-muted);
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .detail-value {
+        color: var(--color-primary-dark);
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .detail-value-total {
+        font-size: 1.25rem;
+        color: var(--color-success);
+        font-weight: 700;
+    }
+
+    /* Action Buttons */
+    .btn-action {
+        background: white;
+        border: 2px solid var(--color-primary-light);
+        color: var(--color-primary-light);
+        font-weight: 600;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-action:hover {
+        background: var(--color-primary-light);
+        color: white;
+    }
+
+    .btn-details {
+        background: white;
+        border: 1px solid var(--color-gray-border);
+        color: var(--color-text-muted);
+        font-weight: 600;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-details:hover {
+        border-color: var(--color-primary-light);
+        color: var(--color-primary-light);
+    }
+
+    /* Observation Alert */
+    .observation-box {
+        background: var(--color-gray-light);
+        border-left: 3px solid var(--color-accent);
+        padding: 0.75rem 1rem;
+        border-radius: 4px;
+        margin: 1rem 0;
+        font-size: 0.875rem;
+        color: var(--color-primary-dark);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        color: var(--color-gray-border);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h4 {
+        color: var(--color-text-muted);
+        font-weight: 600;
+    }
+
+    /* Modal */
+    .modal-header {
+        border-bottom: 2px solid var(--color-accent);
+        background: var(--color-gray-light);
+    }
+
+    .modal-title {
+        color: var(--color-primary-dark);
+        font-weight: 700;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .stats-card { margin-bottom: 1rem; }
+        .payment-card .card-body { padding: 1rem; }
+        .card-detail-row { flex-direction: column; gap: 0.5rem; }
+        .detail-value { text-align: left; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="page-header mb-5">
+        <h1 class="mb-1" style="color: #002555; font-weight: 700;">
+            <i class="fas fa-money-check-alt" style="color: #1245FF;"></i> Gerenciar Pagamentos
+        </h1>
+        <p class="text-muted mb-0" style="font-size: 0.95rem;">Controle e processamento de pagamentos dos monitores</p>
+    </div>
+
+    <!-- Estatísticas Rápidas -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div class="stats-value">{{ pagamentos|length }}</div>
+                <div class="stats-label">Total de Pagamentos</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div style="font-size: 2rem; font-weight: 700; color: #F5AC00; margin: 0.5rem 0;">
+                    {% with pendentes=pagamentos|filter_by_status:'Pendente' %}{{ pendentes|length }}{% endwith %}
+                </div>
+                <div class="stats-label">Pendentes</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div style="font-size: 2rem; font-weight: 700; color: #28a745; margin: 0.5rem 0;">
+                    {% with pagos=pagamentos|filter_by_status:'Pago' %}{{ pagos|length }}{% endwith %}
+                </div>
+                <div class="stats-label">Pagos</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div style="font-size: 2rem; font-weight: 700; color: #1245FF; margin: 0.5rem 0;">
+                    {% with processando=pagamentos|filter_by_status:'Processando' %}{{ processando|length }}{% endwith %}
+                </div>
+                <div class="stats-label">Processando</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Filtros -->
+    <div class="filter-section">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label"><i class="fas fa-filter" style="color: #1245FF;"></i> Filtrar por Status</label>
+                <select name="status" class="form-select">
+                    <option value="">Todos os Status</option>
+                    <option value="Pendente" {% if request.GET.status == 'Pendente' %}selected{% endif %}>Pendente</option>
+                    <option value="Processando" {% if request.GET.status == 'Processando' %}selected{% endif %}>Processando</option>
+                    <option value="Pago" {% if request.GET.status == 'Pago' %}selected{% endif %}>Pago</option>
+                    <option value="Cancelado" {% if request.GET.status == 'Cancelado' %}selected{% endif %}>Cancelado</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-filter w-100">
+                    <i class="fas fa-search"></i> Filtrar
+                </button>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'gerenciar_pagamentos' %}" class="btn btn-clear w-100">
+                    <i class="fas fa-times"></i> Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de Pagamentos -->
+    {% if pagamentos %}
+    <div class="row">
+        {% for pagamento in pagamentos %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="payment-card">
+                <div class="card-body">
+                    <!-- Header do Card -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="card-title mb-1">
+                                <i class="fas fa-user-graduate" style="color: #1245FF;"></i> {{ pagamento.monitor.nome }}
+                            </h5>
+                            <p class="text-muted small mb-0">
+                                <i class="fas fa-id-card"></i> {{ pagamento.monitor.matricula }}
+                            </p>
+                        </div>
+                        <span class="status-badge status-{{ pagamento.status|lower }}">
+                            {{ pagamento.status }}
+                        </span>
+                    </div>
+
+                    <!-- Informações do Pagamento -->
+                    <div class="mb-3">
+                        <div class="card-detail-row">
+                            <span class="detail-label"><i class="fas fa-chalkboard-teacher"></i> Turma</span>
+                            <span class="detail-value">{{ pagamento.turma.vaga.disciplina|default:pagamento.turma.nome }}</span>
+                        </div>
+                        <div class="card-detail-row">
+                            <span class="detail-label"><i class="fas fa-calendar-alt"></i> Data Final do Semestre</span>
+                            <span class="detail-value">{{ pagamento.mes_referencia|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="card-detail-row">
+                            <span class="detail-label"><i class="fas fa-info-circle"></i> Tipo</span>
+                            <span class="detail-value">Valor Fixo de Semestre</span>
+                        </div>
+                        <div class="card-detail-row">
+                            <span class="detail-label"><strong><i class="fas fa-dollar-sign"></i> Valor Pago</strong></span>
+                            <span class="detail-value-total">R$ {{ pagamento.valor_total|floatformat:2 }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Observações -->
+                    {% if pagamento.observacao %}
+                    <div class="observation-box">
+                        <i class="fas fa-info-circle"></i> {{ pagamento.observacao|truncatewords:15 }}
+                    </div>
+                    {% endif %}
+
+                    <!-- Data de Processamento -->
+                    {% if pagamento.data_processamento %}
+                    <p class="text-muted small mb-3">
+                        <i class="fas fa-check-circle"></i> Processado em: {{ pagamento.data_processamento|date:"d/m/Y H:i" }}
+                    </p>
+                    {% endif %}
+
+                    <!-- Ações -->
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="{% url 'processar_pagamento' pagamento.id %}" 
+                           class="btn btn-action flex-fill">
+                            <i class="fas fa-edit"></i> Processar
+                        </a>
+                        <button class="btn btn-details flex-fill" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#detalhesModal{{ pagamento.id }}">
+                            <i class="fas fa-eye"></i> Detalhes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Detalhes -->
+        <div class="modal fade" id="detalhesModal{{ pagamento.id }}" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-file-invoice-dollar" style="color: #1245FF;"></i> Detalhes do Pagamento
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Monitor</div>
+                                <div style="color: #002555; font-weight: 600;">{{ pagamento.monitor.nome }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Matrícula</div>
+                                <div style="color: #002555; font-weight: 600;">{{ pagamento.monitor.matricula }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Turma</div>
+                                <div style="color: #002555; font-weight: 600;">{{ pagamento.turma.vaga.disciplina|default:pagamento.turma.nome }} - {{ pagamento.turma.nome }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Data Final do Semestre</div>
+                                <div style="color: #002555; font-weight: 600;">{{ pagamento.mes_referencia|date:"d \d\e F \d\e Y" }}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Tipo de Pagamento</div>
+                                <div>
+                                    <span class="badge" style="background-color: #1245FF; padding: 0.5rem 0.75rem;">Valor Fixo por Semestre</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Valor Fixo</div>
+                                <div style="color: #28a745; font-weight: 700; font-size: 1.1rem;">R$ {{ pagamento.valor_total|floatformat:2 }}</div>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Status</div>
+                                <span class="status-badge status-{{ pagamento.status|lower }}">
+                                    {{ pagamento.status }}
+                                </span>
+                            </div>
+                            {% if pagamento.observacao %}
+                            <div class="col-12 mb-3">
+                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Observações</div>
+                                <div style="color: #002555; padding: 0.75rem; background: #f8f9fa; border-radius: 4px; border-left: 3px solid #F5AC00;">{{ pagamento.observacao }}</div>
+                            </div>
+                            {% endif %}
+                            {% if pagamento.processado_por %}
+                            <div class="col-md-6 mb-3">
+                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Processado por</div>
+                                <div style="color: #002555; font-weight: 600;">{{ pagamento.processado_por.nome }}</div>
+                            </div>
+                            {% endif %}
+                            {% if pagamento.data_processamento %}
+                            <div class="col-md-6 mb-3">
+                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Data de Processamento</div>
+                                <div style="color: #002555; font-weight: 600;">{{ pagamento.data_processamento|date:"d/m/Y H:i:s" }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top: 1px solid #e9ecef;">
+                        <button type="button" class="btn btn-clear" data-bs-dismiss="modal">Fechar</button>
+                        <a href="{% url 'processar_pagamento' pagamento.id %}" class="btn btn-action">
+                            <i class="fas fa-edit"></i> Processar Pagamento
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-inbox"></i></div>
+        <h4>Nenhum pagamento encontrado</h4>
+        <p class="text-muted">
+            {% if request.GET.status %}
+            Não há pagamentos com o status selecionado.
+            {% else %}
+            Ainda não há pagamentos registrados no sistema.
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Animação ao carregar os cards
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.payment-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.3s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 50);
+        });
+    });
+</script>
+{% endblock %}

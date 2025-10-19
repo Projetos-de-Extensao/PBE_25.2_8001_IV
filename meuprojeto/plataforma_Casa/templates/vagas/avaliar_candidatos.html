@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+
+{% block title %}Avaliar Candidatos{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-4">
+                <i class="fas fa-user-check"></i> Avaliar Candidatos
+            </h1>
+            <p class="lead">Vaga: <strong>{{ vaga.nome }}</strong></p>
+            <p class="text-muted">Curso: {{ vaga.curso.nome }} | Vagas Disponíveis: {{ vaga.numero_vagas }}</p>
+        </div>
+    </div>
+
+    <!-- Estatísticas da Vaga -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-left-primary shadow">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total de Inscritos
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ inscricoes.count }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-warning shadow">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Pendentes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ inscricoes|filter:"status='Pendente'"|length }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-hourglass-half fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-success shadow">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Aprovados
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ inscricoes|filter:"status='Aprovado'"|length }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-danger shadow">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Rejeitados
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ inscricoes|filter:"status='Rejeitado'"|length }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-10">
+                    <label for="status" class="form-label">Filtrar por Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">Todos os Status</option>
+                        <option value="Pendente">Pendente</option>
+                        <option value="Aprovado">Aprovado</option>
+                        <option value="Rejeitado">Rejeitado</option>
+                        <option value="Lista de Espera">Lista de Espera</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter"></i> Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Candidatos -->
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-list"></i> Lista de Candidatos
+            </h4>
+        </div>
+        <div class="card-body">
+            {% if inscricoes %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Candidato</th>
+                            <th>Curso</th>
+                            <th>CR</th>
+                            <th>Data Inscrição</th>
+                            <th>Status</th>
+                            <th>Nota</th>
+                            <th>Documentos</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inscricao in inscricoes %}
+                        <tr>
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td>
+                                <strong>{{ inscricao.aluno.nome }}</strong>
+                                <br>
+                                <small class="text-muted">{{ inscricao.aluno.email }}</small>
+                            </td>
+                            <td>{{ inscricao.aluno.curso.nome }}</td>
+                            <td class="text-center">
+                                <span class="badge bg-info">{{ inscricao.aluno.cr_geral }}</span>
+                            </td>
+                            <td>{{ inscricao.data_inscricao|date:"d/m/Y H:i" }}</td>
+                            <td class="text-center">
+                                {% if inscricao.status == 'Aprovado' %}
+                                    <span class="badge bg-success">{{ inscricao.status }}</span>
+                                {% elif inscricao.status == 'Rejeitado' %}
+                                    <span class="badge bg-danger">{{ inscricao.status }}</span>
+                                {% elif inscricao.status == 'Lista de Espera' %}
+                                    <span class="badge bg-warning">{{ inscricao.status }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ inscricao.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if inscricao.nota_avaliacao %}
+                                    <strong>{{ inscricao.nota_avaliacao }}/10</strong>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#modalDocs{{ inscricao.id }}">
+                                    <i class="fas fa-file-alt"></i> {{ inscricao.documentos.count }} doc(s)
+                                </button>
+                                
+                                <!-- Modal de Documentos -->
+                                <div class="modal fade" id="modalDocs{{ inscricao.id }}" tabindex="-1">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-info text-white">
+                                                <h5 class="modal-title">Documentos - {{ inscricao.aluno.nome }}</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {% if inscricao.documentos.all %}
+                                                <ul class="list-group">
+                                                    {% for doc in inscricao.documentos.all %}
+                                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                        <span>
+                                                            <i class="fas fa-file-pdf text-danger"></i>
+                                                            <strong>{{ doc.tipo }}</strong>
+                                                            <br>
+                                                            <small class="text-muted">{{ doc.nome_arquivo }}</small>
+                                                        </span>
+                                                        <a href="{{ doc.arquivo.url }}" target="_blank" class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-download"></i> Download
+                                                        </a>
+                                                    </li>
+                                                    {% endfor %}
+                                                </ul>
+                                                {% else %}
+                                                <p class="text-muted">Nenhum documento anexado</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <a href="{% url 'avaliar_inscricao' inscricao.id %}" class="btn btn-sm btn-primary" title="Avaliar">
+                                    <i class="fas fa-star"></i> Avaliar
+                                </a>
+                                {% if inscricao.status == 'Aprovado' and not inscricao.resultado_comunicado %}
+                                <a href="{% url 'comunicar_resultado' inscricao.id %}" class="btn btn-sm btn-success mt-1" title="Comunicar Resultado">
+                                    <i class="fas fa-envelope"></i> Comunicar
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                Nenhum candidato encontrado para esta vaga.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Botão Voltar -->
+    <div class="mt-4">
+        <a href="{% url 'portal_vagas' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar para Portal de Vagas
+        </a>
+    </div>
+</div>
+{% endblock %}

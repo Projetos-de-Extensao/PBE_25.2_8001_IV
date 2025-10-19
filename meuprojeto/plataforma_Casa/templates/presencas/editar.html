@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% block title %}Editar Presença - Plataforma Casa{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'listar_presencas' %}">Presenças</a></li>
+        <li class="breadcrumb-item active">Editar Presença</li>
+    </ol>
+</nav>
+
+<div class="page-title">
+    <h1><i class="fas fa-edit"></i> Editar Registro de Presença</h1>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Informações da Presença</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="monitoria" class="form-label">Monitoria *</label>
+                    <select class="form-select" id="monitoria" name="monitoria" required>
+                        <option value="">-- Selecione uma monitoria --</option>
+                        {% for mon in monitorias %}
+                            <option value="{{ mon.id }}" 
+                                {% if presenca.monitoria.id == mon.id %}selected{% endif %}>
+                                {{ mon.aluno.nome }} - {{ mon.vaga.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.monitoria.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.monitoria.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="data" class="form-label">Data *</label>
+                    <input type="date" class="form-control" id="data" name="data" 
+                           value="{{ presenca.data|date:'Y-m-d' }}" required>
+                    {% if form.data.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.data.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="hora_entrada" class="form-label">Hora de Entrada *</label>
+                    <input type="time" class="form-control" id="hora_entrada" name="hora_entrada" 
+                           value="{{ presenca.hora_entrada|time:'H:i' }}" required>
+                    {% if form.hora_entrada.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.hora_entrada.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="hora_saida" class="form-label">Hora de Saída</label>
+                    <input type="time" class="form-control" id="hora_saida" name="hora_saida" 
+                           value="{% if presenca.hora_saida %}{{ presenca.hora_saida|time:'H:i' }}{% endif %}">
+                    <small class="form-text text-muted">Opcional - deixe em branco se ainda estiver em andamento</small>
+                    {% if form.hora_saida.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.hora_saida.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="horas_cumpridas" class="form-label">Horas Cumpridas</label>
+                    <input type="number" step="0.5" class="form-control" id="horas_cumpridas" 
+                           name="horas_cumpridas" value="{{ presenca.horas_cumpridas }}" min="0">
+                    <small class="form-text text-muted">Será calculado automaticamente se informar entrada e saída</small>
+                    {% if form.horas_cumpridas.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.horas_cumpridas.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="status" class="form-label">Status *</label>
+                    <select class="form-select" id="status" name="status" required>
+                        <option value="presente" {% if presenca.status == 'presente' %}selected{% endif %}>Presente</option>
+                        <option value="ausente" {% if presenca.status == 'ausente' %}selected{% endif %}>Ausente</option>
+                        <option value="justificado" {% if presenca.status == 'justificado' %}selected{% endif %}>Justificado</option>
+                    </select>
+                    {% if form.status.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.status.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="observacoes" class="form-label">Observações</label>
+                <textarea class="form-control" id="observacoes" name="observacoes" 
+                          rows="3">{% if presenca.observacoes %}{{ presenca.observacoes }}{% endif %}</textarea>
+                <small class="form-text text-muted">
+                    Adicione justificativas ou informações relevantes
+                </small>
+                {% if form.observacoes.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.observacoes.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'listar_presencas' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvar Alterações
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

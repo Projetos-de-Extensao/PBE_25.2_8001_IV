@@ -1,0 +1,505 @@
+{% extends 'base.html' %}
+{% block title %}Avaliar Candidato - {{ aluno.nome }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Header da Página */
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #002555;
+        margin: 0 0 0.5rem 0;
+    }
+    
+    .page-header p {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+    
+    .breadcrumb {
+        background: transparent;
+        padding: 0 0 1rem 0;
+        margin: 0;
+        font-size: 0.875rem;
+    }
+    
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "/";
+        color: #6c757d;
+    }
+    
+    .breadcrumb-item a {
+        color: #002555;
+        text-decoration: none;
+    }
+    
+    .breadcrumb-item.active {
+        color: #6c757d;
+        font-weight: 600;
+    }
+    
+    /* Layout */
+    .avaliacao-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    /* Cards */
+    .info-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.08);
+        border: 1px solid rgba(0, 37, 85, 0.06);
+        margin-bottom: 1.5rem;
+    }
+    
+    .info-card-header {
+        background: linear-gradient(135deg, #002555, #003d7a);
+        color: white;
+        padding: 1.25rem 1.5rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .info-card-body {
+        padding: 2rem;
+    }
+    
+    /* Resumo do Candidato */
+    .candidato-resumo {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .resumo-item {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 3px solid #F5AC00;
+    }
+    
+    .resumo-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #002555;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .resumo-label i {
+        color: #F5AC00;
+    }
+    
+    .resumo-value {
+        font-size: 0.95rem;
+        color: #495057;
+        font-weight: 500;
+    }
+    
+    /* Formulário */
+    .form-label {
+        font-weight: 700;
+        color: #002555;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .form-label i {
+        color: #F5AC00;
+    }
+    
+    .form-label .required {
+        color: #dc3545;
+        margin-left: 0.25rem;
+    }
+    
+    /* Radio Buttons - Opções de Ação */
+    .opcoes-acao {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .opcao-acao {
+        position: relative;
+        cursor: pointer;
+    }
+    
+    .opcao-acao input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+    }
+    
+    .opcao-label {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        background: white;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .opcao-label:hover {
+        border-color: #002555;
+        background: #f8f9fa;
+    }
+    
+    .opcao-acao input[type="radio"]:checked + .opcao-label {
+        border-color: #002555;
+        background: linear-gradient(135deg, rgba(0, 37, 85, 0.05), rgba(0, 37, 85, 0.1));
+    }
+    
+    .opcao-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .opcao-acao.aprovar .opcao-icon {
+        background: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+    
+    .opcao-acao.aprovar input[type="radio"]:checked + .opcao-label .opcao-icon {
+        background: #28a745;
+        color: white;
+    }
+    
+    .opcao-acao.reprovar .opcao-icon {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+    
+    .opcao-acao.reprovar input[type="radio"]:checked + .opcao-label .opcao-icon {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .opcao-acao.espera .opcao-icon {
+        background: rgba(245, 172, 0, 0.1);
+        color: #F5AC00;
+    }
+    
+    .opcao-acao.espera input[type="radio"]:checked + .opcao-label .opcao-icon {
+        background: #F5AC00;
+        color: white;
+    }
+    
+    .opcao-texto {
+        flex: 1;
+    }
+    
+    .opcao-titulo {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #002555;
+        margin-bottom: 0.25rem;
+    }
+    
+    .opcao-descricao {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin: 0;
+    }
+    
+    /* Campos de Input */
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #002555;
+        box-shadow: 0 0 0 0.2rem rgba(0, 37, 85, 0.1);
+        outline: none;
+    }
+    
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    /* Botões */
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid #e9ecef;
+    }
+    
+    .btn-cancelar {
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-cancelar:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.25);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-submit {
+        background: linear-gradient(135deg, #002555, #003d7a);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2.5rem;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 37, 85, 0.3);
+    }
+    
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+    
+    /* Helper Text */
+    .form-text {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+    
+    /* Alert de Info */
+    .alert-info-custom {
+        background: linear-gradient(135deg, rgba(0, 37, 85, 0.05), rgba(0, 37, 85, 0.1));
+        border-left: 4px solid #002555;
+        padding: 1.25rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .alert-info-custom i {
+        color: #002555;
+        margin-right: 0.75rem;
+    }
+    
+    .alert-info-custom p {
+        margin: 0;
+        color: #495057;
+        line-height: 1.6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'listar_vagas' %}">Vagas</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'detalhe_vaga' vaga.id %}">{{ vaga.nome }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'detalhe_candidato' inscricao.id %}">{{ aluno.nome }}</a></li>
+        <li class="breadcrumb-item active">Avaliar</li>
+    </ol>
+</nav>
+
+<div class="avaliacao-container">
+    <div class="page-header">
+        <h1>Avaliar Candidato</h1>
+        <p>Avalie a candidatura de {{ aluno.nome }} para a vaga {{ vaga.nome }}</p>
+    </div>
+    
+    <!-- Resumo do Candidato -->
+    <div class="info-card">
+        <div class="info-card-header">
+            <i class="fas fa-user"></i>
+            Resumo do Candidato
+        </div>
+        <div class="info-card-body">
+            <div class="candidato-resumo">
+                <div class="resumo-item">
+                    <div class="resumo-label">
+                        <i class="fas fa-id-card"></i>
+                        Matrícula
+                    </div>
+                    <div class="resumo-value">{{ aluno.matricula }}</div>
+                </div>
+                
+                <div class="resumo-item">
+                    <div class="resumo-label">
+                        <i class="fas fa-graduation-cap"></i>
+                        Curso
+                    </div>
+                    <div class="resumo-value">{{ aluno.curso.nome }}</div>
+                </div>
+                
+                <div class="resumo-item">
+                    <div class="resumo-label">
+                        <i class="fas fa-calendar-alt"></i>
+                        Período
+                    </div>
+                    <div class="resumo-value">{{ aluno.periodo }}º período</div>
+                </div>
+                
+                <div class="resumo-item">
+                    <div class="resumo-label">
+                        <i class="fas fa-chart-line"></i>
+                        CR
+                    </div>
+                    <div class="resumo-value">{{ aluno.cr_geral }}</div>
+                </div>
+            </div>
+            
+            <div class="alert-info-custom">
+                <i class="fas fa-info-circle"></i>
+                <strong>Data da Inscrição:</strong> {{ inscricao.data_inscricao|date:"d/m/Y às H:i" }}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Formulário de Avaliação -->
+    <div class="info-card">
+        <div class="info-card-header">
+            <i class="fas fa-clipboard-check"></i>
+            Formulário de Avaliação
+        </div>
+        <div class="info-card-body">
+            <form method="post" action="{% url 'avaliar_candidato' inscricao.id %}">
+                {% csrf_token %}
+                
+                <!-- Decisão -->
+                <div class="mb-4">
+                    <label class="form-label">
+                        <i class="fas fa-gavel"></i>
+                        Decisão
+                        <span class="required">*</span>
+                    </label>
+                    <div class="opcoes-acao">
+                        <div class="opcao-acao aprovar">
+                            <input type="radio" name="acao" value="aprovar" id="acao-aprovar" required>
+                            <label class="opcao-label" for="acao-aprovar">
+                                <div class="opcao-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="opcao-texto">
+                                    <div class="opcao-titulo">Aprovar Candidato</div>
+                                    <p class="opcao-descricao">O candidato será aprovado e notificado sobre a aprovação.</p>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="opcao-acao reprovar">
+                            <input type="radio" name="acao" value="reprovar" id="acao-reprovar">
+                            <label class="opcao-label" for="acao-reprovar">
+                                <div class="opcao-icon">
+                                    <i class="fas fa-times-circle"></i>
+                                </div>
+                                <div class="opcao-texto">
+                                    <div class="opcao-titulo">Reprovar Candidato</div>
+                                    <p class="opcao-descricao">O candidato será reprovado. Por favor, forneça um feedback construtivo.</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Nota de Avaliação -->
+                <div class="mb-4">
+                    <label for="nota" class="form-label">
+                        <i class="fas fa-star"></i>
+                        Nota de Avaliação (opcional)
+                    </label>
+                    <input 
+                        type="number" 
+                        class="form-control" 
+                        id="nota" 
+                        name="nota_avaliacao"
+                        step="0.01"
+                        min="0"
+                        max="10"
+                        placeholder="Ex: 8.5"
+                    >
+                    <div class="form-text">
+                        <i class="fas fa-info-circle"></i>
+                        Informe uma nota de 0 a 10 para avaliação do candidato (pode usar decimais).
+                    </div>
+                </div>
+                
+                <!-- Comentário -->
+                <div class="mb-4">
+                    <label for="comentario" class="form-label">
+                        <i class="fas fa-comment-alt"></i>
+                        Comentário e Feedback
+                    </label>
+                    <textarea 
+                        class="form-control" 
+                        id="comentario" 
+                        name="comentario_avaliacao"
+                        rows="5"
+                        placeholder="Escreva aqui seus comentários sobre a candidatura, feedback construtivo ou justificativa da decisão..."
+                    ></textarea>
+                    <div class="form-text">
+                        <i class="fas fa-info-circle"></i>
+                        Forneça feedback construtivo que possa ajudar o candidato em seu desenvolvimento.
+                    </div>
+                </div>
+                
+                <!-- Botões -->
+                <div class="form-actions">
+                    <a href="{% url 'detalhe_candidato' inscricao.id %}" class="btn-cancelar">
+                        <i class="fas fa-times"></i>
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-save"></i>
+                        Salvar Avaliação
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}Criar Nova Turma - Plataforma Casa{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'listar_turmas' %}">Turmas</a></li>
+        <li class="breadcrumb-item active">Criar Nova Turma</li>
+    </ol>
+</nav>
+
+<div class="page-title">
+    <h1><i class="fas fa-plus"></i> Criar Nova Turma</h1>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Informações da Nova Turma</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="nome" class="form-label">Nome da Turma *</label>
+                    <input type="text" class="form-control" id="nome" name="nome" 
+                           placeholder="Ex: Turma A - Física" required>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="curso" class="form-label">Curso *</label>
+                    <select class="form-select" id="curso" name="curso" required>
+                        <option value="">-- Selecione um curso --</option>
+                        {% for curso in cursos %}
+                            <option value="{{ curso.id }}">
+                                {{ curso.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="vaga" class="form-label">Vaga *</label>
+                    <select class="form-select" id="vaga" name="vaga" required>
+                        <option value="">-- Selecione uma vaga --</option>
+                        {% for vaga in vagas %}
+                            <option value="{{ vaga.id }}">
+                                {{ vaga.disciplina }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="monitor" class="form-label">Monitor *</label>
+                    <select class="form-select" id="monitor" name="monitor" required>
+                        <option value="">-- Selecione um monitor --</option>
+                        {% for monitor in monitores %}
+                            <option value="{{ monitor.id }}">
+                                {{ monitor.nome }} - {{ monitor.matricula }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="sala" class="form-label">Sala *</label>
+                    <select class="form-select" id="sala" name="sala" required>
+                        <option value="">-- Selecione uma sala --</option>
+                        {% for sala in salas %}
+                            <option value="{{ sala.id }}">
+                                Sala {{ sala.numero }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="horario" class="form-label">Horário *</label>
+                    <input type="text" class="form-control" id="horario" name="horario" 
+                           placeholder="Ex: 18:00 - 21:00" required>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="dias_semana" class="form-label">Dias da Semana *</label>
+                    <input type="text" class="form-control" id="dias_semana" name="dias_semana" 
+                           placeholder="Ex: Segunda, Quarta, Sexta" required>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="data_inicio" class="form-label">Data de Início *</label>
+                    <input type="date" class="form-control" id="data_inicio" name="data_inicio" required>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="data_fim" class="form-label">Data de Término *</label>
+                    <input type="date" class="form-control" id="data_fim" name="data_fim" required>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="descricao" class="form-label">Descrição *</label>
+                <textarea class="form-control" id="descricao" name="descricao" 
+                          rows="3" placeholder="Adicione informações relevantes sobre a turma" required></textarea>
+                <small class="form-text text-muted">
+                    Adicione informações relevantes sobre a turma
+                </small>
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'listar_turmas' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Criar Turma
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

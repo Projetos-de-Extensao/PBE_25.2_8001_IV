@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Aprovar Registro de Horas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-4">
+                <i class="fas fa-check-circle"></i> Validar Registro de Horas
+            </h1>
+            <p class="lead">Aprove ou rejeite o registro de horas do monitor</p>
+        </div>
+    </div>
+
+    <!-- Informações do Registro -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-info-circle"></i> Informações do Registro
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong><i class="fas fa-user"></i> Monitor:</strong> {{ registro.monitor.nome }}</p>
+                    <p><strong><i class="fas fa-graduation-cap"></i> Curso:</strong> {{ registro.monitor.curso.nome }}</p>
+                    <p><strong><i class="fas fa-envelope"></i> Email:</strong> {{ registro.monitor.email }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong><i class="fas fa-calendar"></i> Data:</strong> {{ registro.data|date:"d/m/Y" }}</p>
+                    <p><strong><i class="fas fa-clock"></i> Horário:</strong> {{ registro.hora_inicio|time:"H:i" }} - {{ registro.hora_fim|time:"H:i" }}</p>
+                    <p><strong><i class="fas fa-hourglass-half"></i> Total de Horas:</strong> 
+                        <span class="badge bg-primary">{{ registro.total_horas|floatformat:1 }}h</span>
+                    </p>
+                    <p><strong><i class="fas fa-dollar-sign"></i> Valor:</strong> 
+                        <span class="badge bg-success">R$ {{ registro.valor_total|floatformat:2 }}</span>
+                    </p>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <h5><i class="fas fa-tasks"></i> Descrição das Atividades Realizadas:</h5>
+                    <div class="alert alert-secondary">
+                        {{ registro.atividades_realizadas }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulário de Validação -->
+    <div class="card shadow">
+        <div class="card-header bg-warning text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-clipboard-check"></i> Validação
+            </h4>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="status" class="form-label">
+                        <i class="fas fa-tasks"></i> Decisão <span class="text-danger">*</span>
+                    </label>
+                    <select name="status" id="status" class="form-select" required onchange="toggleObservacao()">
+                        <option value="">Selecione uma opção...</option>
+                        <option value="Aprovado">✅ Aprovar Registro</option>
+                        <option value="Rejeitado">❌ Rejeitar Registro</option>
+                    </select>
+                    <small class="form-text text-muted">
+                        Registros aprovados serão contabilizados para pagamento
+                    </small>
+                </div>
+
+                <div class="mb-3" id="divObservacao" style="display: none;">
+                    <label for="observacao" class="form-label">
+                        <i class="fas fa-comment"></i> Observações
+                    </label>
+                    <textarea name="observacao" id="observacao" class="form-control" rows="4" 
+                              placeholder="Adicione comentários sobre a decisão (obrigatório para rejeição)"></textarea>
+                    <small class="form-text text-muted">
+                        Para rejeição, explique o motivo para que o monitor possa corrigir
+                    </small>
+                </div>
+
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Atenção:</strong> Esta ação afetará o cálculo de pagamento do monitor. 
+                    Certifique-se de que as informações estão corretas antes de aprovar.
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'validar_horas' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </a>
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-check"></i> Confirmar Validação
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleObservacao() {
+    const status = document.getElementById('status').value;
+    const divObservacao = document.getElementById('divObservacao');
+    const observacao = document.getElementById('observacao');
+    
+    if (status === 'Rejeitado') {
+        divObservacao.style.display = 'block';
+        observacao.required = true;
+    } else if (status === 'Aprovado') {
+        divObservacao.style.display = 'block';
+        observacao.required = false;
+    } else {
+        divObservacao.style.display = 'none';
+        observacao.required = false;
+    }
+}
+
+// Validação antes do envio
+document.querySelector('form').addEventListener('submit', function(e) {
+    const status = document.getElementById('status').value;
+    const observacao = document.getElementById('observacao').value.trim();
+    
+    if (status === 'Rejeitado' && !observacao) {
+        e.preventDefault();
+        alert('Por favor, adicione uma observação explicando o motivo da rejeição.');
+        document.getElementById('observacao').focus();
+        return false;
+    }
+    
+    if (status === 'Aprovado') {
+        if (!confirm('Confirma a APROVAÇÃO deste registro de horas?')) {
+            e.preventDefault();
+            return false;
+        }
+    } else if (status === 'Rejeitado') {
+        if (!confirm('Confirma a REJEIÇÃO deste registro de horas?\n\nO monitor precisará corrigir as informações.')) {
+            e.preventDefault();
+            return false;
+        }
+    }
+});
+</script>
+{% endblock %}

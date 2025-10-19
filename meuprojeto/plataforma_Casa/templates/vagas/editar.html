@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %}Editar Vaga - Plataforma Casa{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'listar_vagas' %}">Vagas</a></li>
+        <li class="breadcrumb-item active">Editar Vaga</li>
+    </ol>
+</nav>
+
+<div class="page-title">
+    <h1><i class="fas fa-edit"></i> Editar Vaga de Monitoria</h1>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Informações da Vaga</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="nome" class="form-label">Nome da Vaga *</label>
+                    <input type="text" class="form-control" id="nome" name="nome" 
+                           value="{{ vaga.nome }}" required>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="curso" class="form-label">Curso *</label>
+                    <select class="form-select" id="curso" name="curso" required>
+                        <option value="">-- Selecione um curso --</option>
+                        {% for curso in cursos %}
+                            <option value="{{ curso.id }}" 
+                                {% if vaga.curso.id == curso.id %}selected{% endif %}>
+                                {{ curso.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="coordenador" class="form-label">Coordenador *</label>
+                    <select class="form-select" id="coordenador" name="coordenador" required>
+                        <option value="">-- Selecione um coordenador --</option>
+                        {% for coordenador in coordenadores %}
+                            <option value="{{ coordenador.id }}" 
+                                {% if vaga.coordenador.id == coordenador.id %}selected{% endif %}>
+                                {{ coordenador.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="vagas_disponiveis" class="form-label">Vagas Disponíveis *</label>
+                    <input type="number" class="form-control" id="vagas_disponiveis" 
+                           name="vagas_disponiveis" min="1" 
+                           value="{{ vaga.vagas_disponiveis }}" required>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="descricao" class="form-label">Descrição *</label>
+                <textarea class="form-control" id="descricao" name="descricao" 
+                          rows="4" required>{{ vaga.descricao }}</textarea>
+                <small class="form-text text-muted">
+                    Descreva as atividades e objetivos da monitoria
+                </small>
+            </div>
+            
+            <div class="mb-3">
+                <label for="requisitos" class="form-label">Requisitos *</label>
+                <textarea class="form-control" id="requisitos" name="requisitos" 
+                          rows="3" required>{{ vaga.requisitos }}</textarea>
+                <small class="form-text text-muted">
+                    Liste os requisitos necessários para a vaga (conhecimentos, período cursado, etc.)
+                </small>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="data_inicio" class="form-label">Data de Início *</label>
+                    <input type="date" class="form-control" id="data_inicio" 
+                           name="data_inicio" value="{{ vaga.data_inicio|date:'Y-m-d' }}" required>
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <label for="data_fim" class="form-label">Data de Término</label>
+                    <input type="date" class="form-control" id="data_fim" 
+                           name="data_fim" value="{% if vaga.data_fim %}{{ vaga.data_fim|date:'Y-m-d' }}{% endif %}">
+                    <small class="form-text text-muted">Opcional</small>
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <label for="ativo" class="form-label">Status</label>
+                    <select class="form-select" id="ativo" name="ativo">
+                        <option value="True" {% if vaga.ativo %}selected{% endif %}>Ativa</option>
+                        <option value="False" {% if not vaga.ativo %}selected{% endif %}>Inativa</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'listar_vagas' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvar Alterações
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

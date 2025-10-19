@@ -1,0 +1,509 @@
+{% extends 'base.html' %}
+
+{% block title %}Minhas Inscrições{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <!-- Header Minimalista -->
+    <div class="text-center mb-5">
+        <h1 class="inscricoes-title">
+            <i class="fas fa-clipboard-list me-2"></i>Minhas Inscrições
+        </h1>
+        <p class="inscricoes-subtitle">Acompanhe o status de suas candidaturas</p>
+    </div>
+
+    <!-- Lista de Inscrições -->
+    <div class="row g-4">
+        {% for inscricao in inscricoes %}
+        <div class="col-lg-12">
+            <div class="inscricao-card">
+                <!-- Header do Card -->
+                <div class="inscricao-header {% if inscricao.status == 'Aprovado' %}status-aprovado
+                    {% elif inscricao.status == 'Não Aprovado' %}status-rejeitado
+                    {% elif inscricao.status == 'Entrevista' %}status-entrevista
+                    {% else %}status-pendente{% endif %}">
+                    <div class="header-content">
+                        <div class="vaga-info">
+                            <h5 class="vaga-nome">{{ inscricao.vaga.nome }}</h5>
+                            <p class="vaga-curso">{{ inscricao.vaga.curso.nome }}</p>
+                        </div>
+                        <div class="status-badge-container">
+                            <span class="status-badge {% if inscricao.status == 'Aprovado' %}badge-aprovado
+                                {% elif inscricao.status == 'Não Aprovado' %}badge-rejeitado
+                                {% elif inscricao.status == 'Entrevista' %}badge-entrevista
+                                {% else %}badge-pendente{% endif %}">
+                                {% if inscricao.status == 'Pendente' %}
+                                    <i class="fas fa-clock"></i> Pendente
+                                {% elif inscricao.status == 'Entrevista' %}
+                                    <i class="fas fa-comments"></i> Entrevista
+                                {% elif inscricao.status == 'Aprovado' %}
+                                    <i class="fas fa-check-circle"></i> Aprovado
+                                {% elif inscricao.status == 'Não Aprovado' %}
+                                    <i class="fas fa-times-circle"></i> Não Aprovado
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Body do Card -->
+                <div class="inscricao-body">
+                    <!-- Informações Principais -->
+                    <div class="info-grid">
+                        <div class="info-section">
+                            <div class="info-item-compact">
+                                <i class="fas fa-book-open text-muted"></i>
+                                <span class="info-label-compact">Disciplina:</span>
+                                <span class="info-value-compact">{{ inscricao.vaga.disciplina|default:"Não especificada" }}</span>
+                            </div>
+                            <div class="info-item-compact">
+                                <i class="fas fa-calendar text-muted"></i>
+                                <span class="info-label-compact">Inscrição:</span>
+                                <span class="info-value-compact">{{ inscricao.data_inscricao|date:"d/m/Y" }}</span>
+                            </div>
+                        </div>
+
+                        {% if inscricao.nota_avaliacao or inscricao.data_avaliacao or inscricao.avaliado_por %}
+                        <div class="info-section">
+                            {% if inscricao.nota_avaliacao %}
+                            <div class="info-item-compact">
+                                <i class="fas fa-star text-warning"></i>
+                                <span class="info-label-compact">Nota:</span>
+                                <span class="info-value-compact highlight">{{ inscricao.nota_avaliacao }}/10</span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if inscricao.data_avaliacao %}
+                            <div class="info-item-compact">
+                                <i class="fas fa-calendar-check text-muted"></i>
+                                <span class="info-label-compact">Avaliado em:</span>
+                                <span class="info-value-compact">{{ inscricao.data_avaliacao|date:"d/m/Y" }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if inscricao.avaliado_por %}
+                            <div class="info-item-compact">
+                                <i class="fas fa-user-tie text-muted"></i>
+                                <span class="info-label-compact">Avaliador:</span>
+                                <span class="info-value-compact">{{ inscricao.avaliado_por.nome }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Comentários de Avaliação -->
+                    {% if inscricao.comentario_avaliacao %}
+                    <div class="comentario-box">
+                        <div class="comentario-header">
+                            <i class="fas fa-comment-dots"></i>
+                            <span>Feedback do Avaliador</span>
+                        </div>
+                        <p class="comentario-text">{{ inscricao.comentario_avaliacao }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Documentos Enviados -->
+                    <div class="documentos-section">
+                        <div class="documentos-header">
+                            <i class="fas fa-paperclip"></i>
+                            <span>Documentos</span>
+                        </div>
+                        <div class="documentos-list">
+                            {% for documento in inscricao.documentos.all %}
+                            <div class="documento-item">
+                                <div class="documento-info">
+                                    <i class="fas fa-file-pdf text-danger"></i>
+                                    <span class="documento-nome">{{ documento.tipo }}</span>
+                                </div>
+                                <span class="documento-data">{{ documento.enviado_em|date:"d/m/Y" }}</span>
+                            </div>
+                            {% empty %}
+                            <div class="documento-empty">
+                                <i class="fas fa-info-circle text-muted"></i>
+                                <span>Nenhum documento enviado</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Status de Comunicação -->
+                    {% if inscricao.resultado_comunicado %}
+                    <div class="comunicado-box">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Resultado comunicado em {{ inscricao.data_comunicacao|date:"d/m/Y às H:i" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="empty-state-inscricoes">
+                <i class="fas fa-inbox fa-4x mb-3"></i>
+                <h5>Você ainda não se candidatou a nenhuma vaga</h5>
+                <p>Visite o portal de vagas para encontrar oportunidades!</p>
+                <a href="{% url 'portal_vagas' %}" class="btn-primary-custom">
+                    <i class="fas fa-briefcase me-2"></i>Ver Vagas Disponíveis
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Link de Retorno -->
+    {% if inscricoes %}
+    <div class="text-center mt-5">
+        <a href="{% url 'portal_vagas' %}" class="btn btn-outline-primary">
+            <i class="fas fa-briefcase me-2"></i>Ver Mais Vagas
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+/* ========== HEADER ========== */
+.inscricoes-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.inscricoes-subtitle {
+    font-size: 1rem;
+    color: #7f8c8d;
+    margin: 0;
+}
+
+/* ========== CARD DE INSCRIÇÃO ========== */
+.inscricao-card {
+    background: #ffffff;
+    border: 1px solid #e0e6ed;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.inscricao-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Header do Card - Status */
+.inscricao-header {
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.inscricao-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.1;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+}
+
+.status-aprovado {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.status-rejeitado {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.status-entrevista {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+}
+
+.status-pendente {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    z-index: 1;
+}
+
+.vaga-info {
+    flex: 1;
+}
+
+.vaga-nome {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.3;
+}
+
+.vaga-curso {
+    font-size: 0.9375rem;
+    color: rgba(255, 255, 255, 0.95);
+    margin: 0;
+    font-weight: 500;
+}
+
+.status-badge-container {
+    margin-left: 1.5rem;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.badge-aprovado {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.badge-rejeitado {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.badge-entrevista {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.badge-pendente {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Body do Card */
+.inscricao-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* Grid de Informações */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.info-item-compact {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.info-item-compact i {
+    font-size: 0.875rem;
+    width: 16px;
+}
+
+.info-label-compact {
+    font-weight: 600;
+    color: #64748b;
+}
+
+.info-value-compact {
+    color: #334155;
+}
+
+.info-value-compact.highlight {
+    color: #f59e0b;
+    font-weight: 700;
+    font-size: 0.9375rem;
+}
+
+/* Comentários */
+.comentario-box {
+    background: #f0f9ff;
+    border-left: 4px solid #3b82f6;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.comentario-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.comentario-text {
+    font-size: 0.875rem;
+    color: #1e3a8a;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Documentos */
+.documentos-section {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.documentos-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.documentos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.documento-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.625rem 0.75rem;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+}
+
+.documento-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.documento-nome {
+    color: #334155;
+    font-weight: 500;
+}
+
+.documento-data {
+    color: #64748b;
+    font-size: 0.75rem;
+}
+
+.documento-empty {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    color: #94a3b8;
+    font-size: 0.8125rem;
+    justify-content: center;
+}
+
+/* Comunicado */
+.comunicado-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 6px;
+    color: #15803d;
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+/* Empty State */
+.empty-state-inscricoes {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: #ffffff;
+    border: 2px dashed #e0e6ed;
+    border-radius: 16px;
+}
+
+.empty-state-inscricoes i {
+    color: #cbd5e1;
+}
+
+.empty-state-inscricoes h5 {
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 1.125rem;
+}
+
+.empty-state-inscricoes p {
+    color: #94a3b8;
+    margin-bottom: 1.5rem;
+}
+
+.btn-primary-custom {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background: #3b82f6;
+    color: #ffffff;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    transition: all 0.2s ease;
+}
+
+.btn-primary-custom:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .inscricoes-title {
+        font-size: 1.5rem;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .status-badge-container {
+        margin-left: 0;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .vaga-nome {
+        font-size: 1.125rem;
+    }
+}
+</style>
+{% endblock %}

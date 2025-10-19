@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block title %}Monitorias Disponíveis{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-4">
+                <i class="fas fa-book-open"></i> Monitorias
+            </h1>
+            <p class="lead">Todas as monitorias disponíveis para participar</p>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Filtrar por Disciplina</label>
+                            <select name="vaga" class="form-select">
+                                <option value="">Todas as Disciplinas</option>
+                                {% for vaga in vagas %}
+                                <option value="{{ vaga.id }}" {% if request.GET.vaga|stringformat:"s" == vaga.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ vaga.nome }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Filtrar por Curso</label>
+                            <select name="curso" class="form-select">
+                                <option value="">Todos os Cursos</option>
+                                {% for curso in cursos %}
+                                <option value="{{ curso.id }}" {% if request.GET.curso|stringformat:"s" == curso.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ curso.nome }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter"></i> Filtrar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Monitorias -->
+    <div class="row">
+        {% if turmas %}
+            {% for turma in turmas %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-book"></i> {{ turma.vaga.nome }}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <small class="text-muted">Turma</small>
+                                <p class="mb-0"><strong>{{ turma.nome }}</strong></p>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted">Monitor</small>
+                                <p class="mb-0">
+                                    <i class="fas fa-user"></i> {{ turma.monitor.nome }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <small class="text-muted">Disciplina</small>
+                                <p class="mb-0"><strong>{{ turma.curso.nome }}</strong></p>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted">Sala</small>
+                                <p class="mb-0">
+                                    <i class="fas fa-door-open"></i> {{ turma.sala.numero }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <small class="text-muted">Horário</small>
+                                <p class="mb-0">
+                                    <i class="fas fa-clock"></i> {{ turma.horario }}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted">Dias</small>
+                                <p class="mb-0">
+                                    <i class="fas fa-calendar"></i> {{ turma.dias_da_semana }}
+                                </p>
+                            </div>
+                        </div>
+
+                        {% if turma.descricao %}
+                        <hr>
+                        <small class="text-muted">Descrição</small>
+                        <p>{{ turma.descricao }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-light">
+                        <button class="btn btn-sm btn-info w-100" data-bs-toggle="modal" 
+                                data-bs-target="#detalhesModal{{ turma.id }}">
+                            <i class="fas fa-eye"></i> Ver Detalhes Completos
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal de Detalhes -->
+                <div class="modal fade" id="detalhesModal{{ turma.id }}" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">{{ turma.vaga.nome }} - {{ turma.nome }}</h5>
+                                <button type="button" class="btn-close btn-close-white" 
+                                        data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Monitor Responsável</h6>
+                                        <p><strong>{{ turma.monitor.nome }}</strong></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Disciplina</h6>
+                                        <p><strong>{{ turma.curso.nome }}</strong></p>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Sala</h6>
+                                        <p><strong>{{ turma.sala.numero }} - {{ turma.sala.predio }}</strong></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Horário</h6>
+                                        <p><strong>{{ turma.horario }}</strong></p>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Dias da Semana</h6>
+                                        <p><strong>{{ turma.dias_da_semana }}</strong></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Período</h6>
+                                        <p><strong>{{ turma.data_inicio|date:"d/m/Y" }} até {{ turma.data_fim|date:"d/m/Y" }}</strong></p>
+                                    </div>
+                                </div>
+
+                                <hr>
+
+                                <h6 class="text-muted">Sobre a Disciplina</h6>
+                                <p>{{ turma.vaga.descricao|default:"Sem descrição" }}</p>
+
+                                <h6 class="text-muted mt-3">Requisitos</h6>
+                                <p>{{ turma.vaga.requisitos|default:"Nenhum requisito específico" }}</p>
+
+                                {% if turma.descricao %}
+                                <h6 class="text-muted mt-3">Informações da Turma</h6>
+                                <p>{{ turma.descricao }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="col-md-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-search"></i>
+                <strong>Nenhuma monitoria encontrada</strong>
+                <p class="mb-0">Tente ajustar seus filtros.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
