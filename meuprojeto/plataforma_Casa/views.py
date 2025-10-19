@@ -943,7 +943,6 @@ def criar_vaga(request):
                 requisitos=requisitos,
                 ativo=True
             )
-            messages.success(request, f'✅ Vaga "{nome}" criada com sucesso!')
             return redirect('listar_vagas')
         except Exception as e:
             messages.error(request, f'❌ Erro ao criar vaga: {str(e)}')
@@ -1002,7 +1001,6 @@ def editar_vaga(request, vaga_id):
         vaga.requisitos = request.POST.get('requisitos')
         vaga.ativo = request.POST.get('ativo') == 'on'
         vaga.save()
-        messages.success(request, '✅ Vaga atualizada com sucesso!')
         return redirect('listar_vagas')
     
     context = {'vaga': vaga}
@@ -1038,7 +1036,6 @@ def deletar_vaga(request, vaga_id):
     
     nome = vaga.nome
     vaga.delete()
-    messages.success(request, f'✅ Vaga "{nome}" deletada com sucesso!')
     return redirect('listar_vagas')
 
 
