@@ -1,0 +1,541 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Processar Pagamento - Plataforma Casa{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Core Colors */
+    :root {
+        --color-primary-dark: #002555;
+        --color-primary-light: #1245FF;
+        --color-accent: #F5AC00;
+        --color-off-white: #fafaf8;
+        --color-success: #28a745;
+        --color-danger: #dc3545;
+        --color-warning: #ffc107;
+        --color-info: #17a2b8;
+        --color-gray-light: #f8f9fa;
+        --color-gray-border: #e9ecef;
+        --color-text-muted: #6c757d;
+    }
+
+    /* Page Header */
+    .page-header {
+        background: var(--color-primary-dark);
+        color: var(--color-off-white);
+        padding: 2rem;
+        border-radius: 8px 8px 0 0;
+        border-left: 4px solid var(--color-accent);
+    }
+
+    .page-header h1 {
+        color: var(--color-off-white);
+        font-weight: 700;
+        font-size: 1.75rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .page-header p {
+        color: rgba(250, 250, 248, 0.85);
+        margin: 0.5rem 0 0 0;
+        font-size: 0.95rem;
+    }
+
+    /* Main Card */
+    .process-card {
+        background: white;
+        border: 1px solid var(--color-gray-border);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.08);
+    }
+
+    /* Section Title */
+    .section-title {
+        color: var(--color-primary-dark);
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--color-gray-border);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .section-title i {
+        color: var(--color-primary-light);
+    }
+
+    /* Info Section */
+    .info-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-row {
+        padding: 0.875rem 0;
+        border-bottom: 1px solid var(--color-gray-border);
+        display: flex;
+        align-items: center;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .info-label {
+        color: var(--color-text-muted);
+        font-weight: 500;
+        font-size: 0.9rem;
+        min-width: 140px;
+    }
+
+    .info-value {
+        font-weight: 600;
+        color: var(--color-primary-dark);
+        font-size: 0.95rem;
+        flex: 1;
+    }
+
+    /* Highlight Row */
+    .info-row.highlight {
+        background: linear-gradient(to right, rgba(18, 69, 255, 0.05), transparent);
+        padding: 1rem;
+        margin: 0 -1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        border-radius: 6px;
+    }
+
+    .info-row.highlight .info-value {
+        color: var(--color-success);
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    /* Form Section */
+    .form-section {
+        background: var(--color-gray-light);
+        padding: 1.75rem;
+        border-radius: 8px;
+        border: 1px solid var(--color-gray-border);
+    }
+
+    .form-label {
+        color: var(--color-primary-dark);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-select,
+    .form-control {
+        border: 2px solid var(--color-gray-border);
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-select:focus,
+    .form-control:focus {
+        border-color: var(--color-primary-light);
+        box-shadow: 0 0 0 3px rgba(18, 69, 255, 0.1);
+    }
+
+    .form-select.border-success {
+        border-color: var(--color-success) !important;
+    }
+
+    .form-select.border-warning {
+        border-color: var(--color-warning) !important;
+    }
+
+    .form-select.border-info {
+        border-color: var(--color-info) !important;
+    }
+
+    .form-select.border-danger {
+        border-color: var(--color-danger) !important;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .status-badge.pendente {
+        background: rgba(255, 193, 7, 0.15);
+        color: #856404;
+    }
+
+    .status-badge.processando {
+        background: rgba(23, 162, 184, 0.15);
+        color: #0c5460;
+    }
+
+    .status-badge.pago {
+        background: rgba(40, 167, 69, 0.15);
+        color: #155724;
+    }
+
+    .status-badge.cancelado {
+        background: rgba(220, 53, 69, 0.15);
+        color: #721c24;
+    }
+
+    /* Alert Boxes */
+    .alert {
+        border-radius: 8px;
+        border: none;
+        border-left: 4px solid;
+        padding: 1rem 1.25rem;
+    }
+
+    .alert-info {
+        background: rgba(18, 69, 255, 0.08);
+        border-left-color: var(--color-primary-light);
+        color: var(--color-primary-dark);
+    }
+
+    .alert-secondary {
+        background: var(--color-gray-light);
+        border-left-color: var(--color-text-muted);
+        color: #495057;
+    }
+
+    /* Buttons */
+    .btn-action {
+        padding: 0.75rem 1.75rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary.btn-action {
+        background: var(--color-primary-light);
+        color: white;
+    }
+
+    .btn-primary.btn-action:hover {
+        background: var(--color-primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(18, 69, 255, 0.3);
+    }
+
+    .btn-secondary.btn-action {
+        background: var(--color-gray-light);
+        color: var(--color-text-muted);
+        border: 2px solid var(--color-gray-border);
+    }
+
+    .btn-secondary.btn-action:hover {
+        background: white;
+        border-color: var(--color-primary-light);
+        color: var(--color-primary-light);
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin-bottom: 1.5rem;
+    }
+
+    .breadcrumb-item {
+        color: var(--color-text-muted);
+        font-size: 0.9rem;
+    }
+
+    .breadcrumb-item.active {
+        color: var(--color-primary-dark);
+        font-weight: 600;
+    }
+
+    .breadcrumb-item a {
+        color: var(--color-primary-light);
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .breadcrumb-item a:hover {
+        color: var(--color-primary-dark);
+        text-decoration: underline;
+    }
+
+    /* Text Helpers */
+    .text-muted {
+        color: var(--color-text-muted) !important;
+        font-size: 0.85rem;
+    }
+
+    /* Divider */
+    .divider {
+        height: 1px;
+        background: var(--color-gray-border);
+        margin: 1.5rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'dashboard_gestao' %}"><i class="fas fa-home"></i> Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'gerenciar_pagamentos' %}"><i class="fas fa-money-check-alt"></i> Pagamentos</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Processar</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="process-card">
+                <!-- Header -->
+                <div class="page-header">
+                    <h1>
+                        <i class="fas fa-money-check-alt"></i> Processar Pagamento
+                    </h1>
+                    <p>Revise as informações e atualize o status do pagamento</p>
+                </div>
+
+                <!-- Corpo do Card -->
+                <div class="card-body p-4">
+                    <!-- Informações do Monitor -->
+                    <div class="info-section">
+                        <h5 class="section-title">
+                            <i class="fas fa-user-graduate"></i> Informações do Monitor
+                        </h5>
+                        
+                        <div class="info-row">
+                            <span class="info-label">Nome:</span>
+                            <span class="info-value">{{ pagamento.monitor.nome }}</span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">Matrícula:</span>
+                            <span class="info-value">{{ pagamento.monitor.matricula }}</span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">Email:</span>
+                            <span class="info-value">{{ pagamento.monitor.email }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Informações da Turma -->
+                    <div class="info-section">
+                        <h5 class="section-title">
+                            <i class="fas fa-chalkboard-teacher"></i> Informações da Turma
+                        </h5>
+                        
+                        <div class="info-row">
+                            <span class="info-label">Disciplina:</span>
+                            <span class="info-value">{{ pagamento.turma.vaga.disciplina|default:pagamento.turma.nome }}</span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">Nome da Turma:</span>
+                            <span class="info-value">{{ pagamento.turma.nome }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Detalhes do Pagamento -->
+                    <div class="info-section">
+                        <h5 class="section-title">
+                            <i class="fas fa-file-invoice-dollar"></i> Detalhes do Pagamento
+                        </h5>
+                        
+                        <div class="info-row">
+                            <span class="info-label">Mês Referência:</span>
+                            <span class="info-value">{{ pagamento.mes_referencia|date:"F \d\e Y" }}</span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">Total de Horas:</span>
+                            <span class="info-value">{{ pagamento.total_horas }} horas</span>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="info-label">Valor por Hora:</span>
+                            <span class="info-value">R$ {{ pagamento.valor_hora|floatformat:2 }}</span>
+                        </div>
+                        
+                        <div class="divider"></div>
+                        
+                        <div class="info-row highlight">
+                            <span class="info-label"><strong>Valor Total:</strong></span>
+                            <span class="info-value">
+                                R$ {{ pagamento.valor_total|floatformat:2 }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Formulário de Processamento -->
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="fas fa-cogs"></i> Processar Pagamento
+                        </h5>
+                        
+                        <form method="POST">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label for="status" class="form-label">
+                                    Novo Status <span class="text-danger">*</span>
+                                </label>
+                                <select name="status" id="status" class="form-select" required>
+                                    <option value="">Selecione um status...</option>
+                                    <option value="Pendente" {% if pagamento.status == 'Pendente' %}selected{% endif %}>
+                                        ⏳ Pendente
+                                    </option>
+                                    <option value="Processando" {% if pagamento.status == 'Processando' %}selected{% endif %}>
+                                        🔄 Processando
+                                    </option>
+                                    <option value="Pago" {% if pagamento.status == 'Pago' %}selected{% endif %}>
+                                        ✅ Pago
+                                    </option>
+                                    <option value="Cancelado" {% if pagamento.status == 'Cancelado' %}selected{% endif %}>
+                                        ❌ Cancelado
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="observacao" class="form-label">
+                                    Observações
+                                </label>
+                                <textarea name="observacao" 
+                                          id="observacao" 
+                                          class="form-control" 
+                                          rows="4" 
+                                          placeholder="Digite observações sobre o processamento...">{{ pagamento.observacao }}</textarea>
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Use este campo para registrar informações importantes sobre o pagamento
+                                </small>
+                            </div>
+
+                            <!-- Status Atual -->
+                            {% if pagamento.status %}
+                            <div class="alert alert-info mb-4">
+                                <strong><i class="fas fa-info-circle"></i> Status Atual:</strong>
+                                <span class="status-badge {{ pagamento.status|lower }} ms-2">
+                                    {{ pagamento.status }}
+                                </span>
+                            </div>
+                            {% endif %}
+
+                            <!-- Histórico de Processamento -->
+                            {% if pagamento.data_processamento %}
+                            <div class="alert alert-secondary mb-4">
+                                <strong><i class="fas fa-history"></i> Último Processamento:</strong><br>
+                                <small>
+                                    {{ pagamento.data_processamento|date:"d/m/Y H:i:s" }}
+                                    {% if pagamento.processado_por %}
+                                    • Por: {{ pagamento.processado_por.nome }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                            {% endif %}
+
+                            <!-- Botões de Ação -->
+                            <div class="d-flex gap-3 justify-content-end mt-4">
+                                <a href="{% url 'gerenciar_pagamentos' %}" class="btn btn-secondary btn-action">
+                                    <i class="fas fa-arrow-left"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary btn-action">
+                                    <i class="fas fa-check"></i> Processar Pagamento
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Validação do formulário
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const status = document.getElementById('status').value;
+        
+        if (!status) {
+            e.preventDefault();
+            alert('Por favor, selecione um status antes de processar o pagamento.');
+            return false;
+        }
+        
+        // Confirmação para status críticos
+        if (status === 'Pago' || status === 'Cancelado') {
+            const confirma = confirm(
+                `Tem certeza que deseja marcar este pagamento como "${status}"?\n\n` +
+                `Esta ação ficará registrada no histórico.`
+            );
+            
+            if (!confirma) {
+                e.preventDefault();
+                return false;
+            }
+        }
+        
+        return true;
+    });
+
+    // Highlight no status selecionado com cores do sistema
+    document.getElementById('status').addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        this.className = 'form-select';
+        
+        switch(this.value) {
+            case 'Pendente':
+                this.classList.add('border-warning');
+                break;
+            case 'Processando':
+                this.classList.add('border-info');
+                break;
+            case 'Pago':
+                this.classList.add('border-success');
+                break;
+            case 'Cancelado':
+                this.classList.add('border-danger');
+                break;
+        }
+    });
+    
+    // Aplicar cor inicial se já houver status selecionado
+    window.addEventListener('DOMContentLoaded', function() {
+        const statusSelect = document.getElementById('status');
+        if (statusSelect.value) {
+            statusSelect.dispatchEvent(new Event('change'));
+        }
+    });
+</script>
+{% endblock %}
