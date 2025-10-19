@@ -1,0 +1,487 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes do Registro de Horas{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-dark: #002555;
+        --primary-light: #1245FF;
+        --accent-gold: #F5AC00;
+        --success-green: #28a745;
+        --warning-yellow: #ffc107;
+        --danger-red: #dc3545;
+        --gray-light: #f5f5f5;
+        --off-white: #fafaf8;
+    }
+
+    .detalhes-container {
+        background: transparent;
+        min-height: calc(100vh - 80px);
+        padding: 2rem 0;
+    }
+
+    .card-detalhes {
+        background: white;
+        border-radius: 12px;
+        box-shadow: none;
+        border: 1px solid #e9edf5;
+        overflow: hidden;
+    }
+
+    .card-header-detalhes {
+        background: linear-gradient(135deg, #0b2f5c 0%, var(--primary-light) 100%);
+        color: var(--off-white);
+        padding: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-header-detalhes h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: var(--off-white);
+    }
+
+    .status-badge {
+        padding: 0.5rem 1.2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .status-pendente {
+        background: rgba(255, 193, 7, 0.15);
+        color: #FFA000;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+
+    .status-aprovado {
+        background: rgba(40, 167, 69, 0.15);
+        color: var(--success-green);
+        border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+
+    .status-rejeitado {
+        background: rgba(220, 53, 69, 0.15);
+        color: var(--danger-red);
+        border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+
+    .card-body-detalhes {
+        padding: 2rem;
+    }
+
+    .section-titulo {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        margin-bottom: 1rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 2px solid var(--gray-light);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .section-icon {
+        color: var(--accent-gold);
+        font-size: 1.2rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-item {
+        background: #f8f9fc;
+        padding: 1.2rem;
+        border-radius: 8px;
+        border-left: 4px solid var(--accent-gold);
+        border: 1px solid #e9edf5;
+        border-left: 4px solid var(--accent-gold);
+    }
+
+    .info-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+    }
+
+    .info-small {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 0.3rem;
+    }
+
+    .atividades-card {
+        background: #f8f9fc;
+        border-radius: 8px;
+        padding: 1.5rem;
+        border: 1px solid #e9edf5;
+        border-left: 4px solid var(--primary-light);
+        margin-bottom: 2rem;
+    }
+
+    .atividades-card h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--primary-dark);
+        margin-bottom: 1rem;
+    }
+
+    .atividades-texto {
+        font-size: 0.95rem;
+        line-height: 1.8;
+        color: #495057;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .observacao-card {
+        background: rgba(220, 53, 69, 0.05);
+        border-radius: 8px;
+        padding: 1.5rem;
+        border: 1px solid rgba(220, 53, 69, 0.2);
+        border-left: 4px solid var(--danger-red);
+        margin-bottom: 2rem;
+    }
+
+    .observacao-card h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--danger-red);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .observacao-texto {
+        font-size: 0.95rem;
+        line-height: 1.8;
+        color: #721c24;
+    }
+
+    .validacao-info {
+        background: rgba(23, 162, 184, 0.05);
+        border-radius: 8px;
+        padding: 1.5rem;
+        border: 1px solid rgba(23, 162, 184, 0.2);
+        border-left: 4px solid #17a2b8;
+        margin-bottom: 2rem;
+    }
+
+    .validacao-info h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #0c5460;
+        margin-bottom: 1rem;
+    }
+
+    .validacao-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .validacao-item {
+        padding: 1rem;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #e9edf5;
+    }
+
+    .validacao-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .validacao-valor {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        margin-top: 0.5rem;
+    }
+
+    .botoes-footer {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid var(--gray-light);
+        margin-top: 2rem;
+    }
+
+    .btn {
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-voltar {
+        background: white;
+        color: var(--primary-dark);
+        border: 1px solid #e0e6ef;
+    }
+
+    .btn-voltar:hover {
+        background: #f8f9fc;
+        border-color: var(--primary-dark);
+        transform: translateY(-1px);
+    }
+
+    .btn-editar {
+        background: linear-gradient(135deg, var(--primary-light) 0%, #0b2f5c 100%);
+        color: white;
+    }
+
+    .btn-editar:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(18, 69, 255, 0.2);
+    }
+
+    .alert-info-custom {
+        background: rgba(23, 162, 184, 0.08);
+        border-left: 4px solid #17a2b8;
+        border: 1px solid rgba(23, 162, 184, 0.2);
+        border-left: 4px solid #17a2b8;
+        color: #0c5460;
+        padding: 1.2rem;
+        border-radius: 8px;
+        margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .card-header-detalhes {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .botoes-footer {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detalhes-container">
+    <div class="container-lg">
+        
+        <!-- HEADER -->
+        <div class="card-detalhes">
+            <div class="card-header-detalhes">
+                <h1>
+                    <i class="fas fa-file-invoice"></i>
+                    Detalhes do Registro
+                </h1>
+                <div class="status-badge status-{{ registro.status|lower }}">
+                    {% if registro.status == 'Pendente' %}
+                        <i class="fas fa-clock"></i> Aguardando Validação
+                    {% elif registro.status == 'Aprovado' %}
+                        <i class="fas fa-check-circle"></i> Aprovado
+                    {% elif registro.status == 'Rejeitado' %}
+                        <i class="fas fa-times-circle"></i> Rejeitado
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTEÚDO -->
+        <div class="card-detalhes" style="margin-top: 2rem;">
+            <div class="card-body-detalhes">
+
+                <!-- SEÇÃO 1: INFORMAÇÕES DO REGISTRO -->
+                <div>
+                    <h2 class="section-titulo">
+                        <i class="fas fa-calendar section-icon"></i>
+                        Informações do Registro
+                    </h2>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Data</div>
+                            <div class="info-value">{{ registro.data|date:"d/m/Y" }}</div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">Hora de Início</div>
+                            <div class="info-value">{{ registro.hora_inicio|time:"H:i" }}</div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">Hora de Término</div>
+                            <div class="info-value">{{ registro.hora_fim|time:"H:i" }}</div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">Total de Horas</div>
+                            <div class="info-value">{{ registro.total_horas|floatformat:1 }}h</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO 2: TURMA -->
+                <div style="margin-bottom: 2rem;">
+                    <h2 class="section-titulo">
+                        <i class="fas fa-chalkboard section-icon"></i>
+                        Monitoria
+                    </h2>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Nome da Turma</div>
+                            <div class="info-value" style="font-size: 1.1rem;">{{ registro.turma.nome }}</div>
+                            <div class="info-small">{{ registro.turma.vaga.disciplina }}</div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">Horário da Turma</div>
+                            <div class="info-value" style="font-size: 1rem;">{{ registro.turma.horario }}</div>
+                            <div class="info-small">{{ registro.turma.dias_da_semana }}</div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">Sala</div>
+                            <div class="info-value">{{ registro.turma.sala.numero }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO 3: ATIVIDADES REALIZADAS -->
+                <div style="margin-bottom: 2rem;">
+                    <h2 class="section-titulo">
+                        <i class="fas fa-tasks section-icon"></i>
+                        Atividades Realizadas
+                    </h2>
+
+                    <div class="atividades-card">
+                        <div class="atividades-texto">{{ registro.descricao_atividade }}</div>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO 4: OBSERVAÇÕES DO PROFESSOR (se houver) -->
+                {% if registro.status == 'Rejeitado' and registro.observacao_validador %}
+                <div style="margin-bottom: 2rem;">
+                    <h2 class="section-titulo">
+                        <i class="fas fa-comment-slash section-icon" style="color: var(--danger-red);"></i>
+                        Motivo da Rejeição
+                    </h2>
+
+                    <div class="observacao-card">
+                        <h3>
+                            <i class="fas fa-exclamation-circle"></i>
+                            Observações do Professor
+                        </h3>
+                        <div class="observacao-texto">{{ registro.observacao_validador }}</div>
+                    </div>
+
+                    <div class="alert-info-custom">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Próximos Passos:</strong> Corrija as informações conforme indicado acima e registre novamente as horas.
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- SEÇÃO 5: INFORMAÇÕES DE VALIDAÇÃO (se aprovado) -->
+                {% if registro.status == 'Aprovado' %}
+                <div style="margin-bottom: 2rem;">
+                    <h2 class="section-titulo">
+                        <i class="fas fa-check-circle section-icon" style="color: var(--success-green);"></i>
+                        Validação Concluída
+                    </h2>
+
+                    <div class="validacao-info">
+                        <h3>
+                            <i class="fas fa-thumbs-up"></i>
+                            Registro Aprovado
+                        </h3>
+
+                        <div class="validacao-grid">
+                            <div class="validacao-item">
+                                <div class="validacao-label">Validado Por</div>
+                                <div class="validacao-valor">{{ registro.validado_por.nome }}</div>
+                            </div>
+
+                            <div class="validacao-item">
+                                <div class="validacao-label">Data da Validação</div>
+                                <div class="validacao-valor">{{ registro.data_validacao|date:"d/m/Y H:i" }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert-info-custom">
+                        <i class="fas fa-check-circle"></i>
+                        <strong>Status:</strong> Suas horas foram aprovadas e contabilizadas no sistema. Elas aparecerão no próximo cálculo de pagamento.
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- SEÇÃO 6: AGUARDANDO VALIDAÇÃO -->
+                {% if registro.status == 'Pendente' %}
+                <div style="margin-bottom: 2rem;">
+                    <div class="alert-info-custom" style="background: rgba(255, 193, 7, 0.1); border-left-color: #FFA000; color: #856404;">
+                        <i class="fas fa-hourglass-half"></i>
+                        <strong>Status:</strong> Seu registro foi enviado para validação. O professor supervisor analisará em breve.
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- BOTÕES DE AÇÃO -->
+                <div class="botoes-footer">
+                    <a href="{% url 'meus_registros_horas' %}" class="btn btn-voltar">
+                        <i class="fas fa-arrow-left"></i> Voltar para Meus Registros
+                    </a>
+                    {% if registro.status == 'Rejeitado' %}
+                    <a href="{% url 'registrar_horas' %}" class="btn btn-editar">
+                        <i class="fas fa-plus"></i> Registrar Novamente
+                    </a>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
