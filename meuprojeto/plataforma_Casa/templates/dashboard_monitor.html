@@ -32,23 +32,12 @@
     .dashboard-header {
         /* Cabeçalho minimalista usando as cores institucionais */
         background: linear-gradient(135deg, #0b2f5c 0%, var(--primary-light) 100%);
-        color: #fff;
+        color: #fafaf8; /* off-white */
         padding: 1.5rem;
         border-radius: 12px;
         margin-bottom: 1.5rem;
         box-shadow: none;
         position: relative;
-    }
-
-    .dashboard-header::after {
-        /* Fio dourado sutil sob o título */
-        content: "";
-        display: block;
-        height: 3px;
-        background: var(--accent-gold);
-        border-radius: 2px;
-        margin-top: 0.75rem;
-        opacity: 0.9;
     }
 
     .dashboard-header h1 {
@@ -58,12 +47,14 @@
         display: flex;
         align-items: center;
         gap: 1rem;
+        color: #fafaf8; /* off-white */
     }
 
     .dashboard-header p {
         font-size: 0.95rem;
         opacity: 0.95;
         margin-bottom: 0;
+        color: #fafaf8; /* off-white */
     }
 
     /* ========== KPI CARDS ========== */
