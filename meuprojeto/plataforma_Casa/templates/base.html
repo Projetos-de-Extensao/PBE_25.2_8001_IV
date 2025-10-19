@@ -1,63 +1,451 @@
+<!--
+    ============================================================================
+    TEMPLATE BASE - PLATAFORMA CASA DE MONITORIAS
+    ============================================================================
+    
+    Descrição:
+    Template base para todas as páginas do sistema de gestão de monitorias.
+    Implementa layout responsivo com sidebar lateral e navbar superior.
+    
+    Sistema de Permissões:
+    - Utiliza Context Processor (user_groups) para disponibilizar variáveis globais
+    - is_aluno: Estudante que pode se candidatar a vagas
+    - is_monitor: Aluno aprovado que registra horas de monitoria
+    - is_professor: Coordenador que gerencia vagas e valida horas
+    - is_admin: Administrador com acesso total ao sistema
+    
+    Funcionalidades Principais:
+    - Menu lateral dinâmico baseado no perfil do usuário
+    - Navbar fixa superior com informações do usuário
+    - Responsivo: sidebar colapsável em telas menores
+    - Sistema de mensagens flash do Django
+    - Integração com Bootstrap 5.3 e Font Awesome 6.4
+    
+    Autor: Equipe de Desenvolvimento - Plataforma Casa
+    Data: Outubro 2025
+    ============================================================================
+-->
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <!-- ========== META TAGS ========== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Plataforma Casa - Monitorias{% endblock %}</title>
     
-    <!-- Bootstrap 5.3.0 -->
+    <!-- ========== BIBLIOTECAS CSS EXTERNAS ========== -->
+    
+    <!-- Bootstrap 5.3.0 - Framework CSS responsivo -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     
-    <!-- Font Awesome 6.4.0 - Ícones -->
+    <!-- Font Awesome 6.4.0 - Biblioteca de ícones vetoriais -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Cores Institucionais - Paleta oficial Plataforma Casa -->
+    <!-- ========== ESTILOS PERSONALIZADOS ========== -->
+    
+    <!-- Cores Institucionais - Define paleta de cores oficial da Plataforma Casa -->
+    <!-- Amarelo CASA: #F5AC00, Azul Escuro: #002555, Azul Claro: #1245FF -->
     <link rel="stylesheet" href="{% static 'css/cores-institucionais.css' %}">
     
+    <!-- Cores Padrão - Sobrescreve cores padrão do Bootstrap com cores institucionais -->
+    <link rel="stylesheet" href="{% static 'css/cores-padrao.css' %}">
+    
+    <!-- ========== ESTILOS INLINE - LAYOUT PRINCIPAL ========== -->
     <style>
+        /* 
+         * Reset CSS básico
+         * Remove margens e paddings padrão do navegador
+         */
+        /* 
+         * Reset CSS básico
+         * Remove margens e paddings padrão do navegador
+         */
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            box-sizing: border-box; /* Inclui padding e border no width/height total */
         }
         
-        /* Cores e Background */
+        /* 
+         * ========== CONFIGURAÇÃO DO BODY ==========
+         * Background off-white (#fafaf8) - cor institucional de fundo
+         * Previne scroll horizontal indesejado
+         */
         body {
-            background-color: #fafaf8; /* Off-white */
+            background-color: #fafaf8; /* Off-white - cor institucional de fundo */
+            padding-top: 0; /* Remove padding superior (navbar é fixa) */
+            overflow-x: hidden; /* Impede scroll horizontal no body */
+            max-width: 100vw; /* Limita largura máxima à viewport */
         }
         
-        /* Estilos específicos do layout (não inclusos no arquivo de cores) */
+        /* 
+         * Previne scroll horizontal em todo o documento
+         */
+        html {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+        
+        /* 
+         * ========== NAVBAR SUPERIOR FIXA ==========
+         * Navbar fixada no topo da página
+         * Fica visível mesmo ao fazer scroll (position: fixed)
+         * Z-index alto para ficar acima de outros elementos
+         */
+        .navbar {
+            position: fixed; /* Fixa a navbar no topo */
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000; /* Fica acima da maioria dos elementos */
+            height: 60px;
+        }
+        
+        /* 
+         * Menu collapse da navbar (versão mobile)
+         * Z-index maior que a navbar para aparecer acima
+         */
+        .navbar-collapse {
+            z-index: 1001;
+        }
+        
+        /* 
+         * Dropdown do usuário na navbar
+         * Z-index ainda maior para garantir visibilidade
+         */
+        .navbar .nav-item.dropdown {
+            position: relative;
+            z-index: 1002;
+        }
+        
+        /* 
+         * ========== RESPONSIVIDADE - DESKTOP ==========
+         * Em telas grandes (≥992px), força exibição do menu do usuário
+         */
+        @media (min-width: 992px) {
+            .navbar .d-none.d-lg-flex {
+                display: flex !important;
+            }
+        }
+        
+        /* 
+         * ========== RESPONSIVIDADE - MOBILE ==========
+         * Em telas pequenas (<992px), menu fica dentro do collapse
+         */
+        @media (max-width: 991px) {
+            .navbar .d-none.d-lg-flex {
+                display: none !important;
+            }
+        }
+        
+        /* 
+         * ========== DROPDOWN DO USUÁRIO ==========
+         * Menu dropdown que aparece ao clicar no nome do usuário
+         * Z-index altíssimo para garantir que fique acima de tudo
+         */
+        .navbar .dropdown-menu {
+            z-index: 1050 !important; /* Prioridade máxima */
+            position: absolute !important;
+            top: 100 !important; /* Posiciona abaixo do botão */
+            right: 0 !important; /* Alinha à direita */
+            left: auto !important;
+            margin-top: 0.5rem;
+            background-color: white;
+            border: 1px solid rgba(0,0,0,0.15);
+            border-radius: 0.375rem;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.25); /* Sombra para destaque */
+            min-width: 200px;
+            display: none; /* Escondido por padrão */
+        }
+        
+        /* 
+         * Dropdown visível quando ativado (classe .show do Bootstrap)
+         * Animação suave de fade-in ao aparecer
+         */
+        .navbar .dropdown-menu.show {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            animation: fadeInDown 0.2s ease-out; /* Animação de entrada */
+        }
+        
+        /* 
+         * Animação de fade-in de cima para baixo
+         * Efeito visual suave ao abrir o dropdown
+         */
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .navbar .dropdown-menu .dropdown-item {
+            padding: 0.5rem 1rem;
+            color: #212529;
+            text-decoration: none;
+            display: block;
+            clear: both;
+            font-weight: 400;
+            text-align: inherit;
+            white-space: nowrap;
+            background-color: transparent;
+            border: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .dropdown-menu .dropdown-item i {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .navbar .dropdown-menu .dropdown-item:hover,
+        .navbar .dropdown-menu .dropdown-item:focus {
+            background-color: #f8f9fa;
+            color: #002555;
+            padding-left: 1.2rem;
+        }
+        
+        .navbar .dropdown-menu .dropdown-divider {
+            height: 0;
+            margin: 0.5rem 0;
+            overflow: hidden;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .navbar .dropdown-toggle::after {
+            margin-left: 0.5rem;
+        }
+        
+        .navbar .dropdown-toggle {
+            cursor: pointer !important;
+            user-select: none;
+        }
+        
+        .navbar .dropdown-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0.375rem;
+        }
+        
+        .navbar .dropdown-toggle[aria-expanded="true"] {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 0.375rem;
+        }
+        
+        /* 
+         * ========== LAYOUT PRINCIPAL ==========
+         * Configurações de altura e overflow para HTML e Body
+         */
         html, body {
             height: 100%;
+            overflow-x: hidden; /* Previne scroll horizontal */
+            max-width: 100%;
+        }
+        
+        /* 
+         * ========== SIDEBAR (MENU LATERAL) ==========
+         * Menu lateral fixo que pode ser colapsado/expandido
+         * Cores: Azul escuro (#002555) com borda amarela (#F5AC00)
+         * 
+         * Estados:
+         * - Normal: 250px de largura, mostra texto e ícones
+         * - Collapsed: 70px de largura, mostra apenas ícones
+         */
+        .sidebar {
+            background-color: #002555; /* Azul escuro institucional */
+            height: 100vh; /* Altura total da viewport */
+            padding: 0;
+            position: fixed; /* Fixa na lateral esquerda */
+            left: 0;
+            top: 0;
+            width: 250px; /* Largura padrão expandida */
+            z-index: 999; /* Abaixo apenas da navbar */
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Animação suave e fluida */
+            overflow-y: auto; /* Scroll vertical se necessário */
+            overflow-x: hidden; /* Sem scroll horizontal */
+            border-right: 4px solid #F5AC00; /* Borda amarela à direita */
+        }
+        
+        /* 
+         * Estado colapsado do sidebar
+         * Reduz largura para mostrar apenas ícones
+         */
+        .sidebar.collapsed {
+            width: 70px; /* Largura reduzida */
             overflow-x: hidden;
         }
         
-        .sidebar {
-            background-color: #002555;
-            height: calc(100vh - 60px);
-            padding: 2rem 0;
-            position: fixed;
-            left: 0;
-            top: 60px;
-            width: 250px;
-            z-index: 999;
-            transition: transform 0.3s ease;
-            overflow-y: auto;
-            border-right: 4px solid #F5AC00;
+        /* 
+         * Quando colapsado, garante que conteúdo interno não transborde
+         */
+        .sidebar.collapsed * {
+            overflow: hidden;
         }
         
-        .sidebar.collapsed {
-            transform: translateX(-250px);
+        /* 
+         * ========== CABEÇALHO DO SIDEBAR ==========
+         * Contém botão de toggle e nome da plataforma
+         */
+        .sidebar-header {
+            padding: 0.75rem 1rem;
+            background-color: #001a3d; /* Tom mais escuro de azul */
+            border-bottom: 2px solid #F5AC00; /* Linha divisória amarela */
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-height: 60px; /* Alinha altura com navbar */
+            overflow: hidden;
+        }
+        
+        /* 
+         * Botão de toggle do sidebar (ícone de hambúrguer)
+         * Permite colapsar/expandir o menu
+         */
+        .sidebar-toggle-btn-internal {
+            background: none;
+            border: none;
+            color: #F5AC00; /* Amarelo CASA */
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+            flex-shrink: 0; /* Não encolhe quando sidebar colapsa */
+        }
+        
+        /* 
+         * Efeito hover no botão de toggle
+         * Muda cor e aumenta levemente o tamanho
+         */
+        
+        .sidebar-toggle-btn-internal:hover {
+            color: #ffffff;
+            transform: scale(1.1);
+        }
+        
+        /* 
+         * Controle de visibilidade dos ícones do toggle
+         * Hambúrguer visível quando colapsado, Seta visível quando expandido
+         */
+        .sidebar-toggle-icon {
+            display: none; /* Esconde hambúrguer quando expandido */
+            transition: opacity 0.3s ease;
+        }
+        
+        .sidebar-close-icon {
+            display: inline-block; /* Mostra seta quando expandido */
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Quando sidebar está colapsado */
+        .sidebar.collapsed .sidebar-toggle-icon {
+            display: inline-block; /* Mostra hambúrguer */
+        }
+        
+        .sidebar.collapsed .sidebar-close-icon {
+            display: none; /* Esconde seta */
+        }
+        
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #F5AC00;
+            font-size: 0.95rem; /* Tamanho reduzido */
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            transition: opacity 0.3s ease;
+            flex: 1; /* Permite que ocupe espaço disponível */
+            min-width: 0; /* Permite encolher */
+        }
+        
+        .sidebar-brand i {
+            font-size: 1.3rem; /* Ícone menor */
+            flex-shrink: 0;
+            min-width: 20px;
+            transition: opacity 0.15s ease 0.05s, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease, min-width 0.3s ease;
+        }
+        
+        .sidebar-brand .sidebar-text {
+            overflow: hidden;
+            text-overflow: ellipsis; /* Adiciona ... se for muito grande */
+            transition: opacity 0.2s ease, width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        /* Animações suaves para quando o sidebar colapsa */
+        .sidebar.collapsed .sidebar-text {
+            opacity: 0;
+            width: 0;
+            visibility: hidden;
+            transition: opacity 0.15s ease, width 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0.2s;
+        }
+        
+        /* Esconder ícone de universidade quando colapsado */
+        .sidebar.collapsed .sidebar-brand i {
+            opacity: 0;
+            transform: scale(0);
+            width: 0;
+            min-width: 0;
+            transition: opacity 0.15s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease, min-width 0.3s ease;
+        }
+        
+        .sidebar.collapsed .sidebar-brand {
+            justify-content: center;
+            opacity: 0;
+        }
+        
+        .sidebar.collapsed .sidebar-header {
+            justify-content: center;
+            padding: 0.75rem;
+        }
+        
+        .sidebar-content {
+            padding: 1rem 0;
         }
         
         .sidebar-item {
             padding: 0.75rem 1.5rem;
             color: #ffffff;
             text-decoration: none;
-            display: block;
-            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border-left: 4px solid transparent;
+            white-space: nowrap;
+        }
+        
+        .sidebar-item i {
+            flex-shrink: 0;
+            min-width: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar.collapsed .sidebar-item {
+            padding: 0.75rem;
+            justify-content: center;
+        }
+        
+        .sidebar.collapsed .sidebar-item .sidebar-text {
+            opacity: 0;
+            width: 0;
+            visibility: hidden;
+        }
+        
+        .sidebar-item:hover i {
+            transform: scale(1.15);
         }
         
         .sidebar-item:hover,
@@ -68,48 +456,97 @@
             font-weight: 600;
         }
         
+        /* Estilo especial para o botão Sair */
+        .sidebar-item[href*="logout"] {
+            color: #ffcccb !important;
+        }
+        
+        .sidebar-item[href*="logout"]:hover {
+            background-color: #dc3545 !important;
+            color: #ffffff !important;
+            border-left-color: #ffffff;
+        }
+        
         .sidebar-item i {
-            margin-right: 0.5rem;
             width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+            font-size: 1.1rem;
         }
         
-        .sidebar-close-btn {
-            display: none;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: none;
-            border: none;
+        .sidebar-divider {
+            border-color: #F5AC00;
+            margin: 1rem 0;
+        }
+        
+        .sidebar.collapsed .sidebar-divider {
+            margin: 1rem 0.5rem;
+        }
+        
+        /* Títulos de seção do menu */
+        .sidebar-section-title {
+            padding: 0.5rem 1rem;
             color: #F5AC00;
-            font-size: 1.5rem;
-            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.5rem;
+            opacity: 0.9;
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
         
-        .sidebar-toggle-btn {
-            background: none;
-            border: none;
-            color: #ffffff;
-            font-size: 1.5rem;
-            cursor: pointer;
-            margin-right: 1rem;
-            padding: 0.5rem;
-            transition: all 0.3s ease;
+        .sidebar.collapsed .sidebar-section-title {
+            opacity: 0;
+            transform: translateX(-20px);
+            visibility: hidden;
         }
         
-        .sidebar-toggle-btn:hover {
-            color: #F5AC00;
+        .sidebar-section-title .sidebar-text {
+            white-space: nowrap;
+            overflow: hidden;
         }
         
-        .main-content {
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 250px;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+                transform: translateX(-250px);
+            }
+            
+            .sidebar:not(.collapsed) {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+                width: 100%;
+            }
+            
+            .main-content.sidebar-collapsed {
+                margin-left: 0;
+                max-width: 100%;
+                width: 100%;
+            }
+        }        .main-content {
             padding: 2rem;
             background-color: #fafaf8;
             margin-left: 250px;
-            transition: margin-left 0.3s ease;
+            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                        max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             min-height: calc(100vh - 60px);
+            max-width: calc(100% - 250px);
+            width: calc(100% - 250px);
+            overflow-x: hidden;
         }
         
         .main-content.sidebar-collapsed {
-            margin-left: 0;
+            margin-left: 70px;
+            max-width: calc(100% - 70px);
+            width: calc(100% - 70px);
         }
         
         .status-active {
@@ -127,26 +564,18 @@
             color: #856404;
         }
         
-        .footer {
-            background-color: #002555;
-            color: white;
-            padding: 2rem;
-            text-align: center;
-            margin-top: 3rem;
-            border-top: 4px solid #F5AC00;
-            margin-left: 250px;
-            transition: margin-left 0.3s ease;
-        }
-        
-        .footer.sidebar-collapsed {
-            margin-left: 0;
-        }
+
         
         /* Responsividade */
         @media (max-width: 768px) {
             .sidebar {
                 width: 250px;
                 box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+                transform: translateX(-250px);
+            }
+            
+            .sidebar:not(.collapsed) {
+                transform: translateX(0);
             }
             
             .sidebar-close-btn {
@@ -155,24 +584,17 @@
             
             .main-content {
                 margin-left: 0;
-            }
-            
-            .footer {
-                margin-left: 0;
+                width: 100%;
             }
         }
         
         @media (min-width: 769px) {
             .sidebar-toggle-btn {
-                display: none !important;
+                display: inline-block !important; /* Mantém visível no desktop */
             }
             
             .sidebar-close-btn {
                 display: none !important;
-            }
-            
-            .sidebar {
-                transform: none !important;
             }
         }
         
@@ -182,6 +604,12 @@
             margin-bottom: 2rem;
             border-bottom: 3px solid #F5AC00;
             padding-bottom: 1rem;
+        }
+        
+        .page-title h1 {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
         }
         
         .breadcrumb {
@@ -225,82 +653,479 @@
             color: var(--cor-amarelo-institucional);
             margin-bottom: 1rem;
         }
+        
+        /* Prevenir overflow de conteúdo */
+        .container-fluid {
+            padding-left: 0;
+            padding-right: 0;
+            overflow-x: hidden;
+            max-width: 100%;
+            margin-top: 0;
+        }
+        
+        .container-fluid > .row {
+            margin-left: 0;
+            margin-right: 0;
+            max-width: 100%;
+        }
+        
+        .card, .table-responsive, img, iframe, video {
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        
+        pre, code {
+            max-width: 100%;
+            overflow-x: auto;
+            word-wrap: break-word;
+        }
+        
+        /* Garantir que o conteúdo dentro de main-content não vaze */
+        .main-content > * {
+            max-width: 100%;
+        }
+        
+        /* Garantir que tabelas não causem overflow */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table {
+            table-layout: auto;
+            width: 100%;
+        }
+        
+        /* Garantir que elementos de formulário não causem overflow */
+        .form-control, .form-select, input, textarea, select {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #002555 0%, #1245FF 100%); border-bottom: 4px solid #F5AC00;">
-        <div class="container-fluid">
-            <button class="sidebar-toggle-btn" id="sidebarToggleBtn" onclick="toggleSidebar()">
-                <i class="fas fa-bars"></i>
-            </button>
-            <a class="navbar-brand" href="{% url 'dashboard' %}">
-                <i class="fas fa-graduation-cap"></i> Plataforma Casa
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard' %}">
-                            <i class="fas fa-home"></i> Início
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user"></i> Usuário
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{% url 'perfil' %}">Meu Perfil</a></li>
-                            <li><a class="dropdown-item" href="#">Configurações</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Sair</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
             <nav class="sidebar" id="sidebar">
-                <button class="sidebar-close-btn" id="sidebarCloseBtn" onclick="closeSidebar()">
-                    <i class="fas fa-times"></i>
-                </button>
-                <div class="sidebar-content">
-                    <a href="{% url 'dashboard' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                        <i class="fas fa-chart-line"></i> Dashboard
-                    </a>
-                    <a href="{% url 'listar_usuarios' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_usuarios' %}active{% endif %}">
-                        <i class="fas fa-users"></i> Usuários
-                    </a>
-                    <a href="{% url 'listar_alunos' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_alunos' %}active{% endif %}">
-                        <i class="fas fa-user-graduate"></i> Alunos
-                    </a>
-                    <a href="{% url 'listar_vagas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_vagas' %}active{% endif %}">
-                        <i class="fas fa-briefcase"></i> Vagas
-                    </a>
-                    <a href="{% url 'listar_turmas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_turmas' %}active{% endif %}">
-                        <i class="fas fa-chalkboard"></i> Turmas
-                    </a>
-                    <a href="{% url 'listar_monitorias' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_monitorias' %}active{% endif %}">
-                        <i class="fas fa-book"></i> Monitorias
-                    </a>
-                    <a href="{% url 'listar_presencas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_presencas' %}active{% endif %}">
-                        <i class="fas fa-clipboard-check"></i> Presenças
-                    </a>
-                    <a href="{% url 'listar_relatorios' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_relatorios' %}active{% endif %}">
-                        <i class="fas fa-file-alt"></i> Relatórios
-                    </a>
+                <!-- Cabeçalho do Sidebar com botão de toggle -->
+                <div class="sidebar-header">
+                    <button class="sidebar-toggle-btn-internal" id="sidebarToggleBtn" onclick="toggleSidebar()">
+                        <!-- Ícone do menu hambúrguer (visível quando colapsado) -->
+                        <i class="fas fa-bars sidebar-toggle-icon"></i>
+                        <!-- Seta para fechar (visível quando expandido) -->
+                        <i class="fas fa-chevron-left sidebar-close-icon"></i>
+                    </button>
+                    <div class="sidebar-brand">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span class="sidebar-text">Plataforma Casa</span>
+                    </div>
                 </div>
-            </nav>
+                
+                <div class="sidebar-content">
+                    <!--
+                        ========================================================================
+                        SISTEMA DE MENUS BASEADO EM PERMISSÕES
+                        ========================================================================
+                        
+                        Este sistema utiliza Context Processor (plataforma_Casa.context_processors.user_groups)
+                        que injeta variáveis booleanas globalmente em todos os templates:
+                        
+                        Variáveis disponíveis:
+                        - is_aluno: True se usuário pertence ao grupo "Aluno"
+                        - is_monitor: True se usuário pertence ao grupo "Monitor"  
+                        - is_professor: True se usuário pertence ao grupo "Professor"
+                        - is_admin: True se usuário é staff ou superuser
+                        
+                        Estrutura de Permissões:
+                        
+                        1. ALUNO (3 permissões):
+                           - view_vaga: Visualizar vagas disponíveis
+                           - add_inscricao: Candidatar-se a vagas
+                           - add_registrohoras: Registrar horas de monitoria
+                        
+                        2. MONITOR (8 permissões = 3 de Aluno + 5 próprias):
+                           - Todas do Aluno +
+                           - view_monitoria: Visualizar monitorias
+                           - view_turma: Ver turmas associadas
+                           - view_presenca: Ver presenças registradas
+                           - change_registrohoras: Editar próprios registros
+                           - view_registrohoras: Visualizar registros de horas
+                        
+                        3. PROFESSOR (16 permissões = 8 de Monitor + 8 próprias):
+                           - Todas do Monitor +
+                           - add/change/delete_vaga: Gerenciar vagas
+                           - change_inscricao: Avaliar candidaturas
+                           - change_monitoria: Validar horas de monitoria
+                           - view_relatorio: Gerar relatórios
+                           - Outras permissões administrativas
+                        
+                        4. ADMIN (todas as permissões):
+                           - is_staff ou is_superuser = acesso total
+                           - Gerenciar usuários, pagamentos, cadastros, etc.
+                        
+                        IMPORTANTE: Os blocos condicionais (if/endif) são mutuamente exclusivos.
+                        Cada usuário vê apenas o menu correspondente ao seu nível de permissão.
+                        ========================================================================
+                    -->
+                    
+                    <!-- 
+                        ====================================================================
+                        MENU: ALUNO (Candidato a Monitoria)
+                        ====================================================================
+                        
+                        Público: Estudantes que desejam se candidatar a vagas de monitoria
+                        
+                        Funcionalidades disponíveis:
+                        - Navegar no portal de vagas disponíveis
+                        - Visualizar e gerenciar suas candidaturas
+                        
+                        Grupo Django: "Aluno"
+                        Variável Context Processor: is_aluno
+                        
+                        Observação: Alunos não têm acesso ao Dashboard
+                        ====================================================================
+                    -->
+                    {% if is_aluno %}
+                    <!-- Link: Portal de Vagas -->
+                    <!-- Visualizar todas as vagas de monitoria abertas -->
+                    <!-- Permissão necessária: view_vaga -->
+                    <a href="{% url 'portal_vagas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'portal_vagas' %}active{% endif %}">
+                        <i class="fas fa-briefcase"></i>
+                        <span class="sidebar-text">Portal de Vagas</span>
+                    </a>
+                    
+                    <!-- Link: Minhas Inscrições -->
+                    <!-- Ver status das candidaturas submetidas -->
+                    <!-- Permissão necessária: view_inscricao, add_inscricao -->
+                    <a href="{% url 'minhas_inscricoes' %}" class="sidebar-item {% if request.resolver_match.url_name == 'minhas_inscricoes' %}active{% endif %}">
+                        <i class="fas fa-file-signature"></i>
+                        <span class="sidebar-text">Minhas Inscrições</span>
+                    </a>
+                    
+                    <hr class="sidebar-divider">
+                    
+                    <!-- Link: Monitorias Disponíveis -->
+                    <!-- Ver todas as monitorias disponíveis para participar -->
+                    <a href="{% url 'monitorias_disponiveis' %}" class="sidebar-item {% if request.resolver_match.url_name == 'monitorias_disponiveis' %}active{% endif %}">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span class="sidebar-text">Monitorias</span>
+                    </a>
+                    
+                    <!-- Link: Participando -->
+                    <!-- Ver monitorias que está participando (como aluno) -->
+                    <a href="{% url 'participando_monitorias' %}" class="sidebar-item {% if request.resolver_match.url_name == 'participando_monitorias' %}active{% endif %}">
+                        <i class="fas fa-users"></i>
+                        <span class="sidebar-text">Participando</span>
+                    </a>
+                    {% endif %}
+                    
+                    <!-- 
+                        ====================================================================
+                        MENU: MONITOR (Aluno Aprovado em Vaga)
+                        ====================================================================
+                        
+                        Público: Estudantes aprovados que atuam como monitores
+                        
+                        Funcionalidades disponíveis:
+                        - Todas do perfil Aluno (portal de vagas, candidaturas)
+                        - Registrar horas trabalhadas de monitoria
+                        - Visualizar histórico de registros de horas
+                        - Acompanhar validação de horas pelo professor
+                        
+                        Grupo Django: "Monitor"
+                        Variável Context Processor: is_monitor
+                        Herda: Permissões do grupo Aluno
+                        ====================================================================
+                    -->
+                    {% if is_monitor %}
+                    <!-- Link: Dashboard do Monitor -->
+                    <!-- Painel com KPIs e estatísticas personalizadas -->
+                    <!-- Monitorias ativas, horas, alunos, etc -->
+                    <a href="{% url 'dashboard' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard' and is_monitor %}active{% endif %}">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                    
+                    <hr class="sidebar-divider">
+                    
+                    <!-- Link: Registrar Horas -->
+                    <!-- Lançar horas trabalhadas de monitoria -->
+                    <!-- Permissão: add_registrohoras -->
+                    <a href="{% url 'registrar_horas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'registrar_horas' %}active{% endif %}">
+                        <i class="fas fa-clock"></i>
+                        <span class="sidebar-text">Registrar Horas</span>
+                    </a>
+                    
+                    <!-- Link: Meus Registros -->
+                    <!-- Visualizar histórico de horas registradas -->
+                    <!-- Ver status de validação pelo professor -->
+                    <!-- Permissão: view_registrohoras, change_registrohoras -->
+                    <a href="{% url 'meus_registros_horas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'meus_registros_horas' %}active{% endif %}">
+                        <i class="fas fa-history"></i>
+                        <span class="sidebar-text">Meus Registros</span>
+                    </a>
+                    
+                    <hr class="sidebar-divider">
+                    
+                    <!-- Link: Meus Alunos -->
+                    <!-- Ver alunos que estão participando das suas monitorias -->
+                    <a href="{% url 'meus_alunos_monitoria' %}" class="sidebar-item {% if request.resolver_match.url_name == 'meus_alunos_monitoria' %}active{% endif %}">
+                        <i class="fas fa-chalkboard-user"></i>
+                        <span class="sidebar-text">Meus Alunos</span>
+                    </a>
+                    
+                    <hr class="sidebar-divider">
+                    
+                    <!-- Link: Monitorias Disponíveis -->
+                    <!-- Ver todas as monitorias disponíveis para participar como aluno -->
+                    <a href="{% url 'monitorias_disponiveis' %}" class="sidebar-item {% if request.resolver_match.url_name == 'monitorias_disponiveis' %}active{% endif %}">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span class="sidebar-text">Monitorias</span>
+                    </a>
+                    
+                    <!-- Link: Participando -->
+                    <!-- Ver monitorias que está participando como aluno -->
+                    <a href="{% url 'participando_monitorias' %}" class="sidebar-item {% if request.resolver_match.url_name == 'participando_monitorias' %}active{% endif %}">
+                        <i class="fas fa-users"></i>
+                        <span class="sidebar-text">Participando</span>
+                    </a>
+                    
+                    <hr class="sidebar-divider">
+                    
+                    <!-- Link: Portal de Vagas -->
+                    <!-- Monitores podem se candidatar a novas vagas -->
+                    <a href="{% url 'portal_vagas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'portal_vagas' %}active{% endif %}">
+                        <i class="fas fa-briefcase"></i>
+                        <span class="sidebar-text">Portal de Vagas</span>
+                    </a>
+                    
+                    <!-- Link: Minhas Inscrições -->
+                    <!-- Acompanhar candidaturas em andamento -->
+                    <a href="{% url 'minhas_inscricoes' %}" class="sidebar-item {% if request.resolver_match.url_name == 'minhas_inscricoes' %}active{% endif %}">
+                        <i class="fas fa-file-signature"></i>
+                        <span class="sidebar-text">Minhas Inscrições</span>
+                    </a>
+                    {% endif %}
+                    
+                    <!-- 
+                        ====================================================================
+                        MENU: PROFESSOR (Coordenador de Monitoria)
+                        ====================================================================
+                        
+                        Público: Professores coordenadores de disciplinas com monitoria
+                        
+                        Funcionalidades disponíveis:
+                        - Criar e gerenciar vagas de monitoria
+                        - Avaliar candidaturas de alunos
+                        - Aprovar/reprovar monitores selecionados
+                        - Validar horas trabalhadas pelos monitores
+                        - Visualizar e gerenciar turmas e monitorias
+                        - Gerar relatórios de candidatos, monitores e horas
+                        
+                        Grupo Django: "Professor"
+                        Variável Context Processor: is_professor
+                        Herda: Permissões dos grupos Aluno e Monitor
+                        ====================================================================
+                    -->
+                    {% if is_professor %}
+                    <!-- Link: Dashboard do Professor -->
+                    <!-- Painel com KPIs e estatísticas personalizadas -->
+                    <!-- Últimas inscrições, vagas populares, turmas ativas -->
+                    <a href="{% url 'dashboard' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="sidebar-text">Dashboard</span>
+                    </a>
+                    
+                    <hr class="sidebar-divider">
+                    
+                    <!-- Link: Minhas Vagas -->
+                    <!-- Criar, editar e gerenciar vagas de monitoria -->
+                    <!-- Avaliar candidatos é feito dentro de cada vaga -->
+                    <!-- Permissões: view_vaga, add_vaga, change_vaga, delete_vaga -->
+                    <a href="{% url 'listar_vagas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_vagas' %}active{% endif %}">
+                        <i class="fas fa-briefcase"></i>
+                        <span class="sidebar-text">Minhas Vagas</span>
+                    </a>
+                    
+                    <hr class="sidebar-divider">
+                    
+                    <!-- Link: Validar Horas -->
+                    <!-- Aprovar/reprovar registros de horas dos monitores -->
+                    <!-- Verificar cumprimento de carga horária -->
+                    <!-- Permissão: change_registrohoras -->
+                    <a href="{% url 'validar_horas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'validar_horas' %}active{% endif %}">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="sidebar-text">Validar Horas</span>
+                    </a>
+                    
+                    <!-- Link: Minhas Monitorias -->
+                    <!-- Visualizar todas as monitorias sob coordenação -->
+                    <!-- Acompanhar status e desempenho -->
+                    <!-- Permissão: view_monitoria, change_monitoria -->
+                    <a href="{% url 'listar_monitorias' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_monitorias' %}active{% endif %}">
+                        <i class="fas fa-book"></i>
+                        <span class="sidebar-text">Minhas Monitorias</span>
+                    </a>
+                    
+                    <!-- Link: Turmas -->
+                    <!-- Gerenciar turmas vinculadas às monitorias -->
+                    <!-- Permissão: view_turma, change_turma -->
+                    <a href="{% url 'listar_turmas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_turmas' %}active{% endif %}">
+                        <i class="fas fa-chalkboard"></i>
+                        <span class="sidebar-text">Turmas</span>
+                    </a>
+                    {% endif %}
+                    
+                    <!-- 
+                        ====================================================================
+                        MENU: ADMINISTRADOR (Departamento/Gestão)
+                        ====================================================================
+                        
+                        Público: Funcionários do departamento com acesso administrativo
+                        
+                        Funcionalidades disponíveis:
+                        - Todas as funcionalidades dos perfis anteriores
+                        - Dashboard de gestão com métricas globais
+                        - Gerenciar pagamentos aos monitores
+                        - CRUD completo de todos os cadastros (usuários, alunos, etc.)
+                        - Gerar todos os tipos de relatórios
+                        - Acesso ao painel Django Admin
+                        
+                        Identificação: is_staff=True OU is_superuser=True
+                        Variável Context Processor: is_admin
+                        Permissões: TODAS (sem restrições)
+                        ====================================================================
+                    -->
+                    {% if is_admin %}
+                    <!-- Link: Dashboard de Gestão -->
+                    <!-- Métricas globais, KPIs, relatórios executivos -->
+                    <a href="{% url 'dashboard_gestao' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard_gestao' %}active{% endif %}">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span class="sidebar-text">Dashboard Gestão</span>
+                    </a>
+                    
+                    <!-- Link: Gerenciar Pagamentos -->
+                    <!-- Processar folha de pagamento dos monitores -->
+                    <!-- Calcular e aprovar pagamentos -->
+                    <a href="{% url 'gerenciar_pagamentos' %}" class="sidebar-item {% if request.resolver_match.url_name == 'gerenciar_pagamentos' %}active{% endif %}">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span class="sidebar-text">Pagamentos</span>
+                    </a>
+                    
+                    <hr class="sidebar-divider">
+                    
+                    <!-- Link: Gerenciar Usuários -->
+                    <!-- CRUD de usuários do sistema -->
+                    <!-- Atribuir permissões e grupos -->
+                    <a href="{% url 'listar_usuarios' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_usuarios' %}active{% endif %}">
+                        <i class="fas fa-users"></i>
+                        <span class="sidebar-text">Usuários</span>
+                    </a>
+                    
+                    <!-- Link: Gerenciar Alunos -->
+                    <!-- CRUD de cadastro de alunos -->
+                    <!-- Informações acadêmicas e pessoais -->
+                    <a href="{% url 'listar_alunos' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_alunos' %}active{% endif %}">
+                        <i class="fas fa-user-graduate"></i>
+                        <span class="sidebar-text">Alunos</span>
+                    </a>
+                    
+                    <!-- Link: Gerenciar Vagas -->
+                    <!-- CRUD de todas as vagas do sistema -->
+                    <!-- Visão global de vagas de todos os professores -->
+                    <a href="{% url 'listar_vagas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_vagas' %}active{% endif %}">
+                        <i class="fas fa-briefcase"></i>
+                        <span class="sidebar-text">Vagas</span>
+                    </a>
+                    
+                    <!-- Link: Gerenciar Turmas -->
+                    <!-- CRUD de turmas -->
+                    <!-- Associar disciplinas e professores -->
+                    <a href="{% url 'listar_turmas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_turmas' %}active{% endif %}">
+                        <i class="fas fa-chalkboard"></i>
+                        <span class="sidebar-text">Turmas</span>
+                    </a>
+                    
+                    <!-- Link: Gerenciar Monitorias -->
+                    <!-- CRUD de monitorias -->
+                    <!-- Visão global de todas as monitorias ativas -->
+                    <a href="{% url 'listar_monitorias' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_monitorias' %}active{% endif %}">
+                        <i class="fas fa-book"></i>
+                        <span class="sidebar-text">Monitorias</span>
+                    </a>
+                    
+                    <!-- Link: Gerenciar Presenças -->
+                    <!-- CRUD de registro de presença -->
+                    <!-- Controle de frequência dos monitores -->
+                    <a href="{% url 'listar_presencas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_presencas' %}active{% endif %}">
+                        <i class="fas fa-clipboard-check"></i>
+                        <span class="sidebar-text">Presenças</span>
+                    </a>
+                    
+                    <hr class="sidebar-divider">
+                    
+                    <!-- Link: Todos os Relatórios -->
+                    <!-- Central de relatórios do sistema com PDF/Excel -->
+                    <a href="{% url 'listar_relatorios' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_relatorios' %}active{% endif %}">
+                        <i class="fas fa-chart-bar"></i>
+                        <span class="sidebar-text">Todos Relatórios</span>
+                    </a>
+                    
+                    <hr class="sidebar-divider">
+                    {% endif %}
+                    
+                    <!-- 
+                        ====================================================================
+                        MENU COMUM - Visível para TODOS os usuários autenticados
+                        ====================================================================
+                        
+                        Itens disponíveis independente do perfil:
+                        - Perfil: Visualizar e editar dados pessoais
+                        - Sair: Logout do sistema
+                        
+                        Estes links aparecem no final do sidebar para todos os usuários.
+                        ====================================================================
+                    -->
+                    
+                    <!-- Link: Perfil do Usuário -->
+                    <!-- Ver e editar informações pessoais, alterar senha, etc. -->
+                    <a href="{% url 'perfil' %}" class="sidebar-item {% if request.resolver_match.url_name == 'perfil' %}active{% endif %}">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="sidebar-text">Perfil</span>
+                    </a>
+                    
+                    <!-- Link: Sair do Sistema -->
+                    <!-- Fazer logout e encerrar sessão -->
+                    <a href="{% url 'logout' %}" class="sidebar-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="sidebar-text">Sair do Sistema</span>
+                    </a>
+                </div> <!-- Fim de sidebar-content -->
+            </nav> <!-- Fim de sidebar -->
 
-            <!-- Main Content -->
+
+            <!-- 
+                ========================================================================
+                ÁREA DE CONTEÚDO PRINCIPAL
+                ========================================================================
+                
+                Esta área exibe o conteúdo dinâmico de cada página.
+                O conteúdo é injetado através do bloco "content" do Django Template
+                
+                Funcionalidades:
+                - Sistema de mensagens flash do Django (success, error, warning, info)
+                - Conteúdo específico de cada página estende este bloco
+                - Responsivo: ajusta margem quando sidebar colapsa
+                ========================================================================
+            -->
             <main class="main-content" id="mainContent">
+                <!-- 
+                    Sistema de Mensagens Flash do Django
+                    Exibe feedback para o usuário após ações (cadastro, edição, exclusão, etc.)
+                    Classes Bootstrap: alert-success, alert-danger, alert-warning, alert-info
+                -->
                 {% if messages %}
                     {% for message in messages %}
                         <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -315,15 +1140,10 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer" id="footer">
-        <div class="container">
-            <p>&copy; 2025 Plataforma Casa - Sistema de Monitorias. Todos os direitos reservados.</p>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery deve vir antes do Bootstrap -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     
     <!-- Script para controlar o sidebar -->
     <script>
@@ -331,84 +1151,44 @@
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
-            const footer = document.getElementById('footer');
             
-            if (sidebar.classList.contains('collapsed')) {
-                // Abrir sidebar
-                sidebar.classList.remove('collapsed');
-                mainContent.classList.remove('sidebar-collapsed');
-                footer.classList.remove('sidebar-collapsed');
-                localStorage.setItem('sidebarOpen', 'true');
-            } else {
-                // Fechar sidebar
-                sidebar.classList.add('collapsed');
-                mainContent.classList.add('sidebar-collapsed');
-                footer.classList.add('sidebar-collapsed');
-                localStorage.setItem('sidebarOpen', 'false');
-            }
-        }
-        
-        function closeSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            const footer = document.getElementById('footer');
+            // Alternar collapsed
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('sidebar-collapsed');
             
-            sidebar.classList.add('collapsed');
-            mainContent.classList.add('sidebar-collapsed');
-            footer.classList.add('sidebar-collapsed');
-            localStorage.setItem('sidebarOpen', 'false');
-        }
-        
-        function openSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            const footer = document.getElementById('footer');
-            
-            sidebar.classList.remove('collapsed');
-            mainContent.classList.remove('sidebar-collapsed');
-            footer.classList.remove('sidebar-collapsed');
-            localStorage.setItem('sidebarOpen', 'true');
+            // Salvar estado
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            localStorage.setItem('sidebarCollapsed', isCollapsed ? 'true' : 'false');
         }
         
         // Ao carregar a página, verificar o estado do sidebar
         document.addEventListener('DOMContentLoaded', function() {
-            const sidebarOpen = localStorage.getItem('sidebarOpen');
+            const sidebarCollapsed = localStorage.getItem('sidebarCollapsed');
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
-            const footer = document.getElementById('footer');
             
-            // Em mobile, o sidebar começa fechado
+            // Em mobile, o sidebar começa fechado (escondido)
             if (window.innerWidth <= 768) {
-                if (sidebarOpen === null) {
-                    closeSidebar();
-                } else if (sidebarOpen === 'false') {
-                    closeSidebar();
-                } else {
-                    openSidebar();
-                }
+                sidebar.style.transform = 'translateX(-250px)';
             } else {
-                // Em desktop, o sidebar fica sempre aberto
-                openSidebar();
+                // Em desktop, verificar estado salvo
+                if (sidebarCollapsed === 'true') {
+                    sidebar.classList.add('collapsed');
+                    mainContent.classList.add('sidebar-collapsed');
+                }
             }
-            
-            // Fechar sidebar ao clicar em um link de navegação
-            const sidebarItems = document.querySelectorAll('.sidebar-item');
-            sidebarItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    if (window.innerWidth <= 768) {
-                        closeSidebar();
-                    }
-                });
-            });
         });
         
         // Responsividade: ajustar quando a janela é redimensionada
         window.addEventListener('resize', function() {
             const sidebar = document.getElementById('sidebar');
             
-            if (window.innerWidth > 768) {
-                // Desktop: sidebar sempre visível
-                openSidebar();
+            if (window.innerWidth <= 768) {
+                // Mobile: esconder sidebar
+                sidebar.style.transform = 'translateX(-250px)';
+            } else {
+                // Desktop: remover transform
+                sidebar.style.transform = '';
             }
         });
     </script>
