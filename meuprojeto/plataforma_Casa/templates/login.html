@@ -20,7 +20,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #002555 0%, #1245FF 100%);
+            background: #f5f5f2;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -211,6 +211,27 @@
             padding-left: 40px;
         }
         
+        /* Ícone de toggle de senha */
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6d6e71;
+            cursor: pointer;
+            z-index: 10;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+        
+        .password-toggle:hover {
+            color: #002555;
+        }
+        
+        .input-group.password-field input {
+            padding-right: 40px;
+        }
+        
         @media (max-width: 480px) {
             .login-container {
                 margin: 1rem;
@@ -246,10 +267,10 @@
         <form method="POST" class="login-form">
             {% csrf_token %}
             
-            <!-- Username -->
+            <!-- Username ou Email -->
             <div class="form-group">
                 <label for="username">
-                    <i class="fas fa-user"></i> Usuário
+                    <i class="fas fa-user"></i> Usuário ou Email
                 </label>
                 <div class="input-group">
                     <i class="fas fa-user input-icon"></i>
@@ -257,7 +278,7 @@
                         type="text" 
                         id="username" 
                         name="username" 
-                        placeholder="Digite seu usuário"
+                        placeholder="Digite seu usuário ou email"
                         required
                         autofocus
                     >
@@ -269,7 +290,7 @@
                 <label for="password">
                     <i class="fas fa-lock"></i> Senha
                 </label>
-                <div class="input-group">
+                <div class="input-group password-field">
                     <i class="fas fa-lock input-icon"></i>
                     <input 
                         type="password" 
@@ -278,6 +299,7 @@
                         placeholder="Digite sua senha"
                         required
                     >
+                    <i class="fas fa-eye password-toggle" id="togglePassword" title="Mostrar senha"></i>
                 </div>
             </div>
             
@@ -293,17 +315,63 @@
             </button>
         </form>
         
-        <!-- Footer -->
+        <!-- Credenciais de Teste -->
         <div class="login-footer">
-            <p>
-                <strong>Demonstração</strong><br>
-                Usuário: <code>admin</code><br>
-                Senha: <code>admin</code>
+            {% comment %} <div style="background-color: #f8f9fa; border-radius: 6px; padding: 0.8rem; margin-bottom: 1rem; font-size: 0.85rem;">
+                <style>
+                    .cred-line { display: flex; justify-content: space-between; align-items: center; padding: 0.3rem 0; border-bottom: 1px solid #e0e0e0; }
+                    .cred-line:last-child { border-bottom: none; }
+                    .cred-role { background: #0097a7; color: white; padding: 0.2rem 0.5rem; border-radius: 3px; font-size: 0.7rem; font-weight: 600; margin: 0.3rem 0; }
+                    .cred-code { background: #fff; border: 1px solid #ddd; padding: 0.15rem 0.4rem; border-radius: 2px; font-family: monospace; color: #e74c3c; font-size: 0.8rem; font-weight: 500; }
+                </style>
+                
+                <div class="cred-role"><i class="fas fa-graduation-cap"></i> Aluno</div>
+                <div class="cred-line"><span>aluno.teste</span><span class="cred-code">aluno123</span></div>
+                
+                <div class="cred-role"><i class="fas fa-chalkboard-user"></i> Monitor</div>
+                <div class="cred-line"><span>monitor.teste</span><span class="cred-code">monitor123</span></div>
+                
+                <div class="cred-role"><i class="fas fa-user-tie"></i> Professor</div>
+                <div class="cred-line"><span>professor.teste</span><span class="cred-code">professor123</span></div>
+                
+                <div class="cred-role"><i class="fas fa-lock"></i> Admin</div>
+                <div class="cred-line"><span>admin</span><span class="cred-code">admin123</span></div>
+            </div> {% endcomment %}
+            
+            <p style="text-align: center; color: #7f8c8d; font-size: 0.85rem;">
+                Não tem conta? <a href="{% url 'register' %}" style="color: #0097a7; text-decoration: none; font-weight: 600;"><i class="fas fa-user-plus"></i> Crie aqui</a>
             </p>
-        </div>
     </div>
     
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Toggle de visualização de senha -->
+    <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        
+        togglePassword.addEventListener('click', function() {
+            // Toggle do tipo de input
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Toggle do ícone
+            if (type === 'password') {
+                this.classList.remove('fa-eye-slash');
+                this.classList.add('fa-eye');
+                this.setAttribute('title', 'Mostrar senha');
+            } else {
+                this.classList.remove('fa-eye');
+                this.classList.add('fa-eye-slash');
+                this.setAttribute('title', 'Ocultar senha');
+            }
+        });
+        
+        // Manter o foco no input após clicar no ícone
+        togglePassword.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+        });
+    </script>
 </body>
 </html>

@@ -48,6 +48,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'plataforma_Casa.context_processors.user_groups',  # Adiciona grupos do usuário
             ],
         },
     },
@@ -67,6 +68,12 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+
+# Authentication Backends - permite login com email ou username
+AUTHENTICATION_BACKENDS = [
+    'plataforma_Casa.backends.EmailOrUsernameModelBackend',  # Backend customizado
+    'django.contrib.auth.backends.ModelBackend',  # Backend padrão (fallback)
+]
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -96,6 +103,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Media files (uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

@@ -116,13 +116,14 @@ def requer_professor(view_func):
 # ==================== AUTENTICAÇÃO ====================
 def login_view(request):
     """
-    View de Login - Autentica usuários
+    View de Login - Autentica usuários com username ou email
+    Backend customizado (EmailOrUsernameModelBackend) permite ambos
     """
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
         
-        # Autenticar usuário
+        # O backend customizado tentará autenticar com username ou email
         user = authenticate(request, username=username, password=password)
         
         if user is not None:
