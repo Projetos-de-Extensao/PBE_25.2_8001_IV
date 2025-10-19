@@ -1543,12 +1543,13 @@ def minhas_inscricoes(request):
     return render(request, 'inscricoes/minhas_inscricoes.html', context)
 
 
-@requer_aluno
+@requer_grupo('Aluno', 'Monitor')
 def participando_monitorias(request):
     """
-    View para ALUNO ver monitorias que está participando (como aluno)
+    View para ALUNO/MONITOR ver monitorias que está participando (como aluno)
     
-    Mostra todas as monitorias em que o aluno está inscrito e aprovado
+    Mostra todas as monitorias em que o aluno/monitor está inscrito e aprovado
+    Monitores podem participar de monitorias de outras disciplinas como alunos
     """
     participacoes = []
     try:
@@ -1578,12 +1579,13 @@ def participando_monitorias(request):
     return render(request, 'monitorias/participando.html', context)
 
 
-@requer_aluno
+@requer_grupo('Aluno', 'Monitor')
 def monitorias_disponiveis(request):
     """
-    View para ALUNO ver todas as monitorias disponíveis para participar
+    View para ALUNO/MONITOR ver todas as monitorias disponíveis para participar
     
     Similar ao portal de vagas, mas mostra turmas específicas (não vagas)
+    Monitores podem participar de monitorias de outras disciplinas como alunos
     """
     turmas = Turma.objects.filter(ativo=True).select_related('vaga', 'monitor', 'curso', 'sala').order_by('-vaga__nome')
     
@@ -1617,12 +1619,13 @@ def monitorias_disponiveis(request):
 
 
 @login_required
-@requer_aluno
+@requer_grupo('Aluno', 'Monitor')
 def participar_monitoria(request, turma_id):
     """
-    ✨ View para ALUNO se INSCREVER/PARTICIPAR de uma monitoria
+    ✨ View para ALUNO/MONITOR se INSCREVER/PARTICIPAR de uma monitoria
     
-    Cria uma ParticipacaoMonitoria entre o aluno e a turma
+    Cria uma ParticipacaoMonitoria entre o aluno/monitor e a turma
+    Monitores podem participar de monitorias de outras disciplinas como alunos
     """
     turma = get_object_or_404(Turma, id=turma_id, ativo=True)
     
