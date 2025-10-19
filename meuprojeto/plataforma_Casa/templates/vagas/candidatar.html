@@ -18,7 +18,7 @@
 
     /* Page Header */
     .page-header {
-        background: var(--color-success);
+        background: var(--color-primary-dark);
         color: var(--color-off-white);
         padding: 2rem;
         border-radius: 8px 8px 0 0;
@@ -46,7 +46,7 @@
 
     /* Vaga Info Box */
     .vaga-info-box {
-        background: linear-gradient(135deg, rgba(18, 69, 255, 0.08) 0%, rgba(40, 167, 69, 0.08) 100%);
+        background: linear-gradient(135deg, rgba(18, 69, 255, 0.08) 0%, rgba(0, 37, 85, 0.08) 100%);
         border: 2px solid var(--color-primary-light);
         border-radius: 8px;
         padding: 1.5rem;
@@ -197,8 +197,8 @@
 
     /* Checkbox */
     .termo-aceite {
-        background: rgba(40, 167, 69, 0.08);
-        border: 2px solid var(--color-success);
+        background: rgba(18, 69, 255, 0.08);
+        border: 2px solid var(--color-primary-light);
         border-radius: 8px;
         padding: 1.25rem;
         margin-bottom: 1.5rem;
@@ -208,13 +208,13 @@
         width: 1.25rem;
         height: 1.25rem;
         margin-right: 0.75rem;
-        border: 2px solid var(--color-success);
+        border: 2px solid var(--color-primary-light);
         cursor: pointer;
     }
 
     .form-check-input:checked {
-        background-color: var(--color-success);
-        border-color: var(--color-success);
+        background-color: var(--color-primary-light);
+        border-color: var(--color-primary-light);
     }
 
     .form-check-label {
@@ -239,16 +239,16 @@
     }
 
     .btn-submit {
-        background: var(--color-success);
+        background: var(--color-primary-light);
         color: white;
         width: 100%;
         margin-bottom: 0.75rem;
     }
 
     .btn-submit:hover {
-        background: #218838;
+        background: var(--color-primary-dark);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        box-shadow: 0 4px 12px rgba(18, 69, 255, 0.3);
     }
 
     .btn-voltar {
@@ -504,8 +504,8 @@ document.querySelectorAll('input[type="file"]').forEach(input => {
     input.addEventListener('change', function() {
         const parent = this.closest('.form-group-upload');
         if (this.files && this.files.length > 0) {
-            parent.style.borderColor = '#28a745';
-            parent.style.backgroundColor = 'rgba(40, 167, 69, 0.05)';
+            parent.style.borderColor = '#1245FF';
+            parent.style.backgroundColor = 'rgba(18, 69, 255, 0.05)';
         } else {
             parent.style.borderColor = '';
             parent.style.backgroundColor = '';
