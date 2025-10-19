@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Meus Alunos - Monitor{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-4">
+                <i class="fas fa-chalkboard-user"></i> Meus Alunos
+            </h1>
+            <p class="lead">Alunos que estão participando de suas monitorias</p>
+        </div>
+    </div>
+
+    <!-- Resumo por Turma -->
+    {% if turmas %}
+    <div class="row mb-4">
+        {% for turma in turmas %}
+        <div class="col-md-4 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">{{ turma.nome }}</h5>
+                    <p class="text-muted mb-0">{{ turma.vaga.nome }}</p>
+                    <hr>
+                    <div class="display-6 text-primary">
+                        {{ participacoes|length }}
+                    </div>
+                    <small class="text-muted">alunos participando</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Lista Completa de Alunos por Turma -->
+    <div class="row">
+        <div class="col-md-12">
+            {% if participacoes %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Aluno</th>
+                            <th>Matrícula</th>
+                            <th>Turma</th>
+                            <th>Disciplina</th>
+                            <th>Período</th>
+                            <th>CR</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for participacao in participacoes %}
+                        <tr>
+                            <td>
+                                <i class="fas fa-user-circle"></i> {{ participacao.aluno.nome }}
+                            </td>
+                            <td>{{ participacao.aluno.matricula }}</td>
+                            <td>{{ participacao.turma.nome }}</td>
+                            <td>{{ participacao.turma.curso.nome }}</td>
+                            <td>{{ participacao.aluno.periodo }}º</td>
+                            <td>
+                                {% if participacao.aluno.cr_geral >= 7 %}
+                                    <span class="badge bg-success">{{ participacao.aluno.cr_geral }}</span>
+                                {% elif participacao.aluno.cr_geral >= 5 %}
+                                    <span class="badge bg-warning">{{ participacao.aluno.cr_geral }}</span>
+                                {% else %}
+                                    <span class="badge bg-danger">{{ participacao.aluno.cr_geral }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-info" data-bs-toggle="modal" 
+                                        data-bs-target="#alunoModal{{ participacao.id }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Modal com Detalhes do Aluno -->
+                        <div class="modal fade" id="alunoModal{{ participacao.id }}" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-primary text-white">
+                                        <h5 class="modal-title" style="color: #fafaf8;">{{ participacao.aluno.nome }}</h5>
+                                        <button type="button" class="btn-close btn-close-white" 
+                                                data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <h6 class="text-muted">Matrícula</h6>
+                                            <p><strong>{{ participacao.aluno.matricula }}</strong></p>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <h6 class="text-muted">Curso</h6>
+                                                <p><strong>{{ participacao.aluno.curso.nome }}</strong></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6 class="text-muted">Período</h6>
+                                                <p><strong>{{ participacao.aluno.periodo }}º</strong></p>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <h6 class="text-muted">CR Geral</h6>
+                                                <p>
+                                                    {% if participacao.aluno.cr_geral >= 7 %}
+                                                        <strong class="text-success">{{ participacao.aluno.cr_geral }}</strong>
+                                                    {% elif participacao.aluno.cr_geral >= 5 %}
+                                                        <strong class="text-warning">{{ participacao.aluno.cr_geral }}</strong>
+                                                    {% else %}
+                                                        <strong class="text-danger">{{ participacao.aluno.cr_geral }}</strong>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6 class="text-muted">Email</h6>
+                                                <p><small>{{ participacao.aluno.email }}</small></p>
+                                            </div>
+                                        </div>
+
+                                        <hr>
+
+                                        <div class="mb-3">
+                                            <h6 class="text-muted">Turma de Monitoria</h6>
+                                            <p><strong>{{ participacao.turma.nome }}</strong></p>
+                                            <small class="text-muted">{{ participacao.turma.vaga.nome }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle"></i>
+                <strong>Nenhum aluno encontrado</strong>
+                <p class="mb-0">Você ainda não tem alunos participando de suas monitorias.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}
