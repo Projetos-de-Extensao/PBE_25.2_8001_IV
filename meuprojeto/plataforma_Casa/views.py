@@ -878,7 +878,13 @@ def detalhe_candidato(request, inscricao_id):
 def avaliar_candidato(request, inscricao_id):
     """
     View para aprovar/reprovar candidato
+    
+    Quando um candidato é APROVADO:
+    1. Atualiza status da inscrição para 'Aprovado'
+    2. Adiciona o aluno ao relacionamento ManyToMany da vaga (vaga.monitores)
+    3. Adiciona o User do Django ao grupo "Monitor"
     """
+    User = get_user_model()
     inscricao = get_object_or_404(Inscricao, id=inscricao_id)
     
     if request.method == 'POST':
@@ -888,8 +894,36 @@ def avaliar_candidato(request, inscricao_id):
             # Atualizar status baseado na ação
             if acao == 'aprovar':
                 inscricao.status = 'Aprovado'
+                
+                # 1. Adicionar aluno aos monitores da vaga
+                inscricao.vaga.monitores.add(inscricao.aluno)
+                
+                # 2. Adicionar usuário ao grupo "Monitor"
+                try:
+                    # Buscar User pelo email do aluno
+                    user = User.objects.get(email=inscricao.aluno.email)
+                    grupo_monitor, _ = Group.objects.get_or_create(name='Monitor')
+                    user.groups.add(grupo_monitor)
+                    user.save()
+                    print(f"✅ User {user.username} adicionado ao grupo Monitor")
+                except User.DoesNotExist:
+                    print(f"⚠️ User não encontrado para email: {inscricao.aluno.email}")
+                except Exception as e:
+                    print(f"❌ Erro ao adicionar ao grupo Monitor: {e}")
+                
             elif acao == 'reprovar':
                 inscricao.status = 'Não Aprovado'
+                
+                # Remover do grupo Monitor se estava aprovado antes
+                try:
+                    user = User.objects.get(email=inscricao.aluno.email)
+                    grupo_monitor = Group.objects.get(name='Monitor')
+                    user.groups.remove(grupo_monitor)
+                    # Remover da lista de monitores da vaga
+                    inscricao.vaga.monitores.remove(inscricao.aluno)
+                except (User.DoesNotExist, Group.DoesNotExist):
+                    pass
+                
             elif acao == 'entrevista':
                 inscricao.status = 'Entrevista'
             
@@ -897,6 +931,7 @@ def avaliar_candidato(request, inscricao_id):
             
             return redirect('detalhe_vaga', vaga_id=inscricao.vaga.id)
         except Exception as e:
+            print(f"❌ Erro ao avaliar candidato: {e}")
             pass
     
     context = {
