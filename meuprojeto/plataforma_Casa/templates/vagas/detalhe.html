@@ -1,0 +1,858 @@
+{% extends 'base.html' %}
+{% block title %}{{ vaga.nome }} - Candidatos{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Header da Página */
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    
+    .page-header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #002555;
+        margin: 0 0 0.5rem 0;
+    }
+    
+    .page-header p {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+    
+    .breadcrumb {
+        background: transparent;
+        padding: 0 0 1rem 0;
+        margin: 0;
+        font-size: 0.875rem;
+    }
+    
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "/";
+        color: #6c757d;
+    }
+    
+    .breadcrumb-item a {
+        color: #002555;
+        text-decoration: none;
+    }
+    
+    .breadcrumb-item.active {
+        color: #6c757d;
+        font-weight: 600;
+    }
+    
+    /* Botão Voltar */
+    .btn-voltar {
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.65rem 1.25rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-voltar:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.25);
+        color: white;
+        text-decoration: none;
+    }
+    
+    /* Cards de Estatísticas */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.25rem;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.08);
+        border-left: 4px solid;
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.12);
+    }
+    
+    .stat-card.total {
+        border-left-color: #002555;
+    }
+    
+    .stat-card.pendente {
+        border-left-color: #F5AC00;
+    }
+    
+    .stat-card.entrevista {
+        border-left-color: #17a2b8;
+    }
+    
+    .stat-card.aprovado {
+        border-left-color: #28a745;
+    }
+    
+    .stat-card.rejeitado {
+        border-left-color: #dc3545;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 0.25rem;
+        line-height: 1;
+    }
+    
+    .stat-card.total .stat-number {
+        color: #002555;
+    }
+    
+    .stat-card.pendente .stat-number {
+        color: #F5AC00;
+    }
+    
+    .stat-card.entrevista .stat-number {
+        color: #17a2b8;
+    }
+    
+    .stat-card.aprovado .stat-number {
+        color: #28a745;
+    }
+    
+    .stat-card.rejeitado .stat-number {
+        color: #dc3545;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Container de Candidatos */
+    .candidatos-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.08);
+        border: 1px solid rgba(0, 37, 85, 0.06);
+    }
+    
+    .candidatos-header {
+        background: linear-gradient(135deg, #002555, #003d7a);
+        color: white;
+        padding: 1.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    /* Lista de Candidatos */
+    .candidatos-list {
+        padding: 1.5rem;
+    }
+    
+    .candidato-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .candidato-card:hover {
+        background: white;
+        border-color: #002555;
+        transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.1);
+    }
+    
+    .candidato-card:last-child {
+        margin-bottom: 0;
+    }
+    
+    .candidato-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .candidato-info h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #002555;
+        margin: 0 0 0.25rem 0;
+    }
+    
+    .candidato-info p {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin: 0;
+    }
+    
+    /* Badge de Status Clicável */
+    .candidato-status {
+        padding: 0.6rem 1.25rem;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        position: relative;
+    }
+    
+    .candidato-status:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .candidato-status::after {
+        content: '\f0d7';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        margin-left: 0.5rem;
+        font-size: 0.9em;
+    }
+    
+    .candidato-status.pendente {
+        background: #fff3cd;
+        color: #856404;
+        border-color: #F5AC00;
+    }
+    
+    .candidato-status.entrevista {
+        background: #d1ecf1;
+        color: #0c5460;
+        border-color: #17a2b8;
+    }
+    
+    .candidato-status.aprovado {
+        background: #d4edda;
+        color: #155724;
+        border-color: #28a745;
+    }
+    
+    .candidato-status.nao-aprovado {
+        background: #f8d7da;
+        color: #721c24;
+        border-color: #dc3545;
+    }
+    
+    .candidato-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #495057;
+    }
+    
+    .detail-item i {
+        color: #F5AC00;
+        width: 16px;
+    }
+    
+    .candidato-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-action {
+        padding: 0.6rem 1.25rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-ver {
+        background: #002555;
+        color: white;
+    }
+    
+    .btn-ver:hover {
+        background: #003d7a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 37, 85, 0.2);
+        color: white;
+    }
+    
+    .btn-avaliar {
+        background: #28a745;
+        color: white;
+    }
+    
+    .btn-avaliar:hover {
+        background: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+        color: white;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #002555;
+        opacity: 0.2;
+        margin-bottom: 1.5rem;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.25rem;
+        color: #002555;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    /* Mini Modal Minimalista */
+    .status-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        animation: fadeIn 0.2s ease;
+    }
+    
+    .status-modal-overlay.show {
+        display: flex;
+    }
+    
+    .status-modal {
+        background: white;
+        border-radius: 16px;
+        padding: 1.75rem;
+        width: 90%;
+        max-width: 320px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.25s ease;
+        position: relative;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    .status-modal-header {
+        margin-bottom: 1.25rem;
+        text-align: center;
+    }
+    
+    .status-modal-header h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #002555;
+        margin: 0 0 0.25rem 0;
+    }
+    
+    .status-modal-header p {
+        font-size: 0.8125rem;
+        color: #6c757d;
+        margin: 0;
+    }
+    
+    .status-modal-close {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        background: none;
+        border: none;
+        font-size: 1.25rem;
+        color: #6c757d;
+        cursor: pointer;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+    
+    .status-modal-close:hover {
+        background: #f8f9fa;
+        color: #002555;
+    }
+    
+    .status-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .status-option {
+        padding: 0.875rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: #f8f9fa;
+        border: none;
+        color: #495057;
+        font-size: 0.9375rem;
+        font-weight: 500;
+    }
+    
+    .status-option:hover {
+        background: #e9ecef;
+        transform: translateX(4px);
+    }
+    
+    .status-option:active {
+        transform: translateX(2px);
+    }
+    
+    .status-option i {
+        font-size: 1rem;
+        width: 20px;
+        text-align: center;
+    }
+    
+
+    
+    /* Botões de Status Clicáveis */
+    .status-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .status-btn {
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        border: 2px solid;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        position: relative;
+    }
+    
+    .status-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .status-btn:active {
+        transform: scale(0.95);
+    }
+    
+    /* Status: Pendente */
+    .status-btn.pendente {
+        border-color: #F5AC00;
+        color: #856404;
+    }
+    
+    .status-btn.pendente:hover {
+        background: #fff3cd;
+    }
+    
+    .status-btn.pendente.active {
+        background: #F5AC00;
+        color: white;
+        box-shadow: 0 4px 12px rgba(245, 172, 0, 0.4);
+    }
+    
+    /* Status: Entrevista */
+    .status-btn.entrevista {
+        border-color: #17a2b8;
+        color: #0c5460;
+    }
+    
+    .status-btn.entrevista:hover {
+        background: #d1ecf1;
+    }
+    
+    .status-btn.entrevista.active {
+        background: #17a2b8;
+        color: white;
+        box-shadow: 0 4px 12px rgba(23, 162, 184, 0.4);
+    }
+    
+    /* Status: Aprovado */
+    .status-btn.aprovado {
+        border-color: #28a745;
+        color: #155724;
+    }
+    
+    .status-btn.aprovado:hover {
+        background: #d4edda;
+    }
+    
+    .status-btn.aprovado.active {
+        background: #28a745;
+        color: white;
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+    }
+    
+    /* Status: Não Aprovado */
+    .status-btn.rejeitado {
+        border-color: #dc3545;
+        color: #721c24;
+    }
+    
+    .status-btn.rejeitado:hover {
+        background: #f8d7da;
+    }
+    
+    .status-btn.rejeitado.active {
+        background: #dc3545;
+        color: white;
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+    }
+    
+    /* Loading state */
+    .status-btn.loading {
+        pointer-events: none;
+        opacity: 0.6;
+    }
+    
+    .status-btn.loading i {
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'listar_vagas' %}">Vagas</a></li>
+        <li class="breadcrumb-item active">{{ vaga.nome }}</li>
+    </ol>
+</nav>
+
+<div class="page-header">
+    <div class="page-header-top">
+        <div>
+            <h1>{{ vaga.nome }}</h1>
+            <p>{{ vaga.curso.nome }} • Coordenador: {{ vaga.coordenador.nome }}</p>
+        </div>
+        <a href="{% url 'listar_vagas' %}" class="btn-voltar">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+</div>
+
+<!-- Estatísticas -->
+<div class="stats-grid">
+    <div class="stat-card total">
+        <div class="stat-number">{{ total_inscricoes }}</div>
+        <div class="stat-label">Total de Inscrições</div>
+    </div>
+    <div class="stat-card pendente">
+        <div class="stat-number">{{ pendentes }}</div>
+        <div class="stat-label">Pendentes</div>
+    </div>
+    <div class="stat-card entrevista">
+        <div class="stat-number">{{ entrevista }}</div>
+        <div class="stat-label">Entrevista</div>
+    </div>
+    <div class="stat-card aprovado">
+        <div class="stat-number">{{ aprovados }}</div>
+        <div class="stat-label">Aprovados</div>
+    </div>
+    <div class="stat-card rejeitado">
+        <div class="stat-number">{{ rejeitados }}</div>
+        <div class="stat-label">Rejeitados</div>
+    </div>
+</div>
+
+<!-- Lista de Candidatos -->
+<div class="candidatos-container">
+    <div class="candidatos-header">
+        <i class="fas fa-users"></i>
+        Candidatos Inscritos
+    </div>
+    
+    {% if inscricoes %}
+    <div class="candidatos-list">
+        {% for inscricao in inscricoes %}
+        <div class="candidato-card" data-inscricao-id="{{ inscricao.id }}">
+            <div class="candidato-header">
+                <div class="candidato-info">
+                    <h3>{{ inscricao.aluno.nome }}</h3>
+                    <p>{{ inscricao.aluno.curso.nome }} • Matrícula: {{ inscricao.aluno.matricula }}</p>
+                </div>
+                
+                <!-- Badge de Status Clicável -->
+                <span class="candidato-status {% if inscricao.status == 'Pendente' %}pendente{% elif inscricao.status == 'Entrevista' %}entrevista{% elif inscricao.status == 'Aprovado' %}aprovado{% else %}nao-aprovado{% endif %}" 
+                      data-inscricao-id="{{ inscricao.id }}"
+                      data-status-atual="{{ inscricao.status }}">
+                    {{ inscricao.status }}
+                </span>
+            </div>
+            
+            <div class="candidato-details">
+                <div class="detail-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>Inscrito em: {{ inscricao.data_inscricao|date:"d/m/Y" }}</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Período: {{ inscricao.aluno.periodo }}º</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>CR: {{ inscricao.aluno.cr_geral }}</span>
+                </div>
+                {% if inscricao.nota_avaliacao %}
+                <div class="detail-item">
+                    <i class="fas fa-star"></i>
+                    <span>Nota: {{ inscricao.nota_avaliacao }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="candidato-actions">
+                <a href="{% url 'detalhe_candidato' inscricao.id %}" class="btn-action btn-ver">
+                    <i class="fas fa-eye"></i> Ver Perfil Completo
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-user-slash"></i>
+        <h3>Nenhum Candidato Inscrito</h3>
+        <p>Esta vaga ainda não recebeu inscrições.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Mini Modal de Status -->
+<div class="status-modal-overlay" id="statusModal">
+    <div class="status-modal">
+        <button class="status-modal-close" id="closeModal">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="status-modal-header">
+            <h3>Alterar Status</h3>
+            <p id="candidatoNome">Selecione o novo status</p>
+        </div>
+        
+        <div class="status-options">
+            <button class="status-option" data-status="Pendente">
+                <i class="fas fa-clock"></i>
+                <span>Pendente</span>
+            </button>
+            
+            <button class="status-option" data-status="Entrevista">
+                <i class="fas fa-comments"></i>
+                <span>Entrevista</span>
+            </button>
+            
+            <button class="status-option" data-status="Aprovado">
+                <i class="fas fa-check-circle"></i>
+                <span>Aprovado</span>
+            </button>
+            
+            <button class="status-option" data-status="Não Aprovado">
+                <i class="fas fa-times-circle"></i>
+                <span>Não Aprovado</span>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let inscricaoAtualId = null;
+
+    // Inicializa os event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('statusModal');
+        const closeBtn = document.getElementById('closeModal');
+        
+        // Event listeners para os badges de status
+        const badges = document.querySelectorAll('.candidato-status');
+        badges.forEach(badge => {
+            badge.addEventListener('click', function() {
+                inscricaoAtualId = this.getAttribute('data-inscricao-id');
+                abrirModal();
+            });
+        });
+        
+        // Event listeners para as opções do modal
+        const opcoes = document.querySelectorAll('.status-option');
+        opcoes.forEach(opcao => {
+            opcao.addEventListener('click', function() {
+                const novoStatus = this.getAttribute('data-status');
+                mudarStatus(novoStatus);
+            });
+        });
+        
+        // Fechar modal
+        closeBtn.addEventListener('click', fecharModal);
+        
+        // Fechar ao clicar no overlay
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                fecharModal();
+            }
+        });
+        
+        // Fechar com ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                fecharModal();
+            }
+        });
+    });
+
+    function abrirModal() {
+        const modal = document.getElementById('statusModal');
+        modal.classList.add('show');
+    }
+
+    function fecharModal() {
+        const modal = document.getElementById('statusModal');
+        modal.classList.remove('show');
+        inscricaoAtualId = null;
+    }
+
+    function mudarStatus(novoStatus) {
+        if (!inscricaoAtualId) {
+            alert('Erro: Nenhum candidato selecionado');
+            return;
+        }
+
+        // Desabilita os botões durante o processamento
+        const opcoes = document.querySelectorAll('.status-option');
+        opcoes.forEach(op => op.disabled = true);
+
+        fetch(`/candidatos/${inscricaoAtualId}/status/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ status: novoStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                fecharModal();
+                setTimeout(() => location.reload(), 600);
+            } else {
+                opcoes.forEach(op => op.disabled = false);
+                alert('Erro: ' + (data.error || 'Erro desconhecido'));
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            opcoes.forEach(op => op.disabled = false);
+            alert('Erro ao atualizar status. Tente novamente.');
+        });
+    }
+
+    function mostrarNotificacao(tipo, mensagem) {
+        const notif = document.createElement('div');
+        notif.className = `alert alert-${tipo === 'success' ? 'success' : 'danger'} position-fixed top-0 start-50 translate-middle-x mt-3`;
+        notif.style.zIndex = '10000';
+        notif.style.minWidth = '300px';
+        notif.innerHTML = `
+            <i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+            ${mensagem}
+        `;
+        document.body.appendChild(notif);
+        setTimeout(() => notif.remove(), 3000);
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}
