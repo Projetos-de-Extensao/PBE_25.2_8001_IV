@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+
+{% block title %}Meus Registros de Horas{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-dark: #002555;
+        --primary-light: #1245FF;
+        --accent-gold: #F5AC00;
+        --success-green: #28a745;
+        --warning-orange: #ff9800;
+        --danger-red: #dc3545;
+    }
+
+    /* Header minimalista */
+    .page-header {
+        background: linear-gradient(135deg, #0b2f5c 0%, var(--primary-light) 100%);
+        color: #fafaf8;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        box-shadow: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .page-header h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+        color: #fafaf8;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .page-header p {
+        font-size: 0.95rem;
+        margin-bottom: 0;
+        opacity: 0.95;
+        color: #fafaf8;
+    }
+
+    /* KPI Cards minimalistas */
+    .kpi-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.25rem;
+        border: 1px solid #e9edf5;
+        box-shadow: none;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .kpi-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--accent-gold);
+    }
+
+    .kpi-card.success::before {
+        background: var(--success-green);
+    }
+
+    .kpi-card.warning::before {
+        background: var(--warning-orange);
+    }
+
+    .kpi-card.danger::before {
+        background: var(--danger-red);
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+    }
+
+    .kpi-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .kpi-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--primary-dark);
+    }
+
+    /* Content card */
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e9edf5;
+        box-shadow: none;
+        overflow: hidden;
+    }
+
+    .content-card-header {
+        background: #f7f9fc;
+        padding: 1.25rem;
+        border-bottom: 1px solid #e9edf5;
+    }
+
+    .content-card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Tabela minimalista */
+    .table {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .table thead {
+        background: #f7f9fc;
+        color: var(--primary-dark);
+        border-bottom: 1px solid #e9edf5;
+    }
+
+    .table thead th {
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.8rem;
+    }
+
+    .table tbody td {
+        border: none;
+        padding: 0.9rem 1rem;
+        border-bottom: 1px solid #f0f3f8;
+        vertical-align: middle;
+    }
+
+    .table tbody tr:hover {
+        background: #f9fbff;
+    }
+
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Badges minimalistas */
+    .badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-success {
+        background: rgba(40, 167, 69, 0.15);
+        color: var(--success-green);
+    }
+
+    .badge-warning {
+        background: rgba(255, 152, 0, 0.15);
+        color: #f57c00;
+    }
+
+    .badge-danger {
+        background: rgba(220, 53, 69, 0.15);
+        color: var(--danger-red);
+    }
+
+    /* Botões */
+    .btn-primary {
+        background: linear-gradient(135deg, #0b2f5c 0%, var(--primary-light) 100%);
+        color: #fafaf8;
+        border: none;
+        padding: 0.7rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(0, 37, 85, 0.15);
+    }
+
+    .btn-info {
+        background: rgba(23, 162, 184, 0.1);
+        color: #17a2b8;
+        border: 1px solid rgba(23, 162, 184, 0.2);
+    }
+
+    .btn-info:hover {
+        background: #17a2b8;
+        color: white;
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #64748b;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        opacity: 0.3;
+        margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 1.5rem 0;">
+    <!-- Header -->
+    <div class="page-header">
+        <div>
+            <h1>
+                <i class="fas fa-history"></i> Meus Registros de Horas
+            </h1>
+            <p>Acompanhe seu histórico de horas trabalhadas</p>
+        </div>
+        <div>
+            <a href="{% url 'registrar_horas' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Novo Registro
+            </a>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="kpi-card success">
+                <div class="kpi-label">Horas Aprovadas</div>
+                <div class="kpi-value">1h</div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="kpi-card warning">
+                <div class="kpi-label">Horas Pendentes</div>
+                <div class="kpi-value">0h</div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="kpi-card danger">
+                <div class="kpi-label">Horas Rejeitadas</div>
+                <div class="kpi-value">0h</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de Registros -->
+    <div class="row">
+        <div class="col-12">
+            <div class="content-card">
+                <div class="content-card-header">
+                    <h5 class="content-card-title">
+                        <i class="fas fa-list"></i> Histórico Completo
+                    </h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Turma</th>
+                                <th>Horário</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Validador</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for registro in registros %}
+                            <tr>
+                                <td>{{ registro.data|date:"d/m/Y" }}</td>
+                                <td>{{ registro.turma.nome }}</td>
+                                <td>
+                                    {{ registro.hora_inicio|time:"H:i" }} - 
+                                    {{ registro.hora_fim|time:"H:i" }}
+                                </td>
+                                <td>
+                                    <strong>{{ registro.total_horas }}h</strong>
+                                </td>
+                                <td>
+                                    {% if registro.status == 'Aprovado' %}
+                                        <span class="badge badge-success">
+                                            <i class="fas fa-check"></i> Aprovado
+                                        </span>
+                                    {% elif registro.status == 'Rejeitado' %}
+                                        <span class="badge badge-danger">
+                                            <i class="fas fa-times"></i> Rejeitado
+                                        </span>
+                                    {% else %}
+                                        <span class="badge badge-warning">
+                                            <i class="fas fa-clock"></i> Pendente
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if registro.validado_por %}
+                                        {{ registro.validado_por.nome }}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'detalhes_registro' registro.id %}" 
+                                       class="btn btn-sm btn-info" 
+                                       title="Ver detalhes">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">
+                                            <i class="fas fa-inbox"></i>
+                                        </div>
+                                        <p>Nenhum registro de horas encontrado</p>
+                                        <a href="{% url 'registrar_horas' %}" class="btn btn-primary mt-2">
+                                            <i class="fas fa-plus"></i> Criar primeiro registro
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
