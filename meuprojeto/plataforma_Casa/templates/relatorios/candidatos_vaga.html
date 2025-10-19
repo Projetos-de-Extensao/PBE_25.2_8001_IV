@@ -1,0 +1,577 @@
+{% extends 'base.html' %}
+
+{% block title %}Relatório de Candidatos por Vaga - Plataforma Casa{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Core Colors - Paleta do Sistema */
+    :root {
+        --color-primary-dark: #002555;
+        --color-primary-light: #1245FF;
+        --color-accent: #F5AC00;
+        --color-success: #28a745;
+        --color-danger: #dc3545;
+        --color-warning: #ffc107;
+        --color-gray-light: #f8f9fa;
+        --color-gray-border: #e9ecef;
+        --color-text-muted: #6c757d;
+    }
+
+    /* Page Header */
+    .page-header {
+        border-bottom: 2px solid var(--color-accent);
+        padding-bottom: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        color: var(--color-primary-dark);
+        font-weight: 700;
+        font-size: 2rem;
+    }
+
+    .page-header p {
+        color: var(--color-text-muted);
+        font-weight: 500;
+    }
+
+    /* Export Buttons */
+    .export-buttons {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-export {
+        background: white;
+        border: 2px solid var(--color-primary-light);
+        color: var(--color-primary-light);
+        font-weight: 600;
+        padding: 0.6rem 1.2rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .btn-export:hover {
+        background-color: var(--color-primary-light);
+        color: white;
+        box-shadow: 0 4px 12px rgba(18, 69, 255, 0.3);
+    }
+
+    /* Section Title */
+    .section-title {
+        color: var(--color-primary-dark);
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--color-primary-light);
+        padding-left: 1rem;
+    }
+
+    /* Filter Card */
+    .filter-card {
+        background: white;
+        border: 1px solid var(--color-gray-border);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .filter-card .form-label {
+        color: var(--color-primary-dark);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .filter-card .form-select {
+        border: 1px solid var(--color-gray-border);
+        border-radius: 6px;
+        padding: 0.6rem;
+        color: var(--color-text-muted);
+        transition: all 0.3s ease;
+    }
+
+    .filter-card .form-select:focus {
+        border-color: var(--color-primary-light);
+        box-shadow: 0 0 0 0.2rem rgba(18, 69, 255, 0.1);
+    }
+
+    .filter-card .btn-primary {
+        background-color: var(--color-primary-light);
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .filter-card .btn-primary:hover {
+        background-color: var(--color-primary-dark);
+        box-shadow: 0 4px 12px rgba(18, 69, 255, 0.3);
+    }
+
+    /* Report Card */
+    .report-card {
+        background: white;
+        border: 1px solid var(--color-gray-border);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .report-card-header {
+        background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary-dark) 100%);
+        color: white;
+        padding: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .report-card-header h5 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .report-card-header small {
+        opacity: 0.9;
+    }
+
+    .report-card-body {
+        padding: 1.5rem;
+    }
+
+    /* Vaga Summary */
+    .vaga-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--color-gray-border);
+    }
+
+    .summary-item {
+        text-align: center;
+    }
+
+    .summary-label {
+        color: var(--color-text-muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .summary-value {
+        color: var(--color-primary-dark);
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    /* Table Styles */
+    .table {
+        margin-bottom: 0;
+        border-collapse: collapse;
+    }
+
+    .table thead {
+        background: var(--color-gray-light);
+        border-top: 2px solid var(--color-gray-border);
+        border-bottom: 2px solid var(--color-gray-border);
+    }
+
+    .table thead th {
+        color: var(--color-primary-dark);
+        font-weight: 600;
+        padding: 1rem;
+        border: none;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(18, 69, 255, 0.05);
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-top: 1px solid var(--color-gray-border);
+        color: var(--color-text-muted);
+    }
+
+    /* Badge Styles */
+    .badge {
+        font-weight: 600;
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+
+    .badge.bg-primary {
+        background-color: rgba(18, 69, 255, 0.15) !important;
+        color: var(--color-primary-light);
+    }
+
+    .badge.bg-success {
+        background-color: rgba(40, 167, 69, 0.15) !important;
+        color: var(--color-success);
+    }
+
+    .badge.bg-danger {
+        background-color: rgba(220, 53, 69, 0.15) !important;
+        color: var(--color-danger);
+    }
+
+    .badge.bg-warning {
+        background-color: rgba(255, 193, 7, 0.15) !important;
+        color: #856404;
+    }
+
+    .badge.bg-secondary {
+        background-color: rgba(108, 117, 125, 0.15) !important;
+        color: var(--color-text-muted);
+    }
+
+    /* Footer */
+    .report-footer {
+        text-align: center;
+        color: var(--color-text-muted);
+        font-size: 0.85rem;
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--color-gray-border);
+    }
+
+    /* No Data Alert */
+    .alert-no-data {
+        background-color: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+        border-radius: 8px;
+        color: #856404;
+        padding: 1.5rem;
+    }
+
+    @media print {
+        .btn, .card-body form, .export-buttons, .filter-card {
+            display: none !important;
+        }
+        .report-card { page-break-inside: avoid; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1>
+                    <i class="fas fa-users"></i> Candidatos por Vaga
+                </h1>
+                <p>Visualize todos os candidatos inscritos em cada vaga</p>
+            </div>
+            <div class="export-buttons">
+                <button type="button" class="btn btn-export" onclick="exportarPDF()" title="Exportar como PDF">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </button>
+                <button type="button" class="btn btn-export" onclick="exportarExcel()" title="Exportar como Excel">
+                    <i class="fas fa-file-excel"></i> Excel
+                </button>
+                <button type="button" class="btn btn-export" onclick="window.print()" title="Imprimir">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filter-card">
+        <h6 class="section-title mb-3">
+            <i class="fas fa-filter"></i> Filtrar por Vaga
+        </h6>
+        <form method="get" class="row g-3">
+            <div class="col-md-10">
+                <label for="vaga" class="form-label">Vaga</label>
+                <select name="vaga" id="vaga" class="form-select">
+                    <option value="">Todas as Vagas</option>
+                    {% for vaga in vagas %}
+                    <option value="{{ vaga.id }}" {% if request.GET.vaga|stringformat:"s" == vaga.id|stringformat:"s" %}selected{% endif %}>
+                        {{ vaga.nome }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabela de Candidatos por Vaga -->
+    <div id="conteudo-relatorio">
+        {% for vaga in vagas %}
+        <div class="report-card">
+            <div class="report-card-header">
+                <i class="fas fa-briefcase"></i>
+                <div>
+                    <h5>{{ vaga.nome }}</h5>
+                    <small>{{ vaga.curso.nome }} | {{ vaga.numero_vagas }} vaga(s) | Inscritos: {{ vaga.inscricao_set.count }}</small>
+                </div>
+            </div>
+            <div class="report-card-body">
+                {% if vaga.inscricao_set.exists %}
+                <!-- Resumo da Vaga -->
+                <div class="vaga-summary">
+                    <div class="summary-item">
+                        <div class="summary-label">Total de Candidatos</div>
+                        <div class="summary-value">{{ vaga.inscricao_set.count }}</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Aprovados</div>
+                        <div class="summary-value" style="color: var(--color-success);">
+                            {{ vaga.inscricao_set.all|dictsort:"status"|length }}
+                        </div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Vagas Disponíveis</div>
+                        <div class="summary-value" style="color: var(--color-accent);">
+                            {{ vaga.numero_vagas }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Candidatos -->
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Candidato</th>
+                                <th>Curso</th>
+                                <th>CR</th>
+                                <th>Data Inscrição</th>
+                                <th>Status</th>
+                                <th>Documentos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inscricao in vaga.inscricao_set.all %}
+                            <tr>
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td>
+                                    <strong>{{ inscricao.aluno.nome }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ inscricao.aluno.email }}</small>
+                                </td>
+                                <td>{{ inscricao.aluno.curso.nome }}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary">{{ inscricao.aluno.cr_geral }}</span>
+                                </td>
+                                <td>{{ inscricao.data_inscricao|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    {% if inscricao.status == 'Aprovado' %}
+                                        <span class="badge bg-success"><i class="fas fa-check-circle"></i> {{ inscricao.status }}</span>
+                                    {% elif inscricao.status == 'Rejeitado' %}
+                                        <span class="badge bg-danger"><i class="fas fa-times-circle"></i> {{ inscricao.status }}</span>
+                                    {% elif inscricao.status == 'Lista de Espera' %}
+                                        <span class="badge bg-warning"><i class="fas fa-clock"></i> {{ inscricao.status }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary"><i class="fas fa-hourglass-half"></i> {{ inscricao.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary">
+                                        <i class="fas fa-file"></i> {{ inscricao.documentos.count }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert-no-data">
+                    <i class="fas fa-inbox"></i> Nenhum candidato inscrito nesta vaga
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="alert-no-data">
+            <i class="fas fa-exclamation-triangle"></i>
+            Nenhuma vaga encontrada com os filtros selecionados.
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Rodapé -->
+    <div class="report-footer">
+        <p>
+            <i class="fas fa-calendar-alt"></i>
+            Relatório gerado em {{ now|date:"d/m/Y H:i" }}
+        </p>
+    </div>
+</div>
+
+<!-- Scripts para Exportação -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+function exportarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('l', 'mm', 'a4');
+    
+    // Cabeçalho
+    doc.setFillColor(0, 37, 85);
+    doc.rect(0, 0, 297, 25, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.setFont('Helvetica', 'bold');
+    doc.text('Relatório de Candidatos por Vaga', 14, 15);
+    
+    // Data
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(9);
+    doc.setFont('Helvetica', 'normal');
+    doc.text('Gerado em: ' + new Date().toLocaleString('pt-BR'), 14, 28);
+    
+    let finalY = 32;
+    
+    {% for vaga in vagas %}
+    // Título da Vaga
+    doc.setFontSize(11);
+    doc.setFont('Helvetica', 'bold');
+    doc.setTextColor(18, 69, 255);
+    doc.text('{{ vaga.nome }} - {{ vaga.curso.nome }}', 14, finalY);
+    finalY += 6;
+    
+    // Info da Vaga
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.setFont('Helvetica', 'normal');
+    doc.text('Vagas: {{ vaga.numero_vagas }} | Inscritos: {{ vaga.inscricao_set.count }}', 14, finalY);
+    finalY += 5;
+    
+    // Tabela
+    const dados{{ forloop.counter }} = [
+        {% for inscricao in vaga.inscricao_set.all %}
+        [
+            '{{ forloop.counter }}',
+            '{{ inscricao.aluno.nome }}',
+            '{{ inscricao.aluno.curso.nome }}',
+            '{{ inscricao.aluno.cr_geral }}',
+            '{{ inscricao.data_inscricao|date:"d/m/Y" }}',
+            '{{ inscricao.status }}'
+        ]{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    doc.autoTable({
+        startY: finalY,
+        head: [['#', 'Candidato', 'Curso', 'CR', 'Data', 'Status']],
+        body: dados{{ forloop.counter }},
+        theme: 'striped',
+        headStyles: { 
+            fillColor: [18, 69, 255],
+            textColor: [255, 255, 255],
+            fontStyle: 'bold'
+        },
+        alternateRowStyles: {
+            fillColor: [248, 249, 250]
+        },
+        bodyStyles: {
+            textColor: [60, 60, 60]
+        },
+        styles: { 
+            fontSize: 8,
+            font: 'Helvetica'
+        },
+        margin: { left: 14, right: 14 }
+    });
+    
+    finalY = doc.lastAutoTable.finalY + 12;
+    
+    if (finalY > 200) {
+        doc.addPage();
+        finalY = 20;
+    }
+    {% endfor %}
+    
+    doc.save('relatorio-candidatos-vaga.pdf');
+}
+
+function exportarExcel() {
+    const wb = XLSX.utils.book_new();
+    
+    {% for vaga in vagas %}
+    const data{{ forloop.counter }} = [
+        ['Vaga', '{{ vaga.nome }}'],
+        ['Curso', '{{ vaga.curso.nome }}'],
+        ['Vagas Disponíveis', '{{ vaga.numero_vagas }}'],
+        ['Total de Inscritos', '{{ vaga.inscricao_set.count }}'],
+        [],
+        ['#', 'Candidato', 'Email', 'Curso', 'CR', 'Data Inscrição', 'Status'],
+        {% for inscricao in vaga.inscricao_set.all %}
+        [
+            {{ forloop.counter }},
+            '{{ inscricao.aluno.nome }}',
+            '{{ inscricao.aluno.email }}',
+            '{{ inscricao.aluno.curso.nome }}',
+            {{ inscricao.aluno.cr_geral }},
+            '{{ inscricao.data_inscricao|date:"d/m/Y H:i" }}',
+            '{{ inscricao.status }}'
+        ]{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    const ws{{ forloop.counter }} = XLSX.utils.aoa_to_sheet(data{{ forloop.counter }});
+    
+    // Largura das colunas
+    ws{{ forloop.counter }}['!cols'] = [
+        { wch: 5 },
+        { wch: 25 },
+        { wch: 30 },
+        { wch: 25 },
+        { wch: 8 },
+        { wch: 18 },
+        { wch: 18 }
+    ];
+    
+    XLSX.utils.book_append_sheet(wb, ws{{ forloop.counter }}, '{{ vaga.nome|truncatewords:3 }}'.substring(0, 31));
+    {% endfor %}
+    
+    XLSX.writeFile(wb, 'relatorio-candidatos-vaga.xlsx');
+}
+</script>
+
+
+<style>
+@media print {
+    .btn, .card-body form, .no-print {
+        display: none !important;
+    }
+    
+    .report-card {
+        page-break-inside: avoid;
+        border: 1px solid #000;
+    }
+    
+    .report-card-header {
+        background-color: #1245FF !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+</style>
+{% endblock %}

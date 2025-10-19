@@ -1,0 +1,665 @@
+{% extends 'base.html' %}
+
+{% block title %}Monitores Selecionados - Plataforma Casa{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Core Colors - Paleta do Sistema */
+    :root {
+        --color-primary-dark: #002555;
+        --color-primary-light: #1245FF;
+        --color-accent: #F5AC00;
+        --color-success: #28a745;
+        --color-danger: #dc3545;
+        --color-gray-light: #f8f9fa;
+        --color-gray-border: #e9ecef;
+        --color-text-muted: #6c757d;
+    }
+
+    /* Page Header */
+    .page-header {
+        border-bottom: 2px solid var(--color-accent);
+        padding-bottom: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        color: var(--color-primary-dark);
+        font-weight: 700;
+        font-size: 2rem;
+    }
+
+    .page-header p {
+        color: var(--color-text-muted);
+        font-weight: 500;
+    }
+
+    /* Export Buttons */
+    .export-buttons {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-export {
+        background: white;
+        border: 2px solid var(--color-primary-light);
+        color: var(--color-primary-light);
+        font-weight: 600;
+        padding: 0.6rem 1.2rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .btn-export:hover {
+        background-color: var(--color-primary-light);
+        color: white;
+        box-shadow: 0 4px 12px rgba(18, 69, 255, 0.3);
+    }
+
+    /* Section Title */
+    .section-title {
+        color: var(--color-primary-dark);
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--color-primary-light);
+        padding-left: 1rem;
+    }
+
+    /* KPI Cards */
+    .kpi-card {
+        background: white;
+        border: 1px solid var(--color-gray-border);
+        border-radius: 8px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .kpi-card:hover {
+        box-shadow: 0 6px 16px rgba(0, 37, 85, 0.12);
+        border-color: var(--color-primary-light);
+    }
+
+    .kpi-label {
+        color: var(--color-text-muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .kpi-value {
+        color: var(--color-primary-dark);
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .kpi-icon {
+        font-size: 2rem;
+        opacity: 0.2;
+        margin-top: 0.5rem;
+    }
+
+    /* Filter Card */
+    .filter-card {
+        background: white;
+        border: 1px solid var(--color-gray-border);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .filter-card .form-label {
+        color: var(--color-primary-dark);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .filter-card .form-select {
+        border: 1px solid var(--color-gray-border);
+        border-radius: 6px;
+        padding: 0.6rem;
+        color: var(--color-text-muted);
+        transition: all 0.3s ease;
+    }
+
+    .filter-card .form-select:focus {
+        border-color: var(--color-primary-light);
+        box-shadow: 0 0 0 0.2rem rgba(18, 69, 255, 0.1);
+    }
+
+    .filter-card .btn-primary {
+        background-color: var(--color-primary-light);
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .filter-card .btn-primary:hover {
+        background-color: var(--color-primary-dark);
+        box-shadow: 0 4px 12px rgba(18, 69, 255, 0.3);
+    }
+
+    /* Report Card */
+    .report-card {
+        background: white;
+        border: 1px solid var(--color-gray-border);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .report-card-header {
+        background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary-dark) 100%);
+        color: white;
+        padding: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .report-card-header h5 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .report-card-header i {
+        font-size: 1.5rem;
+        opacity: 0.8;
+    }
+
+    .report-card-body {
+        padding: 1.5rem;
+    }
+
+    /* Table Styles */
+    .table {
+        margin-bottom: 0;
+        border-collapse: collapse;
+    }
+
+    .table thead {
+        background: var(--color-gray-light);
+        border-top: 2px solid var(--color-gray-border);
+        border-bottom: 2px solid var(--color-gray-border);
+    }
+
+    .table thead th {
+        color: var(--color-primary-dark);
+        font-weight: 600;
+        padding: 1rem;
+        border: none;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(18, 69, 255, 0.05);
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-top: 1px solid var(--color-gray-border);
+        color: var(--color-text-muted);
+    }
+
+    /* Badge Styles */
+    .badge {
+        font-weight: 600;
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+
+    .badge.bg-primary {
+        background-color: rgba(18, 69, 255, 0.15) !important;
+        color: var(--color-primary-light);
+    }
+
+    .badge.bg-success {
+        background-color: rgba(40, 167, 69, 0.15) !important;
+        color: var(--color-success);
+    }
+
+    /* Chart Container */
+    .chart-container {
+        background: white;
+        border: 1px solid var(--color-gray-border);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Footer */
+    .report-footer {
+        text-align: center;
+        color: var(--color-text-muted);
+        font-size: 0.85rem;
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--color-gray-border);
+    }
+
+    @media print {
+        .btn, .card-body form, canvas, .export-buttons, .filter-card {
+            display: none !important;
+        }
+        .card { page-break-inside: avoid; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Page Header -->
+    <div class="page-header mb-4">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1>
+                    <i class="fas fa-user-check"></i> Monitores Selecionados
+                </h1>
+                <p>Relatório completo dos monitores aprovados</p>
+            </div>
+            <div class="export-buttons">
+                <button type="button" class="btn btn-export" onclick="exportarPDF()" title="Exportar como PDF">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </button>
+                <button type="button" class="btn btn-export" onclick="exportarExcel()" title="Exportar como Excel">
+                    <i class="fas fa-file-excel"></i> Excel
+                </button>
+                <button type="button" class="btn btn-export" onclick="window.print()" title="Imprimir">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Total de Monitores</div>
+                <div class="kpi-value">{{ inscricoes.count }}</div>
+                <i class="fas fa-users kpi-icon"></i>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Vagas Preenchidas</div>
+                <div class="kpi-value">{{ total_vagas_preenchidas }}</div>
+                <i class="fas fa-check-circle kpi-icon"></i>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Média CR</div>
+                <div class="kpi-value">{{ media_cr|floatformat:2 }}</div>
+                <i class="fas fa-star kpi-icon"></i>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Disciplinas</div>
+                <div class="kpi-value">{{ total_disciplinas }}</div>
+                <i class="fas fa-book kpi-icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filter-card">
+        <h6 class="section-title mb-3">
+            <i class="fas fa-filter"></i> Filtrar Monitores
+        </h6>
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label for="curso" class="form-label">Curso</label>
+                <select name="curso" id="curso" class="form-select">
+                    <option value="">Todos os Cursos</option>
+                    {% for curso in cursos %}
+                    <option value="{{ curso.id }}" {% if request.GET.curso|stringformat:"s" == curso.id|stringformat:"s" %}selected{% endif %}>
+                        {{ curso.nome }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="vaga" class="form-label">Vaga/Disciplina</label>
+                <select name="vaga" id="vaga" class="form-select">
+                    <option value="">Todas as Vagas</option>
+                    {% for vaga in vagas %}
+                    <option value="{{ vaga.id }}" {% if request.GET.vaga|stringformat:"s" == vaga.id|stringformat:"s" %}selected{% endif %}>
+                        {{ vaga.nome }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="ordem" class="form-label">Ordenar por</label>
+                <select name="ordem" id="ordem" class="form-select">
+                    <option value="nome" {% if request.GET.ordem == "nome" %}selected{% endif %}>Nome</option>
+                    <option value="cr" {% if request.GET.ordem == "cr" %}selected{% endif %}>CR (maior)</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabela de Monitores -->
+    <div id="conteudo-relatorio">
+        <div class="report-card">
+            <div class="report-card-header">
+                <i class="fas fa-list"></i>
+                <h5>Lista de Monitores Aprovados</h5>
+            </div>
+            <div class="report-card-body">
+                <div class="table-responsive">
+                    <table class="table" id="tabelaMonitores">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Monitor</th>
+                                <th>Curso</th>
+                                <th>Vaga/Disciplina</th>
+                                <th>CR</th>
+                                <th>Data Aprovação</th>
+                                <th>Contato</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inscricao in inscricoes %}
+                            <tr>
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td>
+                                    <strong>{{ inscricao.aluno.nome }}</strong>
+                                    <br>
+                                    <small class="text-muted">Matrícula: {{ inscricao.aluno.matricula }}</small>
+                                </td>
+                                <td>{{ inscricao.aluno.curso.nome }}</td>
+                                <td>
+                                    <strong>{{ inscricao.vaga.nome }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ inscricao.vaga.disciplina }}</small>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary">{{ inscricao.aluno.cr_geral }}</span>
+                                </td>
+                                <td>{{ inscricao.data_resultado|date:"d/m/Y H:i"|default:"-" }}</td>
+                                <td>
+                                    <i class="fas fa-envelope"></i> {{ inscricao.aluno.email }}
+                                    <br>
+                                    {% if inscricao.aluno.telefone %}
+                                    <i class="fas fa-phone"></i> {{ inscricao.aluno.telefone }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted" style="padding: 2rem;">
+                                    <i class="fas fa-inbox"></i> Nenhum monitor selecionado encontrado
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row mt-4">
+        <div class="col-md-6 mb-4">
+            <div class="chart-container">
+                <div class="section-title mb-3">
+                    <i class="fas fa-chart-pie"></i> Distribuição por Curso
+                </div>
+                <canvas id="graficoCursos"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="chart-container">
+                <div class="section-title mb-3">
+                    <i class="fas fa-chart-bar"></i> Top 5 Disciplinas
+                </div>
+                <canvas id="graficoDisciplinas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <div class="report-footer">
+        <p>
+            <i class="fas fa-calendar-alt"></i>
+            Relatório gerado em {{ now|date:"d/m/Y H:i" }}
+        </p>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+// Paleta de Cores - Sistema
+const cores = {
+    primarioDark: '#002555',
+    primarioLight: '#1245FF',
+    accent: '#F5AC00',
+    success: '#28a745',
+    danger: '#dc3545',
+    info: '#17a2b8',
+    warning: '#ffc107',
+    secondary: '#6c757d'
+};
+
+// Gráfico de Distribuição por Curso
+const ctxCursos = document.getElementById('graficoCursos').getContext('2d');
+new Chart(ctxCursos, {
+    type: 'doughnut',
+    data: {
+        labels: {{ cursos_labels|safe }},
+        datasets: [{
+            data: {{ cursos_data|safe }},
+            backgroundColor: [
+                'rgba(18, 69, 255, 0.8)',
+                'rgba(40, 167, 69, 0.8)',
+                'rgba(245, 172, 0, 0.8)',
+                'rgba(220, 53, 69, 0.8)',
+                'rgba(23, 162, 184, 0.8)'
+            ],
+            borderColor: 'white',
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { 
+                position: 'bottom',
+                labels: {
+                    font: { size: 11, weight: '600' },
+                    color: '#6c757d',
+                    padding: 15
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return context.label + ': ' + context.parsed + ' monitores';
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Gráfico de Top 5 Disciplinas
+const ctxDisciplinas = document.getElementById('graficoDisciplinas').getContext('2d');
+new Chart(ctxDisciplinas, {
+    type: 'bar',
+    data: {
+        labels: {{ disciplinas_labels|safe }},
+        datasets: [{
+            label: 'Monitores',
+            data: {{ disciplinas_data|safe }},
+            backgroundColor: 'rgba(245, 172, 0, 0.8)',
+            borderColor: '#F5AC00',
+            borderWidth: 2,
+            borderRadius: 4
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            x: { 
+                beginAtZero: true,
+                ticks: { stepSize: 1 },
+                grid: { color: '#e9ecef' }
+            },
+            y: {
+                grid: { display: false }
+            }
+        }
+    }
+});
+
+// Exportar PDF
+function exportarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('l', 'mm', 'a4');
+    
+    // Cabeçalho
+    doc.setFillColor(0, 37, 85);
+    doc.rect(0, 0, 297, 25, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.setFont('Helvetica', 'bold');
+    doc.text('Relatório de Monitores Selecionados', 14, 15);
+    
+    // Data
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(9);
+    doc.setFont('Helvetica', 'normal');
+    doc.text('Gerado em: ' + new Date().toLocaleString('pt-BR'), 14, 28);
+    
+    // Tabela
+    const tableData = [];
+    {% for inscricao in inscricoes %}
+    tableData.push([
+        '{{ forloop.counter }}',
+        '{{ inscricao.aluno.nome }}',
+        '{{ inscricao.aluno.curso.nome }}',
+        '{{ inscricao.vaga.nome }}',
+        '{{ inscricao.aluno.cr_geral }}',
+        '{{ inscricao.data_resultado|date:"d/m/Y"|default:"-" }}'
+    ]);
+    {% endfor %}
+    
+    doc.autoTable({
+        startY: 32,
+        head: [['#', 'Monitor', 'Curso', 'Vaga/Disciplina', 'CR', 'Data Aprovação']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: { 
+            fillColor: [18, 69, 255],
+            textColor: [255, 255, 255],
+            fontStyle: 'bold'
+        },
+        alternateRowStyles: {
+            fillColor: [248, 249, 250]
+        },
+        bodyStyles: {
+            textColor: [60, 60, 60]
+        },
+        styles: { 
+            fontSize: 9,
+            font: 'Helvetica'
+        },
+        margin: { left: 14, right: 14 },
+        didDrawPage: function(data) {
+            // Rodapé
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            const pageCount = doc.internal.pages.length - 1;
+            doc.text('Página ' + data.pageNumber + ' de ' + pageCount, doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        }
+    });
+    
+    doc.save('relatorio-monitores-selecionados.pdf');
+}
+
+// Exportar Excel
+function exportarExcel() {
+    const data = [
+        ['Relatório de Monitores Selecionados'],
+        ['Gerado em: ' + new Date().toLocaleString('pt-BR')],
+        [],
+        ['#', 'Monitor', 'Matrícula', 'Curso', 'Vaga/Disciplina', 'CR', 'Data Aprovação', 'Email'],
+        {% for inscricao in inscricoes %}
+        [
+            {{ forloop.counter }},
+            '{{ inscricao.aluno.nome }}',
+            '{{ inscricao.aluno.matricula }}',
+            '{{ inscricao.aluno.curso.nome }}',
+            '{{ inscricao.vaga.nome }} - {{ inscricao.vaga.disciplina }}',
+            {{ inscricao.aluno.cr_geral }},
+            '{{ inscricao.data_resultado|date:"d/m/Y H:i"|default:"-" }}',
+            '{{ inscricao.aluno.email }}'
+        ]{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    
+    // Largura das colunas
+    ws['!cols'] = [
+        { wch: 5 }, 
+        { wch: 25 }, 
+        { wch: 12 }, 
+        { wch: 30 }, 
+        { wch: 35 }, 
+        { wch: 8 }, 
+        { wch: 18 },
+        { wch: 30 }
+    ];
+    
+    XLSX.utils.book_append_sheet(wb, ws, 'Monitores Selecionados');
+    XLSX.writeFile(wb, 'relatorio-monitores-selecionados.xlsx');
+}
+</script>
+
+<style>
+@media print {
+    .btn, .card-body form, canvas {
+        display: none !important;
+    }
+    
+    .card {
+        page-break-inside: avoid;
+    }
+}
+</style>
+{% endblock %}

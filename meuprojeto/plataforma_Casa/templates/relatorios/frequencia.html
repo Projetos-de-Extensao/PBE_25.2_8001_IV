@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% block title %}Relatório de Frequência - Plataforma Casa{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Core Colors */
+    :root {
+        --color-primary-dark: #002555;
+        --color-primary-light: #1245FF;
+        --color-accent: #F5AC00;
+        --color-success: #28a745;
+        --color-danger: #dc3545;
+        --color-warning: #ffc107;
+        --color-gray-light: #f8f9fa;
+        --color-gray-border: #e9ecef;
+        --color-text-muted: #6c757d;
+        --color-off-white: #fafaf8;
+    }
+
+    /* Page Header */
+    .page-header {
+        background: var(--color-primary-dark);
+        color: var(--color-off-white);
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .page-header p {
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border: 1px solid var(--color-gray-border);
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        border-color: var(--color-primary-light);
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.1);
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-icon.success {
+        color: var(--color-success);
+    }
+
+    .stat-icon.danger {
+        color: var(--color-danger);
+    }
+
+    .stat-icon.primary {
+        color: var(--color-primary-light);
+    }
+
+    .stat-icon.warning {
+        color: var(--color-accent);
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--color-primary-dark);
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        color: var(--color-text-muted);
+        font-size: 0.875rem;
+    }
+
+    /* Table */
+    .table-container {
+        background: white;
+        border: 1px solid var(--color-gray-border);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .table-header {
+        background: var(--color-gray-light);
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--color-gray-border);
+    }
+
+    .table-header h2 {
+        color: var(--color-primary-dark);
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin: 0;
+    }
+
+    .table {
+        margin: 0;
+    }
+
+    .table thead th {
+        background: var(--color-gray-light);
+        color: var(--color-primary-dark);
+        font-weight: 600;
+        border: none;
+        padding: 1rem;
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--color-gray-border);
+    }
+
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .table tbody tr:hover {
+        background: rgba(18, 69, 255, 0.02);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: var(--color-text-muted);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        background: transparent;
+        border: none;
+        padding: 0;
+        margin-bottom: 2rem;
+    }
+
+    .breadcrumb-item {
+        color: var(--color-text-muted);
+    }
+
+    .breadcrumb-item.active {
+        color: var(--color-primary-dark);
+        font-weight: 600;
+    }
+
+    .breadcrumb-item a {
+        color: var(--color-primary-light);
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'relatorios_listar' %}">Relatórios</a></li>
+        <li class="breadcrumb-item active">Frequência</li>
+    </ol>
+</nav>
+
+<div class="page-header">
+    <h1><i class="fas fa-calendar-check"></i> Relatório de Frequência</h1>
+    <p>Controle de presenças nas monitorias</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon primary">
+            <i class="fas fa-clipboard-check"></i>
+        </div>
+        <div class="stat-value">{{ presencas.count }}</div>
+        <div class="stat-label">Total de Registros</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon success">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-value">{{ presencas|length }}</div>
+        <div class="stat-label">Presenças</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon danger">
+            <i class="fas fa-times-circle"></i>
+        </div>
+        <div class="stat-value">0</div>
+        <div class="stat-label">Faltas</div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon warning">
+            <i class="fas fa-percentage"></i>
+        </div>
+        <div class="stat-value">-</div>
+        <div class="stat-label">Taxa de Presença</div>
+    </div>
+</div>
+
+<div class="table-container">
+    <div class="table-header">
+        <h2><i class="fas fa-table"></i> Registros de Frequência</h2>
+    </div>
+    
+    {% if presencas %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Aluno</th>
+                    <th>Turma</th>
+                    <th>Data</th>
+                    <th>Status</th>
+                    <th>Observações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for presenca in presencas %}
+                <tr>
+                    <td>
+                        <strong>{{ presenca.aluno.nome }}</strong><br>
+                        <small class="text-muted">{{ presenca.aluno.matricula }}</small>
+                    </td>
+                    <td>{{ presenca.turma.codigo }} - {{ presenca.turma.disciplina }}</td>
+                    <td>{{ presenca.data|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if presenca.presente %}
+                        <span class="badge bg-success">
+                            <i class="fas fa-check"></i> Presente
+                        </span>
+                        {% else %}
+                        <span class="badge bg-danger">
+                            <i class="fas fa-times"></i> Falta
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if presenca.observacoes %}
+                        {{ presenca.observacoes }}
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-calendar-times"></i>
+        <h4>Nenhum registro de frequência encontrado</h4>
+        <p>Não há dados de frequência para exibir no momento.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

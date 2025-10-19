@@ -1,69 +1,398 @@
 {% extends 'base.html' %}
-{% block title %}Relatórios - Plataforma Casa{% endblock %}
+{% block title %}Todos os Relatórios - Plataforma Casa{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Core Colors */
+    :root {
+        --color-primary-dark: #002555;
+        --color-primary-light: #1245FF;
+        --color-accent: #F5AC00;
+        --color-success: #28a745;
+        --color-danger: #dc3545;
+        --color-gray-light: #f8f9fa;
+        --color-gray-border: #e9ecef;
+        --color-text-muted: #6c757d;
+    }
+
+    /* Page Header */
+    .page-header {
+        border-bottom: 2px solid var(--color-accent);
+        padding-bottom: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        color: var(--color-primary-dark);
+        font-weight: 700;
+        font-size: 2rem;
+    }
+
+    .page-header p {
+        color: var(--color-text-muted);
+        font-weight: 500;
+    }
+
+    /* Section Title */
+    .section-title {
+        color: var(--color-primary-dark);
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--color-primary-light);
+        padding-left: 1rem;
+    }
+
+    /* Report Card */
+    .report-card {
+        background: white;
+        border: 1px solid var(--color-gray-border);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .report-card:hover {
+        box-shadow: 0 6px 16px rgba(0, 37, 85, 0.12);
+        border-color: var(--color-primary-light);
+        transform: translateY(-4px);
+    }
+
+    /* Card Header with Icon */
+    .report-card-header {
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border-bottom: 1px solid var(--color-gray-border);
+    }
+
+    .report-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .report-icon.icon-danger {
+        background: rgba(220, 53, 69, 0.1);
+        color: var(--color-danger);
+    }
+
+    .report-icon.icon-success {
+        background: rgba(40, 167, 69, 0.1);
+        color: var(--color-success);
+    }
+
+    .report-icon.icon-primary {
+        background: rgba(18, 69, 255, 0.1);
+        color: var(--color-primary-light);
+    }
+
+    .report-card-title {
+        color: var(--color-primary-dark);
+        font-weight: 700;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .report-card-subtitle {
+        color: var(--color-text-muted);
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    /* Card Body */
+    .report-card-body {
+        padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .report-card-body p {
+        color: var(--color-text-muted);
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        flex-grow: 1;
+    }
+
+    /* Buttons */
+    .btn-view-report {
+        background: white;
+        border: 2px solid var(--color-primary-light);
+        color: var(--color-primary-light);
+        font-weight: 600;
+        border-radius: 6px;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .btn-view-report:hover {
+        background: var(--color-primary-light);
+        color: white;
+    }
+
+    .btn-generate {
+        background: var(--color-primary-dark);
+        border: none;
+        color: white;
+        font-weight: 600;
+        border-radius: 6px;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-generate:hover {
+        background: var(--color-primary-light);
+        color: white;
+    }
+
+    /* Badge Container */
+    .badge-container {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: auto;
+        padding-top: 1rem;
+        border-top: 1px solid var(--color-gray-border);
+    }
+
+    .report-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .badge-excel {
+        background: rgba(40, 167, 69, 0.1);
+        color: var(--color-success);
+    }
+
+    .badge-pdf {
+        background: rgba(220, 53, 69, 0.1);
+        color: var(--color-danger);
+    }
+
+    .badge-charts {
+        background: rgba(18, 69, 255, 0.1);
+        color: var(--color-primary-light);
+    }
+
+    .badge-evolution {
+        background: rgba(245, 172, 0, 0.1);
+        color: var(--color-accent);
+    }
+
+    /* General Reports Section */
+    .general-reports-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .general-report-card {
+        background: white;
+        border: 1px solid var(--color-gray-border);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .general-report-card:hover {
+        box-shadow: 0 6px 16px rgba(0, 37, 85, 0.12);
+        border-color: var(--color-primary-light);
+        transform: translateY(-4px);
+    }
+
+    .general-report-card-header {
+        background: var(--color-primary-dark);
+        color: white;
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .general-report-card-body {
+        padding: 1.5rem;
+    }
+
+    .general-report-card-body p {
+        color: var(--color-text-muted);
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        background: transparent;
+        border: none;
+        padding: 0;
+        margin-bottom: 2rem;
+    }
+
+    .breadcrumb-item {
+        color: var(--color-text-muted);
+    }
+
+    .breadcrumb-item.active {
+        color: var(--color-primary-dark);
+        font-weight: 600;
+    }
+
+    .breadcrumb-item a {
+        color: var(--color-primary-light);
+        text-decoration: none;
+    }
+
+    .breadcrumb-item a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
-        <li class="breadcrumb-item active">Relatórios</li>
+        <li class="breadcrumb-item active">Todos os Relatórios</li>
     </ol>
 </nav>
 
-<div class="page-title">
-    <h1><i class="fas fa-file-alt"></i> Relatórios</h1>
+<div class="page-header">
+    <h1><i class="fas fa-chart-bar"></i> Todos os Relatórios</h1>
+    <p>Central de relatórios com exportação PDF e Excel</p>
 </div>
 
-<div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
+<!-- Relatórios com Exportação PDF/Excel -->
+<div class="mb-5">
+    <h2 class="section-title"><i class="fas fa-file-export"></i> Relatórios com Exportação</h2>
+    <div class="row g-4">
+        <!-- Relatório Candidatos -->
+        <div class="col-lg-4 col-md-6">
+            <div class="report-card">
+                <div class="report-card-header">
+                    <div class="report-icon icon-danger">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <h5 class="report-card-title">Relatório Candidatos</h5>
+                        <p class="report-card-subtitle">Por Vaga</p>
+                    </div>
+                </div>
+                <div class="report-card-body">
+                    <p>Relatório detalhado de candidatos por vaga com informações completas de inscrições, documentos e status.</p>
+                    <a href="{% url 'relatorio_candidatos_vaga' %}" class="btn-view-report">
+                        <i class="fas fa-eye"></i> Visualizar Relatório
+                    </a>
+                    <div class="badge-container">
+                        <span class="report-badge badge-excel"><i class="fas fa-file-excel"></i> Excel</span>
+                        <span class="report-badge badge-pdf"><i class="fas fa-file-pdf"></i> PDF</span>
+                        <span class="report-badge badge-charts"><i class="fas fa-print"></i> Impressão</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relatório Monitores -->
+        <div class="col-lg-4 col-md-6">
+            <div class="report-card">
+                <div class="report-card-header">
+                    <div class="report-icon icon-success">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div>
+                        <h5 class="report-card-title">Relatório Monitores</h5>
+                        <p class="report-card-subtitle">Selecionados</p>
+                    </div>
+                </div>
+                <div class="report-card-body">
+                    <p>Relatório de monitores aprovados e ativos com estatísticas, gráficos de distribuição e filtros avançados.</p>
+                    <a href="{% url 'relatorio_monitores_selecionados' %}" class="btn-view-report">
+                        <i class="fas fa-eye"></i> Visualizar Relatório
+                    </a>
+                    <div class="badge-container">
+                        <span class="report-badge badge-excel"><i class="fas fa-file-excel"></i> Excel</span>
+                        <span class="report-badge badge-pdf"><i class="fas fa-file-pdf"></i> PDF</span>
+                        <span class="report-badge badge-charts"><i class="fas fa-chart-pie"></i> Gráficos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Relatórios Gerais -->
+<div class="mb-5">
+    <h2 class="section-title"><i class="fas fa-chart-line"></i> Relatórios Gerais</h2>
+    <div class="general-reports-grid">
+        <div class="general-report-card">
+            <div class="general-report-card-header">
                 <i class="fas fa-chart-bar"></i> Relatório de Desempenho
             </div>
-            <div class="card-body">
+            <div class="general-report-card-body">
                 <p>Acompanhe o desempenho geral dos alunos nas monitorias.</p>
-                <a href="{% url 'relatorio_desempenho' %}" class="btn btn-primary w-100">
+                <a href="{% url 'relatorio_desempenho' %}" class="btn-generate w-100">
                     <i class="fas fa-arrow-right"></i> Gerar Relatório
                 </a>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
+        <div class="general-report-card">
+            <div class="general-report-card-header">
                 <i class="fas fa-users-class"></i> Relatório de Frequência
             </div>
-            <div class="card-body">
+            <div class="general-report-card-body">
                 <p>Consulte a frequência de alunos nas monitorias.</p>
-                <a href="{% url 'relatorio_frequencia' %}" class="btn btn-primary w-100">
+                <a href="{% url 'relatorio_frequencia' %}" class="btn-generate w-100">
                     <i class="fas fa-arrow-right"></i> Gerar Relatório
                 </a>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-6 mt-4">
-        <div class="card">
-            <div class="card-header">
+        <div class="general-report-card">
+            <div class="general-report-card-header">
                 <i class="fas fa-clipboard-list"></i> Relatório de Inscrições
             </div>
-            <div class="card-body">
+            <div class="general-report-card-body">
                 <p>Analise as inscrições nas vagas de monitoria.</p>
-                <a href="{% url 'relatorio_inscricoes' %}" class="btn btn-primary w-100">
+                <a href="{% url 'relatorio_inscricoes' %}" class="btn-generate w-100">
                     <i class="fas fa-arrow-right"></i> Gerar Relatório
                 </a>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-6 mt-4">
-        <div class="card">
-            <div class="card-header">
+        <div class="general-report-card">
+            <div class="general-report-card-header">
                 <i class="fas fa-chart-pie"></i> Relatório Geral
             </div>
-            <div class="card-body">
+            <div class="general-report-card-body">
                 <p>Visualize dados consolidados do sistema.</p>
-                <a href="{% url 'relatorio_geral' %}" class="btn btn-primary w-100">
+                <a href="{% url 'relatorio_geral' %}" class="btn-generate w-100">
                     <i class="fas fa-arrow-right"></i> Gerar Relatório
                 </a>
             </div>
