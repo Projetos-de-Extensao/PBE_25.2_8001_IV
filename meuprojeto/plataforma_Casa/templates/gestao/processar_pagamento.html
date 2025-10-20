@@ -413,16 +413,16 @@
                                 <select name="status" id="status" class="form-select" required>
                                     <option value="">Selecione um status...</option>
                                     <option value="Pendente" {% if pagamento.status == 'Pendente' %}selected{% endif %}>
-                                        ⏳ Pendente
+                                        Pendente
                                     </option>
                                     <option value="Processando" {% if pagamento.status == 'Processando' %}selected{% endif %}>
-                                        🔄 Processando
+                                        Processando
                                     </option>
                                     <option value="Pago" {% if pagamento.status == 'Pago' %}selected{% endif %}>
-                                        ✅ Pago
+                                        Pago
                                     </option>
                                     <option value="Cancelado" {% if pagamento.status == 'Cancelado' %}selected{% endif %}>
-                                        ❌ Cancelado
+                                        Cancelado
                                     </option>
                                 </select>
                             </div>
