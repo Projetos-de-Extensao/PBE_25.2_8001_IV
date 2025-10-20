@@ -6,8 +6,9 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.db.models import Count, Q, Avg, Sum
+from django.db.models.functions import TruncMonth
 from django.utils import timezone
-from datetime import datetime
+from datetime import datetime, timedelta
 from .models import (
     Usuario, Aluno, Funcionario, Curso, Sala, Vaga, Turma, 
     ParticipacaoMonitoria, Presenca, Inscricao, TipoUsuario,
@@ -2249,13 +2250,13 @@ def dashboard_gestao(request):
     seis_meses_atras = timezone.now() - timedelta(days=180)
     inscricoes_timeline = Inscricao.objects.filter(
         data_inscricao__gte=seis_meses_atras
-    ).extra(
-        select={'mes': "strftime('%%Y-%%m', data_inscricao)"}
+    ).annotate(
+        mes=TruncMonth('data_inscricao')
     ).values('mes').annotate(
         total=Count('id')
     ).order_by('mes')
     
-    timeline_labels = [item['mes'] for item in inscricoes_timeline]
+    timeline_labels = [item['mes'].strftime('%Y-%m') if item['mes'] else '' for item in inscricoes_timeline]
     timeline_values = [item['total'] for item in inscricoes_timeline]
     
     # ========== HORAS TRABALHADAS (ÚLTIMOS 6 MESES) ==========
@@ -2263,8 +2264,8 @@ def dashboard_gestao(request):
     horas_timeline = RegistroHoras.objects.filter(
         status='Aprovado',
         data__gte=seis_meses_atras
-    ).extra(
-        select={'mes': "strftime('%%Y-%%m', data)"}
+    ).annotate(
+        mes=TruncMonth('data')
     ).values('mes').annotate(
         total_horas=Sum('total_horas')
     ).order_by('mes')
@@ -2272,17 +2273,17 @@ def dashboard_gestao(request):
     # Buscar valores de pagamento por mês (StatusPagamento)
     pagamentos_timeline = StatusPagamento.objects.filter(
         mes_referencia__gte=seis_meses_atras
-    ).extra(
-        select={'mes': "strftime('%%Y-%%m', mes_referencia)"}
+    ).annotate(
+        mes=TruncMonth('mes_referencia')
     ).values('mes').annotate(
         total_valor=Sum('valor_total')
     ).order_by('mes')
     
-    horas_labels = [item['mes'] for item in horas_timeline]
+    horas_labels = [item['mes'].strftime('%Y-%m') if item['mes'] else '' for item in horas_timeline]
     horas_values = [float(item['total_horas']) for item in horas_timeline]
     
     # Criar dicionário de pagamentos por mês para correlacionar
-    pagamentos_dict = {item['mes']: float(item['total_valor']) for item in pagamentos_timeline}
+    pagamentos_dict = {item['mes'].strftime('%Y-%m') if item['mes'] else '': float(item['total_valor']) for item in pagamentos_timeline}
     valores_pagamento = [pagamentos_dict.get(mes, 0) for mes in horas_labels]
     
     # ========== TOP 10 DISCIPLINAS COM MAIS VAGAS ==========
