@@ -19,7 +19,7 @@
     SEGURANÇA & PERMISSÕES:
     - Acesso: Apenas usuários autenticados (Professor ou Admin)
     - Dados: Context variables injetadas pela view filtra dados do usuário
-    - Templates condicionais: {% if is_professor_dashboard %} garante segurança
+    - Templates condicionais: Usa is_professor_dashboard para garantir segurança
     
     VARIÁVEIS CONTEXT ESPERADAS (Professor):
     - total_minhas_vagas: int - quantidade de vagas criadas
@@ -660,7 +660,7 @@
         - monitoria.disciplina
         - monitoria.semestre
         - monitoria.horario
-        - monitoria.ativo (boolean: usado no {% if %} condicional)
+        - monitoria.ativo (boolean: usado no condicional if)
     -->
     <div class="dashboard-card">
         <div class="card-title"><i class="fas fa-list"></i> Últimas Monitorias</div>
