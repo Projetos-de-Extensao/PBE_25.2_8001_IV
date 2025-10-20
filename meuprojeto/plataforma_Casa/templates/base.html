@@ -787,38 +787,6 @@
                         Observação: Alunos não têm acesso ao Dashboard
                         ====================================================================
                     -->
-                    {% if is_aluno %}
-                    <!-- Link: Portal de Vagas -->
-                    <!-- Visualizar todas as vagas de monitoria abertas -->
-                    <!-- Permissão necessária: view_vaga -->
-                    <a href="{% url 'portal_vagas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'portal_vagas' %}active{% endif %}">
-                        <i class="fas fa-briefcase"></i>
-                        <span class="sidebar-text">Portal de Vagas</span>
-                    </a>
-                    
-                    <!-- Link: Minhas Inscrições -->
-                    <!-- Ver status das candidaturas submetidas -->
-                    <!-- Permissão necessária: view_inscricao, add_inscricao -->
-                    <a href="{% url 'minhas_inscricoes' %}" class="sidebar-item {% if request.resolver_match.url_name == 'minhas_inscricoes' %}active{% endif %}">
-                        <i class="fas fa-file-signature"></i>
-                        <span class="sidebar-text">Minhas Inscrições</span>
-                    </a>
-                    
-                    <hr class="sidebar-divider">
-                    
-                    <!-- Link: Monitorias Disponíveis -->
-                    <!-- Ver todas as monitorias disponíveis para participar -->
-                    <a href="{% url 'monitorias_disponiveis' %}" class="sidebar-item {% if request.resolver_match.url_name == 'monitorias_disponiveis' %}active{% endif %}">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span class="sidebar-text">Monitorias</span>
-                    </a>
-                    
-                    <!-- Link: Participando -->
-                    <!-- Ver monitorias que está participando (como aluno) -->
-                    <a href="{% url 'participando_monitorias' %}" class="sidebar-item {% if request.resolver_match.url_name == 'participando_monitorias' %}active{% endif %}">
-                        <i class="fas fa-users"></i>
-                        <span class="sidebar-text">Participando</span>
-                    </a>
                     
                     <!-- 
                         ====================================================================
@@ -836,9 +804,11 @@
                         Grupo Django: "Monitor"
                         Variável Context Processor: is_monitor
                         Herda: Permissões do grupo Aluno
+                        
+                        IMPORTANTE: Monitor é verificado ANTES de Aluno na hierarquia
                         ====================================================================
                     -->
-                    {% elif is_monitor %}
+                    {% if is_monitor %}
                     <!-- Link: Dashboard do Monitor -->
                     <!-- Painel com KPIs e estatísticas personalizadas -->
                     <!-- Monitorias ativas, horas, alunos, etc -->
@@ -905,6 +875,56 @@
                     <a href="{% url 'minhas_inscricoes' %}" class="sidebar-item {% if request.resolver_match.url_name == 'minhas_inscricoes' %}active{% endif %}">
                         <i class="fas fa-file-signature"></i>
                         <span class="sidebar-text">Minhas Inscrições</span>
+                    </a>
+                    
+                    <!-- 
+                        ====================================================================
+                        MENU: ALUNO (Candidato a Monitoria) - PERFIL BÁSICO
+                        ====================================================================
+                        
+                        Público: Estudantes que desejam se candidatar a vagas de monitoria
+                        
+                        Funcionalidades disponíveis:
+                        - Navegar no portal de vagas disponíveis
+                        - Visualizar e gerenciar suas candidaturas
+                        
+                        Grupo Django: "Aluno"
+                        Variável Context Processor: is_aluno
+                        
+                        Observação: Este menu aparece apenas se o usuário NÃO for Monitor/Professor/Admin
+                        ====================================================================
+                    -->
+                    {% elif is_aluno %}
+                    <!-- Link: Portal de Vagas -->
+                    <!-- Visualizar todas as vagas de monitoria abertas -->
+                    <!-- Permissão necessária: view_vaga -->
+                    <a href="{% url 'portal_vagas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'portal_vagas' %}active{% endif %}">
+                        <i class="fas fa-briefcase"></i>
+                        <span class="sidebar-text">Portal de Vagas</span>
+                    </a>
+                    
+                    <!-- Link: Minhas Inscrições -->
+                    <!-- Ver status das candidaturas submetidas -->
+                    <!-- Permissão necessária: view_inscricao, add_inscricao -->
+                    <a href="{% url 'minhas_inscricoes' %}" class="sidebar-item {% if request.resolver_match.url_name == 'minhas_inscricoes' %}active{% endif %}">
+                        <i class="fas fa-file-signature"></i>
+                        <span class="sidebar-text">Minhas Inscrições</span>
+                    </a>
+                    
+                    <hr class="sidebar-divider">
+                    
+                    <!-- Link: Monitorias Disponíveis -->
+                    <!-- Ver todas as monitorias disponíveis para participar -->
+                    <a href="{% url 'monitorias_disponiveis' %}" class="sidebar-item {% if request.resolver_match.url_name == 'monitorias_disponiveis' %}active{% endif %}">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span class="sidebar-text">Monitorias</span>
+                    </a>
+                    
+                    <!-- Link: Participando -->
+                    <!-- Ver monitorias que está participando (como aluno) -->
+                    <a href="{% url 'participando_monitorias' %}" class="sidebar-item {% if request.resolver_match.url_name == 'participando_monitorias' %}active{% endif %}">
+                        <i class="fas fa-users"></i>
+                        <span class="sidebar-text">Participando</span>
                     </a>
                     
                     <!-- 
