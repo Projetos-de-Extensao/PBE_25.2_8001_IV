@@ -409,7 +409,10 @@ def dashboard(request):
             # Buscar aluno pelo email do Django User
             monitor = get_monitor_by_email(user.email)
             if not monitor:
-                raise Exception("Monitor não encontrado")
+                # Se monitor não foi encontrado, redireciona para login
+                from django.contrib.auth import logout
+                logout(request)
+                return redirect('login')
             
             # Estatísticas do MONITOR (minhas monitorias)
             minhas_monitorias = Turma.objects.filter(monitor=monitor, ativo=True)
