@@ -3,23 +3,20 @@
 SCRIPT DE CRIAÇÃO DE USUÁRIOS DE TESTE
 ================================================================================
 
-Este script cria usuários de teste no sistema com diferentes roles:
+Este script cria usuários de teste no sistema com diferentes roles (groups):
 - Aluno
 - Monitor
 - Professor
 - Admin
 
-Uso:
-    python criar_usuarios_teste.py
-
-Nota: Execute este script no ambiente de produção usando:
+Uso no Heroku:
     heroku run "python meuprojeto/manage.py shell < criar_usuarios_teste.py"
 
 ================================================================================
 """
 
 from django.contrib.auth import get_user_model
-from plataforma_Casa.models import Curso
+from django.contrib.auth.models import Group
 
 User = get_user_model()
 
@@ -31,7 +28,7 @@ usuarios_teste = [
         'password': 'aluno123',
         'first_name': 'Aluno',
         'last_name': 'Teste',
-        'role': 1,  # Aluno
+        'group': 'Aluno',
         'is_staff': False,
         'is_superuser': False
     },
@@ -41,7 +38,7 @@ usuarios_teste = [
         'password': 'monitor123',
         'first_name': 'Monitor',
         'last_name': 'Teste',
-        'role': 2,  # Monitor
+        'group': 'Monitor',
         'is_staff': False,
         'is_superuser': False
     },
@@ -51,7 +48,7 @@ usuarios_teste = [
         'password': 'professor123',
         'first_name': 'Professor',
         'last_name': 'Teste',
-        'role': 3,  # Professor
+        'group': 'Professor',
         'is_staff': True,
         'is_superuser': False
     },
@@ -61,14 +58,27 @@ usuarios_teste = [
         'password': 'admin123',
         'first_name': 'Admin',
         'last_name': 'Sistema',
-        'role': 4,  # Admin
+        'group': 'Admin',
         'is_staff': True,
         'is_superuser': True
     }
 ]
 
 print("=" * 80)
-print("CRIANDO USUÁRIOS DE TESTE")
+print("CRIANDO GRUPOS E USUÁRIOS DE TESTE")
+print("=" * 80)
+
+# Primeiro, criar os grupos se não existirem
+grupos_necessarios = ['Aluno', 'Monitor', 'Professor', 'Admin']
+for grupo_nome in grupos_necessarios:
+    grupo, created = Group.objects.get_or_create(name=grupo_nome)
+    if created:
+        print(f"✅ Grupo '{grupo_nome}' criado")
+    else:
+        print(f"ℹ️  Grupo '{grupo_nome}' já existe")
+
+print("\n" + "=" * 80)
+print("CRIANDO USUÁRIOS")
 print("=" * 80)
 
 for usuario_data in usuarios_teste:
@@ -76,7 +86,17 @@ for usuario_data in usuarios_teste:
     
     # Verificar se usuário já existe
     if User.objects.filter(username=username).exists():
-        print(f"⚠️  Usuário '{username}' já existe - pulando...")
+        user = User.objects.get(username=username)
+        print(f"⚠️  Usuário '{username}' já existe - atualizando grupo...")
+        
+        # Atualizar grupo
+        group = Group.objects.get(name=usuario_data['group'])
+        user.groups.clear()
+        user.groups.add(group)
+        user.is_staff = usuario_data['is_staff']
+        user.is_superuser = usuario_data['is_superuser']
+        user.save()
+        print(f"✅ Atualizado: {username} | Group: {usuario_data['group']}")
         continue
     
     # Criar usuário
@@ -89,29 +109,27 @@ for usuario_data in usuarios_teste:
             last_name=usuario_data['last_name']
         )
         
-        # Configurar role e permissões
-        user.role = usuario_data['role']
+        # Configurar permissões
         user.is_staff = usuario_data['is_staff']
         user.is_superuser = usuario_data['is_superuser']
         user.save()
         
-        # Determinar nome do role
-        role_names = {1: 'Aluno', 2: 'Monitor', 3: 'Professor', 4: 'Admin'}
-        role_name = role_names.get(usuario_data['role'], 'Desconhecido')
+        # Adicionar ao grupo
+        group = Group.objects.get(name=usuario_data['group'])
+        user.groups.add(group)
         
-        print(f"✅ Criado: {username} | Role: {role_name} | Email: {usuario_data['email']}")
+        print(f"✅ Criado: {username} | Group: {usuario_data['group']} | Email: {usuario_data['email']}")
     
     except Exception as e:
         print(f"❌ Erro ao criar '{username}': {str(e)}")
 
-print("=" * 80)
+print("\n" + "=" * 80)
 print("PROCESSO CONCLUÍDO")
 print("=" * 80)
 
 # Estatísticas finais
 total_usuarios = User.objects.count()
 print(f"\n📊 Total de usuários no sistema: {total_usuarios}")
-print(f"   - Alunos: {User.objects.filter(role=1).count()}")
-print(f"   - Monitores: {User.objects.filter(role=2).count()}")
-print(f"   - Professores: {User.objects.filter(role=3).count()}")
-print(f"   - Admins: {User.objects.filter(role=4).count()}")
+for grupo_nome in grupos_necessarios:
+    count = User.objects.filter(groups__name=grupo_nome).count()
+    print(f"   - {grupo_nome}: {count} usuário(s)")
