@@ -522,10 +522,7 @@
         <form method="POST" class="register-form" id="registerForm">
             {% csrf_token %}
             
-            <!-- 
-                CAMPO: NOME COMPLETO
-                Campo básico para identificação do usuário
-            -->
+            <!-- CAMPO: NOME COMPLETO -->
             <div class="form-group">
                 <label for="nome">
                     <i class="fas fa-user"></i> Nome Completo
@@ -539,10 +536,9 @@
                         placeholder="Digite seu nome completo"
                         value="{{ form.nome.value|default:'' }}"
                         required
-                        autofocus                    <!-- Foco automático ao carregar página -->
+                        autofocus
                     >
                 </div>
-                <!-- Exibir erros específicos deste campo -->
                 {% if form.nome.errors %}
                     <div class="text-danger" style="font-size: 0.85rem; margin-top: 0.25rem;">
                         {{ form.nome.errors.0 }}
@@ -550,11 +546,7 @@
                 {% endif %}
             </div>
             
-            <!-- 
-                CAMPO: EMAIL
-                Email será usado para autenticação e notificações
-                Validação de formato e unicidade no backend
-            -->
+            <!-- CAMPO: EMAIL -->
             <div class="form-group">
                 <label for="email">
                     <i class="fas fa-envelope"></i> Email
