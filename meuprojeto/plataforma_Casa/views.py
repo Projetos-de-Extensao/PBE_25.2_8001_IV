@@ -2405,11 +2405,6 @@ def dashboard_gestao(request):
         'horas_values': json.dumps(horas_values),
         'valores_pagamento': json.dumps(valores_pagamento),
         
-        # Top Disciplinas
-        'disciplina_labels': json.dumps(disciplina_labels),
-        'disciplina_vagas': json.dumps(disciplina_vagas),
-        'disciplina_inscritos': json.dumps(disciplina_inscritos),
-        
         # Horas por Status
         'horas_status_labels': json.dumps(horas_status_labels),
         'horas_status_values': json.dumps(horas_status_values),
@@ -2594,31 +2589,38 @@ def mudar_status_candidato(request, inscricao_id):
         # Buscar inscrição
         inscricao = get_object_or_404(Inscricao, id=inscricao_id)
         
-        # Verificar se o usuário é o coordenador da vaga
+        # Verificar permissões do usuário
         user = request.user
         
-        # Verificar se é professor
-        if not user.groups.filter(name='Professor').exists():
+        # ✅ PERMISSÃO: Admin, Professor ou Coordenador podem alterar
+        is_admin = user.is_staff or user.is_superuser
+        is_professor = user.groups.filter(name='Professor').exists()
+        is_coordenador = user.groups.filter(name='Coordenador').exists()
+        
+        if not (is_admin or is_professor or is_coordenador):
             return JsonResponse({
                 'success': False,
                 'error': 'Apenas professores podem alterar status de candidatos'
             }, status=403)
         
-        # Buscar funcionário pelo email
+        # ✅ VERIFICAÇÃO ADICIONAL (Opcional): Verificar se é o coordenador específico da vaga
+        # Comentado para permitir que qualquer professor/admin possa alterar
+        """
         try:
             funcionario = Funcionario.objects.get(email=user.email)
+            # Só valida se não for admin
+            if not is_admin and inscricao.vaga.coordenador != funcionario:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Você não tem permissão para alterar o status desta inscrição'
+                }, status=403)
         except Funcionario.DoesNotExist:
-            return JsonResponse({
-                'success': False,
-                'error': 'Professor não encontrado'
-            }, status=404)
-        
-        # Verificar se é o coordenador da vaga
-        if inscricao.vaga.coordenador != funcionario:
-            return JsonResponse({
-                'success': False,
-                'error': 'Você não tem permissão para alterar o status desta inscrição'
-            }, status=403)
+            if not is_admin:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Professor não encontrado'
+                }, status=404)
+        """
         
         # Atualizar status
         inscricao.status = novo_status
