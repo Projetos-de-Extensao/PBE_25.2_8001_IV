@@ -11,10 +11,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # Utiliza variável de ambiente ou fallback para desenvolvimento local
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-)8e!dd5q@2&qwtt(v0qm4c2&^%t5p3kxi60x$^9(zh6att5qh8')
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-CHANGE-THIS-IN-PRODUCTION-f820a0a16535-secure-key-2025')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG deve ser False em produção
+# DEBUG deve ser False em produção (só True localmente para desenvolvimento)
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Permite múltiplos hosts separados por vírgula
@@ -176,6 +176,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ============================================================================
 # Ativadas apenas quando DEBUG=False (em produção no Heroku)
 
+# ============================================================================
+# CONFIGURAÇÕES DE SEGURANÇA SEMPRE ATIVAS
+# ============================================================================
+# Essas configurações são essenciais mesmo em desenvolvimento
+
+# Configurações de HSTS (HTTP Strict Transport Security)
+SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=31536000 if not DEBUG else 0, cast=int)  # 1 ano em prod
+SECURE_HSTS_INCLUDE_SUBDOMAINS = config('SECURE_HSTS_INCLUDE_SUBDOMAINS', default=not DEBUG, cast=bool)
+SECURE_HSTS_PRELOAD = config('SECURE_HSTS_PRELOAD', default=not DEBUG, cast=bool)
+
+# Proteções de conteúdo
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+
 if not DEBUG:
     # ---------- REDIRECIONAMENTO E TRANSPORTE ----------
     # Força redirecionamento HTTP para HTTPS
@@ -199,21 +214,6 @@ if not DEBUG:
     # SameSite cookie attribute (proteção contra CSRF)
     CSRF_COOKIE_SAMESITE = 'Lax'  # 'Lax' é mais permissivo que 'Strict'
     SESSION_COOKIE_SAMESITE = 'Lax'
-    
-    # ---------- HSTS (HTTP Strict Transport Security) ----------
-    SECURE_HSTS_SECONDS = 31536000  # 1 ano
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    
-    # ---------- PROTEÇÕES ADICIONAIS ----------
-    # Previne que o navegador detecte incorretamente o content type
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    
-    # Ativa proteção XSS do navegador
-    SECURE_BROWSER_XSS_FILTER = True
-    
-    # Previne que o site seja carregado em frames (clickjacking)
-    X_FRAME_OPTIONS = 'DENY'
 
 # ============================================================================
 # CONFIGURAÇÕES CSRF (CROSS-SITE REQUEST FORGERY)
