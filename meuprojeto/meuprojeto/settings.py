@@ -64,7 +64,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
-        'APP_DIRS': True,
+        'APP_DIRS': DEBUG,  # APP_DIRS só quando DEBUG=True e sem loaders customizado
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
@@ -73,15 +73,17 @@ TEMPLATES = [
                 'plataforma_Casa.context_processors.user_groups',  # Adiciona grupos do usuário
             ],
             # Desabilita cache de templates em DEBUG mode para forçar reload
-            'loaders': [
-                'django.template.loaders.app_directories.Loader',
-                'django.template.loaders.filesystem.Loader',
-            ] if DEBUG else [
-                ('django.template.loaders.cached.Loader', [
-                    'django.template.loaders.app_directories.Loader',
-                    'django.template.loaders.filesystem.Loader',
-                ]),
-            ],
+            # Só define loaders quando APP_DIRS=False (produção)
+            **(
+                {} if DEBUG else {
+                    'loaders': [
+                        ('django.template.loaders.cached.Loader', [
+                            'django.template.loaders.app_directories.Loader',
+                            'django.template.loaders.filesystem.Loader',
+                        ]),
+                    ],
+                }
+            ),
         },
     },
 ]
@@ -229,4 +231,4 @@ CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
 
 # Verificador de token CSRF (importante para AJAX e POST)
-CSRF_FAILURE_VIEW = 'plataforma_Casa.views.csrf_failure_view'  # View customizada (opcional)
+# CSRF_FAILURE_VIEW = 'plataforma_Casa.views.csrf_failure_view'  # View customizada (opcional)
