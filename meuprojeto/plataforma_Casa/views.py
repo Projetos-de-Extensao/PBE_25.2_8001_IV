@@ -145,8 +145,8 @@ def login_view(request):
     Backend customizado (EmailOrUsernameModelBackend) permite ambos
     """
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username = request.POST.get('username', '').strip()  # Remove espaços em branco
+        password = request.POST.get('password', '')
         
         # O backend customizado tentará autenticar com username ou email
         user = authenticate(request, username=username, password=password)
@@ -376,10 +376,10 @@ def dashboard(request):
     View do Dashboard - Redireciona cada usuário para seu dashboard específico
     
     Comportamento:
-    - Admin: Redireciona para Dashboard de Gestão
+    - Admin (sem outros grupos): Redireciona para Dashboard de Gestão
     - Professor: Renderiza Dashboard do Professor
-    - Aluno: Redireciona para Portal de Vagas
     - Monitor: Renderiza Dashboard do Monitor
+    - Aluno: Redireciona para Portal de Vagas
     - Outros: Renderiza Dashboard Geral
     """
     user = request.user
@@ -390,10 +390,15 @@ def dashboard(request):
     is_monitor = user.groups.filter(name='Monitor').exists()
     is_aluno = user.groups.filter(name='Aluno').exists()
     
-    # ========== REDIRECIONAMENTOS ==========
+    # ========== REDIRECIONAMENTOS BASEADOS EM HIERARQUIA ==========
     
-    # Admin vai para Dashboard de Gestão
-    if is_admin:
+    # IMPORTANTE: Professor tem prioridade sobre Admin
+    # Se o usuário é Professor (mesmo sendo staff), vai para Dashboard do Professor
+    if is_professor:
+        # Dashboard do Professor será renderizado abaixo
+        pass
+    # Admin SEM grupo Professor vai para Dashboard de Gestão
+    elif is_admin:
         return redirect('dashboard_gestao')
     
     # ========== DASHBOARD DO MONITOR ==========
@@ -2286,24 +2291,6 @@ def dashboard_gestao(request):
     pagamentos_dict = {item['mes'].strftime('%Y-%m') if item['mes'] else '': float(item['total_valor']) for item in pagamentos_timeline}
     valores_pagamento = [pagamentos_dict.get(mes, 0) for mes in horas_labels]
     
-    # ========== TOP 10 DISCIPLINAS COM MAIS VAGAS ==========
-    
-    # disciplina é CharField, não ForeignKey
-    disciplinas_top = Vaga.objects.filter(
-        ativo=True,
-        disciplina__isnull=False
-    ).exclude(
-        disciplina=''
-    ).values(
-        'disciplina'
-    ).annotate(
-        total_vagas=Count('id'),
-        total_inscritos=Count('inscricao')
-    ).order_by('-total_vagas')[:10]
-    
-    disciplina_labels = [item['disciplina'] for item in disciplinas_top]
-    disciplina_vagas = [item['total_vagas'] for item in disciplinas_top]
-    disciplina_inscritos = [item['total_inscritos'] for item in disciplinas_top]
     
     # ========== REGISTRO DE HORAS POR STATUS ==========
     
