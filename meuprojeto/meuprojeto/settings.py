@@ -59,6 +59,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'meuprojeto.urls'
 
+# Configuração de templates com cache desabilitado em DEBUG mode
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -70,6 +71,16 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'plataforma_Casa.context_processors.user_groups',  # Adiciona grupos do usuário
+            ],
+            # Desabilita cache de templates em DEBUG mode para forçar reload
+            'loaders': [
+                'django.template.loaders.app_directories.Loader',
+                'django.template.loaders.filesystem.Loader',
+            ] if DEBUG else [
+                ('django.template.loaders.cached.Loader', [
+                    'django.template.loaders.app_directories.Loader',
+                    'django.template.loaders.filesystem.Loader',
+                ]),
             ],
         },
     },
