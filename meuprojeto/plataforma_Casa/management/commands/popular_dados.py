@@ -201,15 +201,16 @@ class Command(BaseCommand):
                 tipo_usuario=tipo_professor,
                 matricula='PROF001',
                 departamento='Ciência da Computação',
+                funcao='Professor Adjunto',  # ✅ Adicionado
                 coordenador=False
             )
             self.stdout.write("  ✅ Professor de teste criado")
         
         # Outros professores
         professores = [
-            {'nome': 'Prof. Ana Silva', 'email': 'ana.silva@faculdade.edu.br', 'matricula': 'PROF002', 'dept': 'SI', 'coord': True},
-            {'nome': 'Prof. João Santos', 'email': 'joao.santos@faculdade.edu.br', 'matricula': 'PROF003', 'dept': 'ES', 'coord': False},
-            {'nome': 'Prof. Maria Costa', 'email': 'maria.costa@faculdade.edu.br', 'matricula': 'PROF004', 'dept': 'ADS', 'coord': False},
+            {'nome': 'Prof. Ana Silva', 'email': 'ana.silva@faculdade.edu.br', 'matricula': 'PROF002', 'dept': 'Sistemas de Informação', 'funcao': 'Coordenadora', 'coord': True},
+            {'nome': 'Prof. João Santos', 'email': 'joao.santos@faculdade.edu.br', 'matricula': 'PROF003', 'dept': 'Engenharia de Software', 'funcao': 'Professor Titular', 'coord': False},
+            {'nome': 'Prof. Maria Costa', 'email': 'maria.costa@faculdade.edu.br', 'matricula': 'PROF004', 'dept': 'Análise e Desenvolvimento de Sistemas', 'funcao': 'Professora Assistente', 'coord': False},
         ]
         
         for prof in professores:
@@ -220,6 +221,7 @@ class Command(BaseCommand):
                     tipo_usuario=tipo_coordenador if prof['coord'] else tipo_professor,
                     matricula=prof['matricula'],
                     departamento=prof['dept'],
+                    funcao=prof['funcao'],  # ✅ Adicionado
                     coordenador=prof['coord']
                 )
                 self.stdout.write(f"  ✅ {prof['nome']} criado")

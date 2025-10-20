@@ -34,6 +34,7 @@ class Usuario(models.Model):
 class Funcionario(Usuario):
     matricula = models.CharField(max_length=20, unique=True)
     departamento = models.CharField(max_length=100, blank=True, null=True)
+    funcao = models.CharField(max_length=100, blank=True, null=True, default='Professor')  # ✅ Novo campo
     coordenador = models.BooleanField(default=False)
 
     def __str__(self):
