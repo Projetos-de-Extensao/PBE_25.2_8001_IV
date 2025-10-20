@@ -2187,249 +2187,261 @@ def dashboard_gestao(request):
     from datetime import datetime, timedelta
     from collections import defaultdict
     
-    # ========== KPIs PRINCIPAIS ==========
-    
-    # Total de monitores ativos
-    total_monitores = Aluno.objects.filter(monitorias__ativo=True).distinct().count()
-    
-    # Total de alunos no sistema
-    total_alunos = Aluno.objects.filter(ativo=True).count()
-    
-    # Total de professores (usuários no grupo Professor)
-    from django.contrib.auth.models import Group
+    # ✅ TRATAMENTO DE ERRO COMPLETO PARA DEBUG
     try:
-        grupo_professor = Group.objects.get(name='Professor')
-        total_professores = grupo_professor.user_set.count()
-    except:
-        total_professores = 0
-    
-    # Total de vagas ativas
-    total_vagas = Vaga.objects.filter(ativo=True).count()
-    
-    # Total de turmas ativas
-    total_turmas = Turma.objects.filter(ativo=True).count()
-    
-    # Total de inscrições no sistema
-    total_inscricoes = Inscricao.objects.all().count()
-    
-    # Horas totais do mês atual
-    total_horas_mes = RegistroHoras.objects.filter(
-        status='Aprovado',
-        data__month=timezone.now().month,
-        data__year=timezone.now().year
-    ).aggregate(total=Sum('total_horas'))['total'] or 0
-    
-    # Valor total de pagamentos do mês (baseado em StatusPagamento)
-    valor_total_mes = StatusPagamento.objects.filter(
-        status='Pago',
-        mes_referencia__month=timezone.now().month,
-        mes_referencia__year=timezone.now().year
-    ).aggregate(total=Sum('valor_total'))['total'] or 0
-    
-    # ========== ESTATÍSTICAS DE INSCRIÇÕES ==========
-    
-    # Inscrições por status
-    inscricoes_por_status = Inscricao.objects.values('status').annotate(
-        total=Count('id')
-    ).order_by('-total')
-    
-    # Preparar dados para gráfico de pizza
-    status_labels = [item['status'] for item in inscricoes_por_status]
-    status_values = [item['total'] for item in inscricoes_por_status]
-    
-    # Taxa de aprovação
-    total_inscricoes_avaliadas = Inscricao.objects.exclude(status='Pendente').count()
-    total_aprovados = Inscricao.objects.filter(status='Aprovado').count()
-    taxa_aprovacao = round((total_aprovados / total_inscricoes_avaliadas * 100), 1) if total_inscricoes_avaliadas > 0 else 0
-    
-    # ========== MONITORES POR CURSO ==========
-    
-    monitores_por_curso = Inscricao.objects.filter(
-        status='Aprovado'
-    ).values('aluno__curso__nome').annotate(
-        total=Count('id', distinct=True)
-    ).order_by('-total')[:10]
-    
-    curso_labels = [item['aluno__curso__nome'] for item in monitores_por_curso]
-    curso_values = [item['total'] for item in monitores_por_curso]
-    
-    # ========== EVOLUÇÃO DE INSCRIÇÕES (ÚLTIMOS 6 MESES) ==========
-    
-    seis_meses_atras = timezone.now() - timedelta(days=180)
-    inscricoes_timeline = Inscricao.objects.filter(
-        data_inscricao__gte=seis_meses_atras
-    ).annotate(
-        mes=TruncMonth('data_inscricao')
-    ).values('mes').annotate(
-        total=Count('id')
-    ).order_by('mes')
-    
-    timeline_labels = [item['mes'].strftime('%Y-%m') if item['mes'] else '' for item in inscricoes_timeline]
-    timeline_values = [item['total'] for item in inscricoes_timeline]
-    
-    # ========== HORAS TRABALHADAS (ÚLTIMOS 6 MESES) ==========
-    
-    horas_timeline = RegistroHoras.objects.filter(
-        status='Aprovado',
-        data__gte=seis_meses_atras
-    ).annotate(
-        mes=TruncMonth('data')
-    ).values('mes').annotate(
-        total_horas=Sum('total_horas')
-    ).order_by('mes')
-    
-    # Buscar valores de pagamento por mês (StatusPagamento)
-    pagamentos_timeline = StatusPagamento.objects.filter(
-        mes_referencia__gte=seis_meses_atras
-    ).annotate(
-        mes=TruncMonth('mes_referencia')
-    ).values('mes').annotate(
-        total_valor=Sum('valor_total')
-    ).order_by('mes')
-    
-    horas_labels = [item['mes'].strftime('%Y-%m') if item['mes'] else '' for item in horas_timeline]
-    horas_values = [float(item['total_horas']) for item in horas_timeline]
-    
-    # Criar dicionário de pagamentos por mês para correlacionar
-    pagamentos_dict = {item['mes'].strftime('%Y-%m') if item['mes'] else '': float(item['total_valor']) for item in pagamentos_timeline}
-    valores_pagamento = [pagamentos_dict.get(mes, 0) for mes in horas_labels]
-    
-    
-    # ========== REGISTRO DE HORAS POR STATUS ==========
-    
-    horas_por_status = RegistroHoras.objects.values('status').annotate(
-        total=Count('id'),
-        horas=Sum('total_horas')
-    ).order_by('-total')
-    
-    horas_status_labels = [item['status'] for item in horas_por_status]
-    horas_status_values = [item['total'] for item in horas_por_status]
-    
-    # ========== PENDÊNCIAS E ALERTAS ==========
-    
-    # Pagamentos pendentes
-    pagamentos_pendentes = StatusPagamento.objects.filter(
-        status='Pendente'
-    ).count()
-    
-    # Avaliações pendentes
-    avaliacoes_pendentes = Inscricao.objects.filter(
-        status='Pendente'
-    ).count()
-    
-    # Horas pendentes de validação
-    horas_pendentes = RegistroHoras.objects.filter(
-        status='Pendente'
-    ).count()
-    
-    # Documentos de inscrições pendentes (Documento não tem campo status)
-    documentos_pendentes = Documento.objects.filter(
-        inscricao__status='Pendente'
-    ).count()
-    
-    # ========== VAGAS ATIVAS COM DETALHES ==========
-    
-    vagas_ativas = Vaga.objects.filter(ativo=True).annotate(
-        total_inscritos=Count('inscricao'),
-        aprovados=Count('inscricao', filter=Q(inscricao__status='Aprovado'))
-    ).select_related('curso', 'coordenador').order_by('-criado_em')[:10]
-    
-    # ========== ANÁLISE DE DESEMPENHO ==========
-    
-    # CR médio dos monitores aprovados
-    cr_medio_monitores = Inscricao.objects.filter(
-        status='Aprovado'
-    ).aggregate(media=Avg('aluno__cr_geral'))['media'] or 0
-    
-    # Média de horas por monitor
-    media_horas_monitor = RegistroHoras.objects.filter(
-        status='Aprovado'
-    ).aggregate(media=Avg('total_horas'))['media'] or 0
-    
-    # ========== ANÁLISE FINANCEIRA ==========
-    
-    # Total pago no ano (baseado em StatusPagamento)
-    ano_atual = timezone.now().year
-    total_pago_ano = StatusPagamento.objects.filter(
-        status='Pago',
-        mes_referencia__year=ano_atual
-    ).aggregate(total=Sum('valor_total'))['total'] or 0
-    
-    # Média mensal de pagamentos
-    media_mensal = total_pago_ano / timezone.now().month if timezone.now().month > 0 else 0
-    
-    # ========== EXPORTAÇÃO DE DADOS ==========
-    
-    # Preparar dados consolidados para exportação Excel
-    dados_exportacao = {
-        'monitores': Inscricao.objects.filter(status='Aprovado').select_related('aluno', 'vaga').values(
-            'aluno__nome', 'aluno__matricula', 'aluno__curso__nome', 
-            'vaga__disciplina', 'aluno__cr_geral'
-        ),
-        'horas': RegistroHoras.objects.filter(status='Aprovado').select_related('monitor').values(
-            'monitor__nome', 'data', 'total_horas', 'descricao_atividade'
-        ),
-        'vagas': Vaga.objects.filter(ativo=True).select_related('curso', 'coordenador').values(
-            'disciplina', 'curso__nome', 'numero_vagas', 'coordenador__nome'
-        ),
-    }
-    
-    context = {
-        # KPIs Principais
-        'total_monitores': total_monitores,
-        'total_alunos': total_alunos,
-        'total_professores': total_professores,
-        'total_vagas': total_vagas,
-        'total_turmas': total_turmas,
-        'total_inscricoes': total_inscricoes,
-        'total_horas_mes': round(total_horas_mes, 2),
-        'valor_total_mes': round(valor_total_mes, 2),
+        # ========== KPIs PRINCIPAIS ==========
         
-        # Estatísticas de Inscrições
-        'inscricoes_por_status': inscricoes_por_status,
-        'status_labels': json.dumps(status_labels),
-        'status_values': json.dumps(status_values),
-        'taxa_aprovacao': taxa_aprovacao,
+        # Total de monitores ativos
+        total_monitores = Aluno.objects.filter(monitorias__ativo=True).distinct().count()
         
-        # Monitores por Curso
-        'monitores_por_curso': monitores_por_curso,
-        'curso_labels': json.dumps(curso_labels),
-        'curso_values': json.dumps(curso_values),
+        # Total de alunos no sistema
+        total_alunos = Aluno.objects.filter(ativo=True).count()
         
-        # Timeline de Inscrições
-        'timeline_labels': json.dumps(timeline_labels),
-        'timeline_values': json.dumps(timeline_values),
+        # Total de professores (usuários no grupo Professor)
+        from django.contrib.auth.models import Group
+        try:
+            grupo_professor = Group.objects.get(name='Professor')
+            total_professores = grupo_professor.user_set.count()
+        except:
+            total_professores = 0
         
-        # Timeline de Horas
-        'horas_labels': json.dumps(horas_labels),
-        'horas_values': json.dumps(horas_values),
-        'valores_pagamento': json.dumps(valores_pagamento),
+        # Total de vagas ativas
+        total_vagas = Vaga.objects.filter(ativo=True).count()
         
-        # Horas por Status
-        'horas_status_labels': json.dumps(horas_status_labels),
-        'horas_status_values': json.dumps(horas_status_values),
+        # Total de turmas ativas
+        total_turmas = Turma.objects.filter(ativo=True).count()
         
-        # Pendências
-        'pagamentos_pendentes': pagamentos_pendentes,
-        'avaliacoes_pendentes': avaliacoes_pendentes,
-        'horas_pendentes': horas_pendentes,
-        'documentos_pendentes': documentos_pendentes,
+        # Total de inscrições no sistema
+        total_inscricoes = Inscricao.objects.all().count()
         
-        # Vagas
-        'vagas_ativas': vagas_ativas,
+        # Horas totais do mês atual
+        total_horas_mes = RegistroHoras.objects.filter(
+            status='Aprovado',
+            data__month=timezone.now().month,
+            data__year=timezone.now().year
+        ).aggregate(total=Sum('total_horas'))['total'] or 0
         
-        # Análise de Desempenho
-        'cr_medio_monitores': round(cr_medio_monitores, 2),
-        'media_horas_monitor': round(media_horas_monitor, 2),
+        # Valor total de pagamentos do mês (baseado em StatusPagamento)
+        valor_total_mes = StatusPagamento.objects.filter(
+            status='Pago',
+            mes_referencia__month=timezone.now().month,
+            mes_referencia__year=timezone.now().year
+        ).aggregate(total=Sum('valor_total'))['total'] or 0
         
-        # Análise Financeira
-        'total_pago_ano': round(total_pago_ano, 2),
-        'media_mensal': round(media_mensal, 2),
+        # ========== ESTATÍSTICAS DE INSCRIÇÕES ==========
         
-        # Data atual
-        'now': timezone.now(),
-    }
-    return render(request, 'gestao/dashboard.html', context)
+        # Inscrições por status
+        inscricoes_por_status = Inscricao.objects.values('status').annotate(
+            total=Count('id')
+        ).order_by('-total')
+        
+        # Preparar dados para gráfico de pizza
+        status_labels = [item['status'] for item in inscricoes_por_status]
+        status_values = [item['total'] for item in inscricoes_por_status]
+        
+        # Taxa de aprovação
+        total_inscricoes_avaliadas = Inscricao.objects.exclude(status='Pendente').count()
+        total_aprovados = Inscricao.objects.filter(status='Aprovado').count()
+        taxa_aprovacao = round((total_aprovados / total_inscricoes_avaliadas * 100), 1) if total_inscricoes_avaliadas > 0 else 0
+        
+        # ========== MONITORES POR CURSO ==========
+        
+        monitores_por_curso = Inscricao.objects.filter(
+            status='Aprovado'
+        ).values('aluno__curso__nome').annotate(
+            total=Count('id', distinct=True)
+        ).order_by('-total')[:10]
+        
+        curso_labels = [item['aluno__curso__nome'] for item in monitores_por_curso]
+        curso_values = [item['total'] for item in monitores_por_curso]
+        
+        # ========== EVOLUÇÃO DE INSCRIÇÕES (ÚLTIMOS 6 MESES) ==========
+        
+        seis_meses_atras = timezone.now() - timedelta(days=180)
+        inscricoes_timeline = Inscricao.objects.filter(
+            data_inscricao__gte=seis_meses_atras
+        ).annotate(
+            mes=TruncMonth('data_inscricao')
+        ).values('mes').annotate(
+            total=Count('id')
+        ).order_by('mes')
+        
+        timeline_labels = [item['mes'].strftime('%Y-%m') if item['mes'] else '' for item in inscricoes_timeline]
+        timeline_values = [item['total'] for item in inscricoes_timeline]
+        
+        # ========== HORAS TRABALHADAS (ÚLTIMOS 6 MESES) ==========
+        
+        horas_timeline = RegistroHoras.objects.filter(
+            status='Aprovado',
+            data__gte=seis_meses_atras
+        ).annotate(
+            mes=TruncMonth('data')
+        ).values('mes').annotate(
+            total_horas=Sum('total_horas')
+        ).order_by('mes')
+        
+        # Buscar valores de pagamento por mês (StatusPagamento)
+        pagamentos_timeline = StatusPagamento.objects.filter(
+            mes_referencia__gte=seis_meses_atras
+        ).annotate(
+            mes=TruncMonth('mes_referencia')
+        ).values('mes').annotate(
+            total_valor=Sum('valor_total')
+        ).order_by('mes')
+        
+        horas_labels = [item['mes'].strftime('%Y-%m') if item['mes'] else '' for item in horas_timeline]
+        horas_values = [float(item['total_horas']) for item in horas_timeline]
+        
+        # Criar dicionário de pagamentos por mês para correlacionar
+        pagamentos_dict = {item['mes'].strftime('%Y-%m') if item['mes'] else '': float(item['total_valor']) for item in pagamentos_timeline}
+        valores_pagamento = [pagamentos_dict.get(mes, 0) for mes in horas_labels]
+        
+        
+        # ========== REGISTRO DE HORAS POR STATUS ==========
+        
+        horas_por_status = RegistroHoras.objects.values('status').annotate(
+            total=Count('id'),
+            horas=Sum('total_horas')
+        ).order_by('-total')
+        
+        horas_status_labels = [item['status'] for item in horas_por_status]
+        horas_status_values = [item['total'] for item in horas_por_status]
+        
+        # ========== PENDÊNCIAS E ALERTAS ==========
+        
+        # Pagamentos pendentes
+        pagamentos_pendentes = StatusPagamento.objects.filter(
+            status='Pendente'
+        ).count()
+        
+        # Avaliações pendentes
+        avaliacoes_pendentes = Inscricao.objects.filter(
+            status='Pendente'
+        ).count()
+        
+        # Horas pendentes de validação
+        horas_pendentes = RegistroHoras.objects.filter(
+            status='Pendente'
+        ).count()
+        
+        # Documentos de inscrições pendentes (Documento não tem campo status)
+        documentos_pendentes = Documento.objects.filter(
+            inscricao__status='Pendente'
+        ).count()
+        
+        # ========== VAGAS ATIVAS COM DETALHES ==========
+        
+        vagas_ativas = Vaga.objects.filter(ativo=True).annotate(
+            total_inscritos=Count('inscricao'),
+            aprovados=Count('inscricao', filter=Q(inscricao__status='Aprovado'))
+        ).select_related('curso', 'coordenador').order_by('-criado_em')[:10]
+        
+        # ========== ANÁLISE DE DESEMPENHO ==========
+        
+        # CR médio dos monitores aprovados
+        cr_medio_monitores = Inscricao.objects.filter(
+            status='Aprovado'
+        ).aggregate(media=Avg('aluno__cr_geral'))['media'] or 0
+        
+        # Média de horas por monitor
+        media_horas_monitor = RegistroHoras.objects.filter(
+            status='Aprovado'
+        ).aggregate(media=Avg('total_horas'))['media'] or 0
+        
+        # ========== ANÁLISE FINANCEIRA ==========
+        
+        # Total pago no ano (baseado em StatusPagamento)
+        ano_atual = timezone.now().year
+        total_pago_ano = StatusPagamento.objects.filter(
+            status='Pago',
+            mes_referencia__year=ano_atual
+        ).aggregate(total=Sum('valor_total'))['total'] or 0
+        
+        # Média mensal de pagamentos
+        media_mensal = total_pago_ano / timezone.now().month if timezone.now().month > 0 else 0
+        
+        # ========== EXPORTAÇÃO DE DADOS ==========
+        
+        # Preparar dados consolidados para exportação Excel
+        dados_exportacao = {
+            'monitores': Inscricao.objects.filter(status='Aprovado').select_related('aluno', 'vaga').values(
+                'aluno__nome', 'aluno__matricula', 'aluno__curso__nome', 
+                'vaga__disciplina', 'aluno__cr_geral'
+            ),
+            'horas': RegistroHoras.objects.filter(status='Aprovado').select_related('monitor').values(
+                'monitor__nome', 'data', 'total_horas', 'descricao_atividade'
+            ),
+            'vagas': Vaga.objects.filter(ativo=True).select_related('curso', 'coordenador').values(
+                'disciplina', 'curso__nome', 'numero_vagas', 'coordenador__nome'
+            ),
+        }
+        
+        context = {
+            # KPIs Principais
+            'total_monitores': total_monitores,
+            'total_alunos': total_alunos,
+            'total_professores': total_professores,
+            'total_vagas': total_vagas,
+            'total_turmas': total_turmas,
+            'total_inscricoes': total_inscricoes,
+            'total_horas_mes': round(total_horas_mes, 2),
+            'valor_total_mes': round(valor_total_mes, 2),
+            
+            # Estatísticas de Inscrições
+            'inscricoes_por_status': inscricoes_por_status,
+            'status_labels': json.dumps(status_labels),
+            'status_values': json.dumps(status_values),
+            'taxa_aprovacao': taxa_aprovacao,
+            
+            # Monitores por Curso
+            'monitores_por_curso': monitores_por_curso,
+            'curso_labels': json.dumps(curso_labels),
+            'curso_values': json.dumps(curso_values),
+            
+            # Timeline de Inscrições
+            'timeline_labels': json.dumps(timeline_labels),
+            'timeline_values': json.dumps(timeline_values),
+            
+            # Timeline de Horas
+            'horas_labels': json.dumps(horas_labels),
+            'horas_values': json.dumps(horas_values),
+            'valores_pagamento': json.dumps(valores_pagamento),
+            
+            # Horas por Status
+            'horas_status_labels': json.dumps(horas_status_labels),
+            'horas_status_values': json.dumps(horas_status_values),
+            
+            # Pendências
+            'pagamentos_pendentes': pagamentos_pendentes,
+            'avaliacoes_pendentes': avaliacoes_pendentes,
+            'horas_pendentes': horas_pendentes,
+            'documentos_pendentes': documentos_pendentes,
+            
+            # Vagas
+            'vagas_ativas': vagas_ativas,
+            
+            # Análise de Desempenho
+            'cr_medio_monitores': round(cr_medio_monitores, 2),
+            'media_horas_monitor': round(media_horas_monitor, 2),
+            
+            # Análise Financeira
+            'total_pago_ano': round(total_pago_ano, 2),
+            'media_mensal': round(media_mensal, 2),
+            
+            # Data atual
+            'now': timezone.now(),
+        }
+        return render(request, 'gestao/dashboard.html', context)
+    
+    except Exception as e:
+        # Se houver erro, redireciona para dashboard simples com mensagem
+        import traceback
+        from django.contrib import messages
+        messages.error(request, f'Erro ao carregar dashboard de gestão: {str(e)}')
+        print(f"ERRO DASHBOARD_GESTAO: {str(e)}")
+        print(traceback.format_exc())
+        # Redirecionar para dashboard normal
+        return redirect('plataforma_Casa:dashboard')
 
 
 def gerenciar_pagamentos(request):
