@@ -25,12 +25,12 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv(
 # CONFIGURAÇÃO DE CORS E HOSTS CONFIÁVEIS - PRODUÇÃO
 # ============================================================================
 # Para Heroku em produção, adicionar na variável de ambiente:
-# ALLOWED_HOSTS=localhost,127.0.0.1,plataformacasa-f820a0a16535.herokuapp.com
+# ALLOWED_HOSTS=localhost,127.0.0.1,plataformacasa-a2a3d2abfd5e.herokuapp.com
 # 
 # Ou definir aqui diretamente (menos recomendado por segurança):
 CSRF_TRUSTED_ORIGINS = config(
     'CSRF_TRUSTED_ORIGINS',
-    default='https://plataformacasa-f820a0a16535.herokuapp.com',
+    default='https://plataformacasa-a2a3d2abfd5e.herokuapp.com',
     cast=Csv()
 )
 
