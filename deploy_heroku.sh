@@ -60,15 +60,40 @@ echo "Adicionando PostgreSQL..."
 echo "Escolha o plano:"
 echo "1) mini (gratuito, limitado)"
 echo "2) essential-0 ($5/mês - RECOMENDADO)"
-read -p "Digite 1 ou 2: " DB_CHOICE
+echo "3) hobby-dev (gratuito, 10.000 linhas)"
+read -p "Digite 1, 2 ou 3: " DB_CHOICE
 
+echo ""
+echo "Tentando adicionar PostgreSQL..."
+
+# Tenta diferentes nomes de planos (a API da Heroku mudou)
 if [ "$DB_CHOICE" = "2" ]; then
-    heroku addons:create heroku-postgresql:essential-0 --app "$APP_NAME"
+    # Tenta essential-0 primeiro, depois alternativas
+    if heroku addons:create heroku-postgresql:essential-0 --app "$APP_NAME" 2>/dev/null; then
+        echo -e "${GREEN}✓ PostgreSQL essential-0 adicionado${NC}"
+    elif heroku addons:create heroku-postgresql:basic --app "$APP_NAME" 2>/dev/null; then
+        echo -e "${GREEN}✓ PostgreSQL basic adicionado${NC}"
+    elif heroku addons:create heroku-postgresql:standard-0 --app "$APP_NAME" 2>/dev/null; then
+        echo -e "${GREEN}✓ PostgreSQL standard-0 adicionado${NC}"
+    else
+        echo -e "${RED}Erro ao adicionar plano pago. Tentando hobby-dev...${NC}"
+        heroku addons:create heroku-postgresql:hobby-dev --app "$APP_NAME"
+        echo -e "${YELLOW}✓ PostgreSQL hobby-dev (gratuito) adicionado${NC}"
+    fi
+elif [ "$DB_CHOICE" = "3" ]; then
+    heroku addons:create heroku-postgresql:hobby-dev --app "$APP_NAME"
+    echo -e "${GREEN}✓ PostgreSQL hobby-dev adicionado${NC}"
 else
-    heroku addons:create heroku-postgresql:mini --app "$APP_NAME"
+    # Tenta mini primeiro, depois hobby-dev
+    if heroku addons:create heroku-postgresql:mini --app "$APP_NAME" 2>/dev/null; then
+        echo -e "${GREEN}✓ PostgreSQL mini adicionado${NC}"
+    else
+        echo -e "${YELLOW}Mini não disponível. Usando hobby-dev...${NC}"
+        heroku addons:create heroku-postgresql:hobby-dev --app "$APP_NAME"
+        echo -e "${GREEN}✓ PostgreSQL hobby-dev adicionado${NC}"
+    fi
 fi
 
-echo -e "${GREEN}✓ PostgreSQL adicionado${NC}"
 echo ""
 
 # Gera SECRET_KEY

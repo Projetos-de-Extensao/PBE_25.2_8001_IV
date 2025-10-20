@@ -1,3 +1,60 @@
+<!--
+    ============================================================================
+    TEMPLATE: DASHBOARD - PAINEL DE CONTROLE
+    ============================================================================
+    
+    DESCRIÇÃO:
+    Painel de controle com KPIs (Key Performance Indicators) e estatísticas
+    personalizadas por perfil de usuário. Exibe informações críticas para
+    tomada de decisão em tempo real.
+    
+    FUNCIONALIDADES PRINCIPAIS:
+    1. Dashboard do Professor: Vagas ativas, candidatos, monitores aprovados
+    2. Dashboard Admin: Visão geral do sistema com todas as métricas globais
+    3. Renderização condicional: Conteúdo diferente baseado em is_professor_dashboard
+    4. Tabelas de dados: Últimas inscrições, monitorias, dados pendentes
+    5. Cards com hover effects: Feedback visual ao interagir
+    6. Grid layout responsivo: 3 colunas → 1 coluna em mobile
+    
+    SEGURANÇA & PERMISSÕES:
+    - Acesso: Apenas usuários autenticados (Professor ou Admin)
+    - Dados: Context variables injetadas pela view filtra dados do usuário
+    - Templates condicionais: {% if is_professor_dashboard %} garante segurança
+    
+    VARIÁVEIS CONTEXT ESPERADAS (Professor):
+    - total_minhas_vagas: int - quantidade de vagas criadas
+    - total_candidatos: int - total de candidatos em todas as vagas
+    - monitores_aprovados: int - total de monitores aprovados
+    - candidatos_pendentes: int - inscrições não analisadas
+    - horas_pendentes: int - horas de trabalho aguardando validação
+    - ultimas_inscricoes: QuerySet - últimas 5-10 inscrições (ordering: -data_inscricao)
+    - vagas_populares: QuerySet - vagas ordenadas por numero de candidatos
+    - minhas_turmas: QuerySet - turmas do professor (status ativo)
+    
+    VARIÁVEIS CONTEXT ESPERADAS (Admin):
+    - total_usuarios: int - quantidade de usuários registrados
+    - total_alunos: int - quantidade de alunos
+    - total_turmas: int - turmas ativas no sistema
+    - total_vagas: int - vagas abertas
+    - ultimas_monitorias: QuerySet - últimas monitorias criadas
+    - inscricoes_pendentes: QuerySet - inscrições com status pendente
+    
+    PADRÕES DE DESIGN:
+    - Card-based layout: Cada métrica em seu próprio card
+    - Color coding: Cores representam tipos (amarelo=warning, azul=info, verde=success)
+    - Empty states: Mensagens amigáveis quando não há dados
+    - Tables responsive: <table-responsive> para scroll em mobile
+    - Badge styles: Status badges com cores padronizadas
+    
+    PERFORMANCE:
+    - Dados pré-filtrados na view (não na template)
+    - Limite de registros em tabelas (últimas 5-10)
+    - Grid layout com media queries para responsividade
+    
+    AUTOR: Equipe de Desenvolvimento
+    DATA: Outubro 2025
+    ============================================================================
+-->
 {% extends 'base.html' %}
 {% load static %}
 
@@ -5,27 +62,232 @@
 
 {% block extra_css %}
 <style>
-    .dashboard-container { padding: 2rem 0; }
-    .dashboard-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1); margin-bottom: 1.5rem; transition: all 0.3s ease; }
-    .dashboard-card:hover { transform: translateY(-3px); box-shadow: 0 8px 16px rgba(0, 37, 85, 0.15); }
-    .stat-item { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #f0f0f0; }
-    .stat-item:last-child { border-bottom: none; }
-    .stat-number { font-size: 1.75rem; font-weight: 700; color: #002555; }
-    .stat-label { font-size: 0.875rem; color: #6c757d; font-weight: 600; text-transform: uppercase; }
-    .card-title { font-size: 1.25rem; font-weight: 700; color: #002555; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #f5f5f5; }
-    .alert-badge { display: inline-block; background-color: #dc3545; color: white; border-radius: 20px; padding: 0.25rem 0.75rem; font-size: 0.875rem; font-weight: 600; }
-    .info-badge { display: inline-block; background-color: #1245FF; color: white; border-radius: 20px; padding: 0.25rem 0.75rem; font-size: 0.875rem; font-weight: 600; }
-    .table-custom { font-size: 0.875rem; }
-    .table-custom th { background-color: #f8f9fa; color: #002555; font-weight: 700; border-bottom: 2px solid #dee2e6; }
-    .table-custom td { vertical-align: middle; }
-    .status-badge { display: inline-block; padding: 0.35rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
-    .status-pendente { background-color: #fff3cd; color: #856404; }
-    .status-aprovado { background-color: #d4edda; color: #155724; }
-    .status-rejeitado { background-color: #f8d7da; color: #721c24; }
-    .icon-stat { font-size: 2.5rem; color: #d0d0d0; text-align: center; }
-    .grid-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    /* 
+     * ========================================================================
+     * SEÇÃO: CONTAINER DASHBOARD
+     * ========================================================================
+     * Wrapper principal para todo o conteúdo do dashboard
+     * Adiciona padding vertical para separação com navbar fixa
+     */
+    .dashboard-container {
+        padding: 2rem 0;        /* Separação vertical */
+    }
+    
+    /* 
+     * ========================================================================
+     * SEÇÃO: CARD DASHBOARD
+     * ========================================================================
+     * Componente reutilizável para exibir métricas e dados
+     * 
+     * Características visuais:
+     * - Fundo branco com sombra sutil
+     * - Border radius moderado (12px)
+     * - Hover effect: elevação e sombra aumentada
+     * - Transição suave para feedback visual
+     * 
+     * Uso: Envolve KPIs, tabelas, listas de dados
+     */
+    .dashboard-card {
+        background: white;                              /* Fundo limpo */
+        border-radius: 12px;                            /* Cantos suavizados */
+        padding: 1.5rem;                                /* Espaçamento interno */
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1);   /* Sombra sutil (azul institucional) -->
+        margin-bottom: 1.5rem;                          /* Separação entre cards -->
+        transition: all 0.3s ease;                      /* Animação suave */
+    }
+    
+    /* Estado hover: elevação visual e sombra aumentada */
+    .dashboard-card:hover {
+        transform: translateY(-3px);                    /* Sobe 3px ao passar mouse */
+        box-shadow: 0 8px 16px rgba(0, 37, 85, 0.15); /* Sombra maior */
+    }
+    
+    /* 
+     * ========================================================================
+     * SEÇÃO: STAT ITEM (LINHA DE ESTATÍSTICA)
+     * ========================================================================
+     * Organiza horizontalmente: Label/Número à esquerda, Ícone à direita
+     * 
+     * Flexbox layout:
+     * - space-between: Afasta conteúdo para os lados
+     * - align-items: center: Alinha verticalmente
+     * - border-bottom: Linha divisória entre items
+     */
+    .stat-item {
+        display: flex;                              /* Layout horizontal */
+        align-items: center;                        /* Alinha verticalmente */
+        justify-content: space-between;             /* Espaça conteúdo -->
+        padding: 1rem 0;                            /* Espaçamento vertical -->
+        border-bottom: 1px solid #f0f0f0;          /* Linha divisória -->
+    }
+    
+    /* Remove borda do último item (evita linha desnecessária) */
+    .stat-item:last-child {
+        border-bottom: none;
+    }
+    
+    /* Número grande e destacado (KPI) */
+    .stat-number {
+        font-size: 1.75rem;                         /* Tamanho grande */
+        font-weight: 700;                           /* Bold */
+        color: #002555;                             /* Azul escuro institucional -->
+    }
+    
+    /* Rótulo da estatística (texto pequeno) */
+    .stat-label {
+        font-size: 0.875rem;                        /* Pequeno */
+        color: #6c757d;                             /* Cinza médio -->
+        font-weight: 600;                           /* Semi-bold -->
+        text-transform: uppercase;                  /* MAIÚSCULAS -->
+    }
+    
+    /* 
+     * ========================================================================
+     * SEÇÃO: TÍTULOS DE CARD
+     * ========================================================================
+     * Cabeçalho identificador de cada seção/card
+     */
+    .card-title {
+        font-size: 1.25rem;                         /* Grande -->
+        font-weight: 700;                           /* Bold -->
+        color: #002555;                             /* Cor institucional -->
+        margin-bottom: 1rem;                        /* Separação do conteúdo -->
+        padding-bottom: 0.5rem;                     /* Espaço interno para borda -->
+        border-bottom: 2px solid #f5f5f5;          /* Linha divisória sutil -->
+    }
+    
+    /* 
+     * ========================================================================
+     * SEÇÃO: BADGES (BADGES/TAGS)
+     * ========================================================================
+     * Indicadores visuais de status ou quantidade
+     * 
+     * Tipos:
+     * - alert-badge: Alarme/aviso (vermelho)
+     * - info-badge: Informação (azul)
+     * - status-* badges: Estados (pendente/aprovado/rejeitado)
+     */
+    .alert-badge {
+        display: inline-block;                      /* Comportamento inline -->
+        background-color: #dc3545;                  /* Vermelho de alerta -->
+        color: white;                               /* Texto branco -->
+        border-radius: 20px;                        /* Pill shape -->
+        padding: 0.25rem 0.75rem;                  /* Espaçamento compacto -->
+        font-size: 0.875rem;                        /* Tamanho pequeno -->
+        font-weight: 600;                           /* Semi-bold -->
+    }
+    
+    /* Badge informativo (azul institucional) */
+    .info-badge {
+        display: inline-block;
+        background-color: #1245FF;                  /* Azul claro institucional -->
+        color: white;
+        border-radius: 20px;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    
+    /* 
+     * ========================================================================
+     * SEÇÃO: TABELAS CUSTOMIZADAS
+     * ========================================================================
+     * Estilos para tabelas de dados (inscrições, monitorias, etc)
+     * Integra com Bootstrap .table classes
+     */
+    .table-custom {
+        font-size: 0.875rem;                        /* Texto reduzido -->
+    }
+    
+    /* Header da tabela */
+    .table-custom th {
+        background-color: #f8f9fa;                  /* Background cinza claro -->
+        color: #002555;                             /* Texto azul escuro -->
+        font-weight: 700;                           /* Bold -->
+        border-bottom: 2px solid #dee2e6;          /* Borda destacada -->
+    }
+    
+    /* Células de dados */
+    .table-custom td {
+        vertical-align: middle;                     /* Alinha conteúdo centralmente -->
+    }
+    
+    /* 
+     * ========================================================================
+     * SEÇÃO: STATUS BADGES (INDICADORES DE ESTADO)
+     * ========================================================================
+     * Mostram status de inscrições, vagas, monitorias
+     * Cores padronizadas: amarelo=pendente, verde=aprovado, vermelho=rejeitado
+     */
+    .status-badge {
+        display: inline-block;
+        padding: 0.35rem 0.65rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    /* Status: Pendente (amarelo) */
+    .status-pendente {
+        background-color: #fff3cd;                  /* Amarelo claro -->
+        color: #856404;                             /* Amarelo escuro -->
+    }
+    
+    /* Status: Aprovado (verde) */
+    .status-aprovado {
+        background-color: #d4edda;                  /* Verde claro -->
+        color: #155724;                             /* Verde escuro -->
+    }
+    
+    /* Status: Rejeitado (vermelho) */
+    .status-rejeitado {
+        background-color: #f8d7da;                  /* Vermelho claro -->
+        color: #721c24;                             /* Vermelho escuro -->
+    }
+    
+    /* 
+     * ========================================================================
+     * SEÇÃO: ÍCONES ESTATÍSTICOS
+     * ========================================================================
+     * Ícones grandes para visualização em KPI cards
+     * Posicionados à direita do card para equilíbrio visual
+     */
+    .icon-stat {
+        font-size: 2.5rem;                          /* Muito grande -->
+        color: #d0d0d0;                             /* Cinza claro (não chama atenção) -->
+        text-align: center;                         /* Centralizado -->
+    }
+    
+    /* 
+     * ========================================================================
+     * SEÇÃO: GRID LAYOUT DASHBOARD
+     * ========================================================================
+     * Grid CSS responsivo para layout de cards
+     * 
+     * Comportamento:
+     * - Desktop (≥768px): 3 colunas
+     * - Tablet (600-768px): 2-3 colunas (auto-fit)
+     * - Mobile (<600px): 1 coluna
+     * 
+     * minmax(300px, 1fr): Cada coluna tem mínimo 300px, máximo flexível
+     */
+    .grid-dashboard {
+        display: grid;                              /* Grid layout -->
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsivo -->
+        gap: 1.5rem;                                /* Espaçamento entre items -->
+        margin-bottom: 2rem;                        /* Separação do próximo elemento -->
+    }
+    
+    /* 
+     * ========================================================================
+     * SEÇÃO: RESPONSIVIDADE - MOBILE
+     * ========================================================================
+     * Em telas pequenas (≤768px), reduz grid para coluna única
+     */
     @media (max-width: 768px) {
-        .grid-dashboard { grid-template-columns: 1fr; }
+        .grid-dashboard {
+            grid-template-columns: 1fr;            /* 1 coluna em mobile -->
+        }
     }
 </style>
 {% endblock %}
@@ -33,9 +295,45 @@
 {% block content %}
 <div class="container-fluid dashboard-container">
     
-    {% if is_professor_dashboard %}
-    <!-- ========== DASHBOARD DO PROFESSOR ========== -->
+    <!-- 
+        ========================================================================
+        RENDERIZAÇÃO CONDICIONAL: DASHBOARD DO PROFESSOR vs ADMIN
+        ========================================================================
+        
+        Este bloco renderiza conteúdo completamente diferente baseado no tipo de usuário:
+        
+        - is_professor_dashboard == True: Dashboard do Professor (foco em suas vagas)
+        - is_professor_dashboard == False: Dashboard Admin (visão global do sistema)
+        
+        SEGURANÇA: Esta separação garante que professor não veja dados globais
+        e admin tem visão gerencial completa.
+    -->
     
+    {% if is_professor_dashboard %}
+    <!-- 
+        ====================================================================
+        DASHBOARD DO PROFESSOR
+        ====================================================================
+        
+        Conteúdo específico para professores coordenadores de monitoria
+        Foca em: Vagas criadas, candidatos, monitores, inscrições pendentes
+        
+        Permissão: is_professor_dashboard (setado na view por is_professor check)
+        
+        KPIs Exibidos:
+        1. Minhas Vagas Ativas: Quantas vagas estão abertas
+        2. Total de Candidatos: Soma de candidatos em todas as vagas
+        3. Monitores Aprovados: Quantos foram selecionados/aprovados
+        4. Candidatos Pendentes: Inscrições aguardando análise
+        5. Horas Pendentes: Horas de trabalho não validadas
+        
+        Tabelas:
+        1. Últimas Inscrições: Últimas 10 inscrições (com status)
+        2. Vagas Mais Procuradas: Ordenadas por numero de candidatos
+        3. Minhas Turmas Ativas: Turmas vinculadas às monitorias
+    -->
+    
+    <!-- Cabeçalho da página -->
     <div style="margin-bottom: 2rem;">
         <h1 style="color: #002555; font-weight: 700; margin-bottom: 0.5rem;">
             <i class="fas fa-chart-bar"></i> Dashboard do Professor
@@ -45,8 +343,21 @@
         </p>
     </div>
 
-    <!-- KPIs Principais -->
+    <!-- 
+        ====================================================================
+        KPIs PRINCIPAIS - GRID 3 COLUNAS
+        ====================================================================
+        
+        Cards com métricas essenciais para professor
+        Cada card exibe: Label + Número grande + Ícone
+        
+        Variáveis de contexto:
+        - total_minhas_vagas: Contagem de vagas criadas pelo professor
+        - total_candidatos: SUM de inscrições em todas as vagas do professor
+        - monitores_aprovados: Contagem de monitores com status="aprovado"
+    -->
     <div class="grid-dashboard">
+        <!-- Card 1: Vagas Ativas -->
         <div class="dashboard-card">
             <div class="stat-item">
                 <div>
@@ -57,6 +368,7 @@
             </div>
         </div>
 
+        <!-- Card 2: Total de Candidatos -->
         <div class="dashboard-card">
             <div class="stat-item">
                 <div>
@@ -67,6 +379,7 @@
             </div>
         </div>
 
+        <!-- Card 3: Monitores Aprovados -->
         <div class="dashboard-card">
             <div class="stat-item">
                 <div>
@@ -78,8 +391,20 @@
         </div>
     </div>
 
-    <!-- Alertas Pendentes -->
+    <!-- 
+        ====================================================================
+        ALERTAS PENDENTES - GRID 2 COLUNAS
+        ====================================================================
+        
+        Destaques para itens que requerem ação do professor
+        Usa cores diferentes: amarelo (pendentes), azul (horas)
+        
+        Variáveis de contexto:
+        - candidatos_pendentes: Inscrições com status != "aprovado" e != "rejeitado"
+        - horas_pendentes: Registros de horas com status != "validado"
+    -->
     <div class="grid-dashboard" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+        <!-- Alertas de Candidatos -->
         <div class="dashboard-card" style="border-left: 4px solid #ffc107;">
             <div class="card-title"><i class="fas fa-exclamation-triangle"></i> Candidatos Pendentes</div>
             <div style="font-size: 2.5rem; font-weight: 700; color: #ffc107; text-align: center;">
@@ -87,6 +412,7 @@
             </div>
         </div>
 
+        <!-- Alertas de Horas -->
         <div class="dashboard-card" style="border-left: 4px solid #17a2b8;">
             <div class="card-title"><i class="fas fa-hourglass-half"></i> Horas Pendentes</div>
             <div style="font-size: 2.5rem; font-weight: 700; color: #17a2b8; text-align: center;">
@@ -95,7 +421,28 @@
         </div>
     </div>
 
-    <!-- Últimas Inscrições -->
+    <!-- 
+        ====================================================================
+        TABELA: ÚLTIMAS INSCRIÇÕES
+        ====================================================================
+        
+        Mostra inscrições recentes com detalhes:
+        - Candidato: Nome + Matrícula
+        - Vaga: Disciplina/Nome da vaga
+        - Data: Data e hora da inscrição
+        - Status: Badge com status (Pendente/Aprovado/Rejeitado)
+        
+        Variável de contexto:
+        - ultimas_inscricoes: QuerySet ordenado por -data_inscricao (DESC)
+                             Limite: ~10 últimos registros
+        
+        Atributos esperados:
+        - inscricao.aluno.nome
+        - inscricao.aluno.matricula
+        - inscricao.vaga.disciplina ou inscricao.vaga.nome (fallback)
+        - inscricao.data_inscricao
+        - inscricao.status (valor usado para classe CSS: status-{{ status|lower }})
+    -->
     <div class="dashboard-card">
         <div class="card-title" style="display: flex; align-items: center; gap: 0.5rem;">
             <i class="fas fa-list"></i>
@@ -119,7 +466,7 @@
                             <strong>{{ inscricao.aluno.nome }}</strong><br>
                             <small style="color: #6c757d;">{{ inscricao.aluno.matricula }}</small>
                         </td>
-                        <td>{{ inscricao.vaga.disciplina }}</td>
+                        <td>{{ inscricao.vaga.disciplina|default:inscricao.vaga.nome }}</td>
                         <td>{{ inscricao.data_inscricao|date:"d/m/Y H:i" }}</td>
                         <td>
                             <span class="status-badge status-{{ inscricao.status|lower }}">
@@ -132,6 +479,7 @@
             </table>
         </div>
         {% else %}
+        <!-- Estado vazio: Nenhuma inscrição para exibir -->
         <div style="text-align: center; padding: 2rem; color: #6c757d;">
             <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
             <p>Nenhuma inscrição ainda</p>
@@ -139,39 +487,58 @@
         {% endif %}
     </div>
 
-    <!-- Vagas Populares -->
+    <!-- 
+        ====================================================================
+        SEÇÃO PARALELA: VAGAS POPULARES + TURMAS ATIVAS
+        ====================================================================
+        
+        Grid com 2 cards lado a lado:
+        1. Vagas Mais Procuradas: Ordenadas por numero_candidatos DESC
+        2. Minhas Turmas Ativas: Turmas vinculadas ao professor com status=ativo
+        
+        Variáveis de contexto:
+        - vagas_populares: QuerySet ordenado por -num_candidatos
+        - minhas_turmas: QuerySet com turmas ativas do professor
+    -->
     <div class="grid-dashboard" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));">
+        <!-- Card: Vagas Mais Procuradas -->
         <div class="dashboard-card">
             <div class="card-title"><i class="fas fa-star"></i> Vagas Mais Procuradas</div>
             {% if vagas_populares %}
             <div>
                 {% for vaga in vagas_populares %}
+                <!-- Cada vaga em um stat-item para alinhamento consistente -->
                 <div class="stat-item">
                     <div>
-                        <strong>{{ vaga.disciplina }}</strong><br>
+                        <strong>{{ vaga.disciplina|default:vaga.nome }}</strong><br>
                         <small style="color: #6c757d;">Curso: {{ vaga.curso.nome }}</small>
                     </div>
+                    <!-- Badge com número de candidatos -->
                     <span class="info-badge">{{ vaga.num_candidatos }} cand.</span>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
+            <!-- Estado vazio: Nenhuma vaga ativa -->
             <div style="text-align: center; padding: 2rem; color: #6c757d;">
                 <p>Nenhuma vaga ativa</p>
             </div>
             {% endif %}
         </div>
 
+        <!-- Card: Minhas Turmas Ativas -->
         <div class="dashboard-card">
             <div class="card-title"><i class="fas fa-book"></i> Minhas Turmas Ativas</div>
             {% if minhas_turmas %}
             <div>
                 {% for turma in minhas_turmas %}
+                <!-- Cada turma em um stat-item -->
                 <div class="stat-item">
                     <div>
                         <strong>{{ turma.disciplina }}</strong><br>
                         <small style="color: #6c757d;">{{ turma.horario }}</small>
                     </div>
+                    <!-- Badge com semestre/período -->
                     <span style="background: #e7f3ff; color: #1245FF; padding: 0.35rem 0.65rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">
                         {{ turma.semestre }}
                     </span>
@@ -179,6 +546,7 @@
                 {% endfor %}
             </div>
             {% else %}
+            <!-- Estado vazio: Nenhuma turma ativa -->
             <div style="text-align: center; padding: 2rem; color: #6c757d;">
                 <p>Nenhuma turma ativa</p>
             </div>
@@ -187,8 +555,28 @@
     </div>
 
     {% else %}
-    <!-- ========== DASHBOARD GERAL (ADMIN) ========== -->
+    <!-- 
+        ====================================================================
+        DASHBOARD ADMIN / GERAL
+        ====================================================================
+        
+        Conteúdo de nível administrativo/gestão
+        Visão global do sistema com todas as métricas
+        
+        Permissão: is_professor_dashboard == False (user.is_admin ou is_staff)
+        
+        KPIs Exibidos:
+        1. Total de Usuários: Contagem de User registrados
+        2. Total de Alunos: Contagem de Aluno registrados
+        3. Turmas Ativas: Contagem de Turma com status=ativo
+        4. Vagas Ativas: Contagem de Vaga com status=aberta ou similar
+        
+        Tabelas:
+        1. Últimas Monitorias: Últimas monitorias criadas
+        2. Inscrições Pendentes: Inscrições aguardando avaliação
+    -->
     
+    <!-- Cabeçalho da página -->
     <div style="margin-bottom: 2rem;">
         <h1 style="color: #002555; font-weight: 700; margin-bottom: 0.5rem;">
             <i class="fas fa-tachometer-alt"></i> Dashboard Geral
@@ -198,8 +586,21 @@
         </p>
     </div>
 
-    <!-- KPIs -->
+    <!-- 
+        ====================================================================
+        KPIs GLOBAIS - GRID 4 COLUNAS
+        ====================================================================
+        
+        Métricas de nível administrativo
+        
+        Variáveis de contexto:
+        - total_usuarios: COUNT(*) de User
+        - total_alunos: COUNT(*) de Aluno
+        - total_turmas: COUNT(*) de Turma com status=ativo
+        - total_vagas: COUNT(*) de Vaga abertas
+    -->
     <div class="grid-dashboard">
+        <!-- Card 1: Total de Usuários -->
         <div class="dashboard-card">
             <div class="stat-item">
                 <div>
@@ -210,6 +611,7 @@
             </div>
         </div>
 
+        <!-- Card 2: Total de Alunos -->
         <div class="dashboard-card">
             <div class="stat-item">
                 <div>
@@ -220,6 +622,7 @@
             </div>
         </div>
 
+        <!-- Card 3: Turmas Ativas -->
         <div class="dashboard-card">
             <div class="stat-item">
                 <div>
@@ -230,6 +633,7 @@
             </div>
         </div>
 
+        <!-- Card 4: Vagas Ativas -->
         <div class="dashboard-card">
             <div class="stat-item">
                 <div>
@@ -241,7 +645,23 @@
         </div>
     </div>
 
-    <!-- Últimas Monitorias -->
+    <!-- 
+        ====================================================================
+        TABELA: ÚLTIMAS MONITORIAS
+        ====================================================================
+        
+        Mostra monitorias criadas recentemente com status
+        
+        Variável de contexto:
+        - ultimas_monitorias: QuerySet ordenado por -data_criacao
+                             Limite: ~10 últimos registros
+        
+        Atributos esperados:
+        - monitoria.disciplina
+        - monitoria.semestre
+        - monitoria.horario
+        - monitoria.ativo (boolean: usado no {% if %} condicional)
+    -->
     <div class="dashboard-card">
         <div class="card-title"><i class="fas fa-list"></i> Últimas Monitorias</div>
         {% if ultimas_monitorias %}
@@ -262,6 +682,7 @@
                         <td>{{ monitoria.semestre }}</td>
                         <td>{{ monitoria.horario }}</td>
                         <td>
+                            <!-- Renderização condicional de status -->
                             {% if monitoria.ativo %}
                             <span class="status-badge status-aprovado">Ativa</span>
                             {% else %}
@@ -274,13 +695,29 @@
             </table>
         </div>
         {% else %}
+        <!-- Estado vazio: Nenhuma monitoria registrada -->
         <div style="text-align: center; padding: 2rem; color: #6c757d;">
             <p>Nenhuma monitoria registrada</p>
         </div>
         {% endif %}
     </div>
 
-    <!-- Inscrições Pendentes -->
+    <!-- 
+        ====================================================================
+        TABELA: INSCRIÇÕES PENDENTES
+        ====================================================================
+        
+        Inscrições aguardando avaliação/análise
+        
+        Variável de contexto:
+        - inscricoes_pendentes: QuerySet filtrado por status="Pendente"
+                               Ordenado por -data_inscricao
+        
+        Atributos esperados:
+        - inscricao.aluno.nome
+        - inscricao.vaga.disciplina ou inscricao.vaga.nome
+        - inscricao.data_inscricao
+    -->
     <div class="dashboard-card">
         <div class="card-title"><i class="fas fa-hourglass-half"></i> Inscrições Pendentes</div>
         {% if inscricoes_pendentes %}
@@ -297,7 +734,7 @@
                     {% for inscricao in inscricoes_pendentes %}
                     <tr>
                         <td><strong>{{ inscricao.aluno.nome }}</strong></td>
-                        <td>{{ inscricao.vaga.disciplina }}</td>
+                        <td>{{ inscricao.vaga.disciplina|default:inscricao.vaga.nome }}</td>
                         <td>{{ inscricao.data_inscricao|date:"d/m/Y" }}</td>
                     </tr>
                     {% endfor %}
@@ -305,6 +742,7 @@
             </table>
         </div>
         {% else %}
+        <!-- Estado vazio: Nenhuma inscrição pendente -->
         <div style="text-align: center; padding: 2rem; color: #6c757d;">
             <p>Nenhuma inscrição pendente</p>
         </div>

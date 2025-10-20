@@ -1,55 +1,132 @@
 {% load static %}
+<!--
+    ============================================================================
+    TEMPLATE DE AUTENTICAÇÃO - REGISTRO DE NOVO USUÁRIO
+    ============================================================================
+    
+    Descrição:
+    Página de cadastro para novos usuários da plataforma.
+    Implementa formulário multi-campo responsivo com validação em tempo real.
+    
+    Funcionalidades Principais:
+    - Formulário completo com 10+ campos acadêmicos e de conta
+    - Validação de senha em tempo real com checklist visual
+    - Confirmação de senha com verificação de compatibilidade
+    - Aceitação obrigatória de termos de serviço
+    - Design responsivo (mobile-first approach)
+    - Integração com Django Forms para validação backend
+    
+    Segurança:
+    - CSRF token obrigatório em formulário POST
+    - Validação de email (unicidade no backend)
+    - Validação de username (unicidade no backend)
+    - Senha com requisitos mínimos (8 chars, maiúscula, minúscula, número)
+    - Proteção de dados pessoais (conforme LGPD)
+    - Hash seguro de password (PBKDF2 by default em Django)
+    
+    Campos Capturados:
+    - Dados Pessoais: Nome completo, Email
+    - Dados Acadêmicos: Matrícula, Curso, Período, CR Geral
+    - Dados de Conta: Username, Password (com confirmação)
+    - Consentimentos: Termos de Serviço e Política de Privacidade
+    
+    Fluxo de Usuário:
+    1. Usuário preenche formulário com dados
+    2. Validação frontend em tempo real (password requirements, match)
+    3. Envio POST para view de registro
+    4. Validação backend (uniqueness, integrity, business rules)
+    5. Se sucesso: criar usuário e fazer login automático
+    6. Se falha: retornar formulário com erros destacados
+    
+    Dependências:
+    - Bootstrap 5.3.0 (CDN)
+    - Font Awesome 6.4.0 (CDN)
+    - Django Template Tags (load static)
+    - Django Forms (form.field.errors)
+    
+    Autor: Equipe de Desenvolvimento - Plataforma Casa
+    Data: Outubro 2025
+    ============================================================================
+-->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <!-- Meta tags essenciais -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro - Plataforma Casa</title>
     
-    <!-- Bootstrap 5.3.0 -->
+    <!-- Bootstrap 5.3.0 - Framework CSS responsivo -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     
-    <!-- Font Awesome 6.4.0 -->
+    <!-- Font Awesome 6.4.0 - Biblioteca de ícones vetoriais -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /*
+         * ========================================================================
+         * RESET CSS E CONFIGURAÇÃO BASE
+         * ========================================================================
+         */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         
+        /*
+         * ========================================================================
+         * BODY - CONTENEDOR PRINCIPAL
+         * ========================================================================
+         * Flexbox centralizado com altura total da viewport
+         * Padding adicional para mobile
+         */
         body {
-            background: #f5f5f2;
+            background: #f5f5f2;                    /* Off-white - fundo institucional */
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 1rem;
+            padding: 1rem;                          /* Espaço lateral em mobile */
         }
         
+        /*
+         * ========================================================================
+         * CONTAINER DE REGISTRO
+         * ========================================================================
+         * Card principal com formulário multipassos
+         * Max-width de 600px para melhor legibilidade em inputs longos
+         */
         .register-container {
             width: 100%;
             max-width: 600px;
             padding: 2rem;
-            background: #fafaf8;
+            background: #fafaf8;                    /* Fundo card */
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            border-top: 5px solid #F5AC00;
+            border-top: 5px solid #F5AC00;          /* Borda amarela CASA */
         }
         
+        /*
+         * ========================================================================
+         * HEADER DO REGISTRO
+         * ========================================================================
+         * Ícone, título e subtítulo da página de registro
+         */
         .register-header {
             text-align: center;
             margin-bottom: 2rem;
         }
         
+        /* Ícone de novo usuário */
         .register-header i {
             font-size: 3rem;
             color: #F5AC00;
             margin-bottom: 1rem;
         }
         
+        /* Título principal */
         .register-header h1 {
             color: #002555;
             font-size: 1.8rem;
@@ -57,15 +134,23 @@
             margin-bottom: 0.5rem;
         }
         
+        /* Subtítulo descritivo */
         .register-header p {
             color: #6d6e71;
             font-size: 0.9rem;
         }
         
+        /*
+         * ========================================================================
+         * GRUPOS DE FORMULÁRIO
+         * ========================================================================
+         * Espaçamento vertical para elementos de entrada
+         */
         .form-group {
             margin-bottom: 1.5rem;
         }
         
+        /* Labels - identificação clara dos campos */
         .form-group label {
             color: #002555;
             font-weight: 600;
@@ -73,6 +158,7 @@
             display: block;
         }
         
+        /* Inputs de texto e selects com padding e bordas */
         .form-group input,
         .form-group select {
             width: 100%;
@@ -86,6 +172,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
+        /* Estados de foco para feedback visual */
         .form-group input:focus,
         .form-group select:focus {
             border-color: #002555;
@@ -94,10 +181,17 @@
             background: #ffffff;
         }
         
+        /* Placeholder text */
         .form-group input::placeholder {
             color: #a7a9ab;
         }
         
+        /*
+         * ========================================================================
+         * LAYOUT GRID PARA CAMPOS LADO A LADO
+         * ========================================================================
+         * Dois campos em linha em desktop, um por linha em mobile
+         */
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -108,6 +202,11 @@
             margin-bottom: 1.5rem;
         }
         
+        /*
+         * ========================================================================
+         * BOTÃO DE SUBMIT
+         * ========================================================================
+         */
         .register-btn {
             width: 100%;
             padding: 0.9rem 1rem;
@@ -122,15 +221,22 @@
             margin-top: 0.5rem;
         }
         
+        /* Hover com elevação */
         .register-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 20px rgba(0, 37, 85, 0.3);
         }
         
+        /* Estado ativo */
         .register-btn:active {
             background: linear-gradient(135deg, #1245FF 0%, #002555 100%);
         }
         
+        /*
+         * ========================================================================
+         * ALERTAS - MENSAGENS DO SISTEMA
+         * ========================================================================
+         */
         .alert {
             margin-bottom: 1rem;
             border-radius: 8px;
@@ -138,21 +244,30 @@
             padding: 1rem;
         }
         
+        /* Alerta de erro */
         .alert-danger {
             background: #f8d7da;
             color: #721c24;
         }
         
+        /* Alerta de sucesso */
         .alert-success {
             background: #d4edda;
             color: #155724;
         }
         
+        /* Alerta de aviso */
         .alert-warning {
             background: #fff3cd;
             color: #856404;
         }
         
+        /*
+         * ========================================================================
+         * FOOTER DO REGISTRO
+         * ========================================================================
+         * Link para login de usuários existentes
+         */
         .register-footer {
             text-align: center;
             margin-top: 1.5rem;
@@ -173,11 +288,16 @@
             color: #F5AC00;
         }
         
-        /* Input com ícone */
+        /*
+         * ========================================================================
+         * INPUTS COM ÍCONES
+         * ========================================================================
+         */
         .input-group {
             position: relative;
         }
         
+        /* Ícone posicionado absolutamente à esquerda */
         .input-icon {
             position: absolute;
             left: 12px;
@@ -189,10 +309,15 @@
         
         .input-group input,
         .input-group select {
-            padding-left: 40px;
+            padding-left: 40px;                     /* Espaço para ícone */
         }
         
-        /* Ícone de toggle de senha */
+        /*
+         * ========================================================================
+         * TOGGLE DE VISUALIZAÇÃO DE SENHA
+         * ========================================================================
+         * Ícone de olho para mostrar/ocultar password digitado
+         */
         .password-toggle {
             position: absolute;
             right: 12px;
@@ -210,35 +335,50 @@
         }
         
         .input-group.password-field input {
-            padding-right: 40px;
+            padding-right: 40px;                    /* Espaço para ícone de toggle */
         }
         
+        /*
+         * ========================================================================
+         * REQUISITOS DE SENHA
+         * ========================================================================
+         * Checklist visual dos requisitos de segurança de senha
+         * Atualiza em tempo real conforme o usuário digita
+         */
         .password-requirements {
             font-size: 0.8rem;
             color: #6d6e71;
             margin-top: 0.5rem;
         }
         
+        /* Item individual de requisito */
         .requirement {
             margin: 0.25rem 0;
-            padding-left: 1.5rem;
+            padding-left: 1.5rem;                   /* Espaço para ícone de check */
             position: relative;
         }
         
+        /* Ícone de X (requisito não atendido) */
         .requirement:before {
             content: "✗";
             position: absolute;
             left: 0;
-            color: #dc3545;
+            color: #dc3545;                         /* Vermelho - não atendido */
             font-weight: bold;
         }
         
+        /* Ícone de checkmark (requisito atendido) */
         .requirement.met:before {
             content: "✓";
-            color: #28a745;
+            color: #28a745;                         /* Verde - atendido */
         }
         
-        /* Termos de serviço */
+        /*
+         * ========================================================================
+         * CHECKBOX DE TERMOS
+         * ========================================================================
+         * Aceitar Termos de Serviço e Política de Privacidade
+         */
         .terms-checkbox {
             display: flex;
             align-items: flex-start;
@@ -270,6 +410,12 @@
             color: #F5AC00;
         }
         
+        /*
+         * ========================================================================
+         * MENSAGEM DE SUCESSO
+         * ========================================================================
+         * Exibida após cadastro bem-sucedido
+         */
         .success-message {
             text-align: center;
             padding: 2rem 1rem;
@@ -277,7 +423,7 @@
         
         .success-message i {
             font-size: 3rem;
-            color: #28a745;
+            color: #28a745;                         /* Verde - sucesso */
             margin-bottom: 1rem;
         }
         
@@ -291,6 +437,12 @@
             margin-bottom: 1.5rem;
         }
         
+        /*
+         * ========================================================================
+         * RESPONSIVIDADE - MOBILE
+         * ========================================================================
+         * Ajustes para telas menores (<600px)
+         */
         @media (max-width: 600px) {
             .register-container {
                 margin: 1rem;
@@ -302,6 +454,7 @@
                 font-size: 1.5rem;
             }
             
+            /* Em mobile, campos lado a lado viram uma coluna */
             .form-row {
                 grid-template-columns: 1fr;
                 gap: 0;
@@ -310,15 +463,27 @@
     </style>
 </head>
 <body>
+    <!-- Container principal que envolve todo o formulário de registro -->
     <div class="register-container">
-        <!-- Header -->
+        
+        <!-- 
+            ====================================================================
+            SEÇÃO DE HEADER
+            ====================================================================
+            Ícone, título e subtítulo para contexto visual e identidade
+        -->
         <div class="register-header">
-            <i class="fas fa-user-plus"></i>
-            <h1>Criar Conta</h1>
-            <p>Junte-se à Plataforma Casa</p>
+            <i class="fas fa-user-plus"></i>      <!-- Ícone de novo usuário -->
+            <h1>Criar Conta</h1>                  <!-- Título principal -->
+            <p>Junte-se à Plataforma Casa</p>    <!-- Call-to-action -->
         </div>
         
-        <!-- Alertas -->
+        <!-- 
+            ====================================================================
+            SISTEMA DE MENSAGENS FLASH DO DJANGO
+            ====================================================================
+            Exibe alertas de sucesso do sistema (não erro de validação)
+        -->
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -328,7 +493,13 @@
             {% endfor %}
         {% endif %}
         
-        <!-- Erros de Formulário -->
+        <!-- 
+            ====================================================================
+            ERROS NÃO-CAMPO
+            ====================================================================
+            Erros gerais do formulário (ex: "Os dois campos de senha não correspondem")
+            Aparecem no topo do formulário para melhor visualização
+        -->
         {% if form.non_field_errors %}
             {% for error in form.non_field_errors %}
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -338,11 +509,20 @@
             {% endfor %}
         {% endif %}
         
-        <!-- Formulário de Registro -->
+        <!-- 
+            ====================================================================
+            FORMULÁRIO DE REGISTRO
+            ====================================================================
+            Método POST para enviar dados ao servidor de forma segura
+            CSRF token obrigatório em todas requisições POST do Django
+        -->
         <form method="POST" class="register-form" id="registerForm">
             {% csrf_token %}
             
-            <!-- Nome Completo -->
+            <!-- 
+                CAMPO: NOME COMPLETO
+                Campo básico para identificação do usuário
+            -->
             <div class="form-group">
                 <label for="nome">
                     <i class="fas fa-user"></i> Nome Completo
@@ -356,9 +536,10 @@
                         placeholder="Digite seu nome completo"
                         value="{{ form.nome.value|default:'' }}"
                         required
-                        autofocus
+                        autofocus                    <!-- Foco automático ao carregar página -->
                     >
                 </div>
+                <!-- Exibir erros específicos deste campo -->
                 {% if form.nome.errors %}
                     <div class="text-danger" style="font-size: 0.85rem; margin-top: 0.25rem;">
                         {{ form.nome.errors.0 }}
@@ -366,7 +547,11 @@
                 {% endif %}
             </div>
             
-            <!-- Email -->
+            <!-- 
+                CAMPO: EMAIL
+                Email será usado para autenticação e notificações
+                Validação de formato e unicidade no backend
+            -->
             <div class="form-group">
                 <label for="email">
                     <i class="fas fa-envelope"></i> Email
@@ -389,7 +574,10 @@
                 {% endif %}
             </div>
             
-            <!-- Matrícula -->
+            <!-- 
+                CAMPO: MATRÍCULA ACADÊMICA
+                Identificador único do aluno na instituição
+            -->
             <div class="form-group">
                 <label for="matricula">
                     <i class="fas fa-id-card"></i> Matrícula
@@ -412,8 +600,12 @@
                 {% endif %}
             </div>
             
-            <!-- Curso e Período -->
+            <!-- 
+                CAMPOS: CURSO E PERÍODO (lado a lado em desktop)
+                Informações acadêmicas essenciais para categorização de alunos
+            -->
             <div class="form-row">
+                <!-- Dropdown de Curso -->
                 <div class="form-group">
                     <label for="curso">
                         <i class="fas fa-book"></i> Curso
@@ -436,6 +628,7 @@
                     {% endif %}
                 </div>
                 
+                <!-- Dropdown de Período (1º a 8º) -->
                 <div class="form-group">
                     <label for="periodo">
                         <i class="fas fa-calendar"></i> Período
@@ -462,7 +655,11 @@
                 </div>
             </div>
             
-            <!-- CR Geral -->
+            <!-- 
+                CAMPO: CR GERAL (Coeficiente de Rendimento)
+                Histórico acadêmico importante para seleção de monitores
+                Range: 0-10 com incremento de 0.01
+            -->
             <div class="form-group">
                 <label for="cr_geral">
                     <i class="fas fa-percentage"></i> CR Geral
@@ -488,7 +685,11 @@
                 {% endif %}
             </div>
             
-            <!-- Username -->
+            <!-- 
+                CAMPO: USERNAME
+                Identificador único para login (além de email)
+                Deve ser único no banco de dados
+            -->
             <div class="form-group">
                 <label for="username">
                     <i class="fas fa-at"></i> Usuário
@@ -511,7 +712,11 @@
                 {% endif %}
             </div>
             
-            <!-- Senha -->
+            <!-- 
+                CAMPO: PASSWORD
+                Senha com validação em tempo real
+                Requisitos: 8+ chars, maiúscula, minúscula, número
+            -->
             <div class="form-group">
                 <label for="password">
                     <i class="fas fa-lock"></i> Senha
@@ -525,6 +730,7 @@
                         placeholder="Crie uma senha forte"
                         required
                     >
+                    <!-- Toggle de visualização -->
                     <i class="fas fa-eye password-toggle" id="togglePassword" title="Mostrar senha"></i>
                 </div>
                 {% if form.password.errors %}
@@ -532,6 +738,8 @@
                         {{ form.password.errors.0 }}
                     </div>
                 {% endif %}
+                
+                <!-- Checklist visual dos requisitos de senha -->
                 <div class="password-requirements">
                     <div class="requirement" id="req-length">
                         Mínimo 8 caracteres
@@ -548,7 +756,11 @@
                 </div>
             </div>
             
-            <!-- Confirmar Senha -->
+            <!-- 
+                CAMPO: CONFIRMAÇÃO DE SENHA
+                Deve ser idêntica ao campo de senha
+                Validação frontend + backend para segurança
+            -->
             <div class="form-group">
                 <label for="password_confirm">
                     <i class="fas fa-lock"></i> Confirmar Senha
@@ -562,6 +774,7 @@
                         placeholder="Confirme sua senha"
                         required
                     >
+                    <!-- Toggle de visualização -->
                     <i class="fas fa-eye password-toggle" id="togglePasswordConfirm" title="Mostrar senha"></i>
                 </div>
                 {% if form.password_confirm.errors %}
@@ -571,21 +784,36 @@
                 {% endif %}
             </div>
             
-            <!-- Aceitar Termos -->
+            <!-- 
+                CONSENTIMENTO: TERMOS DE SERVIÇO E PRIVACIDADE
+                Obrigatório para conclusão do cadastro (LGPD compliant)
+            -->
             <div class="terms-checkbox">
                 <input type="checkbox" id="terms" name="terms" required>
                 <label for="terms">
-                    Concordo com os <a href="#" target="_blank">Termos de Serviço</a> e a <a href="#" target="_blank">Política de Privacidade</a>
+                    Concordo com os 
+                    <a href="#" target="_blank">Termos de Serviço</a> 
+                    e a 
+                    <a href="#" target="_blank">Política de Privacidade</a>
                 </label>
             </div>
             
-            <!-- Submit Button -->
+            <!-- 
+                BOTÃO: SUBMIT
+                Envia o formulário para processamento no backend
+                Estilo destacado com gradiente para Call-to-Action
+            -->
             <button type="submit" class="register-btn">
                 <i class="fas fa-user-check"></i> Criar Conta
             </button>
         </form>
         
-        <!-- Footer -->
+        <!-- 
+            ====================================================================
+            FOOTER COM LINK PARA LOGIN
+            ====================================================================
+            Para usuários que já possuem conta
+        -->
         <div class="register-footer">
             <p>
                 Já tem conta?
@@ -596,12 +824,25 @@
         </div>
     </div>
     
-    <!-- Bootstrap JS -->
+    <!-- Bootstrap JavaScript - componentes interativos -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Scripts de Interatividade -->
+    <!-- 
+        ====================================================================
+        SCRIPT: FUNCIONALIDADES DE INTERATIVIDADE DO FORMULÁRIO
+        ====================================================================
+        Compreende: toggle de senha, validação de requisitos, comparação
+    -->
     <script>
-        // Toggle de visualização de senha
+        /*
+         * ====================================================================
+         * FUNÇÃO: TOGGLE DE VISUALIZAÇÃO DE SENHA
+         * ====================================================================
+         * Permite alternar entre mostrar/ocultar senha digitada
+         * Melhora UX sem comprometer segurança
+         */
+        
+        // Toggle primeira senha
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
         
@@ -621,11 +862,13 @@
                 }
             });
             
+            // Impedir perda de foco ao clicar no ícone
             togglePassword.addEventListener('mousedown', function(e) {
                 e.preventDefault();
             });
         }
         
+        // Toggle segunda senha (confirmação)
         const togglePasswordConfirm = document.getElementById('togglePasswordConfirm');
         const passwordConfirmInput = document.getElementById('password_confirm');
         
@@ -650,20 +893,27 @@
             });
         }
         
-        // Validação de requisitos de senha em tempo real
+        /*
+         * ====================================================================
+         * FUNÇÃO: VALIDAÇÃO DE REQUISITOS DE SENHA EM TEMPO REAL
+         * ====================================================================
+         * Atualiza visualmente os requisitos conforme usuário digita
+         * Fornece feedback imediato sobre força da senha
+         */
+        
         const passwordField = document.getElementById('password');
         
         if (passwordField) {
             passwordField.addEventListener('input', function() {
                 const password = this.value;
                 
-                // Verificar requisitos
-                const hasLength = password.length >= 8;
-                const hasUpper = /[A-Z]/.test(password);
-                const hasLower = /[a-z]/.test(password);
-                const hasNumber = /[0-9]/.test(password);
+                // Verificar cada requisito individualmente
+                const hasLength = password.length >= 8;                 // 8+ caracteres
+                const hasUpper = /[A-Z]/.test(password);               // Maiúscula
+                const hasLower = /[a-z]/.test(password);               // Minúscula
+                const hasNumber = /[0-9]/.test(password);              // Número
                 
-                // Atualizar visual dos requisitos
+                // Atualizar visual de cada requisito
                 updateRequirement('req-length', hasLength);
                 updateRequirement('req-upper', hasUpper);
                 updateRequirement('req-lower', hasLower);
@@ -671,26 +921,38 @@
             });
         }
         
+        /*
+         * Função auxiliar para atualizar visual de requisito
+         * Adiciona/remove classe 'met' (atendido) do elemento
+         */
         function updateRequirement(elementId, isMet) {
             const element = document.getElementById(elementId);
             if (element) {
                 if (isMet) {
-                    element.classList.add('met');
+                    element.classList.add('met');        // Adiciona check verde
                 } else {
-                    element.classList.remove('met');
+                    element.classList.remove('met');     // Remove check, mantém X
                 }
             }
         }
         
-        // Validação de confirmação de senha
+        /*
+         * ====================================================================
+         * FUNÇÃO: VALIDAÇÃO DE CORRESPONDÊNCIA DE SENHAS
+         * ====================================================================
+         * Valida se as duas senhas digitadas são idênticas
+         * Executa no submit do formulário
+         */
+        
         const registerForm = document.getElementById('registerForm');
         if (registerForm) {
             registerForm.addEventListener('submit', function(e) {
                 const password = document.getElementById('password').value;
                 const passwordConfirm = document.getElementById('password_confirm').value;
                 
+                // Se senhas não combinam, impedir submit
                 if (password !== passwordConfirm) {
-                    e.preventDefault();
+                    e.preventDefault();                  // Cancela envio do form
                     alert('As senhas não correspondem!');
                     document.getElementById('password_confirm').focus();
                     return false;

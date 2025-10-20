@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+
+{% block title %}Minhas Monitorias - Monitor{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Header da página */
+    .page-header {
+        background: linear-gradient(135deg, #002555 0%, #1245FF 100%);
+        color: #fafaf8;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #F5AC00;
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.15);
+    }
+    
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        color: #fafaf8;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .page-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+    
+    /* Cards das monitorias */
+    .monitoria-card {
+        background: white;
+        border-radius: 16px;
+        border: 2px solid #e9ecef;
+        padding: 2rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.08);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        height: 280px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .monitoria-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #1245FF 0%, #F5AC00 100%);
+    }
+    
+    .monitoria-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(18, 69, 255, 0.15);
+        border-color: #1245FF;
+    }
+    
+    .monitoria-card:hover::before {
+        height: 6px;
+        background: linear-gradient(90deg, #F5AC00 0%, #1245FF 100%);
+    }
+    
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #1245FF 0%, #002555 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+    
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #002555;
+        margin: 0;
+        line-height: 1.2;
+    }
+    
+    .card-subtitle {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin: 0.25rem 0 0 0;
+        font-weight: 500;
+    }
+    
+    .card-content {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .card-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #495057;
+        font-size: 0.875rem;
+    }
+    
+    .info-icon {
+        width: 20px;
+        color: #1245FF;
+        text-align: center;
+    }
+    
+    .card-stats {
+        background: linear-gradient(135deg, rgba(18, 69, 255, 0.05) 0%, rgba(245, 172, 0, 0.05) 100%);
+        border-radius: 12px;
+        padding: 1.25rem;
+        text-align: center;
+        margin-top: auto;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1245FF;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stats-label {
+        color: #6c757d;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    
+    /* Estado vazio */
+    .empty-state {
+        background: linear-gradient(135deg, rgba(18, 69, 255, 0.05) 0%, rgba(0, 37, 85, 0.05) 100%);
+        border: 2px dashed #1245FF;
+        border-radius: 16px;
+        padding: 4rem 2rem;
+        text-align: center;
+        margin-top: 2rem;
+    }
+    
+    .empty-state-icon {
+        font-size: 4rem;
+        color: #1245FF;
+        margin-bottom: 1.5rem;
+    }
+    
+    .empty-state-title {
+        color: #002555;
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state-text {
+        color: #6c757d;
+        margin-bottom: 2rem;
+        font-size: 1rem;
+    }
+    
+    .btn-primary-custom {
+        background: linear-gradient(135deg, #1245FF 0%, #002555 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(18, 69, 255, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .monitoria-card {
+            height: auto;
+            min-height: 250px;
+        }
+        
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.25rem;
+        }
+        
+        .stats-number {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding: 2rem;">
+    <!-- Header -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-chalkboard-user"></i> Minhas Monitorias
+        </h1>
+        <p>Clique em uma monitoria para visualizar e gerenciar seus alunos</p>
+    </div>
+
+    {% if turmas_com_alunos %}
+    <!-- Grid de Cards das Monitorias -->
+    <div class="row">
+        {% for item in turmas_com_alunos %}
+        <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+            <div class="monitoria-card" onclick="window.location.href='{% url 'alunos_da_monitoria' item.turma.id %}'">
+                <!-- Header do Card -->
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <h3 class="card-title">{{ item.turma.nome }}</h3>
+                        <p class="card-subtitle">{{ item.turma.vaga.disciplina|default:"Sem disciplina" }}</p>
+                    </div>
+                </div>
+                
+                <!-- Conteúdo do Card -->
+                <div class="card-content">
+                    <div class="card-info">
+                        <div class="info-item">
+                            <i class="fas fa-graduation-cap info-icon"></i>
+                            <span>{{ item.turma.curso.nome }}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-door-open info-icon"></i>
+                            <span>Sala {{ item.turma.sala.numero }}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-calendar-alt info-icon"></i>
+                            <span>{{ item.turma.dias_da_semana }}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-clock info-icon"></i>
+                            <span>{{ item.turma.horario }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Estatísticas -->
+                    <div class="card-stats">
+                        <div class="stats-number">{{ item.total_alunos }}</div>
+                        <div class="stats-label">
+                            {% if item.total_alunos == 1 %}
+                                aluno participando
+                            {% else %}
+                                alunos participando
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% else %}
+    <!-- Estado Vazio -->
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <i class="fas fa-chalkboard-user"></i>
+        </div>
+        <div class="empty-state-title">Nenhuma monitoria encontrada</div>
+        <p class="empty-state-text">
+            Você ainda não está dando nenhuma monitoria. 
+            <br>Aguarde ser designado para uma turma ou entre em contato com a coordenação.
+        </p>
+        <a href="{% url 'dashboard' %}" class="btn-primary-custom">
+            <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Adicionar efeito de hover suave nos cards
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.monitoria-card');
+    
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

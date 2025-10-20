@@ -49,7 +49,7 @@
                         <option value="">-- Selecione uma vaga --</option>
                         {% for vaga in vagas %}
                             <option value="{{ vaga.id }}">
-                                {{ vaga.disciplina }}
+                                {{ vaga.disciplina|default:vaga.nome }}
                             </option>
                         {% endfor %}
                     </select>

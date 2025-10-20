@@ -281,7 +281,7 @@
                         <small class="text-muted">{{ inscricao.aluno.matricula }}</small>
                     </td>
                     <td>
-                        <strong>{{ inscricao.vaga.disciplina.nome }}</strong><br>
+                        <strong>{{ inscricao.vaga.disciplina|default:inscricao.vaga.nome }}</strong><br>
                         <small class="text-muted">{{ inscricao.vaga.turma.codigo }}</small>
                     </td>
                     <td>{{ inscricao.data_inscricao|date:"d/m/Y H:i" }}</td>

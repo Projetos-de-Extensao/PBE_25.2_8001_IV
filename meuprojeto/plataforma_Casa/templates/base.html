@@ -30,153 +30,172 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <!-- ========== META TAGS ========== -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Plataforma Casa - Monitorias{% endblock %}</title>
+    <!-- ========================================================================
+         META TAGS - INFORMAÇÕES DOCUMENT
+         ========================================================================
+         
+         Define características fundamentais e metadados do documento HTML
+    -->
+    <meta charset="UTF-8">                          <!-- Encoding UTF-8 para suportar caracteres especiais e acentuação -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">   <!-- Viewport meta tag para responsividade em dispositivos móveis -->
+    <title>{% block title %}Plataforma Casa - Monitorias{% endblock %}</title>  <!-- Título dinâmico (overridável em templates filhos) -->
     
-    <!-- ========== BIBLIOTECAS CSS EXTERNAS ========== -->
+    <!-- ========================================================================
+         BIBLIOTECAS CSS EXTERNAS - CONTENT DELIVERY NETWORK (CDN)
+         ========================================================================
+         
+         Carregamento de frameworks CSS terceirizados a partir de CDN
+         CDN: Distribuição global de conteúdo (performance otimizada, cache)
+         
+         ORDEM IMPORTANTE: Estilos externos devem ser carregados PRIMEIRO
+         para permitir sobrescrita por estilos customizados
+    -->
     
-    <!-- Bootstrap 5.3.0 - Framework CSS responsivo -->
+    <!-- Bootstrap 5.3.0 - Framework CSS responsivo de componentes web -->
+    <!-- Fornece: Sistema de grid 12 colunas, componentes prontos (navbar, cards, modals, forms) -->
+    <!-- Uso: Classes utilitárias (.container, .row, .col-*, .btn, .alert, .d-flex, etc.) -->
+    <!-- Prioridade: PRIMEIRA a ser carregada para permitir sobrescrita por cores-padrao.css -->
+    <!-- Performance: ~160KB (minificado), cached globalmente em CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     
     <!-- Font Awesome 6.4.0 - Biblioteca de ícones vetoriais -->
+    <!-- Fornece: 1000+ ícones SVG escaláveis (solid, regular, light, duotone) -->
+    <!-- Uso: <i class="fas fa-icon-name"></i> para ícones sólidos, .far para outlined, etc. -->
+    <!-- Aplicação: Menus, botões de ação, status indicators, features icons -->
+    <!-- Prioridade: Carregada antes de cores-padrao.css (não sobrescreve cores) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- ========== ESTILOS PERSONALIZADOS ========== -->
+    <!-- ========================================================================
+         ESTILOS CUSTOMIZADOS - IDENTIDADE VISUAL INSTITUCIONAL
+         ========================================================================
+         
+         Folhas de estilo que definem a identidade visual única da Plataforma Casa
+         ORDEM CRÍTICA: Esta sequência é obrigatória para sobrescrita de estilos
+         
+         1. cores-institucionais.css: Define variáveis CSS base
+         2. cores-padrao.css: Sobrescreve Bootstrap com cores institucionais
+         3. Estilos inline (<style>): Sobrescreve ambas as anteriores
+    -->
     
-    <!-- Cores Institucionais - Define paleta de cores oficial da Plataforma Casa -->
-    <!-- Amarelo CASA: #F5AC00, Azul Escuro: #002555, Azul Claro: #1245FF -->
+    <!-- cores-institucionais.css -->
+    <!-- PROPÓSITO: Definir paleta de cores oficial da instituição -->
+    <!-- VARIÁVEIS CSS DEFINIDAS: -->
+    <!--   --cor-azul-escuro-principal: #002555   (PRIMARY - backgrounds, headers, text primário) -->
+    <!--   --cor-amarelo-institucional: #F5AC00   (ACCENT - highlights, borders, hover, warnings) -->
+    <!--   --cor-azul-claro: #1245FF              (SECONDARY - accents, focus states, links ) -->
+    <!--   --cor-cinza-escuro: #2c3e50            (Dark neutral) -->
+    <!--   --cor-cinza-medio: #7f8c8d             (Medium neutral - subtext) -->
+    <!--   --cor-cinza-claro: #ecf0f1             (Light neutral - backgrounds) -->
+    <!-- CARREGADO PRIMEIRO: Para permitir sobrescrita por cores-padrao.css -->
+    <!-- REÚSO: Variáveis são acessadas via var(--cor-*) em todos os estilos -->
     <link rel="stylesheet" href="{% static 'css/cores-institucionais.css' %}">
     
-    <!-- Cores Padrão - Sobrescreve cores padrão do Bootstrap com cores institucionais -->
+    <!-- cores-padrao.css -->
+    <!-- PROPÓSITO: Sobrescrever estilos padrão do Bootstrap com paleta institucional -->
+    <!-- SOBRESCRITA: Redireciona Bootstrap classes para usar --cor-* variables -->
+    <!-- COMPONENTES AFETADOS: Botões (.btn), alertas (.alert), links (a), badges, etc. -->
+    <!-- CARREGADO SEGUNDO: DEVE vir DEPOIS de cores-institucionais.css para acessar variables -->
+    <!-- RESULT: Consistência visual: todo Bootstrap usa cores institucionais automaticamente -->
     <link rel="stylesheet" href="{% static 'css/cores-padrao.css' %}">
     
     <!-- ========== ESTILOS INLINE - LAYOUT PRINCIPAL ========== -->
     <style>
         /* 
-         * Reset CSS básico
+         * ========================================================================
+         * SEÇÃO: RESET CSS GLOBAL
+         * ========================================================================
          * Remove margens e paddings padrão do navegador
-         */
-        /* 
-         * Reset CSS básico
-         * Remove margens e paddings padrão do navegador
+         * Normaliza comportamento em diferentes navegadores
          */
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box; /* Inclui padding e border no width/height total */
+            box-sizing: border-box; /* Inclui padding e border no width/height total do elemento */
+        }
+        
+        /* Previne scroll horizontal em todo o documento -->
+        html, body {
+            overflow-x: hidden;         /* Remove scroll horizontal */
+            max-width: 100vw;           /* Limita largura máxima à viewport */
+            height: 100%;               /* Utiliza altura total disponível */
         }
         
         /* 
-         * ========== CONFIGURAÇÃO DO BODY ==========
-         * Background off-white (#fafaf8) - cor institucional de fundo
-         * Previne scroll horizontal indesejado
+         * ========================================================================
+         * SEÇÃO: CONFIGURAÇÃO DO BODY
+         * ========================================================================
+         * Define background, padding e overflow para página
          */
         body {
-            background-color: #fafaf8; /* Off-white - cor institucional de fundo */
-            padding-top: 0; /* Remove padding superior (navbar é fixa) */
-            overflow-x: hidden; /* Impede scroll horizontal no body */
-            max-width: 100vw; /* Limita largura máxima à viewport */
+            background-color: #fafaf8; /* Off-white - cor institucional de background */
+            padding-top: 0;            /* Remove padding superior (navbar é position:fixed) */
+            overflow-x: hidden;        /* Impede scroll horizontal */
         }
         
         /* 
-         * Previne scroll horizontal em todo o documento
-         */
-        html {
-            overflow-x: hidden;
-            max-width: 100vw;
-        }
-        
-        /* 
-         * ========== NAVBAR SUPERIOR FIXA ==========
-         * Navbar fixada no topo da página
-         * Fica visível mesmo ao fazer scroll (position: fixed)
-         * Z-index alto para ficar acima de outros elementos
+         * ========================================================================
+         * SEÇÃO: NAVBAR SUPERIOR FIXA
+         * ========================================================================
+         * Navbar fica fixa no topo da página durante scroll
+         * Contém: Logo, menus responsivos, dropdown de usuário
+         * Z-index: 1000 (maioria dos elementos fica abaixo dela)
          */
         .navbar {
-            position: fixed; /* Fixa a navbar no topo */
+            position: fixed;    /* Fixa no topo independente de scroll */
             top: 0;
             left: 0;
             right: 0;
             width: 100%;
-            z-index: 1000; /* Fica acima da maioria dos elementos */
-            height: 60px;
+            z-index: 1000;      /* Acima de background, abaixo apenas de dropdowns extremos */
+            height: 60px;       /* Altura padrão Bootstrap navbar */
         }
         
         /* 
-         * Menu collapse da navbar (versão mobile)
-         * Z-index maior que a navbar para aparecer acima
+         * Collapse menu (versão responsiva em telas pequenas)
+         * Z-index levemente maior que navbar para aparecer acima
          */
         .navbar-collapse {
-            z-index: 1001;
+            z-index: 1001;      /* Acima da navbar para aparecer corretamente */
         }
         
         /* 
-         * Dropdown do usuário na navbar
-         * Z-index ainda maior para garantir visibilidade
+         * ========================================================================
+         * SEÇÃO: DROPDOWN DO USUÁRIO
+         * ========================================================================
+         * Menu que aparece ao clicar no avatar/nome de usuário
+         * Contém: Links para perfil, configurações, logout
+         * Posicionado no canto superior direito
          */
         .navbar .nav-item.dropdown {
             position: relative;
-            z-index: 1002;
+            z-index: 1002;      /* Acima de todos os elementos da navbar -->
         }
         
-        /* 
-         * ========== RESPONSIVIDADE - DESKTOP ==========
-         * Em telas grandes (≥992px), força exibição do menu do usuário
-         */
-        @media (min-width: 992px) {
-            .navbar .d-none.d-lg-flex {
-                display: flex !important;
-            }
-        }
-        
-        /* 
-         * ========== RESPONSIVIDADE - MOBILE ==========
-         * Em telas pequenas (<992px), menu fica dentro do collapse
-         */
-        @media (max-width: 991px) {
-            .navbar .d-none.d-lg-flex {
-                display: none !important;
-            }
-        }
-        
-        /* 
-         * ========== DROPDOWN DO USUÁRIO ==========
-         * Menu dropdown que aparece ao clicar no nome do usuário
-         * Z-index altíssimo para garantir que fique acima de tudo
-         */
+        /* Dropdown menu customizado com estilo profissional */
         .navbar .dropdown-menu {
-            z-index: 1050 !important; /* Prioridade máxima */
+            z-index: 1050 !important;   /* Prioridade máxima (acima de modais) */
             position: absolute !important;
-            top: 100 !important; /* Posiciona abaixo do botão */
-            right: 0 !important; /* Alinha à direita */
+            top: 100% !important;       /* Posiciona abaixo do botão trigger -->
+            right: 0 !important;        /* Alinha à direita */
             left: auto !important;
             margin-top: 0.5rem;
             background-color: white;
             border: 1px solid rgba(0,0,0,0.15);
             border-radius: 0.375rem;
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.25); /* Sombra para destaque */
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.25); /* Sombra para profundidade */
             min-width: 200px;
-            display: none; /* Escondido por padrão */
+            display: none;       /* Escondido por padrão */
         }
         
-        /* 
-         * Dropdown visível quando ativado (classe .show do Bootstrap)
-         * Animação suave de fade-in ao aparecer
-         */
+        /* Dropdown visível quando ativado (classe .show do Bootstrap) */
         .navbar .dropdown-menu.show {
             display: block !important;
             opacity: 1 !important;
             visibility: visible !important;
-            animation: fadeInDown 0.2s ease-out; /* Animação de entrada */
+            animation: fadeInDown 0.2s ease-out;    /* Entrada suave */
         }
         
-        /* 
-         * Animação de fade-in de cima para baixo
-         * Efeito visual suave ao abrir o dropdown
-         */
-        
+        /* Animação de fade-in de cima para baixo */
         @keyframes fadeInDown {
             from {
                 opacity: 0;
@@ -188,6 +207,7 @@
             }
         }
         
+        /* Itens dentro do dropdown menu */
         .navbar .dropdown-menu .dropdown-item {
             padding: 0.5rem 1rem;
             color: #212529;
@@ -202,19 +222,27 @@
             transition: all 0.3s ease;
         }
         
+        /* Ícones dentro dos itens dropdown */
         .navbar .dropdown-menu .dropdown-item i {
-            margin-right: 0.5rem;
+            margin-right: 0.75rem;
             width: 20px;
+            min-width: 20px;
             text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
         }
         
+        /* Estado hover/focus dos itens dropdown -->
         .navbar .dropdown-menu .dropdown-item:hover,
         .navbar .dropdown-menu .dropdown-item:focus {
-            background-color: #f8f9fa;
-            color: #002555;
-            padding-left: 1.2rem;
+            background-color: #f8f9fa;  /* Background destacado */
+            color: #002555;             /* Cor institucional */
+            padding-left: 1.2rem;       /* Animação visual de indentação */
         }
         
+        /* Linha divisória dentro do dropdown (hr) */
         .navbar .dropdown-menu .dropdown-divider {
             height: 0;
             margin: 0.5rem 0;
@@ -222,6 +250,7 @@
             border-top: 1px solid rgba(0,0,0,0.1);
         }
         
+        /* Toggle dropdown e seu comportamento */
         .navbar .dropdown-toggle::after {
             margin-left: 0.5rem;
         }
@@ -239,6 +268,26 @@
         .navbar .dropdown-toggle[aria-expanded="true"] {
             background-color: rgba(255, 255, 255, 0.15);
             border-radius: 0.375rem;
+        }
+        
+        /* 
+         * ========================================================================
+         * SEÇÃO: RESPONSIVIDADE - DISPLAYS CONDICIONAIS
+         * ========================================================================
+         * Mostra/esconde elementos baseado na largura da viewport
+         */
+        @media (min-width: 992px) {
+            /* Em desktop (≥992px), força exibição do menu do usuário */
+            .navbar .d-none.d-lg-flex {
+                display: flex !important;
+            }
+        }
+        
+        @media (max-width: 991px) {
+            /* Em mobile (<992px), menu fica dentro do collapse hamburger */
+            .navbar .d-none.d-lg-flex {
+                display: none !important;
+            }
         }
         
         /* 
@@ -319,6 +368,11 @@
             padding: 0.5rem;
             transition: all 0.3s ease;
             flex-shrink: 0; /* Não encolhe quando sidebar colapsa */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
         }
         
         /* 
@@ -341,13 +395,17 @@
         }
         
         .sidebar-close-icon {
-            display: inline-block; /* Mostra seta quando expandido */
+            display: inline-flex; /* Mostra seta quando expandido */
+            align-items: center;
+            justify-content: center;
             transition: opacity 0.3s ease;
         }
         
         /* Quando sidebar está colapsado */
         .sidebar.collapsed .sidebar-toggle-icon {
-            display: inline-block; /* Mostra hambúrguer */
+            display: inline-flex; /* Mostra hambúrguer */
+            align-items: center;
+            justify-content: center;
         }
         
         .sidebar.collapsed .sidebar-close-icon {
@@ -421,15 +479,44 @@
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.875rem;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border-left: 4px solid transparent;
             white-space: nowrap;
+            position: relative;
+            min-height: 44px;
+        }
+        
+        /* Garantir que o texto esteja alinhado verticalmente */
+        .sidebar-item .sidebar-text {
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Alinhamento especial para ícones no estado colapsado */
+        .sidebar.collapsed .sidebar-item i {
+            margin: 0 auto;
+            transform: translateX(0);
+        }
+        
+        /* Consistência de alinhamento para todos os tipos de ícones */
+        .sidebar-item i.fas,
+        .sidebar-item i.fab,
+        .sidebar-item i.far {
+            vertical-align: middle;
         }
         
         .sidebar-item i {
+            width: 22px;
+            min-width: 22px;
+            max-width: 22px;
+            text-align: center;
             flex-shrink: 0;
-            min-width: 20px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: transform 0.3s ease;
         }
         
@@ -465,13 +552,6 @@
             background-color: #dc3545 !important;
             color: #ffffff !important;
             border-left-color: #ffffff;
-        }
-        
-        .sidebar-item i {
-            width: 20px;
-            text-align: center;
-            flex-shrink: 0;
-            font-size: 1.1rem;
         }
         
         .sidebar-divider {
@@ -838,11 +918,11 @@
                     
                     <hr class="sidebar-divider">
                     
-                    <!-- Link: Meus Alunos -->
-                    <!-- Ver alunos que estão participando das suas monitorias -->
-                    <a href="{% url 'meus_alunos_monitoria' %}" class="sidebar-item {% if request.resolver_match.url_name == 'meus_alunos_monitoria' %}active{% endif %}">
+                    <!-- Link: Minhas Monitorias -->
+                    <!-- Ver monitorias que está dando em formato de cards -->
+                    <a href="{% url 'minhas_monitorias_cards' %}" class="sidebar-item {% if request.resolver_match.url_name == 'minhas_monitorias_cards' or request.resolver_match.url_name == 'alunos_da_monitoria' %}active{% endif %}">
                         <i class="fas fa-chalkboard-user"></i>
-                        <span class="sidebar-text">Meus Alunos</span>
+                        <span class="sidebar-text">Minhas Monitorias</span>
                     </a>
                     
                     <hr class="sidebar-divider">
@@ -1158,53 +1238,124 @@
     </div>
 
     <!-- jQuery deve vir antes do Bootstrap -->
+    <!-- jQuery 3.6.0: Biblioteca JavaScript para manipulação do DOM (depende do Bootstrap) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Bootstrap 5.3.0 JavaScript Bundle -->
+    <!-- Inclui: Popper.js (dropdowns), componentes interativos (modals, toasts, tooltips) -->
+    <!-- Funcionalidade: Habilita interatividade dos componentes Bootstrap CSS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    
-    <!-- Script para controlar o sidebar -->
+    <!-- 
+        ========================================================================
+        SCRIPT: CONTROLE DO SIDEBAR (MENU LATERAL)
+        ========================================================================
+        
+        Funcionalidades:
+        1. toggleSidebar(): Alterna entre estado expandido e colapsado
+        2. Persiste estado em localStorage para manter preferência do usuário
+        3. Responsivo: Ajusta comportamento em mobile vs desktop
+        4. Sincroniza classe CSS no main-content para ajustar margens
+        
+        Workflow:
+        - Usuário clica botão toggle em sidebar-header
+        - toggleSidebar() é chamada
+        - Classe "collapsed" é alternada no sidebar
+        - Classe "sidebar-collapsed" é alternada no main-content
+        - localStorage é atualizado
+        - CSS responde com transições suaves (0.4s cubic-bezier)
+    -->
     <script>
-        // Funções para controlar o sidebar
+        /* ===================================================
+           FUNÇÃO: toggleSidebar()
+           ===================================================
+           Alterna o estado do sidebar entre expandido e colapsado
+           
+           Parâmetros: nenhum
+           Return: void
+           
+           Lógica:
+           1. Seleciona elementos sidebar e main-content
+           2. Adiciona/remove classe "collapsed" do sidebar
+           3. Sincroniza classe "sidebar-collapsed" no main-content
+           4. Persiste escolha em localStorage
+           
+           Efeito CSS:
+           - Sidebar: 250px → 70px
+           - Ícones: Aparecem/desaparecem
+           - Textos: Aparecem/desaparecem com animação
+           - Main-content: Margem ajustada de 250px para 70px
+        */
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
             
-            // Alternar collapsed
+            /* Alternar classe "collapsed" (causa mudança de width via CSS) */
             sidebar.classList.toggle('collapsed');
             mainContent.classList.toggle('sidebar-collapsed');
             
-            // Salvar estado
+            /* Salvar estado em localStorage para persistir entre recarregar página */
             const isCollapsed = sidebar.classList.contains('collapsed');
             localStorage.setItem('sidebarCollapsed', isCollapsed ? 'true' : 'false');
         }
         
-        // Ao carregar a página, verificar o estado do sidebar
+        /* ===================================================
+           EVENTO: DOMContentLoaded
+           ===================================================
+           Executa após o DOM estar completamente carregado
+           Responsável pela inicialização do estado do sidebar
+           
+           Comportamento por resolução:
+           - Mobile (≤768px): Sidebar começa OCULTO (translateX -250px)
+           - Desktop (>768px): Sidebar começa COLAPSADO (apenas ícones)
+           
+           Rationale:
+           - Mobile: Espaço limitado → sidebar começa fora da tela
+           - Desktop: Espaço suficiente → sidebar colapsado para ganhar espaço de conteúdo
+        */
         document.addEventListener('DOMContentLoaded', function() {
-            const sidebarCollapsed = localStorage.getItem('sidebarCollapsed');
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
             
-            // Em mobile, o sidebar começa fechado (escondido)
             if (window.innerWidth <= 768) {
+                /* 
+                   MOBILE: Esconder sidebar completamente
+                   Sidebar sai da tela via transform translateX
+                   Usuário clica ícone para abrir (slideout drawer effect)
+                */
                 sidebar.style.transform = 'translateX(-250px)';
             } else {
-                // Em desktop, verificar estado salvo
-                if (sidebarCollapsed === 'true') {
-                    sidebar.classList.add('collapsed');
-                    mainContent.classList.add('sidebar-collapsed');
-                }
+                /* 
+                   DESKTOP: Sidebar colapsado por padrão
+                   Apenas ícones visíveis, ganha espaço para conteúdo
+                   Usuário pode expandir clicando toggle para ver textos
+                */
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                localStorage.setItem('sidebarCollapsed', 'true');
             }
         });
         
-        // Responsividade: ajustar quando a janela é redimensionada
+        /* ===================================================
+           EVENTO: resize
+           ===================================================
+           Detects alterações no tamanho da janela
+           Reajusta layout quando usuário redimensiona navegador
+           
+           Responsabilidade:
+           1. Detectar crossing de breakpoint 768px
+           2. Ajustar visibilidade do sidebar adequadamente
+           
+           Uso Case: Usuário abre Developer Tools ou redimensiona navegador
+        */
         window.addEventListener('resize', function() {
             const sidebar = document.getElementById('sidebar');
             
             if (window.innerWidth <= 768) {
-                // Mobile: esconder sidebar
+                /* Mobile: Remover transform case exista, voltar ao padrão mobile */
                 sidebar.style.transform = 'translateX(-250px)';
             } else {
-                // Desktop: remover transform
+                /* Desktop: Remover transform, deixar CSS controlar via classes */
                 sidebar.style.transform = '';
             }
         });

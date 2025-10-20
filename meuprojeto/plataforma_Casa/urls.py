@@ -351,6 +351,26 @@ urlpatterns = [
     # Inscrição/participação em uma turma específica
     path('monitorias/<int:turma_id>/participar/', views.participar_monitoria, name='participar_monitoria'),
     
+    # --- Sair de uma Monitoria (ALUNO) ---
+    # Cancelar participação em uma turma específica
+    path('monitorias/<int:turma_id>/sair/', views.sair_monitoria, name='sair_monitoria'),
+    
+    # --- Detalhes das Presenças (ALUNO) ---
+    # Ver presenças do aluno em uma monitoria específica
+    path('monitorias/<int:turma_id>/presencas/', views.detalhes_presencas_monitoria, name='detalhes_presencas_monitoria'),
+    
+    # --- Minhas Monitorias Cards (MONITOR) ---
+    # Cards clicáveis das monitorias que o monitor está dando
+    path('monitorias/minhas-monitorias/', views.minhas_monitorias_cards, name='minhas_monitorias_cards'),
+    
+    # --- Alunos de uma Monitoria Específica (MONITOR) ---
+    # Ver alunos de uma monitoria específica e marcar presença
+    path('monitorias/<int:turma_id>/alunos/', views.alunos_da_monitoria, name='alunos_da_monitoria'),
+    
+    # --- Marcar Presença (AJAX) ---
+    # Marcar presença de um aluno em uma turma
+    path('monitorias/<int:turma_id>/alunos/<int:aluno_id>/presenca/', views.marcar_presenca_aluno, name='marcar_presenca_aluno'),
+    
     # --- Meus Alunos (MONITOR) ---
     # Listar alunos que estão participando das monitorias do monitor
     path('monitorias/meus-alunos/', views.meus_alunos_monitoria, name='meus_alunos_monitoria'),

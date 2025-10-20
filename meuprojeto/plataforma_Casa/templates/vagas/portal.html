@@ -93,8 +93,8 @@
 
                     <!-- Requisitos Tag -->
                     <div class="vaga-requirements">
-                        <i class="fas fa-check-circle text-success me-1"></i>
-                        <small class="text-muted">{{ vaga.requisitos|truncatewords:12 }}</small>
+                        <i class="fas fa-check-circle me-1" style="color: var(--cor-azul-claro);"></i>
+                        <small>{{ vaga.requisitos|truncatewords:12 }}</small>
                     </div>
                 </div>
 
@@ -316,9 +316,10 @@
 .vaga-requirements {
     font-size: 0.8125rem;
     padding: 0.75rem;
-    background: #f0fdf4;
-    border-left: 3px solid #10b981;
+    background: rgba(18, 69, 255, 0.08);
+    border-left: 3px solid var(--cor-azul-claro);
     border-radius: 4px;
+    color: var(--cor-azul-escuro);
 }
 
 /* Footer do Card */
@@ -494,7 +495,7 @@
                     <!-- Requisitos -->
                     <div class="modal-section">
                         <h6 class="modal-section-title">
-                            <i class="fas fa-check-circle"></i> Requisitos
+                            <i class="fas fa-check-circle" style="color: var(--cor-azul-claro);"></i> Requisitos
                         </h6>
                         <p class="modal-section-text" id="modal-requisitos"></p>
                     </div>

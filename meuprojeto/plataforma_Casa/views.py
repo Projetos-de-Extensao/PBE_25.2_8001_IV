@@ -21,6 +21,30 @@ from .repository import (
 from functools import wraps
 
 
+# ==================== FUNÇÕES AUXILIARES ====================
+
+def get_aluno_by_email(email):
+    """
+    Função auxiliar para buscar aluno por email tratando emails duplicados
+    Retorna o primeiro aluno encontrado ou None se não encontrar
+    """
+    try:
+        return Aluno.objects.get(email=email)
+    except Aluno.MultipleObjectsReturned:
+        # Se houver múltiplos alunos com o mesmo email, pegar o primeiro
+        return Aluno.objects.filter(email=email).first()
+    except Aluno.DoesNotExist:
+        return None
+
+
+def get_monitor_by_email(email):
+    """
+    Função auxiliar para buscar monitor (que também é um aluno) por email
+    Retorna o primeiro aluno/monitor encontrado ou None se não encontrar
+    """
+    return get_aluno_by_email(email)  # Monitor é um Aluno também
+
+
 # ==================== DECORATORS DE SEGURANÇA ====================
 
 def requer_grupo(*grupos_permitidos):
@@ -293,12 +317,6 @@ def register_view(request):
             
             # ==================== SUCESSO ====================
             
-            messages.success(
-                request,
-                f'✅ Cadastro realizado com sucesso! Bem-vindo {nome}. '
-                'Agora faça login para acessar a plataforma.'
-            )
-            
             # Log do novo usuário
             print(f"""
 ╔══════════════════════════════════════════════════════════════╗
@@ -383,7 +401,9 @@ def dashboard(request):
         # Dashboard personalizado para MONITOR
         try:
             # Buscar aluno pelo email do Django User
-            monitor = Aluno.objects.get(email=user.email)
+            monitor = get_monitor_by_email(user.email)
+            if not monitor:
+                raise Exception("Monitor não encontrado")
             
             # Estatísticas do MONITOR (minhas monitorias)
             minhas_monitorias = Turma.objects.filter(monitor=monitor, ativo=True)
@@ -731,7 +751,7 @@ def criar_aluno(request):
 def editar_aluno(request, aluno_id):
     """
     View para editar aluno
-    ⚠️ APENAS ADMINS OU COORDENADORES podem acessar
+     APENAS ADMINS OU COORDENADORES podem acessar
     """
     aluno = get_object_or_404(Aluno, id=aluno_id)
     
@@ -753,7 +773,7 @@ def editar_aluno(request, aluno_id):
 def deletar_aluno(request, aluno_id):
     """
     View para deletar aluno
-    ⚠️ APENAS ADMINS OU COORDENADORES podem acessar
+     APENAS ADMINS OU COORDENADORES podem acessar
     """
     aluno = get_object_or_404(Aluno, id=aluno_id)
     nome = aluno.nome
@@ -768,7 +788,7 @@ def listar_vagas(request):
     """
     View para listar vagas de monitoria
     
-    ⚠️ APENAS ADMINS OU COORDENADORES podem acessar
+     APENAS ADMINS OU COORDENADORES podem acessar
     
     Comportamento:
     - Admin: Vê TODAS as vagas do sistema
@@ -814,7 +834,7 @@ def listar_vagas(request):
 def detalhe_vaga(request, vaga_id):
     """
     View para detalhar uma vaga e listar candidatos inscritos
-    ⚠️ APENAS ADMINS OU COORDENADORES podem acessar
+     APENAS ADMINS OU COORDENADORES podem acessar
     
     Comportamento:
     - Admin: Pode ver QUALQUER vaga
@@ -905,11 +925,11 @@ def avaliar_candidato(request, inscricao_id):
                     grupo_monitor, _ = Group.objects.get_or_create(name='Monitor')
                     user.groups.add(grupo_monitor)
                     user.save()
-                    print(f"✅ User {user.username} adicionado ao grupo Monitor")
+                    print(f" User {user.username} adicionado ao grupo Monitor")
                 except User.DoesNotExist:
-                    print(f"⚠️ User não encontrado para email: {inscricao.aluno.email}")
+                    print(f" User não encontrado para email: {inscricao.aluno.email}")
                 except Exception as e:
-                    print(f"❌ Erro ao adicionar ao grupo Monitor: {e}")
+                    print(f" Erro ao adicionar ao grupo Monitor: {e}")
                 
             elif acao == 'reprovar':
                 inscricao.status = 'Não Aprovado'
@@ -944,7 +964,7 @@ def avaliar_candidato(request, inscricao_id):
 def criar_vaga(request):
     """
     View para criar nova vaga
-    ⚠️ APENAS ADMINS OU COORDENADORES podem acessar
+     APENAS ADMINS OU COORDENADORES podem acessar
     
     Comportamento:
     - Admin: Pode criar vaga para qualquer coordenador
@@ -1012,7 +1032,7 @@ def criar_vaga(request):
 def editar_vaga(request, vaga_id):
     """
     View para editar vaga
-    ⚠️ APENAS ADMINS OU COORDENADORES podem acessar
+     APENAS ADMINS OU COORDENADORES podem acessar
     
     Comportamento:
     - Admin: Pode editar QUALQUER vaga
@@ -1051,7 +1071,7 @@ def editar_vaga(request, vaga_id):
 def deletar_vaga(request, vaga_id):
     """
     View para deletar vaga
-    ⚠️ APENAS ADMINS OU COORDENADORES podem acessar
+     APENAS ADMINS OU COORDENADORES podem acessar
     
     Comportamento:
     - Admin: Pode deletar QUALQUER vaga
@@ -1084,7 +1104,7 @@ def deletar_vaga(request, vaga_id):
 def listar_turmas(request):
     """
     View para listar todas as turmas (GESTÃO)
-    ⚠️ APENAS ADMINS OU COORDENADORES podem acessar
+     APENAS ADMINS OU COORDENADORES podem acessar
     """
     turmas = Turma.objects.all().select_related('vaga', 'monitor', 'sala', 'curso')
     
@@ -1109,7 +1129,7 @@ def listar_turmas(request):
 def detalhe_turma(request, turma_id):
     """
     View para detalhar uma turma específica
-    ⚠️ APENAS ADMINS OU COORDENADORES podem acessar
+     APENAS ADMINS OU COORDENADORES podem acessar
     """
     turma = get_object_or_404(Turma, id=turma_id)
     participacoes = ParticipacaoMonitoria.objects.filter(turma=turma).select_related('aluno')
@@ -1127,7 +1147,7 @@ def detalhe_turma(request, turma_id):
 def criar_turma(request):
     """
     View para criar nova turma
-    ⚠️ APENAS ADMINS OU COORDENADORES podem acessar
+     APENAS ADMINS OU COORDENADORES podem acessar
     """
     if request.method == 'POST':
         nome = request.POST.get('nome')
@@ -1379,7 +1399,7 @@ def perfil(request):
     
     # Tentar recuperar dados de Aluno (para Alunos e Monitors)
     try:
-        aluno = Aluno.objects.get(email=usuario.email)
+        aluno = get_aluno_by_email(usuario.email)
     except:
         pass
     
@@ -1529,7 +1549,9 @@ def candidatar_vaga(request, vaga_id):
     
     # Verificar se é aluno
     try:
-        aluno = Aluno.objects.get(email=request.user.email)
+        aluno = get_aluno_by_email(request.user.email)
+        if not aluno:
+            raise Exception("Aluno não encontrado")
     except:
         # messages.error(request, 'Apenas alunos podem se candidatar!')
         return redirect('portal_vagas')
@@ -1571,8 +1593,11 @@ def minhas_inscricoes(request):
     View para aluno ver suas inscrições
     """
     try:
-        aluno = Aluno.objects.get(email=request.user.email)
-        inscricoes = Inscricao.objects.filter(aluno=aluno).select_related('vaga').prefetch_related('documentos')
+        aluno = get_aluno_by_email(request.user.email)
+        if not aluno:
+            inscricoes = []
+        else:
+            inscricoes = Inscricao.objects.filter(aluno=aluno).select_related('vaga').prefetch_related('documentos')
     except:
         inscricoes = []
     
@@ -1590,26 +1615,13 @@ def participando_monitorias(request):
     """
     participacoes = []
     try:
-        # ✅ Obter aluno com tratamento para múltiplos registros
-        usuario_autenticado = request.user
-        print(f"[DEBUG] Usuário autenticado: {usuario_autenticado.username}")
-        print(f"[DEBUG] Email do usuário: {usuario_autenticado.email}")
-        
-        alunos = Aluno.objects.filter(email=usuario_autenticado.email)
-        print(f"[DEBUG] Alunos encontrados: {alunos.count()}")
-        
-        if alunos.exists():
-            # Se houver múltiplos registros, pega o mais recente
-            aluno = alunos.latest('id') if alunos.count() > 1 else alunos.first()
-            print(f"[DEBUG] Aluno selecionado: ID {aluno.id} - {aluno.nome}")
-            
-            # Buscar participações
+        aluno = get_aluno_by_email(request.user.email)
+        if aluno:
+            # Buscar participações ativas
             participacoes = ParticipacaoMonitoria.objects.filter(
                 aluno=aluno
             ).select_related('turma', 'turma__vaga', 'turma__monitor', 'turma__curso').order_by('-turma__vaga__nome')
-            print(f"[DEBUG] Participações encontradas: {participacoes.count()}")
     except Exception as e:
-        print(f"[DEBUG] Erro: {str(e)}")
         participacoes = []
     
     context = {'participacoes': participacoes}
@@ -1666,19 +1678,16 @@ def participar_monitoria(request, turma_id):
     """
     turma = get_object_or_404(Turma, id=turma_id, ativo=True)
     
-    # ✅ Obter aluno pelo usuário autenticado (mais confiável que apenas email)
+    # ✅ Obter aluno pelo usuário autenticado usando a função auxiliar
     try:
-        # Tenta obter pelo usuário da sessão
-        usuario_autenticado = request.user
-        alunos = Aluno.objects.filter(email=usuario_autenticado.email)
-        
-        if not alunos.exists():
+        aluno = get_aluno_by_email(request.user.email)
+        if not aluno:
             messages.error(request, '❌ Aluno não encontrado')
             return redirect('monitorias_disponiveis')
         
-        # Se houver múltiplos registros, pega o mais recente
-        aluno = alunos.latest('id') if alunos.count() > 1 else alunos.first()
+        print(f"[DEBUG] Aluno encontrado: ID {aluno.id}, Nome {aluno.nome}, Email {aluno.email}")
     except Exception as e:
+        print(f"[DEBUG] Erro ao buscar aluno: {str(e)}")
         messages.error(request, '❌ Erro ao buscar aluno')
         return redirect('monitorias_disponiveis')
     
@@ -1694,15 +1703,212 @@ def participar_monitoria(request, turma_id):
             turma=turma
         )
         print(f"[DEBUG] Participação criada: ID {participacao.id}, Aluno {aluno.nome}, Turma {turma.nome}")
-        messages.success(
-            request, 
-            f'✅ Você se inscreveu com sucesso em "{turma.nome}"!'
-        )
     except Exception as e:
         print(f"[DEBUG] Erro ao criar participação: {str(e)}")
         messages.error(request, f'❌ Erro ao se inscrever: {str(e)}')
     
     return redirect('participando_monitorias')
+
+
+@requer_grupo('Aluno', 'Monitor')
+def sair_monitoria(request, turma_id):
+    """
+    ✨ View para ALUNO/MONITOR SAIR de uma monitoria
+    
+    Remove a ParticipacaoMonitoria entre o aluno/monitor e a turma
+    """
+    turma = get_object_or_404(Turma, id=turma_id, ativo=True)
+    
+    # Obter aluno pelo usuário autenticado
+    aluno = get_aluno_by_email(request.user.email)
+    if not aluno:
+        messages.error(request, '❌ Aluno não encontrado')
+        return redirect('participando_monitorias')
+    
+    # Verificar se realmente participa dessa turma
+    try:
+        participacao = ParticipacaoMonitoria.objects.get(aluno=aluno, turma=turma)
+        participacao.delete()
+        print(f"[DEBUG] Participação removida: Aluno {aluno.nome}, Turma {turma.nome}")
+    except ParticipacaoMonitoria.DoesNotExist:
+        messages.warning(request, '⚠️ Você não está inscrito nessa monitoria!')
+    except Exception as e:
+        messages.error(request, f'❌ Erro ao sair da monitoria: {str(e)}')
+    
+    return redirect('participando_monitorias')
+
+
+@requer_grupo('Aluno')
+def detalhes_presencas_monitoria(request, turma_id):
+    """
+    View para ALUNO ver suas presenças em uma monitoria específica
+    """
+    try:
+        aluno = get_aluno_by_email(request.user.email)
+        if not aluno:
+            raise Exception("Aluno não encontrado")
+            
+        turma = get_object_or_404(Turma, id=turma_id)
+        
+        # Verificar se o aluno está inscrito nesta monitoria
+        try:
+            participacao = ParticipacaoMonitoria.objects.get(aluno=aluno, turma=turma)
+        except ParticipacaoMonitoria.DoesNotExist:
+            messages.error(request, 'Você não está participando desta monitoria.')
+            return redirect('participando_monitorias')
+        
+        # Buscar todas as presenças do aluno nesta turma (últimos 30 dias)
+        from datetime import timedelta
+        hoje = timezone.now().date()
+        data_limite = hoje - timedelta(days=30)
+        
+        presencas = Presenca.objects.filter(
+            aluno=aluno,
+            turma=turma,
+            data__gte=data_limite
+        ).order_by('-data')
+        
+        # Calcular estatísticas
+        total_presencas = presencas.count()
+        presencas_confirmadas = presencas.filter(presente=True).count()
+        taxa_presenca = (presencas_confirmadas / total_presencas * 100) if total_presencas > 0 else 0
+        
+        # Presença de hoje
+        presenca_hoje = presencas.filter(data=hoje).first()
+        
+    except (Aluno.DoesNotExist, ParticipacaoMonitoria.DoesNotExist):
+        turma = None
+        participacao = None
+        presencas = []
+        total_presencas = 0
+        presencas_confirmadas = 0
+        taxa_presenca = 0
+        presenca_hoje = None
+    
+    context = {
+        'turma': turma,
+        'participacao': participacao,
+        'presencas': presencas,
+        'total_presencas': total_presencas,
+        'presencas_confirmadas': presencas_confirmadas,
+        'taxa_presenca': round(taxa_presenca, 1),
+        'presenca_hoje': presenca_hoje,
+        'hoje': hoje,
+    }
+    return render(request, 'monitorias/detalhes_presencas.html', context)
+
+
+@requer_monitor
+def minhas_monitorias_cards(request):
+    """
+    View para MONITOR ver suas monitorias em forma de cards clicáveis
+    
+    Cada card mostra uma monitoria que o monitor está dando
+    """
+    try:
+        monitor = get_monitor_by_email(request.user.email)
+        if monitor:
+            # Buscar turmas do monitor com contagem de alunos
+            turmas = Turma.objects.filter(monitor=monitor, ativo=True).select_related('vaga', 'curso')
+            
+            # Adicionar contagem de alunos para cada turma
+            turmas_com_alunos = []
+            for turma in turmas:
+                total_alunos = ParticipacaoMonitoria.objects.filter(turma=turma).count()
+                turmas_com_alunos.append({
+                    'turma': turma,
+                    'total_alunos': total_alunos
+                })
+        else:
+            turmas_com_alunos = []
+            
+    except:
+        turmas_com_alunos = []
+    
+    context = {
+        'turmas_com_alunos': turmas_com_alunos,
+    }
+    return render(request, 'monitorias/minhas_monitorias_cards.html', context)
+
+
+@requer_monitor
+def alunos_da_monitoria(request, turma_id):
+    """
+    View para MONITOR ver alunos de uma monitoria específica
+    
+    Permite ver detalhes dos alunos e marcar presença
+    """
+    try:
+        monitor = get_monitor_by_email(request.user.email)
+        if not monitor:
+            raise Exception("Monitor não encontrado")
+        turma = get_object_or_404(Turma, id=turma_id, monitor=monitor, ativo=True)
+        
+        # Buscar participações (alunos) nessa turma
+        participacoes = ParticipacaoMonitoria.objects.filter(
+            turma=turma
+        ).select_related('aluno').order_by('aluno__nome')
+        
+        # Buscar presenças de hoje para facilitar marcação
+        hoje = timezone.now().date()
+        presencas_hoje = Presenca.objects.filter(
+            turma=turma, 
+            data=hoje
+        ).values_list('aluno_id', flat=True)
+        
+    except:
+        turma = None
+        participacoes = []
+        presencas_hoje = []
+    
+    context = {
+        'turma': turma,
+        'participacoes': participacoes,
+        'presencas_hoje': list(presencas_hoje),
+        'hoje': timezone.now().date(),
+    }
+    return render(request, 'monitorias/alunos_monitoria.html', context)
+
+
+@requer_monitor  
+def marcar_presenca_aluno(request, turma_id, aluno_id):
+    """
+    View para MONITOR marcar presença de um aluno
+    """
+    if request.method == 'POST':
+        try:
+            monitor = get_monitor_by_email(request.user.email)
+            if not monitor:
+                raise Exception("Monitor não encontrado")
+            turma = get_object_or_404(Turma, id=turma_id, monitor=monitor)
+            aluno = get_object_or_404(Aluno, id=aluno_id)
+            
+            hoje = timezone.now().date()
+            presente = request.POST.get('presente') == 'true'
+            
+            # Criar ou atualizar presença
+            presenca, created = Presenca.objects.get_or_create(
+                turma=turma,
+                aluno=aluno,
+                data=hoje,
+                defaults={'presente': presente}
+            )
+            
+            if not created:
+                presenca.presente = presente
+                presenca.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Presença {"marcada" if presente else "desmarcada"} para {aluno.nome}'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Erro ao marcar presença: {str(e)}'
+            })
+    
+    return JsonResponse({'success': False, 'message': 'Método não permitido'})
 
 
 @requer_monitor
@@ -1713,7 +1919,9 @@ def meus_alunos_monitoria(request):
     Mostra alunos aprovados nas turmas do monitor
     """
     try:
-        monitor = Aluno.objects.get(email=request.user.email)
+        monitor = get_monitor_by_email(request.user.email)
+        if not monitor:
+            raise Exception("Monitor não encontrado")
         # Buscar turmas do monitor
         turmas = Turma.objects.filter(monitor=monitor, ativo=True).select_related('vaga', 'curso')
         
@@ -1807,9 +2015,11 @@ def registrar_horas(request):
     5. Professor valida e aprova/rejeita
     """
     try:
-        aluno = Aluno.objects.get(email=request.user.email)
+        aluno = get_monitor_by_email(request.user.email)
+        if not aluno:
+            raise Exception("Monitor não encontrado")
         turmas = Turma.objects.filter(monitor=aluno, ativo=True)
-    except Aluno.DoesNotExist:
+    except:
         # Redirecionar baseado no grupo do usuário
         if request.user.groups.filter(name='Aluno').exists():
             return redirect('portal_vagas')
@@ -1849,7 +2059,6 @@ def registrar_horas(request):
                 descricao_atividade=descricao,
                 status='Pendente'
             )
-            messages.success(request, '✅ Horas registradas com sucesso! Aguardando validação do professor.')
             return redirect('meus_registros_horas')
         except Turma.DoesNotExist:
             messages.error(request, '❌ Turma não encontrada ou você não é o monitor dela.')
@@ -1869,8 +2078,11 @@ def meus_registros_horas(request):
     ⚠️ APENAS MONITORS podem acessar
     """
     try:
-        aluno = Aluno.objects.get(email=request.user.email)
-        registros = RegistroHoras.objects.filter(monitor=aluno).select_related('turma', 'validado_por').order_by('-data')
+        aluno = get_monitor_by_email(request.user.email)
+        if not aluno:
+            registros = []
+        else:
+            registros = RegistroHoras.objects.filter(monitor=aluno).select_related('turma', 'validado_por').order_by('-data')
     except:
         registros = []
     
@@ -1890,15 +2102,17 @@ def detalhes_registro(request, registro_id):
     - @requer_monitor: Garante que APENAS monitors acessem esta view
     """
     try:
-        aluno = Aluno.objects.get(email=request.user.email)
+        aluno = get_monitor_by_email(request.user.email)
+        if not aluno:
+            raise Exception("Monitor não encontrado")
         # ✅ VERIFICAÇÃO DE SEGURANÇA: Monitor só vê seus registros
         registro = RegistroHoras.objects.get(id=registro_id, monitor=aluno)
-    except Aluno.DoesNotExist:
-        messages.error(request, '❌ Acesso negado: Você não é um monitor registrado.')
-        return redirect('portal_vagas')
     except RegistroHoras.DoesNotExist:
         messages.error(request, '❌ Registro não encontrado ou você não tem permissão para acessá-lo.')
         return redirect('meus_registros_horas')
+    except:
+        messages.error(request, '❌ Acesso negado: Você não é um monitor registrado.')
+        return redirect('portal_vagas')
     
     context = {'registro': registro}
     return render(request, 'horas/detalhes_registro.html', context)

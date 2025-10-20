@@ -1,14 +1,23 @@
+<!--
+    TEMPLATE: AVALIAR CANDIDATO INDIVIDUAL
+    Formulário para avaliar um candidato específico de uma vaga
+    - Dados do candidato, histórico, formulário de avaliação
+    - Campos: pontuação, comentários, status (Aprovado/Reprovado)
+    - Acesso: Apenas Professor/Gestor
+-->
+
 {% extends 'base.html' %}
 {% block title %}Avaliar Candidato - {{ aluno.nome }}{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Header da Página */
+    /* ===== HEADER E NAVEGAÇÃO ===== */
     .page-header {
         margin-bottom: 2rem;
     }
     
     .page-header h1 {
+        /* Título da página em cor institucional */
         font-size: 1.75rem;
         font-weight: 600;
         color: #002555;
@@ -22,6 +31,7 @@
     }
     
     .breadcrumb {
+        /* Caminho de navegação separado por "/" */
         background: transparent;
         padding: 0 0 1rem 0;
         margin: 0;
@@ -43,14 +53,16 @@
         font-weight: 600;
     }
     
-    /* Layout */
+    /* ===== LAYOUT PRINCIPAL ===== */
     .avaliacao-container {
+        /* Centraliza e limita largura máxima */
         max-width: 900px;
         margin: 0 auto;
     }
     
-    /* Cards */
+    /* ===== CARTÕES DE INFORMAÇÃO ===== */
     .info-card {
+        /* Card com sombra sutil para hierarquia visual */
         background: white;
         border-radius: 12px;
         overflow: hidden;
@@ -60,6 +72,7 @@
     }
     
     .info-card-header {
+        /* Header do card com gradiente azul */
         background: linear-gradient(135deg, #002555, #003d7a);
         color: white;
         padding: 1.25rem 1.5rem;
@@ -71,11 +84,13 @@
     }
     
     .info-card-body {
+        /* Conteúdo do card */
         padding: 2rem;
     }
     
-    /* Resumo do Candidato */
+    /* ===== RESUMO DO CANDIDATO ===== */
     .candidato-resumo {
+        /* Grid responsivo para dados do candidato */
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1.5rem;
@@ -83,6 +98,7 @@
     }
     
     .resumo-item {
+        /* Cada informação do candidato em box destacado */
         background: #f8f9fa;
         padding: 1rem;
         border-radius: 8px;
@@ -90,6 +106,7 @@
     }
     
     .resumo-label {
+        /* Rótulo da informação em maiúsculas */
         font-size: 0.75rem;
         font-weight: 700;
         color: #002555;

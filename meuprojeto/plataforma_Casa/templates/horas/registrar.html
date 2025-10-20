@@ -219,7 +219,7 @@
                                 <option value="">-- Escolha uma turma --</option>
                                 {% for turma in turmas %}
                                 <option value="{{ turma.id }}">
-                                    📚 {{ turma.nome }} - {{ turma.vaga.disciplina }}
+                                    📚 {{ turma.nome }} - {{ turma.vaga.disciplina|default:turma.vaga.nome }}
                                     ({{ turma.dias_da_semana }} • {{ turma.horario }})
                                 </option>
                                 {% empty %}

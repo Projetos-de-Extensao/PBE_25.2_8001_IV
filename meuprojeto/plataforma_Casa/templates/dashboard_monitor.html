@@ -1,3 +1,20 @@
+<!--
+    ============================================================================
+    TEMPLATE: DASHBOARD MONITOR - PAINEL DO MONITOR
+    ============================================================================
+    
+    Descrição: Dashboard personalizado para alunos que são monitores (aprovados)
+    Mostra: Monitorias, alunos, horas, estatísticas de presença e desempenho
+    
+    Variáveis de context esperadas:
+    - minhas_monitorias: QuerySet de monitorias do monitor
+    - total_horas: int - horas registradas no período
+    - presenca_media: float - taxa de presença (0-100)
+    - alunos_monitorados: int - quantidade de alunos
+    
+    Segurança: Apenas usuários com is_monitor=True acessam
+    ============================================================================
+-->
 {% extends 'base.html' %}
 
 {% block title %}Dashboard - Monitor{% endblock %}
@@ -464,7 +481,7 @@
                                 <td>
                                     <strong>{{ registro.turma.nome }}</strong>
                                     <br>
-                                    <small class="text-muted">{{ registro.turma.vaga.disciplina }}</small>
+                                    <small class="text-muted">{{ registro.turma.vaga.disciplina|default:registro.turma.vaga.nome }}</small>
                                 </td>
                                 <td>{{ registro.data_registro|date:"d/m/Y" }}</td>
                                 <td>{{ registro.duracao_horas }}h</td>
@@ -563,7 +580,7 @@
                             <td>
                                 <strong>{{ monitoria.nome }}</strong>
                             </td>
-                            <td>{{ monitoria.vaga.disciplina }}</td>
+                            <td>{{ monitoria.vaga.disciplina|default:monitoria.vaga.nome }}</td>
                             <td>
                                 <small>{{ monitoria.dias_da_semana }}<br>{{ monitoria.horario }}</small>
                             </td>

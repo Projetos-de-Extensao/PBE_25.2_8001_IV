@@ -1,87 +1,219 @@
 {% extends 'base.html' %}
+<!--
+    ============================================================================
+    TEMPLATE: PERFIL DO USUÁRIO
+    ============================================================================
+    
+    Descrição:
+    Página de gerenciamento de perfil pessoal e dados acadêmicos/profissionais.
+    Implementa interface para edição de informações e alteração de senha.
+    
+    Funcionalidades Principais:
+    - Exibição e edição de dados pessoais (nome, email)
+    - Exibição de dados acadêmicos (matrícula, curso, período, CR)
+    - Dados profissionais para professores (departamento, função)
+    - Modal para alteração segura de senha
+    - Validação de dados no backend
+    - Design responsivo e acessível
+    
+    Estrutura Condicional:
+    - Se usuário é aluno/monitor: exibe dados acadêmicos (readonly)
+    - Se usuário é professor: exibe dados profissionais (readonly)
+    - Caso contrário: mensagem de "sem informações"
+    
+    Fluxo de Usuário:
+    1. Usuário acessa página de perfil
+    2. Visualiza seus dados pessoais e informações acadêmicas/profissionais
+    3. Pode editar apenas nome e email (formulário POST)
+    4. Pode abrir modal para alterar senha (formulário separado)
+    5. Após submit: validação backend + redirect com mensagem de sucesso
+    
+    Segurança:
+    - CSRF token obrigatório em ambos formulários (POST)
+    - Dados acadêmicos em campos readonly (não editáveis)
+    - Password atual requerido para alterar senha
+    - Senha criptografada com PBKDF2 (Django default)
+    - Acesso restrito a usuários autenticados (login_required)
+    
+    Dependências:
+    - Bootstrap 5.3 (componentes modal, forms, grid)
+    - Font Awesome 6.4 (ícones)
+    - Template tag extends (herança de base.html)
+    - Django Template Tags (url, if, for)
+    
+    Autor: Equipe de Desenvolvimento - Plataforma Casa
+    Data: Outubro 2025
+    ============================================================================
+-->
 {% block title %}Meu Perfil - Sistema de Monitoria{% endblock %}
 
 {% block content %}
+{% block content %}
+<!--
+    ====================================================================
+    CONTAINER PRINCIPAL DA PÁGINA DE PERFIL
+    ====================================================================
+    Espaçamento vertical (mt-4 mb-5) para criar distância visual
+-->
 <div class="container mt-4 mb-5">
-    <!-- Header Minimalista -->
+    
+    <!--
+        ====================================================================
+        SEÇÃO: HEADER DO PERFIL
+        ====================================================================
+        Avatar visual do usuário com nome e email
+        Proporciona contexto visual imediato ao acessar a página
+    -->
     <div class="text-center mb-5">
+        <!-- Avatar circular do usuário -->
         <div class="profile-avatar-large">
             <i class="fas fa-user-circle"></i>
         </div>
-        <!-- Nome preferindo o cadastro do Aluno; fallback para nome completo do User; por fim username -->
+        
+        <!-- 
+            Nome do usuário com fallback em cascata:
+            1. Nome do cadastro de Aluno (se existir)
+            2. Nome completo do User (se existir)
+            3. Username (última opção)
+        -->
         <h1 class="perfil-title mt-3">{{ aluno.nome|default:usuario.get_full_name|default:usuario.username }}</h1>
+        
+        <!-- Email do usuário para contato -->
         <p class="perfil-subtitle">{{ usuario.email }}</p>
     </div>
 
-    <!-- Card Único de Informações -->
+    <!-- 
+        ====================================================================
+        CONTAINER DE CONTEÚDO - LAYOUT RESPONSIVO
+        ====================================================================
+        col-lg-10: Em desktop (≥992px), ocupa 10 de 12 colunas (centralizado)
+        Em mobile: ocupa 12 colunas (tela inteira)
+    -->
     <div class="row justify-content-center">
         <div class="col-lg-10">
+            
+            <!--
+                ====================================================================
+                CARD PRINCIPAL DO PERFIL
+                ====================================================================
+                Contém todos os formulários e informações de perfil
+                Estrutura em seções para melhor organização
+            -->
             <div class="perfil-card">
+                
+                <!-- Header do card com ícone e título -->
                 <div class="perfil-card-header">
                     <i class="fas fa-user-edit"></i>
                     <span>Informações Pessoais</span>
                 </div>
+                
+                <!-- Corpo do card com conteúdo -->
                 <div class="perfil-card-body">
+                    
+                    <!--
+                        ====================================================================
+                        FORMULÁRIO PRINCIPAL DE EDIÇÃO
+                        ====================================================================
+                        Método POST para enviar dados ao servidor
+                        CSRF token obrigatório para proteção contra ataques
+                    -->
                     <form method="post">
                         {% csrf_token %}
                         
-                        <!-- Dados Básicos -->
+                        <!--
+                            ====================================================================
+                            SEÇÃO 1: DADOS BÁSICOS (EDITÁVEIS)
+                            ====================================================================
+                            Nome e email do usuário
+                            Campos editáveis - usuário pode alterar valores
+                        -->
                         <div class="form-section">
                             <h6 class="section-title">Dados Básicos</h6>
                             <div class="row g-3">
+                                <!-- Campo: Nome Completo -->
                                 <div class="col-md-6">
                                     <label for="nome" class="form-label-custom">Nome Completo</label>
                                     <input type="text" class="form-control-custom" id="nome" name="nome" 
-                                           value="{{ aluno.nome|default:usuario.get_full_name|default:usuario.username }}" required>
+                                           value="{{ aluno.nome|default:usuario.get_full_name|default:usuario.username }}" 
+                                           required>
                                 </div>
+                                
+                                <!-- Campo: Email -->
                                 <div class="col-md-6">
                                     <label for="email" class="form-label-custom">Email</label>
                                     <input type="email" class="form-control-custom" id="email" name="email" 
-                                           value="{{ usuario.email }}" required>
+                                           value="{{ usuario.email }}" 
+                                           required>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Informações Específicas -->
+                        <!--
+                            ====================================================================
+                            SEÇÃO 2: INFORMAÇÕES ACADÊMICAS OU PROFISSIONAIS (READONLY)
+                            ====================================================================
+                            Dados que dependem do perfil do usuário
+                            
+                            Condição:
+                            - Se tem objeto Aluno: exibir dados acadêmicos (matrícula, curso, período, CR)
+                            - Se é professor: exibir dados profissionais (departamento, função)
+                            - Senão: exibir mensagem genérica
+                        -->
+                        
                         {# Exibir dados acadêmicos sempre que houver objeto Aluno (alunos e monitores) #}
                         {% if aluno %}
                         <div class="form-section">
                             <h6 class="section-title">Informações Acadêmicas</h6>
                             <div class="row g-3">
+                                <!-- Matrícula (readonly) -->
                                 <div class="col-md-6">
                                     <label class="form-label-custom">Matrícula</label>
                                     <div class="form-value-readonly">{{ aluno.matricula }}</div>
                                 </div>
+                                
+                                <!-- Curso (readonly) -->
                                 <div class="col-md-6">
                                     <label class="form-label-custom">Curso</label>
                                     <div class="form-value-readonly">{{ aluno.curso.nome }}</div>
                                 </div>
                             </div>
+                            
+                            <!-- Segunda linha de informações -->
                             <div class="row g-3 mt-2">
+                                <!-- Período (readonly) -->
                                 <div class="col-md-6">
                                     <label class="form-label-custom">Período</label>
                                     <div class="form-value-readonly">{{ aluno.periodo }}º Período</div>
                                 </div>
+                                
+                                <!-- CR Geral (readonly) - Coeficiente de Rendimento -->
                                 <div class="col-md-6">
                                     <label class="form-label-custom">CR Geral</label>
                                     <div class="form-value-readonly">{{ aluno.cr_geral }}</div>
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- Alternativa: Se é professor, exibir dados profissionais -->
                         {% elif is_professor and professor %}
                         <div class="form-section">
                             <h6 class="section-title">Informações Profissionais</h6>
                             <div class="row g-3">
+                                <!-- Departamento (readonly) -->
                                 <div class="col-md-6">
                                     <label class="form-label-custom">Departamento</label>
                                     <div class="form-value-readonly">{{ professor.departamento }}</div>
                                 </div>
+                                
+                                <!-- Função (readonly) -->
                                 <div class="col-md-6">
                                     <label class="form-label-custom">Função</label>
                                     <div class="form-value-readonly">{{ professor.funcao }}</div>
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- Fallback: Usuário sem informações vinculadas -->
                         {% else %}
                         <div class="form-section">
                             <h6 class="section-title">Informações da Conta</h6>
@@ -89,24 +221,42 @@
                         </div>
                         {% endif %}
 
-                        <!-- Segurança -->
+                        <!--
+                            ====================================================================
+                            SEÇÃO 3: SEGURANÇA - ALTERAÇÃO DE SENHA
+                            ====================================================================
+                            Botão que abre modal para alteração de senha
+                            Não é feita inline para aumentar segurança
+                        -->
                         <div class="form-section">
                             <h6 class="section-title">Segurança</h6>
+                            <!-- Botão com atributos Bootstrap para abrir modal -->
                             <button type="button" class="btn-senha" data-bs-toggle="modal" data-bs-target="#modalSenha">
                                 <i class="fas fa-key"></i>
                                 <div>
+                                    <!-- Título do botão -->
                                     <div class="btn-senha-title">Alterar Senha</div>
+                                    <!-- Descrição auxiliar -->
                                     <div class="btn-senha-desc">Mantenha sua conta segura</div>
                                 </div>
+                                <!-- Seta de navegação -->
                                 <i class="fas fa-chevron-right"></i>
                             </button>
                         </div>
 
-                        <!-- Botões de Ação -->
+                        <!--
+                            ====================================================================
+                            SEÇÃO 4: BOTÕES DE AÇÃO
+                            ====================================================================
+                            Cancelar (voltar ao dashboard) ou Salvar alterações
+                        -->
                         <div class="form-actions">
+                            <!-- Botão Cancelar -->
                             <a href="{% url 'dashboard' %}" class="btn-action btn-secondary-custom">
                                 <i class="fas fa-times"></i> Cancelar
                             </a>
+                            
+                            <!-- Botão Salvar -->
                             <button type="submit" class="btn-action btn-primary-custom">
                                 <i class="fas fa-save"></i> Salvar Alterações
                             </button>
@@ -117,23 +267,59 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
-<!-- Modal Alterar Senha -->
+<!--
+    ====================================================================
+    MODAL: ALTERAÇÃO DE SENHA
+    ====================================================================
+    Modal Bootstrap para alterar senha de forma segura
+    Isolado do formulário principal para melhor UX
+    
+    Atributos importantes:
+    - fade: Ativa animação de fade ao abrir/fechar
+    - tabindex=-1: Remove focus automático
+    - id="modalSenha": Referenciado em data-bs-target
+-->
 <div class="modal fade" id="modalSenha" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content modal-custom">
+            
+            <!--
+                Header customizado do modal
+                Com ícone, título e botão de fechar
+            -->
             <div class="modal-header-custom">
+                <!-- Ícone visual do modal -->
                 <div class="modal-icon">
                     <i class="fas fa-key"></i>
                 </div>
+                
+                <!-- Título do modal -->
                 <h5 class="modal-title-custom">Alterar Senha</h5>
+                
+                <!-- Botão de fechar -->
                 <button type="button" class="btn-close-custom" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
+            
+            <!--
+                Formulário separado para alteração de senha
+                Enviado para URL específica (alterar_senha)
+                Método POST com CSRF token
+            -->
             <form method="post" action="{% url 'alterar_senha' %}">
                 {% csrf_token %}
+                
+                <!-- Body do modal com campos de senha -->
                 <div class="modal-body-custom">
+                    
+                    <!--
+                        CAMPO 1: SENHA ATUAL
+                        Validação de acesso - user deve confirmar senha antiga
+                        Proteção contra alteração não-autorizada
+                    -->
                     <div class="form-group-modal">
                         <label for="senhaAtual" class="form-label-modal">
                             <i class="fas fa-lock"></i> Senha Atual
@@ -141,6 +327,12 @@
                         <input type="password" class="form-control-modal" id="senhaAtual" 
                                name="senha_atual" placeholder="Digite sua senha atual" required>
                     </div>
+                    
+                    <!--
+                        CAMPO 2: NOVA SENHA
+                        Deverá atender aos requisitos de força
+                        Será criptografada no backend
+                    -->
                     <div class="form-group-modal">
                         <label for="senhaNova" class="form-label-modal">
                             <i class="fas fa-key"></i> Nova Senha
@@ -148,6 +340,12 @@
                         <input type="password" class="form-control-modal" id="senhaNova" 
                                name="senha_nova" placeholder="Digite a nova senha" required>
                     </div>
+                    
+                    <!--
+                        CAMPO 3: CONFIRMAÇÃO DE NOVA SENHA
+                        Evita erros de digitação
+                        Backend verifica se são idênticas
+                    -->
                     <div class="form-group-modal">
                         <label for="senhaConfirmar" class="form-label-modal">
                             <i class="fas fa-check-circle"></i> Confirmar Nova Senha
@@ -155,15 +353,26 @@
                         <input type="password" class="form-control-modal" id="senhaConfirmar" 
                                name="senha_confirmar" placeholder="Confirme a nova senha" required>
                     </div>
+                    
+                    <!--
+                        DICA DE SEGURANÇA
+                        Informa requisitos mínimos de senha ao usuário
+                        Melhora experiência ao guiar sobre força da senha
+                    -->
                     <div class="senha-dica">
                         <i class="fas fa-info-circle"></i>
                         <span>Use pelo menos 8 caracteres com letras e números</span>
                     </div>
                 </div>
+                
+                <!-- Footer do modal com botões de ação -->
                 <div class="modal-footer-custom">
+                    <!-- Botão Cancelar -->
                     <button type="button" class="btn-modal btn-cancel" data-bs-dismiss="modal">
                         Cancelar
                     </button>
+                    
+                    <!-- Botão Confirmar alteração -->
                     <button type="submit" class="btn-modal btn-confirm">
                         <i class="fas fa-check"></i> Alterar Senha
                     </button>
@@ -174,13 +383,26 @@
 </div>
 
 <style>
-/* ========== HEADER DO PERFIL ========== */
+/*
+ * ========================================================================
+ * ESTILOS DO PERFIL
+ * ========================================================================
+ * Componentes visuais para página de gerenciamento de perfil
+ * Utiliza variáveis CSS e utility classes do Bootstrap
+ */
+
+/* 
+ * ========================================================================
+ * SEÇÃO: AVATAR DO USUÁRIO
+ * ========================================================================
+ * Exibição visual circular com degradê
+ */
 .profile-avatar-large {
     width: 120px;
     height: 120px;
     margin: 0 auto;
     background: linear-gradient(135deg, #003366 0%, #005599 100%);
-    border-radius: 50%;
+    border-radius: 50%;                 /* Circular */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -192,6 +414,11 @@
     color: #ffffff;
 }
 
+/* 
+ * ========================================================================
+ * TÍTULOS E SUBTÍTULOS DE PERFIL
+ * ========================================================================
+ */
 .perfil-title {
     font-size: 2rem;
     font-weight: 700;
@@ -215,7 +442,11 @@
     font-weight: 600;
 }
 
-/* ========== CARDS DO PERFIL ========== */
+/* 
+ * ========================================================================
+ * CARD PRINCIPAL DO PERFIL
+ * ========================================================================
+ */
 .perfil-card {
     background: #ffffff;
     border: 1px solid #e0e6ed;
@@ -245,7 +476,12 @@
     padding: 1.5rem;
 }
 
-/* ========== SEÇÕES DO FORMULÁRIO ========== */
+/* 
+ * ========================================================================
+ * SEÇÕES DO FORMULÁRIO
+ * ========================================================================
+ * Organização visual das informações em agrupamentos temáticos
+ */
 .form-section {
     margin-bottom: 2rem;
 }
@@ -265,6 +501,11 @@
     border-bottom: 2px solid #e0e6ed;
 }
 
+/* 
+ * ========================================================================
+ * LABELS E INPUTS CUSTOMIZADOS
+ * ========================================================================
+ */
 .form-label-custom {
     font-size: 0.875rem;
     font-weight: 600;
@@ -290,6 +531,12 @@
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+/* 
+ * ========================================================================
+ * CAMPOS READONLY
+ * ========================================================================
+ * Exibição de dados que não podem ser alterados (académicos/profissionais)
+ */
 .form-value-readonly {
     padding: 0.75rem 1rem;
     font-size: 0.9375rem;
@@ -310,7 +557,11 @@
     font-weight: 700;
 }
 
-/* ========== BOTÕES DE AÇÃO ========== */
+/* 
+ * ========================================================================
+ * BOTÕES DE AÇÃO
+ * ========================================================================
+ */
 .form-actions {
     display: flex;
     gap: 1rem;
@@ -355,7 +606,12 @@
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-/* ========== BOTÃO DE SENHA ========== */
+/* 
+ * ========================================================================
+ * BOTÃO DE ALTERAÇÃO DE SENHA
+ * ========================================================================
+ * Botão estilizado que abre modal de alteração
+ */
 .btn-senha {
     width: 100%;
     display: flex;
@@ -398,7 +654,11 @@
     color: #cbd5e1;
 }
 
-/* ========== MODAL CUSTOMIZADO ========== */
+/* 
+ * ========================================================================
+ * MODAL CUSTOMIZADO
+ * ========================================================================
+ */
 .modal-custom {
     border: none;
     border-radius: 16px;
@@ -571,7 +831,11 @@
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
-/* ========== RESPONSIVE ========== */
+/* 
+ * ========================================================================
+ * RESPONSIVIDADE - MOBILE
+ * ========================================================================
+ */
 @media (max-width: 768px) {
     .perfil-title {
         font-size: 1.5rem;

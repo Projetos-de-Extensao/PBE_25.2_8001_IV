@@ -372,7 +372,7 @@
                         <div class="info-item">
                             <div class="info-label">Nome da Turma</div>
                             <div class="info-value" style="font-size: 1.1rem;">{{ registro.turma.nome }}</div>
-                            <div class="info-small">{{ registro.turma.vaga.disciplina }}</div>
+                            <div class="info-small">{{ registro.turma.vaga.disciplina|default:registro.turma.vaga.nome }}</div>
                         </div>
 
                         <div class="info-item">

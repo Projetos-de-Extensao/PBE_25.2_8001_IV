@@ -1,0 +1,587 @@
+{% extends 'base.html' %}
+
+{% block title %}Minhas Presenças - {{ turma.nome }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Variáveis de cor */
+    :root {
+        --cor-azul-escuro: #002555;
+        --cor-azul-claro: #1245FF;
+        --cor-amarelo: #F5AC00;
+        --cor-off-white: #fafaf8;
+        --cor-cinza-claro: #f8f9fa;
+        --cor-cinza-texto: #64748b;
+        --cor-texto-primario: #1e293b;
+        --cor-sucesso: #10b981;
+        --cor-erro: #ef4444;
+    }
+
+    /* Header da página */
+    .page-header {
+        background: linear-gradient(135deg, var(--cor-azul-escuro) 0%, var(--cor-azul-claro) 100%);
+        color: var(--cor-off-white);
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border-left: 4px solid var(--cor-amarelo);
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.15);
+    }
+    
+    .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        color: var(--cor-off-white);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .page-subtitle {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1rem;
+        font-weight: 400;
+    }
+
+    /* Informações da turma */
+    .turma-info {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1);
+        border-left: 4px solid var(--cor-amarelo);
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: var(--cor-texto-primario);
+    }
+    
+    .info-icon {
+        width: 20px;
+        color: var(--cor-azul-claro);
+        text-align: center;
+    }
+
+    /* Cards de estatísticas */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1);
+        border-top: 4px solid;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .stat-card.total {
+        border-top-color: var(--cor-azul-claro);
+    }
+
+    .stat-card.presente {
+        border-top-color: var(--cor-sucesso);
+    }
+
+    .stat-card.taxa {
+        border-top-color: var(--cor-amarelo);
+    }
+
+    .stat-card.hoje {
+        border-top-color: var(--cor-erro);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-card.total .stat-number {
+        color: var(--cor-azul-claro);
+    }
+
+    .stat-card.presente .stat-number {
+        color: var(--cor-sucesso);
+    }
+
+    .stat-card.taxa .stat-number {
+        color: var(--cor-amarelo);
+    }
+
+    .stat-card.hoje .stat-number {
+        color: var(--cor-erro);
+    }
+
+    .stat-label {
+        color: var(--cor-cinza-texto);
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Presença de hoje */
+    .presenca-hoje {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1);
+        border-left: 4px solid;
+    }
+
+    .presenca-hoje.presente {
+        border-left-color: var(--cor-sucesso);
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.02) 100%);
+    }
+
+    .presenca-hoje.ausente {
+        border-left-color: var(--cor-erro);
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(239, 68, 68, 0.02) 100%);
+    }
+
+    .presenca-hoje.sem-registro {
+        border-left-color: var(--cor-cinza-texto);
+        background: linear-gradient(135deg, rgba(100, 116, 139, 0.05) 0%, rgba(100, 116, 139, 0.02) 100%);
+    }
+
+    .presenca-hoje-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .presenca-hoje-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: white;
+    }
+
+    .presenca-hoje.presente .presenca-hoje-icon {
+        background: var(--cor-sucesso);
+    }
+
+    .presenca-hoje.ausente .presenca-hoje-icon {
+        background: var(--cor-erro);
+    }
+
+    .presenca-hoje.sem-registro .presenca-hoje-icon {
+        background: var(--cor-cinza-texto);
+    }
+
+    .presenca-hoje-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .presenca-hoje.presente .presenca-hoje-title {
+        color: var(--cor-sucesso);
+    }
+
+    .presenca-hoje.ausente .presenca-hoje-title {
+        color: var(--cor-erro);
+    }
+
+    .presenca-hoje.sem-registro .presenca-hoje-title {
+        color: var(--cor-cinza-texto);
+    }
+
+    .presenca-hoje-texto {
+        color: var(--cor-cinza-texto);
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    /* Lista de presenças */
+    .presencas-lista {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1);
+    }
+
+    .presencas-lista h3 {
+        color: var(--cor-azul-escuro);
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .presenca-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .presenca-item:hover {
+        background: var(--cor-cinza-claro);
+        border-color: var(--cor-azul-claro);
+    }
+
+    .presenca-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .presenca-data {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .data-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--cor-azul-claro);
+        color: white;
+        font-size: 0.875rem;
+        font-weight: 700;
+    }
+
+    .data-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .data-principal {
+        font-weight: 600;
+        color: var(--cor-texto-primario);
+        font-size: 0.9rem;
+    }
+
+    .data-secundaria {
+        font-size: 0.8rem;
+        color: var(--cor-cinza-texto);
+    }
+
+    .presenca-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .presenca-status.presente {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--cor-sucesso);
+        border: 1px solid var(--cor-sucesso);
+    }
+
+    .presenca-status.ausente {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--cor-erro);
+        border: 1px solid var(--cor-erro);
+    }
+
+    /* Estado vazio */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border: 2px dashed #e2e8f0;
+        border-radius: 12px;
+    }
+    
+    .empty-state-icon {
+        font-size: 4rem;
+        color: var(--cor-cinza-texto);
+        margin-bottom: 1.5rem;
+    }
+    
+    .empty-state-title {
+        color: var(--cor-texto-primario);
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state-text {
+        color: var(--cor-cinza-texto);
+        margin-bottom: 2rem;
+        font-size: 1rem;
+    }
+
+    /* Botão voltar */
+    .btn-voltar {
+        background: var(--cor-cinza-texto);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-voltar:hover {
+        background: #4a5568;
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .stats-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .presenca-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        
+        .presenca-data {
+            width: 100%;
+        }
+        
+        .presenca-status {
+            align-self: flex-end;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .presenca-hoje-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding: 2rem;">
+    <!-- Header -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-calendar-check"></i> Minhas Presenças
+        </h1>
+        <p class="page-subtitle">{{ turma.nome }} • {{ turma.vaga.disciplina|default:"Monitoria" }}</p>
+    </div>
+
+    {% if turma %}
+    <!-- Informações da Turma -->
+    <div class="turma-info">
+        <div class="info-grid">
+            <div class="info-item">
+                <i class="fas fa-user-tie info-icon"></i>
+                <span><strong>Monitor:</strong> {{ turma.monitor.nome }}</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-graduation-cap info-icon"></i>
+                <span><strong>Curso:</strong> {{ turma.curso.nome }}</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-clock info-icon"></i>
+                <span><strong>Horário:</strong> {{ turma.horario }}</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-calendar-alt info-icon"></i>
+                <span><strong>Dias:</strong> {{ turma.dias_da_semana }}</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-door-open info-icon"></i>
+                <span><strong>Sala:</strong> {{ turma.sala.numero }}</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-calendar-day info-icon"></i>
+                <span><strong>Hoje:</strong> {{ hoje|date:"d/m/Y" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="stats-container">
+        <div class="stat-card total">
+            <div class="stat-number">{{ total_presencas }}</div>
+            <div class="stat-label">Total de Registros</div>
+        </div>
+        <div class="stat-card presente">
+            <div class="stat-number">{{ presencas_confirmadas }}</div>
+            <div class="stat-label">Presenças Confirmadas</div>
+        </div>
+        <div class="stat-card taxa">
+            <div class="stat-number">{{ taxa_presenca }}%</div>
+            <div class="stat-label">Taxa de Presença</div>
+        </div>
+        <div class="stat-card hoje">
+            <div class="stat-number">
+                {% if presenca_hoje %}
+                    {% if presenca_hoje.presente %}1{% else %}0{% endif %}
+                {% else %}
+                    ?
+                {% endif %}
+            </div>
+            <div class="stat-label">Hoje</div>
+        </div>
+    </div>
+
+    <!-- Presença de Hoje -->
+    {% if presenca_hoje %}
+        {% if presenca_hoje.presente %}
+        <div class="presenca-hoje presente">
+            <div class="presenca-hoje-header">
+                <div class="presenca-hoje-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div>
+                    <h3 class="presenca-hoje-title">Presente Hoje!</h3>
+                    <p class="presenca-hoje-texto">Sua presença foi registrada pelo monitor em {{ presenca_hoje.data|date:"d/m/Y" }}</p>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="presenca-hoje ausente">
+            <div class="presenca-hoje-header">
+                <div class="presenca-hoje-icon">
+                    <i class="fas fa-times"></i>
+                </div>
+                <div>
+                    <h3 class="presenca-hoje-title">Falta Registrada</h3>
+                    <p class="presenca-hoje-texto">O monitor registrou sua ausência em {{ presenca_hoje.data|date:"d/m/Y" }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    {% else %}
+    <div class="presenca-hoje sem-registro">
+        <div class="presenca-hoje-header">
+            <div class="presenca-hoje-icon">
+                <i class="fas fa-question"></i>
+            </div>
+            <div>
+                <h3 class="presenca-hoje-title">Sem Registro Hoje</h3>
+                <p class="presenca-hoje-texto">O monitor ainda não registrou sua presença para hoje ({{ hoje|date:"d/m/Y" }})</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Lista de Presenças -->
+    {% if presencas %}
+    <div class="presencas-lista">
+        <h3>
+            <i class="fas fa-history"></i>
+            Histórico de Presenças (Últimos 30 dias)
+        </h3>
+        
+        {% for presenca in presencas %}
+        <div class="presenca-item">
+            <div class="presenca-data">
+                <div class="data-icon">
+                    {{ presenca.data|date:"d" }}
+                </div>
+                <div class="data-info">
+                    <div class="data-principal">{{ presenca.data|date:"l, d \d\e F" }}</div>
+                    <div class="data-secundaria">{{ presenca.data|date:"d/m/Y" }}</div>
+                </div>
+            </div>
+            <div class="presenca-status {% if presenca.presente %}presente{% else %}ausente{% endif %}">
+                <i class="fas {% if presenca.presente %}fa-check{% else %}fa-times{% endif %}"></i>
+                {% if presenca.presente %}Presente{% else %}Ausente{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% else %}
+    <!-- Estado Vazio -->
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <i class="fas fa-calendar-times"></i>
+        </div>
+        <div class="empty-state-title">Nenhum registro de presença</div>
+        <p class="empty-state-text">
+            Ainda não há registros de presença para esta monitoria nos últimos 30 dias.
+        </p>
+    </div>
+    {% endif %}
+    
+    <!-- Botão Voltar -->
+    <div style="margin-top: 2rem; text-align: center;">
+        <a href="{% url 'participando_monitorias' %}" class="btn-voltar">
+            <i class="fas fa-arrow-left"></i> Voltar às Minhas Monitorias
+        </a>
+    </div>
+    
+    {% else %}
+    <!-- Turma não encontrada -->
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="empty-state-title">Monitoria não encontrada</div>
+        <p class="empty-state-text">
+            A monitoria solicitada não foi encontrada ou você não tem permissão para acessá-la.
+        </p>
+        <a href="{% url 'participando_monitorias' %}" class="btn-voltar">
+            <i class="fas fa-arrow-left"></i> Voltar às Minhas Monitorias
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,653 @@
+{% extends 'base.html' %}
+
+{% block title %}Alunos da {{ turma.nome }} - Monitor{% endblock %}
+
+{% csrf_token %}
+
+{% block extra_css %}
+<style>
+    /* Header da página */
+    .page-header {
+        background: linear-gradient(135deg, #002555 0%, #1245FF 100%);
+        color: #fafaf8;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #F5AC00;
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.15);
+    }
+    
+    .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        color: #fafaf8;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .page-subtitle {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 1rem;
+        font-weight: 400;
+    }
+    
+    /* Informações da turma */
+    .turma-info {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1);
+        border-left: 4px solid #F5AC00;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #495057;
+    }
+    
+    .info-icon {
+        width: 20px;
+        color: #1245FF;
+        text-align: center;
+    }
+    
+    /* Cards dos alunos */
+    .alunos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .aluno-card {
+        background: white;
+        border-radius: 16px;
+        border: 2px solid #e9ecef;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .aluno-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #1245FF 0%, #F5AC00 100%);
+    }
+    
+    .aluno-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(18, 69, 255, 0.15);
+        border-color: #1245FF;
+    }
+    
+    .aluno-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .aluno-avatar {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #1245FF 0%, #002555 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+    
+    .aluno-info {
+        flex-grow: 1;
+    }
+    
+    .aluno-nome {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #002555;
+        margin: 0 0 0.25rem 0;
+    }
+    
+    .aluno-matricula {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin: 0;
+        font-weight: 500;
+    }
+    
+    .aluno-detalhes {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .detalhe-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #495057;
+    }
+    
+    .detalhe-icon {
+        width: 16px;
+        color: #1245FF;
+        text-align: center;
+        font-size: 0.75rem;
+    }
+    
+    /* Controles de presença */
+    .presenca-controls {
+        background: linear-gradient(135deg, rgba(18, 69, 255, 0.05) 0%, rgba(245, 172, 0, 0.05) 100%);
+        border-radius: 12px;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+    }
+    
+    .presenca-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #002555;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .presenca-toggle {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 30px;
+    }
+    
+    .presenca-toggle input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #dc3545;
+        transition: .3s;
+        border-radius: 15px;
+    }
+    
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 22px;
+        width: 22px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .3s;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    input:checked + .toggle-slider {
+        background-color: #28a745;
+    }
+    
+    input:checked + .toggle-slider:before {
+        transform: translateX(30px);
+    }
+    
+    /* Status da presença */
+    .status-presente {
+        color: #28a745;
+        font-weight: 600;
+    }
+    
+    .status-ausente {
+        color: #dc3545;
+        font-weight: 600;
+    }
+    
+    /* Botões de ação */
+    .btn-ver-detalhes {
+        background: linear-gradient(135deg, #1245FF 0%, #002555 100%);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-ver-detalhes:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(18, 69, 255, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-voltar {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-voltar:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+    
+    /* Estado vazio */
+    .empty-state {
+        background: linear-gradient(135deg, rgba(18, 69, 255, 0.05) 0%, rgba(0, 37, 85, 0.05) 100%);
+        border: 2px dashed #1245FF;
+        border-radius: 16px;
+        padding: 4rem 2rem;
+        text-align: center;
+        margin-top: 2rem;
+    }
+    
+    .empty-state-icon {
+        font-size: 4rem;
+        color: #1245FF;
+        margin-bottom: 1.5rem;
+    }
+    
+    .empty-state-title {
+        color: #002555;
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state-text {
+        color: #6c757d;
+        margin-bottom: 2rem;
+        font-size: 1rem;
+    }
+    
+    /* Modal de detalhes */
+    .modal-content {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 37, 85, 0.2);
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, #002555 0%, #1245FF 100%);
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+        border-bottom: 3px solid #F5AC00;
+        padding: 1.5rem;
+    }
+    
+    .modal-title {
+        color: #fafaf8 !important;
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+    
+    .modal-body {
+        padding: 2rem;
+    }
+    
+    .modal-info-label {
+        color: #6c757d;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .modal-info-value {
+        color: #002555;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* Toast notifications */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .alunos-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .aluno-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.75rem;
+        }
+        
+        .presenca-controls {
+            flex-direction: column;
+            gap: 0.75rem;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding: 2rem;">
+    <!-- Header -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-users"></i> {{ turma.nome }}
+        </h1>
+        <p class="page-subtitle">{{ turma.vaga.disciplina|default:"Monitoria" }} • {{ turma.total_alunos|default:"0" }} alunos participando</p>
+    </div>
+
+    {% if turma %}
+    <!-- Informações da Turma -->
+    <div class="turma-info">
+        <div class="info-grid">
+            <div class="info-item">
+                <i class="fas fa-graduation-cap info-icon"></i>
+                <span><strong>Curso:</strong> {{ turma.curso.nome }}</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-door-open info-icon"></i>
+                <span><strong>Sala:</strong> {{ turma.sala.numero }}</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-calendar-alt info-icon"></i>
+                <span><strong>Dias:</strong> {{ turma.dias_da_semana }}</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-clock info-icon"></i>
+                <span><strong>Horário:</strong> {{ turma.horario }}</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-calendar-check info-icon"></i>
+                <span><strong>Período:</strong> {{ turma.data_inicio|date:"d/m/Y" }} até {{ turma.data_fim|date:"d/m/Y" }}</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-calendar-day info-icon"></i>
+                <span><strong>Hoje:</strong> {{ hoje|date:"d/m/Y" }}</span>
+            </div>
+        </div>
+    </div>
+
+    {% if participacoes %}
+    <!-- Grid de Alunos -->
+    <div class="alunos-grid">
+        {% for participacao in participacoes %}
+        <div class="aluno-card">
+            <!-- Header do Aluno -->
+            <div class="aluno-header">
+                <div class="aluno-avatar">
+                    {{ participacao.aluno.nome|first|upper }}
+                </div>
+                <div class="aluno-info">
+                    <h3 class="aluno-nome">{{ participacao.aluno.nome }}</h3>
+                    <p class="aluno-matricula">{{ participacao.aluno.matricula }}</p>
+                </div>
+            </div>
+            
+            <!-- Detalhes do Aluno -->
+            <div class="aluno-detalhes">
+                <div class="detalhe-item">
+                    <i class="fas fa-graduation-cap detalhe-icon"></i>
+                    <span>{{ participacao.aluno.curso.nome }}</span>
+                </div>
+                <div class="detalhe-item">
+                    <i class="fas fa-layer-group detalhe-icon"></i>
+                    <span>{{ participacao.aluno.periodo }}º Período</span>
+                </div>
+                <div class="detalhe-item">
+                    <i class="fas fa-envelope detalhe-icon"></i>
+                    <span>{{ participacao.aluno.email }}</span>
+                </div>
+                <div class="detalhe-item">
+                    <i class="fas fa-calendar detalhe-icon"></i>
+                    <span>Ingresso: {{ participacao.aluno.data_ingresso|date:"m/Y" }}</span>
+                </div>
+            </div>
+            
+            <!-- Controles de Presença -->
+            <div class="presenca-controls">
+                <div class="presenca-label">
+                    <i class="fas fa-calendar-check"></i>
+                    Presença de hoje
+                </div>
+                <div class="presenca-toggle">
+                    <input type="checkbox" 
+                           id="presenca_{{ participacao.aluno.id }}" 
+                           {% if participacao.aluno.id in presencas_hoje %}checked{% endif %}
+                           onchange="marcarPresenca({{ turma.id }}, {{ participacao.aluno.id }}, this.checked)">
+                    <span class="toggle-slider"></span>
+                </div>
+            </div>
+            
+            <!-- Ações -->
+            <div style="margin-top: 1rem; text-align: center;">
+                <button class="btn-ver-detalhes" data-bs-toggle="modal" 
+                        data-bs-target="#alunoModal{{ participacao.id }}">
+                    <i class="fas fa-eye"></i> Ver Detalhes
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal com Detalhes Completos do Aluno -->
+        <div class="modal fade" id="alunoModal{{ participacao.id }}" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-user-graduate"></i> {{ participacao.aluno.nome }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" 
+                                data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="modal-info-label">Matrícula</div>
+                                <div class="modal-info-value">{{ participacao.aluno.matricula }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="modal-info-label">Email</div>
+                                <div class="modal-info-value">{{ participacao.aluno.email }}</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="modal-info-label">Curso</div>
+                                <div class="modal-info-value">{{ participacao.aluno.curso.nome }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="modal-info-label">Período</div>
+                                <div class="modal-info-value">{{ participacao.aluno.periodo }}º</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="modal-info-label">Data de Ingresso</div>
+                                <div class="modal-info-value">{{ participacao.aluno.data_ingresso|date:"d/m/Y" }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="modal-info-label">Status na Monitoria</div>
+                                <div class="modal-info-value">
+                                    <span class="badge bg-success">Participando</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr style="border-color: #e9ecef; margin: 1.5rem 0;">
+
+                        <div class="modal-info-label">Turma de Monitoria</div>
+                        <div class="modal-info-value">{{ participacao.turma.nome }}</div>
+                        <small style="color: #6c757d;">{{ participacao.turma.vaga.nome }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% else %}
+    <!-- Estado Vazio -->
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <i class="fas fa-user-slash"></i>
+        </div>
+        <div class="empty-state-title">Nenhum aluno encontrado</div>
+        <p class="empty-state-text">
+            Esta monitoria ainda não tem alunos participando.
+        </p>
+    </div>
+    {% endif %}
+    
+    <!-- Botão Voltar -->
+    <div style="margin-top: 2rem; text-align: center;">
+        <a href="{% url 'minhas_monitorias_cards' %}" class="btn-voltar">
+            <i class="fas fa-arrow-left"></i> Voltar às Minhas Monitorias
+        </a>
+    </div>
+    
+    {% else %}
+    <!-- Turma não encontrada -->
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="empty-state-title">Monitoria não encontrada</div>
+        <p class="empty-state-text">
+            A monitoria solicitada não foi encontrada ou você não tem permissão para acessá-la.
+        </p>
+        <a href="{% url 'minhas_monitorias_cards' %}" class="btn-voltar">
+            <i class="fas fa-arrow-left"></i> Voltar às Minhas Monitorias
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container"></div>
+
+<script>
+// Função para marcar presença via AJAX
+function marcarPresenca(turmaId, alunoId, presente) {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                     document.querySelector('meta[name=csrf-token]')?.getAttribute('content');
+    
+    fetch(`/monitorias/${turmaId}/alunos/${alunoId}/presenca/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrfToken,
+        },
+        body: `presente=${presente}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+        } else {
+            showToast(data.message, 'error');
+            // Reverter o checkbox em caso de erro
+            document.getElementById(`presenca_${alunoId}`).checked = !presente;
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showToast('Erro ao marcar presença', 'error');
+        // Reverter o checkbox em caso de erro
+        document.getElementById(`presenca_${alunoId}`).checked = !presente;
+    });
+}
+
+// Função para mostrar toast notifications
+function showToast(message, type = 'info') {
+    const toastContainer = document.querySelector('.toast-container');
+    
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+    toast.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    // Auto remover após 5 segundos
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    }, 5000);
+}
+
+// Adicionar CSRF token como meta tag se não existir
+if (!document.querySelector('meta[name=csrf-token]')) {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    if (csrfToken) {
+        const meta = document.createElement('meta');
+        meta.name = 'csrf-token';
+        meta.content = csrfToken;
+        document.head.appendChild(meta);
+    }
+}
+</script>
+{% endblock %}

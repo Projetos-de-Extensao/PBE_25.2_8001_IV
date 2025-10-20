@@ -1,70 +1,149 @@
 {% load static %}
+<!--
+    ============================================================================
+    TEMPLATE DE AUTENTICAÇÃO - LOGIN
+    ============================================================================
+    
+    Descrição:
+    Página de autenticação para usuários existentes do sistema.
+    Implementa interface de formulário de login responsiva e acessível.
+    
+    Funcionalidades Principais:
+    - Autenticação por usuário ou email
+    - Toggle de visualização de senha
+    - Opção "Lembrar-me" para manter sessão
+    - Validação de credenciais pelo Django
+    - Design responsivo com Bootstrap 5.3
+    - Integração com Font Awesome para ícones
+    
+    Segurança:
+    - CSRF token obrigatório em formulário POST
+    - Proteção contra força bruta via Django-ratelimit (configurável em settings)
+    - Sem armazenamento de senhas em sessão
+    - Envio de credenciais apenas via HTTPS em produção
+    
+    Fluxo de Usuário:
+    1. Usuário insere credenciais (username/email + password)
+    2. Django autentica credenciais no backend configurado
+    3. Se sucesso: redireciona para dashboard baseado em perfil (aluno/monitor/professor/admin)
+    4. Se falha: exibe mensagem de erro e permite nova tentativa
+    5. Novo usuário pode acessar link de registro
+    
+    Dependências:
+    - Bootstrap 5.3.0 (CDN)
+    - Font Awesome 6.4.0 (CDN)
+    - Django Template Tags (load static)
+    - Django Messages Framework
+    
+    Autor: Equipe de Desenvolvimento - Plataforma Casa
+    Data: Outubro 2025
+    ============================================================================
+-->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <!-- Meta tags essenciais para compatibilidade e responsividade -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Plataforma Casa</title>
     
-    <!-- Bootstrap 5.3.0 -->
+    <!-- Bootstrap 5.3.0 - Framework CSS responsivo e componentes de UI -->
+    <!-- Fornece grid system, componentes predefinidos e estilos padrão -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     
-    <!-- Font Awesome 6.4.0 -->
+    <!-- Font Awesome 6.4.0 - Biblioteca de ícones vetoriais escaláveis -->
+    <!-- Utilizado para ícones de interface (usuário, chave, etc) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /*
+         * ========================================================================
+         * ESTILOS DE RESET E BASE
+         * ========================================================================
+         * Remove estilos padrão do navegador para garantir consistência visual
+         */
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            box-sizing: border-box; /* Inclui padding/border no cálculo de width/height */
         }
         
+        /*
+         * ========================================================================
+         * BODY - CONTENEDOR PRINCIPAL
+         * ========================================================================
+         * Configuração do fundo e layout vertical centralizado
+         * Utiliza flexbox para centralizar o formulário de login na tela
+         */
         body {
-            background: #f5f5f2;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: #f5f5f2;                    /* Cor off-white - fundo institucional */
+            min-height: 100vh;                      /* Ocupa altura total da viewport */
+            display: flex;                          /* Ativa flexbox */
+            align-items: center;                    /* Centra verticalmente */
+            justify-content: center;                /* Centra horizontalmente */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
+        /*
+         * ========================================================================
+         * CONTAINER DE LOGIN
+         * ========================================================================
+         * Card principal com formulário de autenticação
+         * Limitado a 400px de largura para melhor UX em inputs
+         */
         .login-container {
             width: 100%;
             max-width: 400px;
             padding: 2rem;
-            background: #fafaf8;
+            background: #fafaf8;                    /* Fundo card - branco institucional */
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            border-top: 5px solid #F5AC00;
+            border-top: 5px solid #F5AC00;          /* Borda amarela CASA - identidade visual */
         }
         
+        /*
+         * ========================================================================
+         * HEADER DO LOGIN
+         * ========================================================================
+         * Seção contendo ícone, título e subtítulo do login
+         */
         .login-header {
             text-align: center;
             margin-bottom: 2rem;
         }
         
+        /* Ícone de formatura - visual identitário */
         .login-header i {
             font-size: 3rem;
-            color: #F5AC00;
+            color: #F5AC00;                         /* Amarelo CASA */
             margin-bottom: 1rem;
         }
         
+        /* Título principal da página */
         .login-header h1 {
-            color: #002555;
+            color: #002555;                         /* Azul escuro CASA */
             font-size: 1.8rem;
-            font-weight: 700;
+            font-weight: 700;                       /* Negrito forte para hierarquia */
             margin-bottom: 0.5rem;
         }
         
+        /* Subtítulo descritivo */
         .login-header p {
-            color: #6d6e71;
+            color: #6d6e71;                         /* Cinza-médio para contraste */
             font-size: 0.9rem;
         }
         
+        /*
+         * ========================================================================
+         * GRUPOS DE FORMULÁRIO
+         * ========================================================================
+         * Espaçamento e layout para campos do formulário
+         */
         .form-group {
             margin-bottom: 1.5rem;
         }
         
+        /* Labels do formulário - identificação clara dos campos */
         .form-group label {
             color: #002555;
             font-weight: 600;
@@ -72,28 +151,37 @@
             display: block;
         }
         
+        /* Inputs de texto - username e password */
         .form-group input {
             width: 100%;
             padding: 0.8rem 1rem;
-            border: 2px solid #d1d3d4;
+            border: 2px solid #d1d3d4;              /* Borda cinza leve */
             border-radius: 8px;
             font-size: 0.95rem;
-            transition: all 0.3s ease;
+            transition: all 0.3s ease;              /* Suaviza transição de focus */
             background: #ffffff;
             color: #6d6e71;
         }
         
+        /* Estado de foco - feedback visual ao usuário */
         .form-group input:focus {
-            border-color: #002555;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 37, 85, 0.1);
+            border-color: #002555;                  /* Muda para azul escuro */
+            outline: none;                          /* Remove outline padrão */
+            box-shadow: 0 0 0 3px rgba(0, 37, 85, 0.1); /* Sombra sutil azulada */
             background: #ffffff;
         }
         
+        /* Placeholder text - dicas de preenchimento */
         .form-group input::placeholder {
-            color: #a7a9ab;
+            color: #a7a9ab;                         /* Cinza claro */
         }
         
+        /*
+         * ========================================================================
+         * BOTÃO DE SUBMIT
+         * ========================================================================
+         * Estilo do botão de entrada com gradiente e efeitos de interação
+         */
         .login-btn {
             width: 100%;
             padding: 0.9rem 1rem;
@@ -108,15 +196,23 @@
             margin-top: 1rem;
         }
         
+        /* Efeito hover - elevação do botão */
         .login-btn:hover {
-            transform: translateY(-2px);
+            transform: translateY(-2px);            /* Move 2px para cima */
             box-shadow: 0 5px 20px rgba(0, 37, 85, 0.3);
         }
         
+        /* Estado ativo - gradiente inverso */
         .login-btn:active {
             background: linear-gradient(135deg, #1245FF 0%, #002555 100%);
         }
         
+        /*
+         * ========================================================================
+         * ALERTAS - MENSAGENS DO SISTEMA
+         * ========================================================================
+         * Feedback de erros e sucessos
+         */
         .alert {
             margin-bottom: 1rem;
             border-radius: 8px;
@@ -124,16 +220,24 @@
             padding: 1rem;
         }
         
+        /* Alerta de erro - credenciais inválidas, etc */
         .alert-danger {
-            background: #f8d7da;
-            color: #721c24;
+            background: #f8d7da;                    /* Fundo rosa pálido */
+            color: #721c24;                         /* Texto vermelho escuro */
         }
         
+        /* Alerta de sucesso - login após mudança de senha, etc */
         .alert-success {
-            background: #d4edda;
-            color: #155724;
+            background: #d4edda;                    /* Fundo verde pálido */
+            color: #155724;                         /* Texto verde escuro */
         }
         
+        /*
+         * ========================================================================
+         * OPÇÃO "LEMBRAR-ME"
+         * ========================================================================
+         * Checkbox para manter sessão do usuário
+         */
         .remember-me {
             display: flex;
             align-items: center;
@@ -141,6 +245,7 @@
             margin-bottom: 1rem;
         }
         
+        /* Checkbox customizado */
         .remember-me input {
             margin-right: 0.5rem;
             width: auto;
@@ -148,6 +253,7 @@
             cursor: pointer;
         }
         
+        /* Label do checkbox */
         .remember-me label {
             margin: 0;
             color: #6d6e71;
@@ -156,6 +262,12 @@
             cursor: pointer;
         }
         
+        /*
+         * ========================================================================
+         * FOOTER DO LOGIN
+         * ========================================================================
+         * Seção inferior com link para novo registro
+         */
         .login-footer {
             text-align: center;
             margin-top: 1.5rem;
@@ -165,6 +277,7 @@
             font-size: 0.9rem;
         }
         
+        /* Links internos no footer */
         .login-footer a {
             color: #002555;
             text-decoration: none;
@@ -172,16 +285,24 @@
             transition: all 0.3s ease;
         }
         
+        /* Hover em links do footer */
         .login-footer a:hover {
-            color: #F5AC00;
+            color: #F5AC00;                         /* Muda para amarelo CASA */
         }
         
+        /*
+         * ========================================================================
+         * SENHA ESQUECIDA
+         * ========================================================================
+         * Link para recuperação de senha
+         */
         .forgot-password {
             text-align: right;
             margin-top: -0.5rem;
             margin-bottom: 1rem;
         }
         
+        /* Link de "Esqueceu a senha?" */
         .forgot-password a {
             color: #002555;
             font-size: 0.85rem;
@@ -189,29 +310,42 @@
             transition: all 0.3s ease;
         }
         
+        /* Hover no link de senha */
         .forgot-password a:hover {
             color: #F5AC00;
         }
         
-        /* Input com ícone */
+        /*
+         * ========================================================================
+         * INPUTS COM ÍCONES
+         * ========================================================================
+         * Estrutura para posicionar ícones dentro dos inputs
+         */
         .input-group {
             position: relative;
         }
         
+        /* Ícone dentro do input (esquerda) */
         .input-icon {
             position: absolute;
             left: 12px;
             top: 50%;
             transform: translateY(-50%);
             color: #6d6e71;
-            z-index: 10;
+            z-index: 10;                            /* Fica acima do input */
         }
         
+        /* Input com espaço para ícone na esquerda */
         .input-group input {
-            padding-left: 40px;
+            padding-left: 40px;                     /* Espaço para ícone */
         }
         
-        /* Ícone de toggle de senha */
+        /*
+         * ========================================================================
+         * TOGGLE DE VISUALIZAÇÃO DE SENHA
+         * ========================================================================
+         * Botão para mostrar/ocultar senha digitada
+         */
         .password-toggle {
             position: absolute;
             right: 12px;
@@ -224,56 +358,94 @@
             transition: color 0.3s ease;
         }
         
+        /* Hover no ícone de toggle */
         .password-toggle:hover {
-            color: #002555;
+            color: #002555;                         /* Muda para azul escuro */
         }
         
+        /* Input password com espaço para ícone na direita */
         .input-group.password-field input {
-            padding-right: 40px;
+            padding-right: 40px;                    /* Espaço para ícone de olho */
         }
         
+        /*
+         * ========================================================================
+         * RESPONSIVIDADE - MOBILE
+         * ========================================================================
+         * Ajustes para telas pequenas (< 480px)
+         */
         @media (max-width: 480px) {
             .login-container {
-                margin: 1rem;
+                margin: 1rem;                       /* Espaço lateral em mobile */
                 max-width: 100%;
             }
             
             .login-header h1 {
-                font-size: 1.5rem;
+                font-size: 1.5rem;                  /* Título menor */
             }
         }
     </style>
 </head>
 <body>
+    <!-- Container principal que centraliza o formulário de login -->
     <div class="login-container">
-        <!-- Header -->
+        
+        <!-- 
+            ====================================================================
+            SEÇÃO DE HEADER DO LOGIN
+            ====================================================================
+            Contém ícone visual, título e subtítulo do formulário de autenticação
+            Proporciona contexto e identidade visual ao usuário
+        -->
         <div class="login-header">
-            <i class="fas fa-graduation-cap"></i>
-            <h1>Plataforma Casa</h1>
-            <p>Sistema de Monitorias</p>
+            <i class="fas fa-graduation-cap"></i>  <!-- Ícone de formatura - identidade da plataforma -->
+            <h1>Plataforma Casa</h1>               <!-- Título principal -->
+            <p>Sistema de Monitorias</p>           <!-- Subtítulo descritivo -->
         </div>
         
-        <!-- Alertas -->
+        <!-- 
+            ====================================================================
+            SISTEMA DE MENSAGENS DO DJANGO
+            ====================================================================
+            Exibe alertas de erro (credenciais inválidas) ou aviso de logout
+            Utiliza o messages framework do Django para feedback do usuário
+        -->
         {% if messages %}
             {% for message in messages %}
+                <!-- Alerta customizado com classe de tag (danger/success/warning/info) -->
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                     {{ message }}
+                    <!-- Botão de fechar para descartar alerta -->
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             {% endfor %}
         {% endif %}
         
-        <!-- Formulário de Login -->
+        <!-- 
+            ====================================================================
+            FORMULÁRIO DE AUTENTICAÇÃO
+            ====================================================================
+            Formulário POST com validação CSRF do Django
+            Envia credenciais para a view de login (settings.LOGIN_URL)
+        -->
         <form method="POST" class="login-form">
+            <!-- CSRF Token - proteção contra cross-site request forgery -->
             {% csrf_token %}
             
-            <!-- Username ou Email -->
+            <!-- 
+                CAMPO: USERNAME OU EMAIL
+                Aceita tanto nome de usuário quanto email para maior flexibilidade
+                Validação no backend permite ambas as opções
+            -->
             <div class="form-group">
                 <label for="username">
+                    <!-- Ícone de usuário para melhor UX -->
                     <i class="fas fa-user"></i> Usuário ou Email
                 </label>
                 <div class="input-group">
+                    <!-- Ícone dentro do input -->
                     <i class="fas fa-user input-icon"></i>
+                    <!-- Campo de entrada com focus automático (autofocus) -->
                     <input 
                         type="text" 
                         id="username" 
@@ -285,13 +457,19 @@
                 </div>
             </div>
             
-            <!-- Password -->
+            <!-- 
+                CAMPO: PASSWORD
+                Senha criptografada - nunca salva em sessions ou cookies
+                Toggle de visibilidade implementado em JavaScript
+            -->
             <div class="form-group">
                 <label for="password">
                     <i class="fas fa-lock"></i> Senha
                 </label>
                 <div class="input-group password-field">
+                    <!-- Ícone de cadeado -->
                     <i class="fas fa-lock input-icon"></i>
+                    <!-- Input de password - mascarado por padrão -->
                     <input 
                         type="password" 
                         id="password" 
@@ -299,76 +477,92 @@
                         placeholder="Digite sua senha"
                         required
                     >
+                    <!-- Ícone de olho para toggle de visibilidade -->
                     <i class="fas fa-eye password-toggle" id="togglePassword" title="Mostrar senha"></i>
                 </div>
             </div>
             
-            <!-- Remember Me -->
+            <!-- 
+                OPÇÃO: LEMBRAR-ME
+                Mantém a sessão do usuário mesmo após fechar o navegador
+                Utiliza cookie de sessão do Django
+            -->
             <div class="remember-me">
                 <input type="checkbox" id="remember" name="remember">
                 <label for="remember">Lembrar-me nesta sessão</label>
             </div>
             
-            <!-- Submit Button -->
+            <!-- 
+                BOTÃO: SUBMIT
+                Envia o formulário para autenticação
+                Gradiente visual para destaque e Call-to-Action
+            -->
             <button type="submit" class="login-btn">
                 <i class="fas fa-sign-in-alt"></i> Entrar
             </button>
         </form>
         
-        <!-- Credenciais de Teste -->
+        <!-- 
+            ====================================================================
+            SEÇÃO DE FOOTER
+            ====================================================================
+            Links adicionais: registro de novo usuário
+            Convida usuários que não possuem conta a se cadastrar
+        -->
         <div class="login-footer">
-            {% comment %} <div style="background-color: #f8f9fa; border-radius: 6px; padding: 0.8rem; margin-bottom: 1rem; font-size: 0.85rem;">
-                <style>
-                    .cred-line { display: flex; justify-content: space-between; align-items: center; padding: 0.3rem 0; border-bottom: 1px solid #e0e0e0; }
-                    .cred-line:last-child { border-bottom: none; }
-                    .cred-role { background: #0097a7; color: white; padding: 0.2rem 0.5rem; border-radius: 3px; font-size: 0.7rem; font-weight: 600; margin: 0.3rem 0; }
-                    .cred-code { background: #fff; border: 1px solid #ddd; padding: 0.15rem 0.4rem; border-radius: 2px; font-family: monospace; color: #e74c3c; font-size: 0.8rem; font-weight: 500; }
-                </style>
-                
-                <div class="cred-role"><i class="fas fa-graduation-cap"></i> Aluno</div>
-                <div class="cred-line"><span>aluno.teste</span><span class="cred-code">aluno123</span></div>
-                
-                <div class="cred-role"><i class="fas fa-chalkboard-user"></i> Monitor</div>
-                <div class="cred-line"><span>monitor.teste</span><span class="cred-code">monitor123</span></div>
-                
-                <div class="cred-role"><i class="fas fa-user-tie"></i> Professor</div>
-                <div class="cred-line"><span>professor.teste</span><span class="cred-code">professor123</span></div>
-                
-                <div class="cred-role"><i class="fas fa-lock"></i> Admin</div>
-                <div class="cred-line"><span>admin</span><span class="cred-code">admin123</span></div>
-            </div> {% endcomment %}
-            
             <p style="text-align: center; color: #7f8c8d; font-size: 0.85rem;">
-                Não tem conta? <a href="{% url 'register' %}" style="color: #0097a7; text-decoration: none; font-weight: 600;"><i class="fas fa-user-plus"></i> Crie aqui</a>
+                <!-- Link para página de registro com tooltip -->
+                Não tem conta? 
+                <a href="{% url 'register' %}" style="color: #0097a7; text-decoration: none; font-weight: 600;">
+                    <i class="fas fa-user-plus"></i> Crie aqui
+                </a>
             </p>
+        </div>
     </div>
     
-    <!-- Bootstrap JS -->
+    <!-- Bootstrap JavaScript - necessário para funcionamento de componentes Bootstrap -->
+    <!-- CDN fornecido pela MaxCDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Toggle de visualização de senha -->
+    <!-- 
+        ====================================================================
+        SCRIPT: TOGGLE DE VISUALIZAÇÃO DE SENHA
+        ====================================================================
+        Permite ao usuário mostrar/ocultar a senha enquanto digita
+        Melhora usabilidade sem comprometer segurança
+        
+        Funcionalidade:
+        - Toggle entre type="password" e type="text"
+        - Muda ícone entre olho fechado e aberto
+        - Mantém foco no input após clicar
+    -->
     <script>
+        // Obter referências aos elementos do DOM
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
         
+        // Adicionar listener para clique no ícone de toggle
         togglePassword.addEventListener('click', function() {
-            // Toggle do tipo de input
+            // Toggle do tipo de input entre password e text
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
             
-            // Toggle do ícone
+            // Toggle do ícone e título (tooltip) para feedback visual
             if (type === 'password') {
+                // Se voltou para password, mostrar ícone de olho aberto
                 this.classList.remove('fa-eye-slash');
                 this.classList.add('fa-eye');
                 this.setAttribute('title', 'Mostrar senha');
             } else {
+                // Se mudou para text, mostrar ícone de olho fechado
                 this.classList.remove('fa-eye');
                 this.classList.add('fa-eye-slash');
                 this.setAttribute('title', 'Ocultar senha');
             }
         });
         
-        // Manter o foco no input após clicar no ícone
+        // Impedir que o clique no ícone tire o foco do input
+        // mousedown é disparado antes de blur, prevenindo perda de foco
         togglePassword.addEventListener('mousedown', function(e) {
             e.preventDefault();
         });

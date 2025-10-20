@@ -391,7 +391,7 @@
                                 <td>
                                     <strong>{{ inscricao.vaga.nome }}</strong>
                                     <br>
-                                    <small class="text-muted">{{ inscricao.vaga.disciplina }}</small>
+                                    <small class="text-muted">{{ inscricao.vaga.disciplina|default:inscricao.vaga.nome }}</small>
                                 </td>
                                 <td class="text-center">
                                     <span class="badge bg-primary">{{ inscricao.aluno.cr_geral }}</span>
@@ -623,7 +623,7 @@ function exportarExcel() {
             '{{ inscricao.aluno.nome }}',
             '{{ inscricao.aluno.matricula }}',
             '{{ inscricao.aluno.curso.nome }}',
-            '{{ inscricao.vaga.nome }} - {{ inscricao.vaga.disciplina }}',
+            '{{ inscricao.vaga.nome }} - {{ inscricao.vaga.disciplina|default:inscricao.vaga.nome }}',
             {{ inscricao.aluno.cr_geral }},
             '{{ inscricao.data_resultado|date:"d/m/Y H:i"|default:"-" }}',
             '{{ inscricao.aluno.email }}'

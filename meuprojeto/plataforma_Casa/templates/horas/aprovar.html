@@ -1,113 +1,488 @@
 {% extends 'base.html' %}
 
-{% block title %}Aprovar Registro de Horas{% endblock %}
+{% block title %}Validar Registro de Horas{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <h1 class="display-4">
-                <i class="fas fa-check-circle"></i> Validar Registro de Horas
-            </h1>
-            <p class="lead">Aprove ou rejeite o registro de horas do monitor</p>
-        </div>
+<style>
+.validation-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.page-header h1 {
+    color: #2c3e50;
+    font-weight: 300;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+    font-weight: 400;
+}
+
+.info-card {
+    background: #ffffff;
+    border: 1px solid #e8ecef;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.info-header {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-size: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1rem 1.5rem;
+    margin: -2rem -2rem 1.5rem -2rem;
+    border-radius: 12px 12px 0 0;
+    border-bottom: 1px solid #e8ecef;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.info-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.info-value {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.badge-minimal {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.badge-hours {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+
+.badge-value {
+    background-color: #e8f5e8;
+    color: #2e7d32;
+}
+
+.description-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e8ecef;
+}
+
+.description-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 0.8rem;
+}
+
+.description-content {
+    background-color: #f8f9fa;
+    border: 1px solid #e8ecef;
+    border-radius: 8px;
+    padding: 1rem;
+    color: #495057;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.validation-card {
+    background: #ffffff;
+    border: 1px solid #e8ecef;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.validation-header {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1rem 1.5rem;
+    margin: -2rem -2rem 1.5rem -2rem;
+    border-radius: 12px 12px 0 0;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label-minimal {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-select-minimal {
+    border: 1px solid #e8ecef;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.form-select-minimal:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    outline: none;
+}
+
+.form-textarea-minimal {
+    border: 1px solid #e8ecef;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    width: 100%;
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-textarea-minimal:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    outline: none;
+}
+
+.alert-minimal {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    color: #856404;
+    font-size: 0.9rem;
+}
+
+.actions-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e8ecef;
+}
+
+.btn-minimal {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-secondary-minimal {
+    background-color: #6c757d;
+    color: #ffffff;
+}
+
+.btn-secondary-minimal:hover {
+    background-color: #545b62;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.btn-primary-minimal {
+    background-color: #27ae60;
+    color: #ffffff;
+    padding: 0.85rem 2rem;
+    font-weight: 600;
+}
+
+.btn-primary-minimal:hover {
+    background-color: #219a52;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+/* Custom Select Styling */
+.select-wrapper {
+    position: relative;
+}
+
+.form-select-minimal {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+    padding-right: 3rem;
+}
+
+.form-select-minimal option {
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+}
+
+.form-select-minimal option[value="Aprovado"] {
+    color: #27ae60;
+    font-weight: 500;
+}
+
+.form-select-minimal option[value="Rejeitado"] {
+    color: #e74c3c;
+    font-weight: 500;
+}
+
+.decision-icons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.decision-option {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    color: #495057;
+    text-decoration: none;
+    min-width: 160px;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.decision-option:hover {
+    background-color: #e9ecef;
+    text-decoration: none;
+}
+
+.decision-option.approve {
+    color: #27ae60;
+    border-color: #27ae60;
+}
+
+.decision-option.approve:hover {
+    background-color: rgba(39, 174, 96, 0.1);
+    color: #27ae60;
+}
+
+.decision-option.reject {
+    color: #e74c3c;
+    border-color: #e74c3c;
+}
+
+.decision-option.reject:hover {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+@media (max-width: 768px) {
+    .validation-container {
+        padding: 1rem;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .decision-icons {
+        flex-direction: column;
+    }
+    
+    .decision-option {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .actions-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .btn-minimal {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
+<div class="validation-container">
+    <!-- Header da Página -->
+    <div class="page-header">
+        <h1>✓ Validar Registro de Horas</h1>
+        <p>Aprove ou rejeite o registro de horas do monitor</p>
     </div>
 
     <!-- Informações do Registro -->
-    <div class="card shadow mb-4">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">
-                <i class="fas fa-info-circle"></i> Informações do Registro
-            </h4>
+    <div class="info-card">
+        <div class="info-header">
+            Informações do Registro
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong><i class="fas fa-user"></i> Monitor:</strong> {{ registro.monitor.nome }}</p>
-                    <p><strong><i class="fas fa-graduation-cap"></i> Curso:</strong> {{ registro.monitor.curso.nome }}</p>
-                    <p><strong><i class="fas fa-envelope"></i> Email:</strong> {{ registro.monitor.email }}</p>
-                </div>
-                <div class="col-md-6">
-                    <p><strong><i class="fas fa-calendar"></i> Data:</strong> {{ registro.data|date:"d/m/Y" }}</p>
-                    <p><strong><i class="fas fa-clock"></i> Horário:</strong> {{ registro.hora_inicio|time:"H:i" }} - {{ registro.hora_fim|time:"H:i" }}</p>
-                    <p><strong><i class="fas fa-hourglass-half"></i> Total de Horas:</strong> 
-                        <span class="badge bg-primary">{{ registro.total_horas|floatformat:1 }}h</span>
-                    </p>
-                    <p><strong><i class="fas fa-dollar-sign"></i> Valor:</strong> 
-                        <span class="badge bg-success">R$ {{ registro.valor_total|floatformat:2 }}</span>
-                    </p>
-                </div>
+        
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Monitor</span>
+                <span class="info-value">{{ registro.monitor.nome }}</span>
             </div>
+            <div class="info-item">
+                <span class="info-label">Data</span>
+                <span class="info-value">{{ registro.data|date:"d/m/Y" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Curso</span>
+                <span class="info-value">{{ registro.monitor.curso.nome }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Horário</span>
+                <span class="info-value">{{ registro.hora_inicio|time:"H:i" }} - {{ registro.hora_fim|time:"H:i" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Email</span>
+                <span class="info-value">{{ registro.monitor.email }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Total de Horas</span>
+                <span class="badge-minimal badge-hours">{{ registro.total_horas|floatformat:1 }}h</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Valor</span>
+                <span class="badge-minimal badge-value">R$ {{ registro.valor_total|floatformat:2 }}</span>
+            </div>
+        </div>
 
-            <hr>
-
-            <div class="row">
-                <div class="col-md-12">
-                    <h5><i class="fas fa-tasks"></i> Descrição das Atividades Realizadas:</h5>
-                    <div class="alert alert-secondary">
-                        {{ registro.atividades_realizadas }}
-                    </div>
-                </div>
+        <div class="description-section">
+            <div class="description-label">Descrição das Atividades Realizadas</div>
+            <div class="description-content">
+                {{ registro.atividades_realizadas }}
             </div>
         </div>
     </div>
 
     <!-- Formulário de Validação -->
-    <div class="card shadow">
-        <div class="card-header bg-warning text-white">
-            <h4 class="mb-0">
-                <i class="fas fa-clipboard-check"></i> Validação
-            </h4>
+    <div class="validation-card">
+        <div class="validation-header">
+            Validação
         </div>
-        <div class="card-body">
-            <form method="POST">
-                {% csrf_token %}
-                
-                <div class="mb-3">
-                    <label for="status" class="form-label">
-                        <i class="fas fa-tasks"></i> Decisão <span class="text-danger">*</span>
-                    </label>
-                    <select name="status" id="status" class="form-select" required onchange="toggleObservacao()">
-                        <option value="">Selecione uma opção...</option>
-                        <option value="Aprovado">✅ Aprovar Registro</option>
-                        <option value="Rejeitado">❌ Rejeitar Registro</option>
-                    </select>
-                    <small class="form-text text-muted">
-                        Registros aprovados serão contabilizados para pagamento
-                    </small>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label-minimal">
+                    Decisão *
+                </label>
+                <input type="hidden" name="status" id="status" required>
+                <div class="decision-icons">
+                    <div class="decision-option approve" onclick="selectDecision('Aprovado', this)">
+                        <i class="fas fa-check-circle"></i>
+                        Aprovar Registro
+                    </div>
+                    <div class="decision-option reject" onclick="selectDecision('Rejeitado', this)">
+                        <i class="fas fa-times-circle"></i>
+                        Rejeitar Registro
+                    </div>
                 </div>
+            </div>
 
-                <div class="mb-3" id="divObservacao" style="display: none;">
-                    <label for="observacao" class="form-label">
-                        <i class="fas fa-comment"></i> Observações
-                    </label>
-                    <textarea name="observacao" id="observacao" class="form-control" rows="4" 
-                              placeholder="Adicione comentários sobre a decisão (obrigatório para rejeição)"></textarea>
-                    <small class="form-text text-muted">
-                        Para rejeição, explique o motivo para que o monitor possa corrigir
-                    </small>
-                </div>
+            <div class="form-group" id="divObservacao" style="display: none;">
+                <label for="observacao" class="form-label-minimal">
+                    Observações
+                </label>
+                <textarea name="observacao" id="observacao" class="form-textarea-minimal" 
+                          placeholder="Adicione comentários sobre a decisão (obrigatório para rejeição)"></textarea>
+            </div>
 
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <strong>Atenção:</strong> Esta ação afetará o cálculo de pagamento do monitor. 
-                    Certifique-se de que as informações estão corretas antes de aprovar.
-                </div>
+            <div class="alert-minimal">
+                <strong>Atenção:</strong> Esta ação afetará o cálculo de pagamento do monitor. 
+                Certifique-se de que as informações estão corretas antes de aprovar.
+            </div>
 
-                <div class="d-flex justify-content-between">
-                    <a href="{% url 'validar_horas' %}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Voltar
-                    </a>
-                    <button type="submit" class="btn btn-success btn-lg">
-                        <i class="fas fa-check"></i> Confirmar Validação
-                    </button>
-                </div>
-            </form>
-        </div>
+            <div class="actions-container">
+                <a href="{% url 'validar_horas' %}" class="btn-minimal btn-secondary-minimal">
+                    ← Voltar
+                </a>
+                <button type="submit" class="btn-minimal btn-primary-minimal">
+                    ✓ Confirmar Validação
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
+
 <script>
+function selectDecision(decision, element) {
+    // Remove active state from all options
+    document.querySelectorAll('.decision-option').forEach(option => {
+        option.style.backgroundColor = '';
+        option.style.transform = '';
+        option.style.boxShadow = '';
+    });
+    
+    // Set active state for selected option
+    if (decision === 'Aprovado') {
+        element.style.backgroundColor = 'rgba(39, 174, 96, 0.15)';
+        element.style.transform = 'translateY(-2px)';
+        element.style.boxShadow = '0 4px 12px rgba(39, 174, 96, 0.3)';
+    } else {
+        element.style.backgroundColor = 'rgba(231, 76, 60, 0.15)';
+        element.style.transform = 'translateY(-2px)';
+        element.style.boxShadow = '0 4px 12px rgba(231, 76, 60, 0.3)';
+    }
+    
+    // Set the hidden input value
+    document.getElementById('status').value = decision;
+    
+    // Show/hide observations field
+    toggleObservacao();
+}
+
 function toggleObservacao() {
     const status = document.getElementById('status').value;
     const divObservacao = document.getElementById('divObservacao');

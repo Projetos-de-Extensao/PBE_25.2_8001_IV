@@ -1,11 +1,21 @@
+<!--
+    TEMPLATE: AVALIAR CANDIDATOS (LISTAGEM)
+    Lista todos os candidatos de uma vaga para avaliação em lote
+    - Dashboard com estatísticas (total, pendentes, aprovados, reprovados)
+    - Tabela com ações rápidas para aceitar/rejeitar
+    - Acesso: Apenas Professor/Gestor
+-->
+
 {% extends 'base.html' %}
 
 {% block title %}Avaliar Candidatos{% endblock %}
 
 {% block content %}
+<!-- ===== HEADER COM TÍTULO E CONTEXTO ===== -->
 <div class="container-fluid mt-4">
     <div class="row mb-4">
         <div class="col-md-12">
+            <!-- Título com ícone e nome da vaga -->
             <h1 class="display-4">
                 <i class="fas fa-user-check"></i> Avaliar Candidatos
             </h1>
@@ -14,8 +24,9 @@
         </div>
     </div>
 
-    <!-- Estatísticas da Vaga -->
+    <!-- ===== ESTATÍSTICAS DA VAGA ===== -->
     <div class="row mb-4">
+        <!-- Card: Total de Inscritos -->
         <div class="col-md-3">
             <div class="card border-left-primary shadow">
                 <div class="card-body">
@@ -35,6 +46,8 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Card: Candidatos Pendentes -->
         <div class="col-md-3">
             <div class="card border-left-warning shadow">
                 <div class="card-body">
@@ -54,6 +67,8 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Card: Candidatos Aprovados -->
         <div class="col-md-3">
             <div class="card border-left-success shadow">
                 <div class="card-body">
@@ -73,6 +88,8 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Card: Candidatos Reprovados -->
         <div class="col-md-3">
             <div class="card border-left-danger shadow">
                 <div class="card-body">
