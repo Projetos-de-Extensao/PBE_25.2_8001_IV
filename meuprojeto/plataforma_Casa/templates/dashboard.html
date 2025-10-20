@@ -62,125 +62,63 @@
 
 {% block extra_css %}
 <style>
-    /* 
-     * ========================================================================
-     * SEÇÃO: CONTAINER DASHBOARD
-     * ========================================================================
-     * Wrapper principal para todo o conteúdo do dashboard
-     * Adiciona padding vertical para separação com navbar fixa
-     */
     .dashboard-container {
         padding: 2rem 0;       
     }
     
- 
-     * ========================================================================
-     * SEÇÃO: CARD DASHBOARD
-     * ========================================================================
-     * Componente reutilizável para exibir métricas e dados
-     * 
-     * Características visuais:
-     * - Fundo branco com sombra sutil
-     * - Border radius moderado (12px)
-     * - Hover effect: elevação e sombra aumentada
-     * - Transição suave para feedback visual
-     * 
-     * Uso: Envolve KPIs, tabelas, listas de dados
-     */
     .dashboard-card {
-        background: white;                              /* Fundo limpo */
-        border-radius: 12px;                            /* Cantos suavizados */
-        padding: 1.5rem;                                /* Espaçamento interno */
-        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1);   /* Sombra sutil (azul institucional) -->
-        margin-bottom: 1.5rem;                          /* Separação entre cards -->
-        transition: all 0.3s ease;                      /* Animação suave */
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1);
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
     }
     
-    /* Estado hover: elevação visual e sombra aumentada */
     .dashboard-card:hover {
-        transform: translateY(-3px);                    /* Sobe 3px ao passar mouse */
-        box-shadow: 0 8px 16px rgba(0, 37, 85, 0.15); /* Sombra maior */
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(0, 37, 85, 0.15);
     }
     
-    /* 
-     * ========================================================================
-     * SEÇÃO: STAT ITEM (LINHA DE ESTATÍSTICA)
-     * ========================================================================
-     * Organiza horizontalmente: Label/Número à esquerda, Ícone à direita
-     * 
-     * Flexbox layout:
-     * - space-between: Afasta conteúdo para os lados
-     * - align-items: center: Alinha verticalmente
-     * - border-bottom: Linha divisória entre items
-     */
     .stat-item {
-        display: flex;                              /* Layout horizontal */
-        align-items: center;                        /* Alinha verticalmente */
-        justify-content: space-between;             /* Espaça conteúdo -->
-        padding: 1rem 0;                            /* Espaçamento vertical -->
-        border-bottom: 1px solid #f0f0f0;          /* Linha divisória -->
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f0f0f0;
     }
     
-    /* Remove borda do último item (evita linha desnecessária) */
     .stat-item:last-child {
         border-bottom: none;
     }
     
-    /* Número grande e destacado (KPI) */
     .stat-number {
         font-size: 1.75rem;                        
-        font-weight: 700;                          ]
-        color: #002555;                            
+        font-weight: 700;
+        color: #002555;
     }
     
-    /* Rótulo da estatística (texto pequeno) */
     .stat-label {
-        font-size: 0.875rem;                       
-        color: #6c757d;                           
-        font-weight: 600;                          
-        text-transform: uppercase;                  
+        font-size: 0.875rem;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
     }
     
-    /* 
-     * ========================================================================
-     * SEÇÃO: TÍTULOS DE CARD
-     * ========================================================================
-     * Cabeçalho identificador de cada seção/card
-     */
     .card-title {
-        font-size: 1.25rem;                         /* Grande -->
-        font-weight: 700;                           /* Bold -->
-        color: #002555;                             /* Cor institucional -->
-        margin-bottom: 1rem;                        /* Separação do conteúdo -->
-        padding-bottom: 0.5rem;                     /* Espaço interno para borda -->
-        border-bottom: 2px solid #f5f5f5;          /* Linha divisória sutil -->
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #002555;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f5f5f5;
     }
     
-    /* 
-     * ========================================================================
-     * SEÇÃO: BADGES (BADGES/TAGS)
-     * ========================================================================
-     * Indicadores visuais de status ou quantidade
-     * 
-     * Tipos:
-     * - alert-badge: Alarme/aviso (vermelho)
-     * - info-badge: Informação (azul)
-     * - status-* badges: Estados (pendente/aprovado/rejeitado)
-     */
+    }
+    
     .alert-badge {
-        display: inline-block;                      /* Comportamento inline -->
-        background-color: #dc3545;                  /* Vermelho de alerta -->
-        color: white;                               /* Texto branco -->
-        border-radius: 20px;                        /* Pill shape -->
-        padding: 0.25rem 0.75rem;                  /* Espaçamento compacto -->
-        font-size: 0.875rem;                        /* Tamanho pequeno -->
-        font-weight: 600;                           /* Semi-bold -->
-    }
-    
-    /* Badge informativo (azul institucional) */
-    .info-badge {
         display: inline-block;
-        background-color: #1245FF;                  /* Azul claro institucional -->
+        background-color: #dc3545;
         color: white;
         border-radius: 20px;
         padding: 0.25rem 0.75rem;
@@ -188,37 +126,32 @@
         font-weight: 600;
     }
     
-    /* 
-     * ========================================================================
-     * SEÇÃO: TABELAS CUSTOMIZADAS
-     * ========================================================================
-     * Estilos para tabelas de dados (inscrições, monitorias, etc)
-     * Integra com Bootstrap .table classes
-     */
+    .info-badge {
+        display: inline-block;
+        background-color: #1245FF;
+        color: white;
+        border-radius: 20px;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    }
+    
     .table-custom {
-        font-size: 0.875rem;                        /* Texto reduzido -->
+        font-size: 0.875rem;
     }
     
-    /* Header da tabela */
     .table-custom th {
-        background-color: #f8f9fa;                  /* Background cinza claro -->
-        color: #002555;                             /* Texto azul escuro -->
-        font-weight: 700;                           /* Bold -->
-        border-bottom: 2px solid #dee2e6;          /* Borda destacada -->
+        background-color: #f8f9fa;
+        color: #002555;
+        font-weight: 700;
+        border-bottom: 2px solid #dee2e6;
     }
     
-    /* Células de dados */
     .table-custom td {
-        vertical-align: middle;                     /* Alinha conteúdo centralmente -->
+        vertical-align: middle;
     }
     
-    /* 
-     * ========================================================================
-     * SEÇÃO: STATUS BADGES (INDICADORES DE ESTADO)
-     * ========================================================================
-     * Mostram status de inscrições, vagas, monitorias
-     * Cores padronizadas: amarelo=pendente, verde=aprovado, vermelho=rejeitado
-     */
     .status-badge {
         display: inline-block;
         padding: 0.35rem 0.65rem;
@@ -227,66 +160,37 @@
         font-weight: 600;
     }
     
-    /* Status: Pendente (amarelo) */
     .status-pendente {
-        background-color: #fff3cd;                  /* Amarelo claro -->
-        color: #856404;                             /* Amarelo escuro -->
+        background-color: #fff3cd;
+        color: #856404;
     }
     
-    /* Status: Aprovado (verde) */
     .status-aprovado {
-        background-color: #d4edda;                  /* Verde claro -->
-        color: #155724;                             /* Verde escuro -->
+        background-color: #d4edda;
+        color: #155724;
     }
     
-    /* Status: Rejeitado (vermelho) */
     .status-rejeitado {
-        background-color: #f8d7da;                  /* Vermelho claro -->
-        color: #721c24;                             /* Vermelho escuro -->
+        background-color: #f8d7da;
+        color: #721c24;
     }
     
-    /* 
-     * ========================================================================
-     * SEÇÃO: ÍCONES ESTATÍSTICOS
-     * ========================================================================
-     * Ícones grandes para visualização em KPI cards
-     * Posicionados à direita do card para equilíbrio visual
-     */
     .icon-stat {
-        font-size: 2.5rem;                          /* Muito grande -->
-        color: #d0d0d0;                             /* Cinza claro (não chama atenção) -->
-        text-align: center;                         /* Centralizado -->
+        font-size: 2.5rem;
+        color: #d0d0d0;
+        text-align: center;
     }
     
-    /* 
-     * ========================================================================
-     * SEÇÃO: GRID LAYOUT DASHBOARD
-     * ========================================================================
-     * Grid CSS responsivo para layout de cards
-     * 
-     * Comportamento:
-     * - Desktop (≥768px): 3 colunas
-     * - Tablet (600-768px): 2-3 colunas (auto-fit)
-     * - Mobile (<600px): 1 coluna
-     * 
-     * minmax(300px, 1fr): Cada coluna tem mínimo 300px, máximo flexível
-     */
     .grid-dashboard {
-        display: grid;                              /* Grid layout -->
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsivo -->
-        gap: 1.5rem;                                /* Espaçamento entre items -->
-        margin-bottom: 2rem;                        /* Separação do próximo elemento -->
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
     }
     
-    /* 
-     * ========================================================================
-     * SEÇÃO: RESPONSIVIDADE - MOBILE
-     * ========================================================================
-     * Em telas pequenas (≤768px), reduz grid para coluna única
-     */
     @media (max-width: 768px) {
         .grid-dashboard {
-            grid-template-columns: 1fr;            /* 1 coluna em mobile -->
+            grid-template-columns: 1fr;
         }
     }
 </style>
