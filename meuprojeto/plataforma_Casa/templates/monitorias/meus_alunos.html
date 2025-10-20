@@ -2,15 +2,251 @@
 
 {% block title %}Meus Alunos - Monitor{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Header da página */
+    .page-header {
+        background: linear-gradient(135deg, #002555 0%, #1245FF 100%);
+        color: #fafaf8;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #F5AC00;
+    }
+    
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        color: #fafaf8;
+    }
+    
+    .page-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+    
+    /* Cards de resumo por turma */
+    .turma-card {
+        background: white;
+        border-radius: 12px;
+        border: 2px solid #1245FF;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1);
+    }
+    
+    .turma-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(18, 69, 255, 0.2);
+        border-color: #F5AC00;
+    }
+    
+    .turma-card-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #002555;
+        margin-bottom: 0.5rem;
+    }
+    
+    .turma-card-subtitle {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+    }
+    
+    .turma-card-number {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #1245FF;
+        margin: 1rem 0;
+    }
+    
+    .turma-card-label {
+        color: #6c757d;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    
+    /* Tabela moderna */
+    .modern-table-container {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1);
+    }
+    
+    .modern-table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .modern-table thead {
+        background: #002555;
+    }
+    
+    .modern-table thead th {
+        color: #fafaf8;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding: 1rem;
+        border: none;
+    }
+    
+    .modern-table thead th:first-child {
+        border-top-left-radius: 8px;
+    }
+    
+    .modern-table thead th:last-child {
+        border-top-right-radius: 8px;
+    }
+    
+    .modern-table tbody tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .modern-table tbody tr:hover {
+        background-color: rgba(18, 69, 255, 0.05);
+        transform: scale(1.01);
+    }
+    
+    .modern-table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        color: #495057;
+    }
+    
+    /* Badges modernos */
+    .cr-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    .cr-badge.high {
+        background-color: rgba(40, 167, 69, 0.15);
+        color: #28a745;
+        border: 1px solid #28a745;
+    }
+    
+    .cr-badge.medium {
+        background-color: rgba(245, 172, 0, 0.15);
+        color: #d39e00;
+        border: 1px solid #F5AC00;
+    }
+    
+    .cr-badge.low {
+        background-color: rgba(220, 53, 69, 0.15);
+        color: #dc3545;
+        border: 1px solid #dc3545;
+    }
+    
+    /* Botão de ação */
+    .btn-view {
+        background-color: #1245FF;
+        color: #fafaf8;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-view:hover {
+        background-color: #002555;
+        color: #fafaf8;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(18, 69, 255, 0.3);
+    }
+    
+    /* Modal redesign */
+    .modal-content {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 37, 85, 0.2);
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, #002555 0%, #1245FF 100%);
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        border-bottom: 3px solid #F5AC00;
+    }
+    
+    .modal-title {
+        color: #fafaf8 !important;
+        font-weight: 700;
+    }
+    
+    .modal-body {
+        padding: 2rem;
+    }
+    
+    .modal-info-label {
+        color: #6c757d;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .modal-info-value {
+        color: #002555;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    /* Alert vazio */
+    .empty-state {
+        background: linear-gradient(135deg, rgba(18, 69, 255, 0.05) 0%, rgba(0, 37, 85, 0.05) 100%);
+        border: 2px dashed #1245FF;
+        border-radius: 12px;
+        padding: 3rem;
+        text-align: center;
+    }
+    
+    .empty-state-icon {
+        font-size: 4rem;
+        color: #1245FF;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state-title {
+        color: #002555;
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state-text {
+        color: #6c757d;
+        margin: 0;
+    }
+    
+    /* Ícones */
+    .fa-user-circle {
+        color: #1245FF;
+        margin-right: 0.5rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <h1 class="display-4">
-                <i class="fas fa-chalkboard-user"></i> Meus Alunos
-            </h1>
-            <p class="lead">Alunos que estão participando de suas monitorias</p>
-        </div>
+<div class="container-fluid" style="padding: 2rem;">
+    <!-- Header -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-chalkboard-user"></i> Meus Alunos
+        </h1>
+        <p>Alunos que estão participando de suas monitorias</p>
     </div>
 
     <!-- Resumo por Turma -->
@@ -18,16 +254,12 @@
     <div class="row mb-4">
         {% for turma in turmas %}
         <div class="col-md-4 mb-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">{{ turma.nome }}</h5>
-                    <p class="text-muted mb-0">{{ turma.vaga.nome }}</p>
-                    <hr>
-                    <div class="display-6 text-primary">
-                        {{ participacoes|length }}
-                    </div>
-                    <small class="text-muted">alunos participando</small>
-                </div>
+            <div class="turma-card">
+                <div class="turma-card-title">{{ turma.nome }}</div>
+                <div class="turma-card-subtitle">{{ turma.vaga.nome }}</div>
+                <hr style="border-color: #e9ecef;">
+                <div class="turma-card-number">{{ participacoes|length }}</div>
+                <div class="turma-card-label">alunos participando</div>
             </div>
         </div>
         {% endfor %}
@@ -38,9 +270,9 @@
     <div class="row">
         <div class="col-md-12">
             {% if participacoes %}
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-dark">
+            <div class="modern-table-container">
+                <table class="table modern-table">
+                    <thead>
                         <tr>
                             <th>Aluno</th>
                             <th>Matrícula</th>
@@ -63,17 +295,17 @@
                             <td>{{ participacao.aluno.periodo }}º</td>
                             <td>
                                 {% if participacao.aluno.cr_geral >= 7 %}
-                                    <span class="badge bg-success">{{ participacao.aluno.cr_geral }}</span>
+                                    <span class="cr-badge high">{{ participacao.aluno.cr_geral }}</span>
                                 {% elif participacao.aluno.cr_geral >= 5 %}
-                                    <span class="badge bg-warning">{{ participacao.aluno.cr_geral }}</span>
+                                    <span class="cr-badge medium">{{ participacao.aluno.cr_geral }}</span>
                                 {% else %}
-                                    <span class="badge bg-danger">{{ participacao.aluno.cr_geral }}</span>
+                                    <span class="cr-badge low">{{ participacao.aluno.cr_geral }}</span>
                                 {% endif %}
                             </td>
                             <td>
-                                <button class="btn btn-sm btn-info" data-bs-toggle="modal" 
+                                <button class="btn btn-view btn-sm" data-bs-toggle="modal" 
                                         data-bs-target="#alunoModal{{ participacao.id }}">
-                                    <i class="fas fa-eye"></i>
+                                    <i class="fas fa-eye"></i> Ver Detalhes
                                 </button>
                             </td>
                         </tr>
@@ -82,53 +314,53 @@
                         <div class="modal fade" id="alunoModal{{ participacao.id }}" tabindex="-1">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
-                                    <div class="modal-header bg-primary text-white">
-                                        <h5 class="modal-title" style="color: #fafaf8;">{{ participacao.aluno.nome }}</h5>
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">{{ participacao.aluno.nome }}</h5>
                                         <button type="button" class="btn-close btn-close-white" 
                                                 data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body">
                                         <div class="mb-3">
-                                            <h6 class="text-muted">Matrícula</h6>
-                                            <p><strong>{{ participacao.aluno.matricula }}</strong></p>
+                                            <div class="modal-info-label">Matrícula</div>
+                                            <div class="modal-info-value">{{ participacao.aluno.matricula }}</div>
                                         </div>
 
                                         <div class="row mb-3">
                                             <div class="col-md-6">
-                                                <h6 class="text-muted">Curso</h6>
-                                                <p><strong>{{ participacao.aluno.curso.nome }}</strong></p>
+                                                <div class="modal-info-label">Curso</div>
+                                                <div class="modal-info-value">{{ participacao.aluno.curso.nome }}</div>
                                             </div>
                                             <div class="col-md-6">
-                                                <h6 class="text-muted">Período</h6>
-                                                <p><strong>{{ participacao.aluno.periodo }}º</strong></p>
+                                                <div class="modal-info-label">Período</div>
+                                                <div class="modal-info-value">{{ participacao.aluno.periodo }}º</div>
                                             </div>
                                         </div>
 
                                         <div class="row mb-3">
                                             <div class="col-md-6">
-                                                <h6 class="text-muted">CR Geral</h6>
-                                                <p>
+                                                <div class="modal-info-label">CR Geral</div>
+                                                <div class="modal-info-value">
                                                     {% if participacao.aluno.cr_geral >= 7 %}
-                                                        <strong class="text-success">{{ participacao.aluno.cr_geral }}</strong>
+                                                        <span class="cr-badge high">{{ participacao.aluno.cr_geral }}</span>
                                                     {% elif participacao.aluno.cr_geral >= 5 %}
-                                                        <strong class="text-warning">{{ participacao.aluno.cr_geral }}</strong>
+                                                        <span class="cr-badge medium">{{ participacao.aluno.cr_geral }}</span>
                                                     {% else %}
-                                                        <strong class="text-danger">{{ participacao.aluno.cr_geral }}</strong>
+                                                        <span class="cr-badge low">{{ participacao.aluno.cr_geral }}</span>
                                                     {% endif %}
-                                                </p>
+                                                </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <h6 class="text-muted">Email</h6>
-                                                <p><small>{{ participacao.aluno.email }}</small></p>
+                                                <div class="modal-info-label">Email</div>
+                                                <div class="modal-info-value" style="font-size: 0.875rem;">{{ participacao.aluno.email }}</div>
                                             </div>
                                         </div>
 
-                                        <hr>
+                                        <hr style="border-color: #e9ecef; margin: 1.5rem 0;">
 
                                         <div class="mb-3">
-                                            <h6 class="text-muted">Turma de Monitoria</h6>
-                                            <p><strong>{{ participacao.turma.nome }}</strong></p>
-                                            <small class="text-muted">{{ participacao.turma.vaga.nome }}</small>
+                                            <div class="modal-info-label">Turma de Monitoria</div>
+                                            <div class="modal-info-value">{{ participacao.turma.nome }}</div>
+                                            <small style="color: #6c757d;">{{ participacao.turma.vaga.nome }}</small>
                                         </div>
                                     </div>
                                 </div>
@@ -139,19 +371,15 @@
                 </table>
             </div>
             {% else %}
-            <div class="alert alert-info text-center">
-                <i class="fas fa-info-circle"></i>
-                <strong>Nenhum aluno encontrado</strong>
-                <p class="mb-0">Você ainda não tem alunos participando de suas monitorias.</p>
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-users-slash"></i>
+                </div>
+                <div class="empty-state-title">Nenhum aluno encontrado</div>
+                <p class="empty-state-text">Você ainda não tem alunos participando de suas monitorias.</p>
             </div>
             {% endif %}
         </div>
     </div>
 </div>
-
-<style>
-    .table-hover tbody tr:hover {
-        background-color: #f8f9fa;
-    }
-</style>
 {% endblock %}
