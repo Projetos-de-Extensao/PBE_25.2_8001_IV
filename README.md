@@ -1,14 +1,4 @@
-# 📚 Documentação Completa - Sistema de Monitorias (Plataforma Casa)
-
-Eu sou um programador junior trabalhando no desenvolvimento de um sistema completo de gestão de monitorias para uma instituição acadêmica. Este documento consolida todo o meu trabalho, desde a arquitetura até os detalhes de implementação, passando pelos desafios enfrentados e soluções encontradas.
-
----
-
-## 🎯 Visão Geral do Projeto
-
-### O que é a Plataforma Casa?
-
-A Plataforma Casa é um sistema web completo desenvolvido com Django que gerencia todas as atividades de monitoria em uma instituição acadêmica. Como programador junior, eu criei um sistema onde:
+##  Visão Geral do Projeto
 
 - **Alunos** podem se candidatar a vagas de monitoria
 - **Monitores** (alunos aprovados) registram suas horas de trabalho
@@ -17,18 +7,16 @@ A Plataforma Casa é um sistema web completo desenvolvido com Django que gerenci
 
 ### Objetivos Principais
 
-Eu implementei um sistema que:
-
-1. ✅ Gerencia candidaturas a vagas de monitoria
-2. ✅ Rastreia horas de trabalho de monitores
-3. ✅ Processa pagamentos de forma automática
-4. ✅ Gera relatórios profissionais em PDF e Excel
-5. ✅ Controla permissões por perfil de usuário
-6. ✅ Oferece interface limpa e intuitiva
+1. Gerencia candidaturas a vagas de monitoria
+2. Rastreia horas de trabalho de monitores
+3. Processa pagamentos de forma automática
+4. Gera relatórios profissionais em PDF e Excel
+5. Controla permissões por perfil de usuário
+6. Oferece interface limpa e intuitiva
 
 ---
 
-## 🔑 Credenciais de Teste
+##  Credenciais de Teste
 
 ### Login como Aluno
 ```
@@ -84,81 +72,80 @@ is_superuser: True
 
 ---
 
-## 👥 4 Perfis de Usuário Implementados
+##  4 Perfis de Usuário Implementados
 
-### 1️⃣ Aluno (Candidato)
+### 1️ Aluno (Candidato)
 
 **Funcionalidades:**
-- ✅ Ver vagas disponíveis
-- ✅ Candidatar-se anexando documentos (PDF/DOC/DOCX)
-- ✅ Acompanhar status de candidaturas
-- ✅ Ver feedback de avaliação
+- Ver vagas disponíveis
+- Candidatar-se anexando documentos (PDF/DOC/DOCX)
+- Acompanhar status de candidaturas
+- Ver feedback de avaliação
 
 **Menu:**
 ```
-📊 Dashboard
-💼 Portal de Vagas
-📝 Minhas Inscrições
-👤 Perfil
+Dashboard
+Portal de Vagas
+Minhas Inscrições
+Perfil
 ```
 
-### 2️⃣ Monitor (Aluno Selecionado)
+### 2️ Monitor (Aluno Selecionado)
 
 **Funcionalidades:**
-- ✅ Fazer tudo que um aluno faz
-- ✅ Registrar horas trabalhadas
-- ✅ Ver histórico de horas com status
-- ✅ Ver avaliações recebidas
+- Fazer tudo que um aluno faz
+- Registrar horas trabalhadas
+- Ver histórico de horas com status
+- Ver avaliações recebidas
 
 **Menu (adicional):**
 ```
-⏰ Registrar Horas
-📜 Meus Registros
+Registrar Horas
+Meus Registros
 ```
 
-### 3️⃣ Professor (Coordenador/Supervisor)
+###  Professor (Coordenador/Supervisor)
 
 **Funcionalidades:**
-- ✅ Publicar vagas de monitoria
-- ✅ Avaliar candidatos (aprovar/rejeitar/espera)
-- ✅ Validar registros de horas
-- ✅ Ver relatórios de desempenho
-- ✅ Gerenciar turmas
+- Publicar vagas de monitoria
+- Avaliar candidatos (aprovar/rejeitar/espera)
+- Validar registros de horas
+- Ver relatórios de desempenho
+- Gerenciar turmas
 
 **Menu (adicional):**
 ```
-�� Minhas Vagas
+ Minhas Vagas
 ✓ Avaliar Candidatos
 ✓✓ Aprovar Monitores
-✅ Validar Horas
-📖 Minhas Monitorias
-📚 Turmas
-📄 Rel. Candidatos
-📊 Rel. Monitores
-⏱️ Rel. Horas
+Validar Horas
+Minhas Monitorias
+Turmas
+Rel. Candidatos
+Rel. Monitores
 ```
 
-### 4️⃣ Admin (Departamento/Gestão)
+### 4️ Admin (Departamento/Gestão)
 
 **Funcionalidades:**
-- ✅ Tudo que os outros perfis fazem
-- ✅ Gerenciar todos os usuários
-- ✅ Processar pagamentos
-- ✅ Acessar painel administrativo completo
-- ✅ Gerar relatórios gerenciais
+- Tudo que os outros perfis fazem
+- Gerenciar todos os usuários
+- Processar pagamentos
+- Acessar painel administrativo completo
+- Gerar relatórios gerenciais
 
 **Menu (adicional):**
 ```
-📈 Dashboard Gestão
-💰 Pagamentos
-👥 Usuários
-🎓 Alunos
-📁 Todos Relatórios
+Dashboard Gestão
+Pagamentos
+Usuários
+Alunos
+Todos Relatórios
 ```
 
 ---
 
-## 🎨 Design System - Cores Institucionais
+## Design System - Cores Institucionais
 
 Eu implementei um sistema de cores baseado em cores institucionais:
 
@@ -175,11 +162,11 @@ Eu implementei um sistema de cores baseado em cores institucionais:
 ```
 
 **Características do Design:**
-- ✅ Sem gradientes pesados (design minimalista)
-- ✅ Sombras sutis apenas no hover
-- ✅ Espaçamento generoso
-- ✅ Bordas finas (1px)
-- ✅ Typography clara e legível
+- Sem gradientes pesados (design minimalista)
+- Sombras sutis apenas no hover
+- Espaçamento generoso
+- Bordas finas (1px)
+- Typography clara e legível
 
 ---
 
@@ -200,7 +187,7 @@ Eu implementei um sistema de cores baseado em cores institucionais:
 ### 3. Sistema de Avaliação de Candidatos
 - Lista de candidatos por vaga com estatísticas
 - Perfil completo do candidato com documentos
-- Botões de status clicáveis (⏳ 💬 ✅ ❌)
+- Botões de status clicáveis 
 - Formulário de avaliação com nota e comentário
 
 ### 4. Registro e Validação de Horas
@@ -221,13 +208,13 @@ Eu implementei um sistema de cores baseado em cores institucionais:
 - **Horas Trabalhadas**: KPI cards, gráficos, timeline
 
 **Exportações:**
-- ✅ PDF com layout profissional (jsPDF)
-- ✅ Excel com múltiplas abas (XLSX)
-- ✅ Impressão com CSS media print
+-  PDF com layout profissional (jsPDF)
+-  Excel com múltiplas abas (XLSX)
+-  Impressão com CSS media print
 
 ---
 
-## 🔐 Autenticação Custom
+## Autenticação Custom
 
 Criei um backend que permite login com **email OU username**:
 
@@ -245,109 +232,6 @@ class EmailOrUsernameModelBackend(ModelBackend):
         if user.check_password(password) and self.user_can_authenticate(user):
             return user
         return None
-```
-
----
-
-## 🚨 Desafios e Soluções
-
-### Desafio 1: FieldError em select_related('professor')
-
-**Problema:** Tentava filtrar por campo que não existia em Turma
-
-**Solução:**
-```python
-# Usar relacionamentos corretos
-monitores_aprovados = Inscricao.objects.filter(
-    vaga__coordenador=funcionario,
-    status='Aprovado'
-).values_list('aluno_id', flat=True)
-
-minhas_turmas = Turma.objects.filter(
-    monitor_id__in=monitores_aprovados,
-    ativo=True
-)
-```
-
-### Desafio 2: Aluno não conseguia fazer login
-
-**Problema:** Criei Aluno mas não criei User do Django
-
-**Solução:**
-```python
-# Criar ambos
-user = User.objects.create_user(
-    username='aluno.teste',
-    email='aluno.teste@casa.com',
-    password='aluno123'
-)
-
-aluno = Aluno.objects.create(
-    usuario=user,
-    nome='João da Silva',
-    # ... outros campos
-)
-
-# Atribuir grupo
-user.groups.add(aluno_group)
-```
-
-### Desafio 3: Menu renderizava diferente por perfil
-
-**Problema:** Queries múltiplas no loop do template
-
-**Solução:** Context Processor que prepara dados uma vez:
-```python
-def user_grupos(request):
-    if request.user.is_authenticated:
-        grupos = request.user.groups.values_list('name', flat=True)
-        return {
-            'is_aluno': 'Aluno' in grupos,
-            'is_monitor': 'Monitor' in grupos,
-            'is_professor': 'Professor' in grupos,
-            'is_admin': request.user.is_staff,
-        }
-    return {}
-```
-
-### Desafio 4: Sidebar muito larga no mobile
-
-**Problema:** Sidebar com width: 250px ocupava toda tela
-
-**Solução:**
-```css
-@media (max-width: 768px) {
-    .sidebar {
-        width: 70px;  /* Apenas ícones */
-    }
-    .sidebar-text {
-        display: none;
-    }
-}
-```
-
-### Desafio 5: TemplateSyntaxError no widtratio
-
-**Problema:** Typo em template tag Django
-
-**Solução:** Remover a tag se não necessária
-
-### Desafio 6: Cores inconsistentes entre páginas
-
-**Problema:** Diferentes páginas usavam cores diferentes do Bootstrap
-
-**Solução:** Arquivo CSS centralizado com variáveis de cores:
-```css
-:root {
-    --color-primary-dark: #002555;
-    --color-primary-light: #1245FF;
-    --color-accent: #F5AC00;
-    /* ... */
-}
-
-.btn-primary {
-    background-color: var(--color-primary-dark);
-}
 ```
 
 ---
@@ -479,33 +363,9 @@ http://localhost:8000/relatorios/horas-trabalhadas/
 
 - [ ] Notificações por Email
 - [ ] Integração Power BI
-- [ ] Aplicativo Móvel (React Native)
-- [ ] Sistema de Chat
 - [ ] Cache com Redis
 - [ ] Testes Automatizados (pytest)
 - [ ] CI/CD Pipeline (GitHub Actions)
 - [ ] Dark Mode
 - [ ] Relatórios Agendados
-
 ---
-
-## 📝 Conclusão
-
-Eu criei um **sistema completo de gestão de monitorias** que está:
-
-✅ **Funcional** - Todas as features testadas  
-✅ **Seguro** - Autenticação, permissões, validações  
-✅ **Responsivo** - Funciona em desktop, tablet e mobile  
-✅ **Profissional** - Design minimalista com cores institucionais  
-✅ **Produção-ready** - Pronto para usar em produção  
-
-O sistema pode ser usado imediatamente por uma instituição acadêmica para gerenciar seu programa de monitorias.
-
----
-
-**Desenvolvido por:** Anderson (Programador Junior)  
-**Data:** Outubro de 2025  
-**Status:** ✅ Completo e Testado  
-**Versão:** 2.0
-
-🎉 **Sistema pronto para produção!** 🎉
