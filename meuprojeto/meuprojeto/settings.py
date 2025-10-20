@@ -18,7 +18,21 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-)8e!dd5q@2&qwtt(v0qm4
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Permite múltiplos hosts separados por vírgula
+# Em produção (Heroku), inclua o domínio: plataformacasa-f820a0a16535.herokuapp.com
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+
+# ============================================================================
+# CONFIGURAÇÃO DE CORS E HOSTS CONFIÁVEIS - PRODUÇÃO
+# ============================================================================
+# Para Heroku em produção, adicionar na variável de ambiente:
+# ALLOWED_HOSTS=localhost,127.0.0.1,plataformacasa-f820a0a16535.herokuapp.com
+# 
+# Ou definir aqui diretamente (menos recomendado por segurança):
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='https://plataformacasa-f820a0a16535.herokuapp.com',
+    cast=Csv()
+)
 
 # Application definition
 
@@ -144,24 +158,41 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configurações de Segurança para Produção
-# Estas configurações são ativadas apenas quando DEBUG=False
+# ============================================================================
+# CONFIGURAÇÕES DE SEGURANÇA PARA PRODUÇÃO
+# ============================================================================
+# Ativadas apenas quando DEBUG=False (em produção no Heroku)
 
 if not DEBUG:
+    # ---------- REDIRECIONAMENTO E TRANSPORTE ----------
     # Força redirecionamento HTTP para HTTPS
     SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
     
+    # ⚠️ IMPORTANTE: Em Heroku com proxy reverso, usar X-Forwarded-Proto
+    # Evita redirecionamento infinito HTTP->HTTPS
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    # ---------- COOKIES SEGUROS ----------
     # Cookies de sessão apenas via HTTPS
     SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=True, cast=bool)
     
     # Cookies CSRF apenas via HTTPS
     CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=True, cast=bool)
     
-    # Ativa HSTS (HTTP Strict Transport Security)
+    # ⚠️ IMPORTANTE: HttpOnly previne acesso via JavaScript
+    CSRF_COOKIE_HTTPONLY = False  # Deve ser False para Django carregar o token
+    SESSION_COOKIE_HTTPONLY = True  # Protege o cookie de sessão
+    
+    # SameSite cookie attribute (proteção contra CSRF)
+    CSRF_COOKIE_SAMESITE = 'Lax'  # 'Lax' é mais permissivo que 'Strict'
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    
+    # ---------- HSTS (HTTP Strict Transport Security) ----------
     SECURE_HSTS_SECONDS = 31536000  # 1 ano
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     
+    # ---------- PROTEÇÕES ADICIONAIS ----------
     # Previne que o navegador detecte incorretamente o content type
     SECURE_CONTENT_TYPE_NOSNIFF = True
     
@@ -170,3 +201,21 @@ if not DEBUG:
     
     # Previne que o site seja carregado em frames (clickjacking)
     X_FRAME_OPTIONS = 'DENY'
+
+# ============================================================================
+# CONFIGURAÇÕES CSRF (CROSS-SITE REQUEST FORGERY)
+# ============================================================================
+# Essas configurações funcionam em DEV e PRODUÇÃO
+
+# Tempo de vida do token CSRF (em segundos)
+# 31449600 = 1 ano
+CSRF_COOKIE_AGE = config('CSRF_COOKIE_AGE', default=31449600, cast=int)
+
+# Usar valor seguro para nome do campo de cookie CSRF
+CSRF_COOKIE_NAME = 'csrftoken'
+
+# Nome do campo do formulário para token CSRF
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+
+# Verificador de token CSRF (importante para AJAX e POST)
+CSRF_FAILURE_VIEW = 'plataforma_Casa.views.csrf_failure_view'  # View customizada (opcional)
