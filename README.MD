@@ -1,19 +1,23 @@
-##  Visão Geral do Projeto
+## Visão Geral do Projeto
 
-# Projeto Back-End 
+# Projeto Back-End
+
 **Código da Disciplina**: IBM8936
 
-## Sobre 
-Descreva o seu projeto em linhas gerais. 
+## Sobre
+
+Descreva o seu projeto em linhas gerais.
 
 ## Integrantes
+
 - Anderson Lima
 - João Pedro Campos
 - Bernardo Casanovas
 - Gabriel Caruzo
 
-## Instalação 
-**Linguagens**: Python, Django<br>
+## Instalação
+
+**Linguagens**: Python, Django`<br>`
 
 **Tecnologias**: Github, Visual Studio Code
 
@@ -35,9 +39,10 @@ Os pré-requisitos para rodar o projeto são UX, Engenharia de Dados, POO.
 
 ---
 
-##  Credenciais de Teste
+## Credenciais de Teste
 
 ### Login como Aluno
+
 ```
 Username: aluno.teste
 Email: aluno.teste@casa.com
@@ -46,6 +51,7 @@ Grupo: Aluno
 ```
 
 ### Login como Monitor
+
 ```
 Username: monitor.teste
 Email: monitor.teste@casa.com
@@ -54,6 +60,7 @@ Grupo: Monitor
 ```
 
 ### Login como Professor
+
 ```
 Username: professor.teste
 Email: professor.teste@casa.com
@@ -62,6 +69,7 @@ Grupo: Professor
 ```
 
 ### Login como Admin
+
 ```
 Username: admin
 Email: admin@casa.com
@@ -75,33 +83,38 @@ is_superuser: True
 ## 🔧 Stack Tecnológico
 
 **Backend:**
+
 - Django 5.2.7 - Framework web robusto
 - Python 3.10+ - Linguagem de programação
 - SQLite3 - Banco de dados local
 
 **Frontend:**
+
 - Bootstrap 5.3.0 - Framework CSS responsivo
 - Font Awesome 6.4.0 - Ícones vetoriais
 - HTML5 + CSS3 + JavaScript vanilla
 
 **Bibliotecas de Exportação:**
+
 - jsPDF 2.5.1 - Geração de PDFs
 - XLSX 0.18.5 - Exportação para Excel
 - Chart.js 3.x - Gráficos interativos
 
 ---
 
-##  4 Perfis de Usuário Implementados
+## 4 Perfis de Usuário Implementados
 
 ### 1️ Aluno (Candidato)
 
 **Funcionalidades:**
+
 - Ver vagas disponíveis
 - Candidatar-se anexando documentos (PDF/DOC/DOCX)
 - Acompanhar status de candidaturas
 - Ver feedback de avaliação
 
 **Menu:**
+
 ```
 Dashboard
 Portal de Vagas
@@ -112,20 +125,23 @@ Perfil
 ### 2️ Monitor (Aluno Selecionado)
 
 **Funcionalidades:**
+
 - Fazer tudo que um aluno faz
 - Registrar horas trabalhadas
 - Ver histórico de horas com status
 - Ver avaliações recebidas
 
 **Menu (adicional):**
+
 ```
 Registrar Horas
 Meus Registros
 ```
 
-###  Professor (Coordenador/Supervisor)
+### Professor (Coordenador/Supervisor)
 
 **Funcionalidades:**
+
 - Publicar vagas de monitoria
 - Avaliar candidatos (aprovar/rejeitar/espera)
 - Validar registros de horas
@@ -133,6 +149,7 @@ Meus Registros
 - Gerenciar turmas
 
 **Menu (adicional):**
+
 ```
  Minhas Vagas
 ✓ Avaliar Candidatos
@@ -147,6 +164,7 @@ Rel. Monitores
 ### 4️ Admin (Departamento/Gestão)
 
 **Funcionalidades:**
+
 - Tudo que os outros perfis fazem
 - Gerenciar todos os usuários
 - Processar pagamentos
@@ -154,6 +172,7 @@ Rel. Monitores
 - Gerar relatórios gerenciais
 
 **Menu (adicional):**
+
 ```
 Dashboard Gestão
 Pagamentos
@@ -181,6 +200,7 @@ Eu implementei um sistema de cores baseado em cores institucionais:
 ```
 
 **Características do Design:**
+
 - Sem gradientes pesados (design minimalista)
 - Sombras sutis apenas no hover
 - Espaçamento generoso
@@ -192,50 +212,57 @@ Eu implementei um sistema de cores baseado em cores institucionais:
 ## ��️ Funcionalidades Implementadas
 
 ### 1. Portal de Vagas
+
 - Grid responsivo de cards com vagas
 - Modal de detalhes quando clica "Detalhes"
 - Botão "Candidatar-se" funcional
 - Indicador visual de vagas disponíveis/esgotadas
 
 ### 2. Formulário de Candidatura
+
 - Upload de 3 documentos (Histórico, Currículo, Carta)
 - Validação de extensões (PDF, DOC, DOCX)
 - Aceitação de termos obrigatória
 - Proteção CSRF automática
 
 ### 3. Sistema de Avaliação de Candidatos
+
 - Lista de candidatos por vaga com estatísticas
 - Perfil completo do candidato com documentos
-- Botões de status clicáveis 
+- Botões de status clicáveis
 - Formulário de avaliação com nota e comentário
 
 ### 4. Registro e Validação de Horas
+
 - Formulário para registrar horas com data/hora
 - Cálculo automático de duração
 - Status: Pendente → Aprovado/Rejeitado
 - Validação por professor
 
 ### 5. Sistema de Pagamentos
+
 - Valor fixo: R$ 1.500 por semestre
 - 4 status: Pendente, Processando, Pago, Cancelado
 - Interface de gerenciamento de pagamentos
 - Histórico de processamentos
 
 ### 6. Relatórios Profissionais
+
 - **Candidatos por Vaga**: Tabela com status, documentos, CR
 - **Monitores Selecionados**: KPI cards, gráficos, distribuição por curso
 - **Horas Trabalhadas**: KPI cards, gráficos, timeline
 
 **Exportações:**
--  PDF com layout profissional (jsPDF)
--  Excel com múltiplas abas (XLSX)
--  Impressão com CSS media print
+
+- PDF com layout profissional (jsPDF)
+- Excel com múltiplas abas (XLSX)
+- Impressão com CSS media print
 
 ---
 
 ## Autenticação Custom
 
-Criei um backend que permite login com **email OU username**:
+backend que permite login com **email OU username**:
 
 ```python
 class EmailOrUsernameModelBackend(ModelBackend):
@@ -247,7 +274,7 @@ class EmailOrUsernameModelBackend(ModelBackend):
                 user = User.objects.get(email=username)
             except User.DoesNotExist:
                 return None
-        
+      
         if user.check_password(password) and self.user_can_authenticate(user):
             return user
         return None
@@ -255,7 +282,7 @@ class EmailOrUsernameModelBackend(ModelBackend):
 
 ---
 
-##  Como Testar o Sistema
+## Como Testar o Sistema
 
 ### 1. Iniciar Servidor
 
@@ -274,6 +301,7 @@ Senha: aluno123
 ```
 
 **Ações:**
+
 - Ver Portal de Vagas
 - Clicar "Detalhes" para ver modal
 - Candidatar-se a uma vaga (upload documentos)
@@ -287,6 +315,7 @@ Senha: professor123
 ```
 
 **Ações:**
+
 - Ver "Minhas Vagas"
 - Clicar numa vaga para ver candidatos
 - Usar botões de status
@@ -301,6 +330,7 @@ Senha: monitor123
 ```
 
 **Ações:**
+
 - "Registrar Horas" (data, hora, atividade)
 - "Meus Registros" (ver histórico)
 - Ver status dos registros
@@ -313,6 +343,7 @@ Senha: admin
 ```
 
 **Ações:**
+
 - http://localhost:8000/admin/ (painel administrativo)
 - "Dashboard Gestão" (métricas)
 - "Pagamentos" (processar)
@@ -327,6 +358,7 @@ http://localhost:8000/relatorios/horas-trabalhadas/
 ```
 
 **Ações:**
+
 - Exportar PDF
 - Exportar Excel
 - Imprimir
@@ -336,49 +368,55 @@ http://localhost:8000/relatorios/horas-trabalhadas/
 ## 📊 Dados de Teste Inclusos
 
 **Usuários:**
+
 - 1 Admin (superuser)
 - 1 Aluno de teste
 - 1 Professor de teste
 - 1 Monitor de teste
 
 **Vagas:**
+
 - 11 vagas com diferentes disciplinas
 - Mix de vagas com vagas disponíveis e esgotadas
 
 **Inscrições:**
+
 - 81 inscrições testando diferentes status
 - Alguns aprovados, alguns pendentes, alguns rejeitados
 
 **Horas:**
+
 - 20 registros de horas
 - Mix de status (pendente, aprovado, rejeitado)
 
 **Pagamentos:**
+
 - 4 pagamentos processados
 - Diferentes status (pendente, pago, cancelado)
 
 **Avaliações:**
+
 - 8 avaliações de monitores
 - Diferentes notas e comentários
 
 ---
 
-##  Recursos Principais
+## Recursos Principais
 
-**Autenticação:** Email ou Username login  
-**Permissões:** 4 perfis com menus personalizados  
-**Candidaturas:** Upload de documentos com validação  
-**Avaliação:** Sistema de status clicável AJAX  
-**Horas:** Registro com cálculo automático  
-**Pagamentos:** Sistema fixo R$ 1.500/semestre  
-**Relatórios:** PDF/Excel/Print  
-**Design:** Cores institucionais, responsivo, minimalista  
-**Segurança:** CSRF, proteção SQL injection, validações  
-**Performance:** Otimizações com select_related, prefetch_related  
+**Autenticação:** Email ou Username login
+**Permissões:** 4 perfis com menus personalizados
+**Candidaturas:** Upload de documentos com validação
+**Avaliação:** Sistema de status clicável AJAX
+**Horas:** Registro com cálculo automático
+**Pagamentos:** Sistema fixo R$ 1.500/semestre
+**Relatórios:** PDF/Excel/Print
+**Design:** Cores institucionais, responsivo, minimalista
+**Segurança:** CSRF, proteção SQL injection, validações
+**Performance:** Otimizações com select_related, prefetch_related
 
 ---
 
-##  Próximas Etapas Opcionais
+## Próximas Etapas Opcionais
 
 - [ ] Notificações por Email
 - [ ] Integração Power BI
@@ -387,4 +425,7 @@ http://localhost:8000/relatorios/horas-trabalhadas/
 - [ ] CI/CD Pipeline (GitHub Actions)
 - [ ] Dark Mode
 - [ ] Relatórios Agendados
+- [ ] CORS (importante)
+- [ ] Swagger ( fundamental para documentação da API)
+
 ---
