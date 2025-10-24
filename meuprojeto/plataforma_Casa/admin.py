@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (
     Usuario, Funcionario, Aluno, Vaga, Turma, Inscricao, Curso, 
     TipoUsuario, Sala, ParticipacaoMonitoria, Presenca,
-    Documento, RegistroHoras, StatusPagamento
+    Documento, RegistroHoras, StatusPagamento, MaterialApoio
 )
 
 # Register your models here.
@@ -43,8 +43,7 @@ admin.site.register(ParticipacaoMonitoria)
 admin.site.register(Documento)
 admin.site.register(RegistroHoras)
 admin.site.register(StatusPagamento, StatusPagamentoAdmin)
-
-
+admin.site.register(MaterialApoio)  # Permite que coordenação visualize materiais no admin
 
 
 

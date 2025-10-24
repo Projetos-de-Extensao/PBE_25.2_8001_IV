@@ -11,15 +11,47 @@ Documentação: https://docs.djangoproject.com/en/5.2/topics/http/urls/
 """
 
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+# ================================================================================
+# DOCUMENTAÇÃO SWAGGER (DRF-YASG)
+# ================================================================================
+api_patterns = [
+    # Agrupa as rotas da API REST para reaproveitar no Swagger e no projeto
+    path('api/', include('plataforma_Casa.api_urls')),
+]
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Plataforma CASA API",
+        default_version='v1',
+        description="Documentação interativa da API REST da Plataforma CASA.",
+        terms_of_service="https://www.unifeso.edu.br/",
+        contact=openapi.Contact(email="suporte@plataformacasa.com.br"),
+        license=openapi.License(name="Uso interno Plataforma CASA"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+    patterns=api_patterns,
+)
 
 # ================================================================================
 # PADRÕES DE URL - URL PATTERNS
 # ================================================================================
 
 urlpatterns = [
+    # ---------------------------------------------------------------------------
+    # DOCUMENTAÇÃO DA API (SWAGGER UI)
+    # ---------------------------------------------------------------------------
+    path('restapi/', schema_view.with_ui('swagger', cache_timeout=0), name='api-docs'),
+    re_path(r'^restapi/schema(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='api-schema'),
+    path('restapi/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='api-redoc'),
+    
     # ---------------------------------------------------------------------------
     # ADMIN DO DJANGO
     # ---------------------------------------------------------------------------
@@ -48,6 +80,9 @@ urlpatterns = [
     # - http://localhost:8000/sql/          (view sql legado)
     path('', include('plataforma_Casa.urls')),
 ]
+
+# Rotas da API REST (utilizadas pelo Swagger)
+urlpatterns += api_patterns
 
 # Servir arquivos de media em desenvolvimento
 if settings.DEBUG:

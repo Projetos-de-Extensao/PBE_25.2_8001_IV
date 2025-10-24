@@ -367,6 +367,10 @@ urlpatterns = [
     # Ver alunos de uma monitoria específica e marcar presença
     path('monitorias/<int:turma_id>/alunos/', views.alunos_da_monitoria, name='alunos_da_monitoria'),
     
+    # --- Materiais de Apoio (MONITOR/ALUNO) ---
+    # Interface compartilhada onde monitor faz upload e alunos baixam os arquivos
+    path('monitorias/<int:turma_id>/materiais/', views.materiais_monitoria, name='materiais_monitoria'),
+    
     # --- Marcar Presença (AJAX) ---
     # Marcar presença de um aluno em uma turma
     path('monitorias/<int:turma_id>/alunos/<int:aluno_id>/presenca/', views.marcar_presenca_aluno, name='marcar_presenca_aluno'),

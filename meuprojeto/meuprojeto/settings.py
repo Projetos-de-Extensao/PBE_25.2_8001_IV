@@ -34,6 +34,16 @@ CSRF_TRUSTED_ORIGINS = config(
     cast=Csv()
 )
 
+# Configurações de CORS - controlam quais origens podem acessar a API
+DEFAULT_CORS_ORIGINS = 'http://localhost:3000,http://127.0.0.1:3000'
+CORS_ALLOWED_ORIGINS = config(
+    'CORS_ALLOWED_ORIGINS',
+    default=DEFAULT_CORS_ORIGINS,
+    cast=Csv()
+)
+CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=DEBUG, cast=bool)
+CORS_ALLOW_CREDENTIALS = True
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,6 +53,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
+    'rest_framework',
+    'drf_yasg',
     'plataforma_Casa',
 ]
 
@@ -50,6 +63,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve arquivos estáticos em produção
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Habilita suporte a CORS antes do CommonMiddleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -170,6 +184,49 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    # Padrão mais aberto para facilitar visualização via Swagger em ambiente interno
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    # Faz o DRF gerar esquema OpenAPI automaticamente
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.openapi.AutoSchema',
+}
+
+SWAGGER_SETTINGS = {
+    # Permite testar endpoints autenticados usando sessão do Django
+    'USE_SESSION_AUTH': True,
+    'LOGIN_URL': 'login',
+    'LOGOUT_URL': 'logout',
+    # Expansão padrão em formato de lista para evitar poluição visual
+    'DOC_EXPANSION': 'list',
+    # Exibe exemplos reais em vez de estruturas vazias
+    'DEFAULT_MODEL_RENDERING': 'example',
+    # Recarrega o schema quando as credenciais mudarem
+    'REFETCH_SCHEMA_WITH_AUTH': True,
+    # Mostra operationId para facilitar cópia em integrações futuras
+    'DISPLAY_OPERATION_ID': True,
+    # Permite testar tanto autenticação básica quanto Bearer token
+    'SECURITY_DEFINITIONS': {
+        'basic': {
+            'type': 'basic'
+        },
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'Formato: Bearer <token>'
+        },
+    },
+}
+
+REDOC_SETTINGS = {
+    # Otimiza o carregamento e navegação da documentação alternativa (Redoc)
+    'LAZY_RENDERING': True,
+    'NATIVE_SCROLLBARS': True,
+    'PATH_IN_MIDDLE': True,
+}
 
 # ============================================================================
 # CONFIGURAÇÕES DE SEGURANÇA PARA PRODUÇÃO

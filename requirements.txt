@@ -51,6 +51,13 @@ watchdog==6.0.0
 # Django Framework
 Django==5.2
 
+# API e documentação
+djangorestframework==3.15.2
+drf-yasg==1.21.7
+
+# CORS
+django-cors-headers==4.4.0
+
 # PostgreSQL Database Adapter
 psycopg2-binary==2.9.10
 

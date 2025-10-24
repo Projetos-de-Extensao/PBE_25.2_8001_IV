@@ -17,6 +17,13 @@
         box-shadow: 0 4px 12px rgba(0, 37, 85, 0.15);
     }
     
+    .page-header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
     .page-header h1 {
         font-size: 1.75rem;
         font-weight: 700;
@@ -32,6 +39,24 @@
         opacity: 0.9;
         font-size: 1rem;
         font-weight: 400;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-materiais {
+        background: #fafaf8;
+        color: #002555;
+        font-weight: 600;
+        padding: 0.6rem 1.25rem;
+        border-radius: 10px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
     }
     
     /* Informações da turma */
@@ -367,6 +392,21 @@
             font-size: 1.5rem;
         }
         
+        .page-header-content {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .header-actions {
+            width: 100%;
+            justify-content: stretch;
+        }
+        
+        .btn-materiais {
+            width: 100%;
+            justify-content: center;
+        }
+        
         .info-grid {
             grid-template-columns: 1fr;
         }
@@ -390,10 +430,28 @@
 <div class="container-fluid" style="padding: 2rem;">
     <!-- Header -->
     <div class="page-header">
-        <h1>
-            <i class="fas fa-users"></i> {{ turma.nome }}
-        </h1>
-        <p class="page-subtitle">{{ turma.vaga.disciplina|default:"Monitoria" }} • {{ turma.total_alunos|default:"0" }} alunos participando</p>
+        <div class="page-header-content">
+            <div>
+                <h1>
+                    <i class="fas fa-users"></i> {{ turma.nome }}
+                </h1>
+                <p class="page-subtitle">
+                    {{ turma.vaga.disciplina|default:"Monitoria" }} • 
+                    {{ total_participantes }}
+                    {% if total_participantes == 1 %}
+                        aluno participando
+                    {% else %}
+                        alunos participando
+                    {% endif %}
+                </p>
+            </div>
+            <div class="header-actions">
+                {# Atalho para que o monitor acesse rapidamente a página de materiais #}
+                <a href="{% url 'materiais_monitoria' turma.id %}" class="btn-materiais">
+                    <i class="fas fa-folder-open"></i> Materiais da turma
+                </a>
+            </div>
+        </div>
     </div>
 
     {% if turma %}

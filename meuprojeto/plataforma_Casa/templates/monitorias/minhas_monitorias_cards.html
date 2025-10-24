@@ -42,7 +42,7 @@
         cursor: pointer;
         position: relative;
         overflow: hidden;
-        height: 280px;
+        min-height: 280px;  /* Garante altura mínima sem cortar conteúdos extras */
         display: flex;
         flex-direction: column;
     }
@@ -151,6 +151,39 @@
         text-transform: uppercase;
         font-weight: 600;
         letter-spacing: 0.5px;
+    }
+
+    .card-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+
+    .card-action-btn {
+        flex: 1;
+        border-radius: 10px;
+        padding: 0.6rem;
+        font-weight: 600;
+        text-align: center;
+        border: none;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-action-primary {
+        background: linear-gradient(135deg, #1245FF 0%, #002555 100%);
+        color: #fff;
+    }
+
+    .btn-action-secondary {
+        background: rgba(18, 69, 255, 0.05);
+        color: #1245FF;
+        border: 1px solid #1245FF;
+    }
+
+    .btn-action-secondary:hover {
+        background: #1245FF;
+        color: #fff;
     }
 
     
@@ -284,6 +317,16 @@
                                 alunos participando
                             {% endif %}
                         </div>
+                    </div>
+
+                    {# Ações rápidas para acessar lista de alunos ou materiais da turma #}
+                    <div class="card-actions">
+                        <a href="{% url 'alunos_da_monitoria' item.turma.id %}" class="card-action-btn btn-action-primary" onclick="event.stopPropagation();">
+                            <i class="fas fa-users me-1"></i> Gerenciar
+                        </a>
+                        <a href="{% url 'materiais_monitoria' item.turma.id %}" class="card-action-btn btn-action-secondary" onclick="event.stopPropagation();">
+                            <i class="fas fa-folder-open me-1"></i> Materiais
+                        </a>
                     </div>
                 </div>
             </div>

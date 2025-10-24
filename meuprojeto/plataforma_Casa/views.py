@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from .models import (
     Usuario, Aluno, Funcionario, Curso, Sala, Vaga, Turma, 
     ParticipacaoMonitoria, Presenca, Inscricao, TipoUsuario,
-    Documento, RegistroHoras, StatusPagamento
+    Documento, RegistroHoras, StatusPagamento, MaterialApoio
 )
 from .repository import (
     listar_usuarios, listar_alunos, listar_cursos, listar_funcionarios, 
@@ -20,6 +20,7 @@ from .repository import (
     listar_presencas, listar_salas, listar_tipos_usuario
 )
 from functools import wraps
+from .forms import MaterialApoioForm
 
 
 # ==================== FUNÇÕES AUXILIARES ====================
@@ -1870,13 +1871,92 @@ def alunos_da_monitoria(request, turma_id):
         participacoes = []
         presencas_hoje = []
     
+    # Garante que o total de participantes funcione tanto com QuerySet quanto listas simples
+    total_participantes = (
+        participacoes.count() if hasattr(participacoes, 'count') else len(participacoes)
+    )
+    
     context = {
         'turma': turma,
         'participacoes': participacoes,
         'presencas_hoje': list(presencas_hoje),
         'hoje': timezone.now().date(),
+        'total_participantes': total_participantes,
     }
     return render(request, 'monitorias/alunos_monitoria.html', context)
+
+
+@requer_grupo('Aluno', 'Monitor')
+def materiais_monitoria(request, turma_id):
+    """
+    Página de materiais de apoio vinculados a uma monitoria.
+    Monitores podem gerenciar (upload/exclusão) e alunos visualizam e baixam.
+    """
+    # Localiza a turma alvo e valida se está ativa
+    turma = get_object_or_404(Turma, id=turma_id, ativo=True)
+
+    # Recupera informações do usuário logado para validar permissões
+    monitor_logado = get_monitor_by_email(request.user.email)
+    aluno_logado = get_aluno_by_email(request.user.email)
+
+    # Apenas o monitor responsável pela turma pode fazer upload/remoção
+    is_monitor_da_turma = monitor_logado and turma.monitor_id == monitor_logado.id
+    participa_da_turma = False
+
+    # Alunos que participam da monitoria também podem visualizar os materiais
+    if aluno_logado:
+        participa_da_turma = ParticipacaoMonitoria.objects.filter(
+            aluno=aluno_logado,
+            turma=turma
+        ).exists()
+
+    # Bloqueia acesso para quem não é monitor da turma nem aluno participante
+    if not is_monitor_da_turma and not participa_da_turma:
+        messages.error(request, 'Você não tem acesso a estes materiais.')
+        if monitor_logado:
+            return redirect('minhas_monitorias_cards')
+        return redirect('participando_monitorias')
+
+    # Lista somente materiais marcados como publicados
+    materiais = turma.materiais.filter(publicado=True).select_related('monitor')
+    # Formulário vazio é exibido apenas para o monitor (verificado no template)
+    form = MaterialApoioForm()
+
+    if request.method == 'POST':
+        # Evita que alunos tentem enviar arquivos manualmente
+        if not is_monitor_da_turma:
+            messages.error(request, 'Apenas o monitor responsável pode enviar materiais.')
+            return redirect('materiais_monitoria', turma_id=turma.id)
+
+        acao = request.POST.get('action', 'create')
+
+        if acao == 'delete':
+            # Exclusão simples com remoção física do arquivo
+            material_id = request.POST.get('material_id')
+            material = get_object_or_404(MaterialApoio, id=material_id, turma=turma)
+            material.arquivo.delete(save=False)
+            material.delete()
+            messages.success(request, 'Material removido com sucesso.')
+            return redirect('materiais_monitoria', turma_id=turma.id)
+
+        # Upload de novo material
+        form = MaterialApoioForm(request.POST, request.FILES)
+        if form.is_valid():
+            material = form.save(commit=False)
+            material.turma = turma
+            material.monitor = monitor_logado
+            material.save()
+            return redirect('materiais_monitoria', turma_id=turma.id)
+        else:
+            messages.error(request, 'Corrija os erros abaixo para enviar o material.')
+
+    context = {
+        'turma': turma,
+        'materiais': materiais,
+        'form': form,
+        'pode_gerenciar': is_monitor_da_turma,
+    }
+    return render(request, 'monitorias/materiais_monitoria.html', context)
 
 
 @requer_monitor  

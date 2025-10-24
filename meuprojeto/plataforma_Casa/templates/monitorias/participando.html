@@ -123,6 +123,12 @@
                                 <i class="fas fa-calendar-check"></i>
                                 Ver Presenças
                             </a>
+                            {# Link direto para o hub de materiais disponibilizados pelo monitor #}
+                            <a href="{% url 'materiais_monitoria' participacao.turma.id %}" 
+                               class="btn-action btn-material">
+                                <i class="fas fa-folder-open"></i>
+                                Materiais
+                            </a>
                             <a href="{% url 'sair_monitoria' participacao.turma.id %}" 
                                class="btn-action btn-sair" 
                                onclick="return confirm('Tem certeza que deseja sair desta monitoria?')">
@@ -483,6 +489,20 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(18, 69, 255, 0.3);
     color: white;
+    text-decoration: none;
+}
+
+.btn-material {
+    background: rgba(245, 172, 0, 0.15);
+    color: var(--cor-azul-escuro);
+    border-color: var(--cor-amarelo);
+}
+
+.btn-material:hover {
+    background: var(--cor-amarelo);
+    color: #002555;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 172, 0, 0.3);
     text-decoration: none;
 }
 

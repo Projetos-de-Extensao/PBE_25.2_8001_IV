@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+
+{% block title %}Materiais - {{ turma.nome }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #002555 0%, #1245FF 100%);
+        color: #fafaf8;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #F5AC00;
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.15);
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: #fafaf8;  /* Mantém o título principal em off white */
+    }
+
+    .page-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+
+    .upload-card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 2px dashed rgba(18, 69, 255, 0.25);
+        padding: 2rem;
+        box-shadow: 0 4px 16px rgba(18, 69, 255, 0.08);
+    }
+
+    .upload-card h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #002555;
+        margin-bottom: 1rem;
+    }
+
+    .upload-card .form-label {
+        font-weight: 600;
+        color: #002555;
+    }
+
+    .upload-card .btn-primary {
+        background: linear-gradient(135deg, #1245FF 0%, #002555 100%);
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        border-radius: 10px;
+    }
+
+    .material-card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid #e9ecef;
+        padding: 1.5rem;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .material-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #1245FF 0%, #002555 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.5rem;
+    }
+
+    .material-header {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .material-title {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #002555;
+    }
+
+    .material-meta {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .material-actions {
+        margin-top: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .material-actions .btn-download {
+        background: linear-gradient(135deg, #F5AC00 0%, #FF7800 100%);
+        color: #002555;
+        border: none;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        border-radius: 10px;
+    }
+
+    .material-actions .btn-delete {
+        background: transparent;
+        border: 1px solid rgba(220, 53, 69, 0.4);
+        color: #dc3545;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+
+    .empty-state {
+        border: 2px dashed rgba(18, 69, 255, 0.2);
+        border-radius: 16px;
+        padding: 3rem;
+        text-align: center;
+        color: #6c757d;
+        background: rgba(18, 69, 255, 0.03);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: #1245FF;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="padding: 2rem;">
+    {# Cabeçalho indicando a turma e o responsável pelo material #}
+    <div class="page-header">
+        <h1><i class="fas fa-folder-open"></i> Materiais da {{ turma.nome }}</h1>
+        <p>Disciplina: {{ turma.vaga.disciplina|default:turma.vaga.nome }} • Monitor: {{ turma.monitor.nome }}</p>
+    </div>
+
+    {% if pode_gerenciar %}
+    <div class="row mb-4 justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <div class="upload-card">
+                <h3><i class="fas fa-cloud-upload-alt me-2"></i>Disponibilizar novo material</h3>
+                {# Formulário exibido apenas para o monitor responsável #}
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.titulo.label }}</label>
+                        {{ form.titulo }}
+                        {% if form.titulo.errors %}
+                        <div class="text-danger small mt-1">{{ form.titulo.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">{{ form.tipo.label }}</label>
+                                {{ form.tipo }}
+                                {% if form.tipo.errors %}
+                                <div class="text-danger small mt-1">{{ form.tipo.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">{{ form.arquivo.label }}</label>
+                                {{ form.arquivo }}
+                                {% if form.arquivo.errors %}
+                                <div class="text-danger small mt-1">{{ form.arquivo.errors|join:", " }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.descricao.label }}</label>
+                        {{ form.descricao }}
+                        {% if form.descricao.errors %}
+                        <div class="text-danger small mt-1">{{ form.descricao.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-2"></i>Enviar material
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row g-4">
+        {% if materiais %}
+            {% for material in materiais %}
+            {# Card individual para cada material publicado #}
+            <div class="col-xl-4 col-lg-6">
+                <div class="material-card">
+                    <div class="material-header">
+                        <div class="material-icon">
+                            {% if material.tipo == 'tutorial' %}
+                            <i class="fas fa-lightbulb"></i>
+                            {% elif material.tipo == 'outro' %}
+                            <i class="fas fa-paperclip"></i>
+                            {% else %}
+                            <i class="fas fa-list-alt"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h4 class="material-title">{{ material.titulo }}</h4>
+                            <div class="badge bg-light text-dark text-uppercase">{{ material.get_tipo_display }}</div>
+                        </div>
+                    </div>
+                    {% if material.descricao %}
+                    <p class="mb-2 text-muted">{{ material.descricao|linebreaksbr }}</p>
+                    {% endif %}
+                    <div class="material-meta">
+                        <span><i class="fas fa-user me-1"></i>{{ material.monitor.nome }}</span>
+                        <span><i class="fas fa-calendar me-1"></i>{{ material.criado_em|date:"d/m/Y H:i" }}</span>
+                    </div>
+                    <div class="material-actions">
+                        <a href="{{ material.arquivo.url }}" class="btn btn-download" target="_blank">
+                            <i class="fas fa-download me-2"></i>Baixar
+                        </a>
+                        {% if pode_gerenciar %}
+                        <form method="post" onsubmit="return confirm('Deseja remover este material?');">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="material_id" value="{{ material.id }}">
+                            <button type="submit" class="btn btn-delete">
+                                <i class="fas fa-trash-alt me-1"></i>Remover
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="col-12">
+            <div class="empty-state">
+                <i class="fas fa-folder-open"></i>
+                <h4>Nenhum material disponível ainda.</h4>
+                {% if pode_gerenciar %}
+                <p>Use o formulário acima para enviar listas de exercícios, tutoriais e outros materiais de apoio.</p>
+                {% else %}
+                <p>O monitor ainda não disponibilizou materiais para esta monitoria.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -217,3 +217,39 @@ class StatusPagamento(models.Model):
         verbose_name = 'Status de Pagamento'
         verbose_name_plural = 'Status de Pagamentos'
         ordering = ['-mes_referencia']
+
+
+class MaterialApoio(models.Model):
+    """Materiais disponibilizados pelos monitores para auxiliar os alunos."""
+
+    TIPO_CHOICES = [
+        ('lista', 'Lista de Exercícios'),
+        ('tutorial', 'Tutorial'),
+        ('outro', 'Outro Material'),
+    ]
+
+    # Turma que receberá o material – apaga os arquivos associados se a turma for removida
+    turma = models.ForeignKey(Turma, on_delete=models.CASCADE, related_name='materiais')
+    # Monitor que cadastrou o material – só ele pode gerenciar seus próprios uploads
+    monitor = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name='materiais_compartilhados')
+    # Título visível para alunos e professores
+    titulo = models.CharField(max_length=150)
+    # Categoria do material para facilitar filtragem futura
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='lista')
+    # Descrição opcional explicando o conteúdo
+    descricao = models.TextField(blank=True)
+    # Arquivo enviado pelo monitor (armazenado no diretório /materiais/ano/mes/dia)
+    arquivo = models.FileField(upload_to='materiais/%Y/%m/%d/')
+    # Datas de criação e atualização para histórico
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    # Flag para permitir futura publicação agendada ou desativação
+    publicado = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-criado_em']
+        verbose_name = 'Material de Apoio'
+        verbose_name_plural = 'Materiais de Apoio'
+
+    def __str__(self):
+        return f'{self.titulo} - {self.turma.nome}'
