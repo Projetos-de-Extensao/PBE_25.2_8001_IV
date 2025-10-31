@@ -631,7 +631,7 @@ hr {
    RESPONSIVE
    ================================================================================ */
 
-@media (max-width: 768px) {
+@media (max-width: 576px) {
     .sidebar {
         border-right: none;
         border-bottom: 4px solid var(--cor-amarelo-institucional);

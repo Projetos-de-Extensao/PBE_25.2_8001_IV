@@ -103,6 +103,14 @@
     <!-- RESULT: Consistência visual: todo Bootstrap usa cores institucionais automaticamente -->
     <link rel="stylesheet" href="{% static 'css/cores-padrao.css' %}">
     
+    <!-- mobile-first.css -->
+    <!-- PROPÓSITO: Design Mobile-First com breakpoints responsivos -->
+    <!-- ABORDAGEM: Estilos padrão otimizados para mobile (<576px) -->
+    <!-- BREAKPOINTS: Tablet (576px), Desktop (768px), Grande Desktop (1200px) -->
+    <!-- RECURSOS: Touch-friendly buttons, safe area padding, dark mode support -->
+    <!-- CARREGADO TERCEIRO: Sobrescreve cores-padrao.css com media queries -->
+    <link rel="stylesheet" href="{% static 'css/mobile-first.css' %}">
+    
     <!-- ========== ESTILOS INLINE - LAYOUT PRINCIPAL ========== -->
     <style>
         /* 
