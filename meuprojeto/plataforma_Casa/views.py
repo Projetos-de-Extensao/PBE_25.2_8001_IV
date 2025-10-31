@@ -1520,23 +1520,40 @@ def sql_view(request):
 
 
 # ==================== PORTAL DE VAGAS APRIMORADO ====================
+@login_required(login_url='login')
 def portal_vagas(request):
     """
     View para portal público de vagas
+    
+    ⚠️ CORREÇÃO: Protege contra erros quando disciplina não existe
     """
-    vagas = Vaga.objects.filter(ativo=True).select_related('curso', 'disciplina').prefetch_related('coordenadores', 'professores').annotate(
-        total_inscritos=Count('inscricao')
-    )
+    try:
+        vagas = Vaga.objects.filter(ativo=True).select_related('curso', 'disciplina').prefetch_related('coordenadores', 'professores').annotate(
+            total_inscritos=Count('inscricao')
+        )
+        
+        # Filtros
+        curso_filtro = request.GET.get('curso')
+        if curso_filtro:
+            vagas = vagas.filter(curso__id=curso_filtro)
+        
+        context = {
+            'vagas': vagas,
+            'cursos': Curso.objects.filter(ativo=True),
+        }
+    except Exception as e:
+        # Log do erro para debug
+        print(f"❌ ERRO no portal_vagas: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
+        # Contexto vazio em caso de erro
+        context = {
+            'vagas': [],
+            'cursos': Curso.objects.filter(ativo=True),
+            'erro': str(e)
+        }
     
-    # Filtros
-    curso_filtro = request.GET.get('curso')
-    if curso_filtro:
-        vagas = vagas.filter(curso__id=curso_filtro)
-    
-    context = {
-        'vagas': vagas,
-        'cursos': Curso.objects.filter(ativo=True),
-    }
     return render(request, 'vagas/portal.html', context)
 
 
