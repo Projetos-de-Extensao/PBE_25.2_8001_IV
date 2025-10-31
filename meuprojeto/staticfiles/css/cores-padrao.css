@@ -1,0 +1,393 @@
+/* 
+ * Cores Institucionais - Plataforma Casa
+ * Substituição das cores padrão do Bootstrap pelas cores oficiais
+ */
+
+/* ===== VARIÁVEIS DE CORES ===== */
+:root {
+    /* Cores Primárias */
+    --cor-amarelo-institucional: #F5AC00;
+    --cor-azul-escuro-principal: #002555;
+    --cor-azul-auxiliar: #1245FF;
+    
+    /* Cores de Apoio */
+    --cor-cinza-escuro: #6d6e71;
+    --cor-cinza-medio: #a7a9ab;
+    --cor-cinza-claro: #d1d3d4;
+    --cor-branco: #ffffff;
+    --cor-preto: #000000;
+    
+    /* Cores de Status */
+    --cor-sucesso: #27ae60;
+    --cor-erro: #e74c3c;
+    --cor-aviso: #f39c12;
+    --cor-info: #3498db;
+}
+
+/* ===== SUBSTITUIR CORES BOOTSTRAP ===== */
+
+/* Primary = Azul Escuro */
+.bg-primary,
+.btn-primary,
+.badge.bg-primary,
+.alert-primary,
+.border-primary {
+    background-color: var(--cor-azul-escuro-principal) !important;
+    border-color: var(--cor-azul-escuro-principal) !important;
+    color: var(--cor-branco) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--cor-azul-auxiliar) !important;
+    border-color: var(--cor-azul-auxiliar) !important;
+}
+
+.text-primary,
+.link-primary {
+    color: var(--cor-azul-escuro-principal) !important;
+}
+
+/* Success = Verde */
+.bg-success,
+.btn-success,
+.badge.bg-success,
+.alert-success,
+.border-success {
+    background-color: var(--cor-sucesso) !important;
+    border-color: var(--cor-sucesso) !important;
+}
+
+.text-success {
+    color: var(--cor-sucesso) !important;
+}
+
+/* Danger/Error = Vermelho */
+.bg-danger,
+.btn-danger,
+.badge.bg-danger,
+.alert-danger,
+.border-danger {
+    background-color: var(--cor-erro) !important;
+    border-color: var(--cor-erro) !important;
+}
+
+.text-danger {
+    color: var(--cor-erro) !important;
+}
+
+/* Warning = Laranja */
+.bg-warning,
+.btn-warning,
+.badge.bg-warning,
+.alert-warning,
+.border-warning {
+    background-color: var(--cor-aviso) !important;
+    border-color: var(--cor-aviso) !important;
+    color: var(--cor-preto) !important;
+}
+
+.text-warning {
+    color: var(--cor-aviso) !important;
+}
+
+/* Info = Azul Info */
+.bg-info,
+.btn-info,
+.badge.bg-info,
+.alert-info,
+.border-info {
+    background-color: var(--cor-info) !important;
+    border-color: var(--cor-info) !important;
+}
+
+.text-info {
+    color: var(--cor-info) !important;
+}
+
+/* ===== CORES ESPECÍFICAS DO SISTEMA ===== */
+
+/* Border com destaque amarelo */
+.border-left-primary {
+    border-left: 4px solid var(--cor-azul-escuro-principal) !important;
+}
+
+.border-left-success {
+    border-left: 4px solid var(--cor-sucesso) !important;
+}
+
+.border-left-warning {
+    border-left: 4px solid var(--cor-aviso) !important;
+}
+
+.border-left-info {
+    border-left: 4px solid var(--cor-info) !important;
+}
+
+.border-left-danger {
+    border-left: 4px solid var(--cor-erro) !important;
+}
+
+/* Card Headers com gradiente institucional */
+.card-header.bg-primary {
+    background: linear-gradient(135deg, var(--cor-azul-escuro-principal) 0%, var(--cor-azul-auxiliar) 100%) !important;
+    border-bottom: 2px solid var(--cor-amarelo-institucional) !important;
+}
+
+.card-header.bg-success {
+    background: var(--cor-sucesso) !important;
+    border-bottom: 2px solid var(--cor-amarelo-institucional) !important;
+}
+
+.card-header.bg-warning {
+    background: var(--cor-aviso) !important;
+    border-bottom: 2px solid var(--cor-amarelo-institucional) !important;
+}
+
+.card-header.bg-info {
+    background: var(--cor-info) !important;
+    border-bottom: 2px solid var(--cor-amarelo-institucional) !important;
+}
+
+/* Tabelas com cabeçalho institucional */
+.table thead.table-light {
+    background: linear-gradient(135deg, var(--cor-azul-escuro-principal) 0%, var(--cor-azul-auxiliar) 100%) !important;
+    color: var(--cor-branco) !important;
+    border-bottom: 3px solid var(--cor-amarelo-institucional) !important;
+}
+
+.table thead.table-light th {
+    color: var(--cor-branco) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Botões com estilo institucional */
+.btn {
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Formulários */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--cor-azul-escuro-principal) !important;
+    box-shadow: 0 0 0 0.25rem rgba(0, 37, 85, 0.25) !important;
+}
+
+/* Badges */
+.badge {
+    font-weight: 600;
+    padding: 0.5em 0.75em;
+    border-radius: 6px;
+}
+
+/* Cards */
+.card {
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: none;
+    border-top: 4px solid var(--cor-azul-escuro-principal);
+}
+
+.card.shadow {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.alert-primary {
+    border-left-color: var(--cor-azul-escuro-principal);
+    background-color: rgba(0, 37, 85, 0.1);
+    color: var(--cor-azul-escuro-principal);
+}
+
+.alert-success {
+    border-left-color: var(--cor-sucesso);
+    background-color: rgba(39, 174, 96, 0.1);
+    color: var(--cor-sucesso);
+}
+
+.alert-danger {
+    border-left-color: var(--cor-erro);
+    background-color: rgba(231, 76, 60, 0.1);
+    color: var(--cor-erro);
+}
+
+.alert-warning {
+    border-left-color: var(--cor-aviso);
+    background-color: rgba(243, 156, 18, 0.1);
+    color: var(--cor-aviso);
+}
+
+.alert-info {
+    border-left-color: var(--cor-info);
+    background-color: rgba(52, 152, 219, 0.1);
+    color: var(--cor-info);
+}
+
+/* Cores de texto adicionais */
+.text-gray-800 {
+    color: var(--cor-cinza-escuro) !important;
+}
+
+.text-gray-300 {
+    color: var(--cor-cinza-medio) !important;
+}
+
+/* Títulos e headings */
+.display-4,
+h1, h2 {
+    color: var(--cor-azul-escuro-principal);
+}
+
+.lead {
+    color: var(--cor-cinza-escuro);
+}
+
+/* Hover effects institucionais */
+.sidebar-item:hover,
+.nav-link:hover {
+    background-color: var(--cor-amarelo-institucional) !important;
+    color: var(--cor-azul-escuro-principal) !important;
+}
+
+/* Modal headers */
+.modal-header.bg-primary {
+    background: linear-gradient(135deg, var(--cor-azul-escuro-principal) 0%, var(--cor-azul-auxiliar) 100%) !important;
+}
+
+.modal-header.bg-info {
+    background: var(--cor-info) !important;
+}
+
+.modal-header.bg-success {
+    background: var(--cor-sucesso) !important;
+}
+
+.modal-header.bg-warning {
+    background: var(--cor-aviso) !important;
+}
+
+/* Links */
+a {
+    color: var(--cor-azul-escuro-principal);
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: var(--cor-azul-auxiliar);
+}
+
+/* Botões secundários */
+.btn-secondary {
+    background-color: var(--cor-cinza-escuro) !important;
+    border-color: var(--cor-cinza-escuro) !important;
+}
+
+.btn-secondary:hover {
+    background-color: var(--cor-cinza-medio) !important;
+    border-color: var(--cor-cinza-medio) !important;
+}
+
+/* Status badges customizados */
+.status-active,
+.badge.bg-success {
+    background-color: var(--cor-sucesso) !important;
+}
+
+.status-inactive {
+    background-color: var(--cor-erro) !important;
+}
+
+.status-pending {
+    background-color: var(--cor-aviso) !important;
+    color: var(--cor-preto) !important;
+}
+
+/* Divisores com cor institucional */
+.sidebar-divider,
+hr {
+    border-color: var(--cor-amarelo-institucional) !important;
+    opacity: 0.5;
+}
+
+/* Breadcrumb */
+.breadcrumb-item.active {
+    color: var(--cor-azul-escuro-principal) !important;
+}
+
+/* Paginação */
+.pagination .page-link {
+    color: var(--cor-azul-escuro-principal);
+    border-color: var(--cor-cinza-claro);
+}
+
+.pagination .page-link:hover {
+    background-color: var(--cor-amarelo-institucional);
+    border-color: var(--cor-amarelo-institucional);
+    color: var(--cor-azul-escuro-principal);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--cor-azul-escuro-principal);
+    border-color: var(--cor-azul-escuro-principal);
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item:hover {
+    background-color: rgba(245, 172, 0, 0.1);
+    color: var(--cor-azul-escuro-principal);
+}
+
+/* Progress bars */
+.progress {
+    background-color: var(--cor-cinza-claro);
+}
+
+.progress-bar {
+    background-color: var(--cor-azul-escuro-principal);
+}
+
+.progress-bar.bg-success {
+    background-color: var(--cor-sucesso) !important;
+}
+
+/* Chart.js colors override */
+.chart-primary {
+    background-color: var(--cor-azul-escuro-principal);
+}
+
+.chart-success {
+    background-color: var(--cor-sucesso);
+}
+
+.chart-warning {
+    background-color: var(--cor-aviso);
+}
+
+.chart-info {
+    background-color: var(--cor-info);
+}
+
+.chart-danger {
+    background-color: var(--cor-erro);
+}
+
+.chart-accent {
+    background-color: var(--cor-amarelo-institucional);
+}

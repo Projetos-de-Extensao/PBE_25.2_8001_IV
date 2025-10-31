@@ -235,32 +235,135 @@
         text-decoration: none;
     }
     
-    /* Responsividade */
+    /* Responsividade Mobile */
     @media (max-width: 768px) {
-        .monitoria-card {
-            height: auto;
-            min-height: 250px;
+        /* Container principal com padding adequado */
+        .container-fluid {
+            padding: 1rem !important; /* Reduz padding nas bordas */
+        }
+        
+        /* Header da página */
+        .page-header {
+            padding: 1.25rem !important;
+            margin-bottom: 1.25rem;
+            border-radius: 10px;
         }
         
         .page-header h1 {
-            font-size: 1.5rem;
+            font-size: 1.35rem;
+            gap: 0.75rem;
+        }
+        
+        .page-header h1 i {
+            font-size: 1.35rem;
+        }
+        
+        .page-header p {
+            font-size: 0.875rem;
+        }
+        
+        /* Cards das monitorias */
+        .monitoria-card {
+            padding: 1.25rem !important;
+            min-height: auto;
+            height: auto;
+            border-radius: 12px;
+        }
+        
+        .card-header {
+            margin-bottom: 1rem;
+            gap: 0.75rem;
         }
         
         .card-icon {
-            width: 50px;
-            height: 50px;
-            font-size: 1.25rem;
+            width: 48px;
+            height: 48px;
+            font-size: 1.15rem;
+            border-radius: 10px;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            line-height: 1.3;
+        }
+        
+        .card-subtitle {
+            font-size: 0.8rem;
+        }
+        
+        .card-info {
+            gap: 0.6rem;
+        }
+        
+        .info-item {
+            font-size: 0.8rem;
+            gap: 0.6rem;
+        }
+        
+        .info-icon {
+            width: 18px;
+            font-size: 0.9rem;
+        }
+        
+        .card-stats {
+            padding: 1rem;
+            border-radius: 10px;
         }
         
         .stats-number {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
+        }
+        
+        .stats-label {
+            font-size: 0.7rem;
+        }
+        
+        /* Grid responsivo - mantém espaçamento do Bootstrap */
+        .row {
+            margin-left: -0.5rem !important;
+            margin-right: -0.5rem !important;
+        }
+        
+        [class*="col-"] {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        .mb-4 {
+            margin-bottom: 1rem !important;
+        }
+        
+        /* Empty state */
+        .empty-state {
+            padding: 2rem 1rem !important;
+            margin-top: 1rem;
+            border-radius: 10px;
+        }
+        
+        .empty-state i {
+            font-size: 3rem !important;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .empty-state p {
+            font-size: 0.875rem;
+            margin-bottom: 1.25rem;
+        }
+        
+        .btn-primary {
+            padding: 0.625rem 1.5rem;
+            font-size: 0.875rem;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid" style="padding: 2rem;">
+<div class="container-fluid px-3 px-md-4 py-3">
     <!-- Header -->
     <div class="page-header">
         <h1>
@@ -271,9 +374,9 @@
 
     {% if turmas_com_alunos %}
     <!-- Grid de Cards das Monitorias -->
-    <div class="row">
+    <div class="row g-3 g-md-4">
         {% for item in turmas_com_alunos %}
-        <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+        <div class="col-12 col-md-6 col-xl-4 mb-3 mb-md-4">
             <div class="monitoria-card" onclick="window.location.href='{% url 'alunos_da_monitoria' item.turma.id %}'">
                 <!-- Header do Card -->
                 <div class="card-header">

@@ -883,6 +883,7 @@
     }
 
     .monitorias-header {
+        margin-top: 0.5rem; /* Espaço extra no mobile */
         margin-bottom: 1.5rem;
         padding-bottom: 1rem;
     }
@@ -1054,7 +1055,9 @@
     }
 }
 </style>
+{% endblock %}
 
+{% block extra_js %}
 <script>
 function abrirModalMonitoria(turmaId, vagaNome, turmaNome, monitor, curso, horario, dias, sala, predio, dataInicio, dataFim, turmaDesc, vagaDesc, requisitos) {
     // Limpar e preencher dados

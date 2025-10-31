@@ -15,11 +15,16 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-CHANGE-THIS-IN-PRODUC
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG deve ser False em produção (só True localmente para desenvolvimento)
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Permite múltiplos hosts separados por vírgula
 # Em produção (Heroku), inclua o domínio: plataformacasa-f820a0a16535.herokuapp.com
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+# '*' permite qualquer host - use apenas se necessário para deploy
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=lambda v: ['*'] if v == '*' else Csv()(v))
+
+# Garante que 0.0.0.0 esteja sempre em ALLOWED_HOSTS para desenvolvimento
+if DEBUG and isinstance(ALLOWED_HOSTS, list) and '0.0.0.0' not in ALLOWED_HOSTS and '*' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('0.0.0.0')
 
 # ============================================================================
 # CONFIGURAÇÃO DE CORS E HOSTS CONFIÁVEIS - PRODUÇÃO
@@ -28,20 +33,28 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv(
 # ALLOWED_HOSTS=localhost,127.0.0.1,plataformacasa-a2a3d2abfd5e.herokuapp.com
 # 
 # Ou definir aqui diretamente (menos recomendado por segurança):
+# Lista vazia ou com seus domínios específicos se necessário
 CSRF_TRUSTED_ORIGINS = config(
     'CSRF_TRUSTED_ORIGINS',
     default='https://plataformacasa-a2a3d2abfd5e.herokuapp.com',
     cast=Csv()
 )
 
+# Caso precise desabilitar CSRF para API pública (use com cautela!)
+# Descomente a linha abaixo apenas se realmente necessário
+# CSRF_COOKIE_SECURE = False
+# SESSION_COOKIE_SECURE = False
+
 # Configurações de CORS - controlam quais origens podem acessar a API
+# CORS_ALLOW_ALL_ORIGINS=True permite requisições de qualquer origem
 DEFAULT_CORS_ORIGINS = 'http://localhost:3000,http://127.0.0.1:3000'
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
     default=DEFAULT_CORS_ORIGINS,
     cast=Csv()
 )
-CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=DEBUG, cast=bool)
+# Permite requisições de qualquer origem em produção
+CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=True, cast=bool)
 CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
