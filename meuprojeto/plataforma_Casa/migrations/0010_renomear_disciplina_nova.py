@@ -17,11 +17,12 @@ def renomear_disciplina_nova(apps, schema_editor):
                 IF EXISTS (
                     SELECT 1 
                     FROM information_schema.columns 
-                    WHERE table_name = 'plataforma_Casa_vaga' 
+                    WHERE table_schema = 'public'
+                    AND table_name = 'plataforma_Casa_vaga' 
                     AND column_name = 'disciplina'
                     AND data_type = 'character varying'
                 ) THEN
-                    ALTER TABLE plataforma_Casa_vaga DROP COLUMN disciplina;
+                    ALTER TABLE "plataforma_Casa_vaga" DROP COLUMN disciplina;
                 END IF;
             END $$;
         """)
@@ -33,10 +34,11 @@ def renomear_disciplina_nova(apps, schema_editor):
                 IF EXISTS (
                     SELECT 1 
                     FROM information_schema.columns 
-                    WHERE table_name = 'plataforma_Casa_vaga' 
+                    WHERE table_schema = 'public'
+                    AND table_name = 'plataforma_Casa_vaga' 
                     AND column_name = 'disciplina_nova_id'
                 ) THEN
-                    ALTER TABLE plataforma_Casa_vaga 
+                    ALTER TABLE "plataforma_Casa_vaga" 
                     RENAME COLUMN disciplina_nova_id TO disciplina_id;
                 END IF;
             END $$;
@@ -55,10 +57,11 @@ def reverter_renomeacao(apps, schema_editor):
                 IF EXISTS (
                     SELECT 1 
                     FROM information_schema.columns 
-                    WHERE table_name = 'plataforma_Casa_vaga' 
+                    WHERE table_schema = 'public'
+                    AND table_name = 'plataforma_Casa_vaga' 
                     AND column_name = 'disciplina_id'
                 ) THEN
-                    ALTER TABLE plataforma_Casa_vaga 
+                    ALTER TABLE "plataforma_Casa_vaga" 
                     RENAME COLUMN disciplina_id TO disciplina_nova_id;
                 END IF;
             END $$;
