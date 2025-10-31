@@ -1,7 +1,6 @@
 # 🏠 Plataforma CASA - Sistema de Gestão de Monitorias
 
 **Código da Disciplina**: IBM8936  
-**Versão**: 1.0  
 **Status**: ✅ Em Produção
 
 ---
@@ -28,10 +27,10 @@ Sistema web completo que digitaliza e automatiza todo o processo de monitoria ac
 
 | Nome | Função | GitHub |
 |------|--------|--------|
-| Anderson Lima | Backend & DevOps | [@anderson](https://github.com/anderson) |
-| João Pedro Campos | Backend & API | [@joao](https://github.com/joao) |
-| Bernardo Casanovas | Frontend & UX | [@bernardo](https://github.com/bernardo) |
-| Gabriel Caruzo | Database & Reports | [@gabriel](https://github.com/gabriel) |
+| Anderson Lima | Backend, DevOps, FrontEND | [@anderson](https://github.com/anderson) |
+| João Pedro Campos | Full Stack, API | [@joao](https://github.com/joao) |
+| Bernardo Casanovas | Frontend, UX, analista de dados | [@bernardo](https://github.com/bernardo) |
+| Gabriel Caruzo | Database, Reports, DevOps, Scrum Master | [@gabriel](https://github.com/gabriel) |
 
 ---
 
