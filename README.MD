@@ -1231,36 +1231,10 @@ heroku run "cd meuprojeto && python manage.py collectstatic --noinput" --app pla
 - **Swagger UI:** [https://plataformacasa-a2a3d2abfd5e.herokuapp.com/restapi/](https://plataformacasa-a2a3d2abfd5e.herokuapp.com/restapi/)
 - **ReDoc:** [https://plataformacasa-a2a3d2abfd5e.herokuapp.com/redoc/](https://plataformacasa-a2a3d2abfd5e.herokuapp.com/redoc/)
 
-### Equipe de Desenvolvimento
-- Anderson Lima - Backend & DevOps
-- João Pedro Campos - Backend & API
-- Bernardo Casanovas - Frontend & UX
-- Gabriel Caruzo - Database & Reports
-
 ---
 
-## 📜 Licença
 
-Este projeto foi desenvolvido para fins acadêmicos como parte do curso **IBM8936 - Projeto Back-End** do IBMEC.
-
-**MIT License** - Livre para uso acadêmico e comercial.
-
----
-
-## 🙏 Agradecimentos
-
-- **Professor(a) da disciplina** - Pela orientação e suporte
-- **IBMEC** - Pela estrutura e oportunidade
-- **Comunidade Django** - Pela documentação excelente
-- **Heroku** - Pela plataforma de deploy gratuita
-
----
-
-**Última atualização:** 31 de outubro de 2025  
-**Versão:** 1.0  
 **Status:** ✅ Em Produção  
 **Deploy:** [https://plataformacasa-a2a3d2abfd5e.herokuapp.com](https://plataformacasa-a2a3d2abfd5e.herokuapp.com)
 
 ---
-
-**⭐ Se este projeto foi útil, deixe uma estrela no GitHub!**
