@@ -604,7 +604,13 @@
     <div class="page-header-top">
         <div>
             <h1>{{ vaga.nome }}</h1>
-            <p>{{ vaga.curso.nome }} • Coordenador: {{ vaga.coordenador.nome }}</p>
+            <p>{{ vaga.curso.nome }} • Coordenadores: 
+                {% for coord in vaga.coordenadores.all %}
+                    {{ coord.nome }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                    Não especificado
+                {% endfor %}
+            </p>
         </div>
         <a href="{% url 'listar_vagas' %}" class="btn-voltar">
             <i class="fas fa-arrow-left"></i> Voltar

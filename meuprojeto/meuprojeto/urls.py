@@ -28,12 +28,63 @@ api_patterns = [
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Plataforma CASA API",
-        default_version='v1',
-        description="Documentação interativa da API REST da Plataforma CASA.",
+        title="🏠 API Plataforma CASA - Sistema de Monitoria",
+        default_version='v1.0',
+        description="""
+# Bem-vindo à API da Plataforma CASA! 🚀
+
+## 📚 Sobre
+API REST completa para gerenciamento de monitoria acadêmica, incluindo:
+- Gestão de disciplinas, vagas e turmas
+- Controle de inscrições e presenças
+- Registro de horas e pagamentos
+- Materiais de apoio
+- Relatórios e estatísticas
+
+## 🔑 Recursos Principais
+### Para Professores
+- Criar e gerenciar disciplinas
+- Criar vagas de monitoria
+- Selecionar coordenadores responsáveis
+
+### Para Coordenadores
+- Gerenciar vagas
+- Selecionar professores para as disciplinas
+- Aprovar inscrições e horas
+
+### Para Alunos
+- Inscrever-se em vagas
+- Registrar horas de monitoria
+- Acessar materiais de apoio
+
+## 🛠️ Como Usar
+1. Explore os endpoints abaixo organizados por categoria
+2. Clique em um endpoint para ver detalhes
+3. Use "Try it out" para testar diretamente na interface
+4. Todos os endpoints suportam busca, filtros e ordenação
+
+## 📊 Endpoints Disponíveis
+- **Base**: Tipos de usuário, Cursos, Salas, Disciplinas
+- **Usuários**: Funcionários, Alunos
+- **Acadêmico**: Vagas, Turmas, Inscrições
+- **Controle**: Presenças, Horas, Pagamentos
+- **Conteúdo**: Materiais de Apoio, Documentos
+- **Análise**: Estatísticas do Sistema
+
+---
+**Suporte**: suporte@plataformacasa.com.br  
+**Documentação**: [API Guide](https://github.com/Projetos-de-Extensao/PBE_25.2_8001_IV)
+        """,
         terms_of_service="https://www.unifeso.edu.br/",
-        contact=openapi.Contact(email="suporte@plataformacasa.com.br"),
-        license=openapi.License(name="Uso interno Plataforma CASA"),
+        contact=openapi.Contact(
+            name="Equipe Plataforma CASA",
+            email="suporte@plataformacasa.com.br",
+            url="https://www.unifeso.edu.br"
+        ),
+        license=openapi.License(
+            name="MIT License",
+            url="https://opensource.org/licenses/MIT"
+        ),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),

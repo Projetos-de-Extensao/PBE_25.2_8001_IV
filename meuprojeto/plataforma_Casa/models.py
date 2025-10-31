@@ -22,6 +22,28 @@ class Sala(models.Model):
     def __str__(self):
         return self.numero
 
+class Disciplina(models.Model):
+    """Modelo para disciplinas que podem ser ministradas"""
+    codigo = models.CharField(max_length=20, unique=True, help_text="Código da disciplina (ex: CC101)")
+    nome = models.CharField(max_length=100, help_text="Nome da disciplina")
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='disciplinas')
+    carga_horaria = models.IntegerField(help_text="Carga horária em horas")
+    periodo_sugerido = models.IntegerField(help_text="Período sugerido para cursar", blank=True, null=True)
+    ementa = models.TextField(blank=True, null=True, help_text="Ementa da disciplina")
+    pre_requisitos = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='e_pre_requisito_de')
+    criado_por = models.ForeignKey('Funcionario', on_delete=models.SET_NULL, null=True, blank=True, related_name='disciplinas_criadas')
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    ativo = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['curso', 'periodo_sugerido', 'nome']
+        verbose_name = 'Disciplina'
+        verbose_name_plural = 'Disciplinas'
+
+    def __str__(self):
+        return f"{self.codigo} - {self.nome}"
+
 class Usuario(models.Model):
     nome = models.CharField(max_length=100)
     email = models.EmailField(max_length=100)
@@ -51,14 +73,53 @@ class Aluno(Usuario):
         return f"{self.nome} (Aluno)"
 
 class Vaga(models.Model):
+    TIPO_VAGA_CHOICES = [
+        ('TEA', 'TEA - Monitoria Remunerada'),
+        ('Voluntaria', 'Monitoria Voluntária'),
+    ]
+    
     nome = models.CharField(max_length=100)
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
-    coordenador = models.ForeignKey(Funcionario, on_delete=models.CASCADE, related_name='vagas_coordenadas')
+    disciplina = models.ForeignKey(Disciplina, on_delete=models.CASCADE, related_name='vagas', help_text="Disciplina da vaga")
+    
+    # Tipo de vaga: TEA (paga) ou Voluntária
+    tipo_vaga = models.CharField(
+        max_length=20,
+        choices=TIPO_VAGA_CHOICES,
+        default='Voluntaria',
+        help_text="Tipo de monitoria: TEA (remunerada) ou Voluntária"
+    )
+    
+    # Valor da bolsa (apenas para TEA)
+    valor_bolsa = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Valor da bolsa para monitoria TEA (R$ 1.500,00 por semestre)"
+    )
+    
+    # Relacionamento com coordenadores (ManyToMany para permitir múltiplos coordenadores)
+    coordenadores = models.ManyToManyField(
+        Funcionario, 
+        related_name='vagas_como_coordenador',
+        limit_choices_to={'coordenador': True},
+        help_text="Coordenadores responsáveis pela vaga"
+    )
+    
+    # Relacionamento com professores (ManyToMany para permitir múltiplos professores)
+    professores = models.ManyToManyField(
+        Funcionario,
+        related_name='vagas_como_professor',
+        blank=True,
+        limit_choices_to={'funcao': 'Professor'},
+        help_text="Professores associados à vaga"
+    )
+    
     descricao = models.TextField()
     requisitos = models.TextField()
-    responsabilidades = models.TextField(blank=True, null=True)  # Novo campo
-    numero_vagas = models.IntegerField(default=1)  # Novo campo
-    disciplina = models.CharField(max_length=100, blank=True, null=True)  # Novo campo
+    responsabilidades = models.TextField(blank=True, null=True)
+    numero_vagas = models.IntegerField(default=1)
     monitores = models.ManyToManyField(Aluno, related_name='vagas_inscritas', blank=True)
     ativo = models.BooleanField(default=True)
     criado_em = models.DateTimeField(auto_now_add=True)
@@ -143,7 +204,6 @@ class Documento(models.Model):
     
     def __str__(self):
         return f"{self.tipo} - {self.inscricao.aluno.nome}"
-
 
 class RegistroHoras(models.Model):
     """Modelo para registro de horas trabalhadas pelos monitores"""

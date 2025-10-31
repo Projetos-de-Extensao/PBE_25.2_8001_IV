@@ -53,17 +53,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
     'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
     'drf_yasg',
     'plataforma_Casa',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Serve arquivos estáticos em produção
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # Habilita suporte a CORS antes do CommonMiddleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -192,6 +192,18 @@ REST_FRAMEWORK = {
     ],
     # Faz o DRF gerar esquema OpenAPI automaticamente
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.openapi.AutoSchema',
+    # Paginação configurada
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+    # Filtros padrão
+    'DEFAULT_FILTER_BACKENDS': [
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+    # Formato de data/hora mais legível
+    'DATETIME_FORMAT': '%d/%m/%Y %H:%M:%S',
+    'DATE_FORMAT': '%d/%m/%Y',
+    'TIME_FORMAT': '%H:%M:%S',
 }
 
 SWAGGER_SETTINGS = {
@@ -199,33 +211,124 @@ SWAGGER_SETTINGS = {
     'USE_SESSION_AUTH': True,
     'LOGIN_URL': 'login',
     'LOGOUT_URL': 'logout',
-    # Expansão padrão em formato de lista para evitar poluição visual
-    'DOC_EXPANSION': 'list',
+    
+    # Expansão padrão - 'none' deixa tudo colapsado inicialmente (melhor UX)
+    'DOC_EXPANSION': 'none',
+    
     # Exibe exemplos reais em vez de estruturas vazias
     'DEFAULT_MODEL_RENDERING': 'example',
+    
+    # Profundidade dos modelos aninhados
+    'DEFAULT_MODEL_DEPTH': 2,
+    
     # Recarrega o schema quando as credenciais mudarem
     'REFETCH_SCHEMA_WITH_AUTH': True,
+    
     # Mostra operationId para facilitar cópia em integrações futuras
-    'DISPLAY_OPERATION_ID': True,
+    'DISPLAY_OPERATION_ID': False,
+    
+    # Configuração de filtros
+    'OPERATIONS_SORTER': 'alpha',  # Ordena alfabeticamente
+    'TAGS_SORTER': 'alpha',         # Ordena tags alfabeticamente
+    
+    # Deep linking - permite compartilhar links diretos para endpoints
+    'DEEP_LINKING': True,
+    
+    # Mostra extensões da spec OpenAPI
+    'SHOW_EXTENSIONS': True,
+    
+    # Mostra common parameters
+    'SHOW_COMMON_EXTENSIONS': True,
+    
+    # Validação de requisições
+    'VALIDATOR_URL': None,  # Desabilita validação externa
+    
+    # JSON Editor
+    'JSON_EDITOR': True,
+    
+    # Configurações visuais
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'drf_yasg.inspectors.SwaggerAutoSchema',
+    
     # Permite testar tanto autenticação básica quanto Bearer token
     'SECURITY_DEFINITIONS': {
         'basic': {
-            'type': 'basic'
+            'type': 'basic',
+            'description': 'Autenticação básica HTTP'
         },
         'Bearer': {
             'type': 'apiKey',
             'name': 'Authorization',
             'in': 'header',
-            'description': 'Formato: Bearer <token>'
+            'description': 'Token de autenticação. Formato: Bearer {token}'
         },
     },
+    
+    # Configurações de persistência
+    'PERSIST_AUTH': True,
+    
+    # Suporte a CORS
+    'SUPPORTED_SUBMIT_METHODS': [
+        'get',
+        'post',
+        'put',
+        'delete',
+        'patch',
+        'options'
+    ],
 }
 
 REDOC_SETTINGS = {
     # Otimiza o carregamento e navegação da documentação alternativa (Redoc)
-    'LAZY_RENDERING': True,
+    'LAZY_RENDERING': False,  # Renderiza tudo de uma vez (melhor para navegação)
+    
+    # Usa scrollbar nativo do navegador
     'NATIVE_SCROLLBARS': True,
+    
+    # Exibe caminho no meio da tela
     'PATH_IN_MIDDLE': True,
+    
+    # Expande respostas por padrão
+    'EXPAND_RESPONSES': 'all',
+    
+    # Expande navegação lateral
+    'EXPAND_DEFAULT_SERVER_VARIABLES': True,
+    
+    # Configurações visuais
+    'HIDE_HOSTNAME': False,
+    'HIDE_LOADING': False,
+    
+    # Menu lateral fixo
+    'MENU_TOGGLE': True,
+    
+    # Mostra logo se configurado
+    'NO_AUTO_AUTH': False,
+    
+    # Configurações de requisição
+    'REQUIRED_PROPS_FIRST': True,
+    
+    # Scrollbar position
+    'SCROLL_Y_OFFSET': 0,
+    
+    # Theme customization (você pode adicionar depois)
+    'THEME': {
+        'colors': {
+            'primary': {
+                'main': '#2196F3'  # Azul Material
+            }
+        },
+        'typography': {
+            'fontSize': '16px',
+            'fontFamily': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            'headings': {
+                'fontFamily': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                'fontWeight': '600'
+            }
+        },
+        'sidebar': {
+            'backgroundColor': '#fafafa',
+            'textColor': '#333'
+        }
+    }
 }
 
 # ============================================================================

@@ -45,16 +45,16 @@
             
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="coordenador" class="form-label">Coordenador *</label>
-                    <select class="form-select" id="coordenador" name="coordenador" required>
-                        <option value="">-- Selecione um coordenador --</option>
+                    <label for="coordenadores" class="form-label">Coordenadores *</label>
+                    <select class="form-select" id="coordenadores" name="coordenadores" multiple required>
                         {% for coordenador in coordenadores %}
                             <option value="{{ coordenador.id }}" 
-                                {% if vaga.coordenador.id == coordenador.id %}selected{% endif %}>
+                                {% if coordenador in vaga.coordenadores.all %}selected{% endif %}>
                                 {{ coordenador.nome }}
                             </option>
                         {% endfor %}
                     </select>
+                    <small class="text-muted">Segure Ctrl/Cmd para selecionar múltiplos coordenadores</small>
                 </div>
                 
                 <div class="col-md-6 mb-3">

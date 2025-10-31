@@ -393,14 +393,15 @@ def dashboard(request):
     
     # ========== REDIRECIONAMENTOS BASEADOS EM HIERARQUIA ==========
     
+    # Admin (sem grupo Professor) vai para Dashboard de Gestão
+    if is_admin and not is_professor:
+        return redirect('dashboard_gestao')
+    
     # IMPORTANTE: Professor tem prioridade sobre Admin
     # Se o usuário é Professor (mesmo sendo staff), vai para Dashboard do Professor
     if is_professor:
         # Dashboard do Professor será renderizado abaixo
         pass
-    # Admin SEM grupo Professor vai para Dashboard de Gestão
-    elif is_admin:
-        return redirect('dashboard_gestao')
     
     # ========== DASHBOARD DO MONITOR ==========
     
@@ -504,28 +505,28 @@ def dashboard(request):
             
             # ✅ SINCRONIZAR GRUPO: Se professor tem vagas, adicionar grupo "Coordenador"
             grupo_coordenador, _ = Group.objects.get_or_create(name='Coordenador')
-            tem_vagas = Vaga.objects.filter(coordenador=funcionario).exists()
+            tem_vagas = Vaga.objects.filter(coordenadores=funcionario).exists()
             
             if tem_vagas and not user.groups.filter(name='Coordenador').exists():
                 user.groups.add(grupo_coordenador)
                 print(f"✅ Grupo 'Coordenador' adicionado ao professor {funcionario.nome}")
             
             # Estatísticas das MINHAS vagas (vagas que eu coordeno)
-            minhas_vagas = Vaga.objects.filter(coordenador=funcionario)
+            minhas_vagas = Vaga.objects.filter(coordenadores=funcionario)
             total_minhas_vagas = minhas_vagas.filter(ativo=True).count()
             
             # Total de candidatos nas minhas vagas
-            total_candidatos = Inscricao.objects.filter(vaga__coordenador=funcionario).count()
+            total_candidatos = Inscricao.objects.filter(vaga__coordenadores=funcionario).count()
             
             # Candidatos pendentes de avaliação
             candidatos_pendentes = Inscricao.objects.filter(
-                vaga__coordenador=funcionario,
+                vaga__coordenadores=funcionario,
                 status='Pendente'
             ).count()
             
             # Monitores aprovados nas minhas vagas
             monitores_aprovados = Inscricao.objects.filter(
-                vaga__coordenador=funcionario,
+                vaga__coordenadores=funcionario,
                 status='Aprovado'
             ).count()
             
@@ -538,7 +539,7 @@ def dashboard(request):
             # Minhas turmas (turmas onde o monitor está registrado nas vagas que coordeno)
             # Obter todos os monitores aprovados nas minhas vagas
             monitores_aprovados_ids = Inscricao.objects.filter(
-                vaga__coordenador=funcionario,
+                vaga__coordenadores=funcionario,
                 status='Aprovado'
             ).values_list('aluno_id', flat=True)
             
@@ -550,7 +551,7 @@ def dashboard(request):
             
             # Últimas inscrições nas minhas vagas
             ultimas_inscricoes = Inscricao.objects.filter(
-                vaga__coordenador=funcionario
+                vaga__coordenadores=funcionario
             ).select_related('aluno', 'vaga').order_by('-data_inscricao')[:5]
             
             # Vagas com mais candidatos
@@ -808,14 +809,14 @@ def listar_vagas(request):
     
     # Admin vê todas as vagas
     if user.is_staff or user.is_superuser:
-        vagas = Vaga.objects.all().select_related('curso', 'coordenador').prefetch_related('monitores').annotate(
+        vagas = Vaga.objects.all().select_related('curso', 'disciplina').prefetch_related('coordenadores', 'professores', 'monitores').annotate(
             total_inscritos=Count('inscricao')
         )
     else:
         # Professor/Coordenador vê apenas suas vagas
         try:
             funcionario = Funcionario.objects.get(email=user.email)
-            vagas = Vaga.objects.filter(coordenador=funcionario).select_related('curso', 'coordenador').prefetch_related('monitores').annotate(
+            vagas = Vaga.objects.filter(coordenadores=funcionario).select_related('curso', 'disciplina').prefetch_related('coordenadores', 'professores', 'monitores').annotate(
                 total_inscritos=Count('inscricao')
             )
         except Funcionario.DoesNotExist:
@@ -859,7 +860,7 @@ def detalhe_vaga(request, vaga_id):
         # Professor/Coordenador: verificar se é o coordenador da vaga
         try:
             funcionario = Funcionario.objects.get(email=user.email)
-            if vaga.coordenador != funcionario:
+            if funcionario not in vaga.coordenadores.all() and funcionario not in vaga.professores.all():
                 # Não tem permissão para ver esta vaga
                 messages.error(request, '❌ Você não tem permissão para ver esta vaga')
                 return redirect('listar_vagas')
@@ -1057,7 +1058,7 @@ def editar_vaga(request, vaga_id):
         # Professor/Coordenador: verificar se é o coordenador da vaga
         try:
             funcionario = Funcionario.objects.get(email=user.email)
-            if vaga.coordenador != funcionario:
+            if funcionario not in vaga.coordenadores.all() and funcionario not in vaga.professores.all():
                 # Não tem permissão para editar esta vaga
                 messages.error(request, '❌ Você não tem permissão para editar esta vaga')
                 return redirect('listar_vagas')
@@ -1070,10 +1071,29 @@ def editar_vaga(request, vaga_id):
         vaga.descricao = request.POST.get('descricao')
         vaga.requisitos = request.POST.get('requisitos')
         vaga.ativo = request.POST.get('ativo') == 'on'
+        
+        # Atualizar coordenadores (ManyToMany)
+        coordenadores_ids = request.POST.getlist('coordenadores')
+        if coordenadores_ids:
+            vaga.coordenadores.set(coordenadores_ids)
+        
+        # Atualizar professores (ManyToMany) se fornecido
+        professores_ids = request.POST.getlist('professores')
+        if professores_ids:
+            vaga.professores.set(professores_ids)
+        
         vaga.save()
+        messages.success(request, '✅ Vaga atualizada com sucesso!')
         return redirect('listar_vagas')
     
-    context = {'vaga': vaga}
+    coordenadores = Funcionario.objects.filter(coordenador=True)
+    professores = Funcionario.objects.filter(funcao='Professor')
+    
+    context = {
+        'vaga': vaga,
+        'coordenadores': coordenadores,
+        'professores': professores
+    }
     return render(request, 'vagas/editar.html', context)
 
 
@@ -1096,7 +1116,7 @@ def deletar_vaga(request, vaga_id):
         # Professor/Coordenador: verificar se é o coordenador da vaga
         try:
             funcionario = Funcionario.objects.get(email=user.email)
-            if vaga.coordenador != funcionario:
+            if funcionario not in vaga.coordenadores.all():
                 # Não tem permissão para deletar esta vaga
                 messages.error(request, '❌ Você não tem permissão para deletar esta vaga')
                 return redirect('listar_vagas')
@@ -1504,7 +1524,7 @@ def portal_vagas(request):
     """
     View para portal público de vagas
     """
-    vagas = Vaga.objects.filter(ativo=True).select_related('curso', 'coordenador').annotate(
+    vagas = Vaga.objects.filter(ativo=True).select_related('curso', 'disciplina').prefetch_related('coordenadores', 'professores').annotate(
         total_inscritos=Count('inscricao')
     )
     
@@ -1538,8 +1558,9 @@ def api_detalhes_vaga(request, vaga_id):
         'id': vaga.id,
         'nome': vaga.nome,
         'curso': vaga.curso.nome,
-        'disciplina': vaga.disciplina or 'Não especificada',
-        'coordenador': vaga.coordenador.nome if vaga.coordenador else 'Não especificado',
+        'disciplina': vaga.disciplina.nome if vaga.disciplina else 'Não especificada',
+        'coordenadores': [coord.nome for coord in vaga.coordenadores.all()],
+        'professores': [prof.nome for prof in vaga.professores.all()],
         'descricao': vaga.descricao,
         'requisitos': vaga.requisitos,
         'responsabilidades': vaga.responsabilidades or 'Não especificadas',
@@ -2414,7 +2435,7 @@ def dashboard_gestao(request):
         vagas_ativas = Vaga.objects.filter(ativo=True).annotate(
             total_inscritos=Count('inscricao'),
             aprovados=Count('inscricao', filter=Q(inscricao__status='Aprovado'))
-        ).select_related('curso', 'coordenador').order_by('-criado_em')[:10]
+        ).select_related('curso', 'disciplina').prefetch_related('coordenadores').order_by('-criado_em')[:10]
         
         # ========== ANÁLISE DE DESEMPENHO ==========
         
@@ -2451,8 +2472,8 @@ def dashboard_gestao(request):
             'horas': RegistroHoras.objects.filter(status='Aprovado').select_related('monitor').values(
                 'monitor__nome', 'data', 'total_horas', 'descricao_atividade'
             ),
-            'vagas': Vaga.objects.filter(ativo=True).select_related('curso', 'coordenador').values(
-                'disciplina', 'curso__nome', 'numero_vagas', 'coordenador__nome'
+            'vagas': Vaga.objects.filter(ativo=True).select_related('curso', 'disciplina').prefetch_related('coordenadores').values(
+                'disciplina__nome', 'curso__nome', 'numero_vagas'
             ),
         }
         
@@ -2701,7 +2722,7 @@ def mudar_status_candidato(request, inscricao_id):
         try:
             funcionario = Funcionario.objects.get(email=user.email)
             # Só valida se não for admin
-            if not is_admin and inscricao.vaga.coordenador != funcionario:
+            if not is_admin and funcionario not in inscricao.vaga.coordenadores.all():
                 return JsonResponse({
                     'success': False,
                     'error': 'Você não tem permissão para alterar o status desta inscrição'

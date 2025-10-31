@@ -357,10 +357,16 @@
                     <div class="vaga-info">
                         <div class="vaga-info-item">
                             <div class="vaga-info-label">
-                                <i class="fas fa-user"></i>
-                                Coordenador
+                                <i class="fas fa-users"></i>
+                                Coordenadores
                             </div>
-                            <p class="vaga-info-value">{{ vaga.coordenador.nome }}</p>
+                            <p class="vaga-info-value">
+                                {% for coord in vaga.coordenadores.all %}
+                                    {{ coord.nome }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    Não especificado
+                                {% endfor %}
+                            </p>
                         </div>
                         
                         <div class="vaga-info-item">
