@@ -1200,8 +1200,6 @@ heroku run "cd meuprojeto && python manage.py collectstatic --noinput" --app pla
 
 ### 🚧 Em Desenvolvimento (v1.1)
 
-- [ ] Notificações por email (SMTP)
-- [ ] Sistema de mensagens internas
 - [ ] Calendário de monitorias
 - [ ] Dashboard com gráficos avançados
 - [ ] Integração com Microsoft Teams
