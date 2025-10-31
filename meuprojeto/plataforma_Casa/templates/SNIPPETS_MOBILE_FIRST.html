@@ -1,0 +1,389 @@
+{% comment %}
+================================================================================
+SNIPPETS MOBILE-FIRST - COMPONENTES REUTILIZÁVEIS
+================================================================================
+
+Coleção de componentes HTML otimizados para mobile-first design.
+Use como referência ao criar novos templates ou modificar existentes.
+
+Estrutura:
+- Navbar responsiva
+- Sidebar colapsável
+- Cards responsivas
+- Botões touch-friendly
+- Formulários otimizados
+- Tabelas responsivas
+- Modals fullscreen em mobile
+- Alertas e badges
+
+Autor: Equipe de Desenvolvimento
+Data: 31 de outubro de 2025
+================================================================================
+{% endcomment %}
+
+{# ====================================================================== #}
+{# 1. NAVBAR RESPONSIVA COM HAMBURGER MENU #}
+{# ====================================================================== #}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary-dark sticky-top">
+    <div class="container-fluid">
+        <!-- Logo/Brand -->
+        <a class="navbar-brand" href="{% url 'dashboard' %}">
+            <i class="fas fa-graduation-cap me-2"></i>
+            <span class="d-none-mobile">Plataforma Casa</span>
+            <span class="d-only-mobile">Casa</span>
+        </a>
+        
+        <!-- Hamburger Toggle -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                data-bs-target="#navbarNav" aria-controls="navbarNav">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- Menu Items -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'dashboard' %}">
+                        <i class="fas fa-home me-2"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'listar_usuarios' %}">
+                        <i class="fas fa-users me-2"></i>Usuários
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" 
+                       data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-2"></i>
+                        <span class="d-none-mobile">{{ user.username }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'perfil' %}">Perfil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+{# ====================================================================== #}
+{# 2. SIDEBAR COLAPSÁVEL #}
+{# ====================================================================== #}
+
+<aside class="sidebar d-none d-md-block">
+    <nav class="sidebar-nav">
+        <ul class="nav flex-column">
+            {% if is_admin %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'dashboard_gestao' %}">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Gestão</span>
+                    </a>
+                </li>
+            {% endif %}
+            
+            {% if is_professor %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'validar_horas' %}">
+                        <i class="fas fa-clock"></i>
+                        <span>Validar Horas</span>
+                    </a>
+                </li>
+            {% endif %}
+            
+            {% if is_monitor %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'meus_registros_horas' %}">
+                        <i class="fas fa-book"></i>
+                        <span>Meus Registros</span>
+                    </a>
+                </li>
+            {% endif %}
+            
+            {% if is_aluno %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'portal_vagas' %}">
+                        <i class="fas fa-briefcase"></i>
+                        <span>Vagas</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</aside>
+
+
+{# ====================================================================== #}
+{# 3. CARD KPI RESPONSIVA #}
+{# ====================================================================== #}
+
+<div class="row mb-4">
+    <!-- Card KPI 1 -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card kpi-card">
+            <div class="kpi-icon">
+                <i class="fas fa-users text-accent"></i>
+            </div>
+            <div class="kpi-label">Total Alunos</div>
+            <div class="kpi-value">{{ total_alunos }}</div>
+        </div>
+    </div>
+    
+    <!-- Card KPI 2 -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card kpi-card">
+            <div class="kpi-icon">
+                <i class="fas fa-briefcase text-accent"></i>
+            </div>
+            <div class="kpi-label">Vagas Ativas</div>
+            <div class="kpi-value">{{ total_vagas }}</div>
+        </div>
+    </div>
+    
+    <!-- Card KPI 3 -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card kpi-card">
+            <div class="kpi-icon">
+                <i class="fas fa-graduation-cap text-accent"></i>
+            </div>
+            <div class="kpi-label">Monitores</div>
+            <div class="kpi-value">{{ total_monitores }}</div>
+        </div>
+    </div>
+    
+    <!-- Card KPI 4 -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card kpi-card">
+            <div class="kpi-icon">
+                <i class="fas fa-clock text-accent"></i>
+            </div>
+            <div class="kpi-label">Horas Totais</div>
+            <div class="kpi-value">{{ total_horas }}</div>
+        </div>
+    </div>
+</div>
+
+
+{# ====================================================================== #}
+{# 4. BOTÕES COM LAYOUT RESPONSIVO #}
+{# ====================================================================== #}
+
+<!-- Layout móvel: botões empilhados -->
+<div class="btn-group d-flex flex-column gap-2">
+    <button type="button" class="btn btn-primary">
+        <i class="fas fa-download me-2"></i>Excel
+    </button>
+    <button type="button" class="btn btn-secondary">
+        <i class="fas fa-file-pdf me-2"></i>PDF
+    </button>
+    <button type="button" class="btn btn-warning">
+        <i class="fas fa-print me-2"></i>Imprimir
+    </button>
+</div>
+
+<!-- Layout desktop: botões ao lado -->
+<div class="btn-group d-none d-md-flex gap-2">
+    <button type="button" class="btn btn-primary">
+        <i class="fas fa-download me-2"></i>Excel
+    </button>
+    <button type="button" class="btn btn-secondary">
+        <i class="fas fa-file-pdf me-2"></i>PDF
+    </button>
+    <button type="button" class="btn btn-warning">
+        <i class="fas fa-print me-2"></i>Imprimir
+    </button>
+</div>
+
+
+{# ====================================================================== #}
+{# 5. FORMULÁRIO RESPONSIVO #}
+{# ====================================================================== #}
+
+<form method="post" class="form-responsive">
+    {% csrf_token %}
+    
+    <!-- Campo de texto -->
+    <div class="form-group mb-3">
+        <label for="nome" class="form-label">Nome Completo</label>
+        <input type="text" class="form-control" id="nome" name="nome" 
+               placeholder="Digite seu nome" required>
+    </div>
+    
+    <!-- Campo de email -->
+    <div class="form-group mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" name="email" 
+               placeholder="seu@email.com" required>
+    </div>
+    
+    <!-- Select -->
+    <div class="form-group mb-3">
+        <label for="curso" class="form-label">Curso</label>
+        <select class="form-select" id="curso" name="curso" required>
+            <option value="">Selecione um curso</option>
+            {% for curso in cursos %}
+                <option value="{{ curso.id }}">{{ curso.nome }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    
+    <!-- Buttons -->
+    <div class="d-grid gap-2 d-sm-flex">
+        <button type="submit" class="btn btn-primary flex-grow-1 flex-sm-grow-0">
+            <i class="fas fa-save me-2"></i>Salvar
+        </button>
+        <button type="reset" class="btn btn-secondary flex-grow-1 flex-sm-grow-0">
+            <i class="fas fa-undo me-2"></i>Limpar
+        </button>
+    </div>
+</form>
+
+
+{# ====================================================================== #}
+{# 6. TABELA RESPONSIVA #}
+{# ====================================================================== #}
+
+<div class="table-responsive">
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th class="d-none d-md-table-cell">Email</th>
+                <th class="d-none d-lg-table-cell">Curso</th>
+                <th class="text-center">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for aluno in alunos %}
+                <tr>
+                    <td>
+                        <strong>{{ aluno.nome }}</strong>
+                        <br>
+                        <small class="text-muted d-md-none">{{ aluno.email }}</small>
+                    </td>
+                    <td class="d-none d-md-table-cell">{{ aluno.email }}</td>
+                    <td class="d-none d-lg-table-cell">{{ aluno.curso.nome }}</td>
+                    <td class="text-center">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <a href="{% url 'editar_aluno' aluno.id %}" 
+                               class="btn btn-outline-primary touch-target">
+                                <i class="fas fa-edit"></i>
+                                <span class="d-none d-sm-inline ms-1">Editar</span>
+                            </a>
+                            <a href="{% url 'deletar_aluno' aluno.id %}" 
+                               class="btn btn-outline-danger touch-target">
+                                <i class="fas fa-trash"></i>
+                                <span class="d-none d-sm-inline ms-1">Deletar</span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{# ====================================================================== #}
+{# 7. MODAL FULLSCREEN EM MOBILE #}
+{# ====================================================================== #}
+
+<div class="modal fade" id="modalExemplo" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Título do Modal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Conteúdo do modal -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{# ====================================================================== #}
+{# 8. ALERTAS E BADGES #}
+{# ====================================================================== #}
+
+<!-- Alert de sucesso -->
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="fas fa-check-circle me-2"></i>
+    <strong>Sucesso!</strong> Operação realizada com sucesso.
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+
+<!-- Alert de erro -->
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-circle me-2"></i>
+    <strong>Erro!</strong> Ocorreu um erro ao processar.
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+
+<!-- Badge de status -->
+<span class="badge bg-success">Aprovado</span>
+<span class="badge bg-warning">Pendente</span>
+<span class="badge bg-danger">Rejeitado</span>
+
+
+{# ====================================================================== #}
+{# 9. GRID RESPONSIVO #}
+{# ====================================================================== #}
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- 100% em mobile, 50% em tablet, 33% em desktop -->
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">Coluna 1</div>
+            </div>
+        </div>
+        
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">Coluna 2</div>
+            </div>
+        </div>
+        
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">Coluna 3</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{# ====================================================================== #}
+{# 10. ELEMENTOS VISIBILIDADE POR TAMANHO #}
+{# ====================================================================== #}
+
+<!-- Mostrar apenas em mobile -->
+<div class="d-md-none">
+    <button class="btn btn-primary w-100">Menu Mobile</button>
+</div>
+
+<!-- Ocultar em mobile -->
+<div class="d-none d-md-block">
+    <div class="row">
+        <!-- Layout desktop -->
+    </div>
+</div>
+
+<!-- Classes customizadas -->
+<div class="d-only-mobile">Visível em mobile</div>
+<div class="d-none-mobile">Oculto em mobile</div>

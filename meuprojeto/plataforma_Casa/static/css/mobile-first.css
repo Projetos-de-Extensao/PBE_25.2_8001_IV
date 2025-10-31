@@ -529,6 +529,46 @@ footer a {
 }
 
 /* ================================================================================
+   IMAGENS E MÍDIA RESPONSIVA
+   ================================================================================ */
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+video, iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Aspect ratio containers */
+.ratio {
+    position: relative;
+    width: 100%;
+}
+
+.ratio::before {
+    display: block;
+    padding-bottom: var(--bs-aspect-ratio, calc(1 / 1 * 100%));
+    content: "";
+}
+
+.ratio > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* ================================================================================
    ANIMAÇÕES E TRANSIÇÕES
    ================================================================================ */
 
@@ -542,6 +582,33 @@ footer a {
         animation: none !important;
         transition: none !important;
     }
+}
+
+/* ================================================================================
+   ACESSIBILIDADE - FOCUS STYLES
+   ================================================================================ */
+
+/* Focus styles para navegação por teclado */
+button:focus, a:focus, input:focus, select:focus, textarea:focus {
+    outline: 2px solid var(--cor-amarelo-institucional);
+    outline-offset: 2px;
+}
+
+/* Skip link para acessibilidade */
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    z-index: 999;
+}
+
+.skip-link:focus {
+    left: 0;
+    top: 0;
+    position: fixed;
+    background-color: var(--cor-azul-escuro-principal);
+    color: var(--cor-branco);
+    padding: 1rem;
+    text-decoration: none;
 }
 
 /* Dark mode support (opcional) */
