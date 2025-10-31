@@ -459,6 +459,11 @@ class Command(BaseCommand):
             return
         
         for i, vaga in enumerate(vagas[:3]):
+            # Pular vagas sem disciplina
+            if not hasattr(vaga, 'disciplina') or not vaga.disciplina:
+                self.stdout.write(f"  ⚠️  Vaga '{vaga.nome}' sem disciplina associada - pulando")
+                continue
+                
             if not Turma.objects.filter(vaga=vaga).exists():
                 Turma.objects.create(
                     nome=f'Turma {vaga.disciplina.nome} - 2024.2',
