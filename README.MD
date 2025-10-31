@@ -27,7 +27,7 @@ Sistema web completo que digitaliza e automatiza todo o processo de monitoria ac
 
 | Nome | Função | GitHub |
 |------|--------|--------|
-| Anderson Lima | Backend, DevOps, FrontEND | [@anderson](https://github.com/anderson) |
+| Anderson Lima | Backend, DevOps, FrontEnd | [@anderson](https://github.com/anderson) |
 | João Pedro Campos | Full Stack, API | [@joao](https://github.com/joao) |
 | Bernardo Casanovas | Frontend, UX, analista de dados | [@bernardo](https://github.com/bernardo) |
 | Gabriel Caruzo | Database, Reports, DevOps, Scrum Master | [@gabriel](https://github.com/gabriel) |
