@@ -97,11 +97,17 @@ API REST completa para gerenciamento de monitoria acadêmica, incluindo:
 
 urlpatterns = [
     # ---------------------------------------------------------------------------
-    # DOCUMENTAÇÃO DA API (SWAGGER UI)
+    # DOCUMENTAÇÃO DA API (SWAGGER UI E REDOC)
     # ---------------------------------------------------------------------------
+    # Swagger UI - Documentação interativa
     path('restapi/', schema_view.with_ui('swagger', cache_timeout=0), name='api-docs'),
+    
+    # ReDoc - Documentação alternativa (mais bonita e limpa)
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='api-redoc'),
+    path('restapi/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='api-redoc-alt'),
+    
+    # Schema JSON/YAML
     re_path(r'^restapi/schema(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='api-schema'),
-    path('restapi/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='api-redoc'),
     
     # ---------------------------------------------------------------------------
     # ADMIN DO DJANGO
