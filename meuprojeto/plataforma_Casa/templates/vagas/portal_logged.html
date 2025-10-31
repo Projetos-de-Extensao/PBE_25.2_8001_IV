@@ -1,0 +1,1072 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Portal de Vagas - Monitoria{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ==================== MOBILE FIRST PORTAL STYLES ==================== */
+    :root {
+        --primary-blue: #002555;
+        --accent-yellow: #F5AC00;
+        --light-blue: #1245FF;
+        --text-dark: #2c3e50;
+        --text-medium: #7f8c8d;
+        --bg-light: #f8f9fa;
+    }
+    
+    /* Hero Section Mobile First */
+    .hero-section {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, #003a7a 100%);
+        color: white;
+        padding: 1rem 0;
+        margin: 0;
+    }
+    
+    @media (min-width: 768px) {
+        .hero-section {
+            padding: 2rem 0;
+        }
+    }
+    
+    @media (min-width: 1024px) {
+        .hero-section {
+            padding: 3rem 0;
+        }
+    }
+    
+    .hero-section h1 {
+        font-size: 1.25rem;
+        font-weight: 800;
+        margin-bottom: 3.5rem;
+        color: #f8f9fa;
+        text-align: center;
+        position: relative;
+        padding-bottom: 0;
+        margin-top: 3.5rem;
+    }
+    
+    .hero-section h1::after {
+        content: none;
+    }
+    
+    @media (min-width: 768px) {
+        .hero-section h1 {
+            font-size: 2rem;
+        }
+        
+        .hero-section h1::after {
+            width: 120px;
+        }
+    }
+    
+    @media (min-width: 1024px) {
+        .hero-section h1 {
+            font-size: 2.5rem;
+        }
+        
+        .hero-section h1::after {
+            width: 150px;
+            height: 4px;
+        }
+    }
+    
+    .hero-section p {
+        font-size: 0.85rem;
+        opacity: 0.95;
+        max-width: 600px;
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    @media (min-width: 768px) {
+        .hero-section p {
+            font-size: 1rem;
+        }
+    }
+    
+    .hero-stats {
+        display: flex;
+        gap: 0.35rem;
+        margin-top: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    @media (min-width: 768px) {
+        .hero-stats {
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+    }
+    
+    @media (min-width: 1024px) {
+        .hero-stats {
+            gap: 1.5rem;
+        }
+    }
+    
+    .stat-item {
+        text-align: center;
+        flex: 1;
+        min-width: 60px;
+    }
+    
+    .stat-number {
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--accent-yellow);
+        display: block;
+        line-height: 1;
+    }
+    
+    @media (min-width: 768px) {
+        .stat-number {
+            font-size: 1.6rem;
+        }
+    }
+    
+    .stat-label {
+        font-size: 0.55rem;
+        opacity: 0.9;
+        margin-top: 0.15rem;
+    }
+    
+    /* Filtros Mobile First */
+    .filter-section {
+        background: white;
+        border-radius: 12px;
+        padding: 0.7rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        margin-bottom: 0.75rem;
+        margin-top: -1rem;
+        position: relative;
+        z-index: 10;
+    }
+    
+    @media (min-width: 768px) {
+        .filter-section {
+            padding: 1rem;
+            border-radius: 14px;
+        }
+    }
+    
+    @media (min-width: 1024px) {
+        .filter-section {
+            padding: 1.25rem;
+            border-radius: 16px;
+            margin-bottom: 1.25rem;
+        }
+    }
+    
+    .filter-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        margin-bottom: 0.6rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    
+    @media (min-width: 768px) {
+        .filter-title {
+            font-size: 1rem;
+            margin-bottom: 0.85rem;
+        }
+    }
+    
+    .filter-title i {
+        color: var(--accent-yellow);
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.55rem 0.65rem;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        min-height: 38px;
+    }
+    
+    @media (min-width: 768px) {
+        .form-control, .form-select {
+            padding: 0.75rem 0.9rem;
+            font-size: 0.95rem;
+            min-height: 42px;
+        }
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.2rem rgba(0, 37, 85, 0.1);
+    }
+    
+    .btn-filter {
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 0.55rem 0.85rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        min-height: 38px;
+        font-size: 0.8rem;
+    }
+    
+    @media (min-width: 768px) {
+        .btn-filter {
+            padding: 0.75rem 1.25rem;
+            min-height: 42px;
+            font-size: 0.9rem;
+        }
+    }
+    
+    .btn-filter:hover {
+        background: #003a7a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.2);
+    }
+    
+    .btn-clear {
+        background: transparent;
+        color: var(--text-medium);
+        border: 2px solid #dee2e6;
+        padding: 0.55rem 0.65rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        min-height: 38px;
+    }
+    
+    @media (min-width: 768px) {
+        .btn-clear {
+            padding: 0.75rem 0.9rem;
+            min-height: 42px;
+        }
+    }
+    
+    .btn-clear:hover {
+        border-color: var(--text-medium);
+        color: var(--text-dark);
+    }
+    
+    /* Cards de Vagas Mobile First */
+    .vagas-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.6rem;
+        margin-bottom: 1.25rem;
+        padding: 0 0.15rem;
+    }
+    
+    @media (min-width: 768px) {
+        .vagas-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.85rem;
+            padding: 0;
+        }
+    }
+    
+    @media (min-width: 1200px) {
+        .vagas-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+    }
+    
+    .vaga-card {
+        background: white;
+        border-radius: 12px;
+        padding: 0.7rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 300px;
+    }
+    
+    @media (min-width: 768px) {
+        .vaga-card {
+            padding: 1rem;
+            border-radius: 14px;
+            min-height: 340px;
+        }
+    }
+    
+    @media (min-width: 1200px) {
+        .vaga-card {
+            min-height: 320px;
+        }
+    }
+    
+    .vaga-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-blue), var(--accent-yellow));
+    }
+    
+    .vaga-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0, 37, 85, 0.15);
+        border-color: var(--primary-blue);
+    }
+    
+    .vaga-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.6rem;
+        gap: 0.5rem;
+    }
+    
+    .vaga-header-badges {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        align-items: flex-end;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+    }
+    
+    .vaga-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        margin-bottom: 0.15rem;
+        line-height: 1.2;
+        word-break: break-word;
+    }
+    
+    @media (min-width: 768px) {
+        .vaga-title {
+            font-size: 1rem;
+        }
+    }
+    
+    .vaga-badge {
+        padding: 0.18rem 0.5rem;
+        border-radius: 16px;
+        font-size: 0.6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        flex-shrink: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+    
+    .badge-tea {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .badge-voluntaria {
+        background: #cce5ff;
+        color: #004085;
+    }
+    
+    .badge-vagas {
+        background: #fff3cd;
+        color: #856404;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    
+    .vaga-info {
+        margin: 0.35rem 0;
+        flex-grow: 0;
+        flex-shrink: 0;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-bottom: 0.35rem;
+        font-size: 0.75rem;
+        color: var(--text-medium);
+        line-height: 1.3;
+    }
+    
+    .info-item i {
+        color: var(--accent-yellow);
+        width: 14px;
+        text-align: center;
+        font-size: 0.75rem;
+        flex-shrink: 0;
+    }
+    
+    .vaga-description {
+        font-size: 0.75rem;
+        color: var(--text-medium);
+        line-height: 1.4;
+        margin-bottom: 0.4rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex-grow: 1;
+    }
+    
+    .vaga-footer {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        margin-top: auto;
+        padding-top: 0.5rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    @media (min-width: 768px) {
+        .vaga-footer {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    }
+    
+    .btn-candidatar {
+        background: var(--accent-yellow);
+        color: var(--primary-blue);
+        border: 2px solid var(--accent-yellow);
+        padding: 0.45rem 0.8rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.7rem;
+        transition: all 0.3s ease;
+        min-height: 36px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+        text-decoration: none;
+    }
+    
+    @media (min-width: 768px) {
+        .btn-candidatar {
+            width: auto;
+            flex: 1;
+            padding: 0.6rem 1rem;
+            font-size: 0.8rem;
+            min-height: 40px;
+        }
+    }
+    
+    .btn-candidatar:hover {
+        background: #ffc107;
+        border-color: #ffc107;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 172, 0, 0.3);
+        color: var(--primary-blue);
+    }
+    
+    .btn-ver-detalhes {
+        background: transparent;
+        color: var(--primary-blue);
+        border: 2px solid var(--primary-blue);
+        padding: 0.45rem 0.65rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.65rem;
+        transition: all 0.3s ease;
+        min-height: 36px;
+        width: 100%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+        text-decoration: none;
+    }
+    
+    @media (min-width: 768px) {
+        .btn-ver-detalhes {
+            width: auto;
+            padding: 0.6rem 0.9rem;
+            font-size: 0.75rem;
+            min-height: 40px;
+        }
+    }
+    
+    .btn-ver-detalhes:hover {
+        background: var(--primary-blue);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    /* Modal */
+    .modal {
+        z-index: 1050;
+    }
+    
+    .modal-backdrop {
+        z-index: 1040;
+    }
+    
+    .modal-dialog {
+        margin: 0.75rem auto;
+    }
+    
+    .modal-content {
+        border-radius: 14px;
+        border: none;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, #003a7a 100%);
+        color: white;
+        border: none;
+        padding: 0.875rem 1rem;
+    }
+    
+    .modal-title {
+        font-weight: 700;
+        font-size: 0.95rem;
+        margin: 0;
+        color: #f8f9fa;
+    }
+    
+    @media (min-width: 768px) {
+        .modal-title {
+            font-size: 1.25rem;
+        }
+    }
+    
+    .btn-close {
+        filter: brightness(0) invert(1);
+        opacity: 1;
+    }
+    
+    .modal-body {
+        padding: 0.875rem;
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+    }
+    
+    @media (min-width: 768px) {
+        .modal-body {
+            padding: 1.5rem;
+        }
+    }
+    
+    .detail-section {
+        margin-bottom: 0.875rem;
+        padding-bottom: 0.875rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .detail-section:last-of-type {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    
+    .detail-section h6 {
+        font-weight: 700;
+        color: var(--primary-blue);
+        margin-bottom: 0.65rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.9rem;
+    }
+    
+    .detail-section h6 i {
+        color: var(--accent-yellow);
+        font-size: 1rem;
+    }
+    
+    .detail-section p {
+        color: var(--text-medium);
+        line-height: 1.6;
+        margin-bottom: 0.35rem;
+        font-size: 0.85rem;
+    }
+    
+    .detail-section ul {
+        color: var(--text-medium);
+        line-height: 1.6;
+        margin-bottom: 0;
+        padding-left: 1.2rem;
+        font-size: 0.85rem;
+    }
+    
+    .detail-section ul li {
+        margin-bottom: 0.35rem;
+    }
+    
+    /* Badge dentro do modal (detalhes) */
+    .detail-section .vaga-badge {
+        display: inline-block;
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+    
+    .detail-section .badge-tea {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+    
+    .detail-section .badge-voluntaria {
+        background: linear-gradient(135deg, var(--light-blue) 0%, #0066ff 100%);
+        color: white;
+    }
+    
+    /* Empty State */
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 1.5rem 0.75rem;
+        color: var(--text-medium);
+    }
+    
+    .empty-state i {
+        font-size: 2.5rem;
+        color: var(--text-medium);
+        opacity: 0.3;
+        margin-bottom: 0.75rem;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.05rem;
+        color: var(--text-dark);
+        margin-bottom: 0.6rem;
+    }
+    
+    /* Touch Optimizations */
+    * {
+        -webkit-tap-highlight-color: rgba(18, 69, 255, 0.2);
+    }
+    
+    @media (hover: none) {
+        .btn-filter:active,
+        .btn-clear:active {
+            transform: scale(0.95);
+        }
+    }
+    
+    /* Prevenir zoom no iOS */
+    @supports (-webkit-touch-callout: none) {
+        input[type="text"],
+        input[type="search"],
+        select,
+        textarea {
+            font-size: 16px !important;
+        }
+    }
+    
+    /* Ajustes adicionais para mobile */
+    @media (max-width: 768px) {
+        /* Hero */
+        .hero-section {
+            padding: 1.5rem 0 !important;
+            margin-bottom: 2rem !important;
+        }
+        
+        .hero-section h1 {
+            font-size: 1.5rem !important;
+            margin-bottom: 0.75rem !important;
+            margin-top: 2.5rem !important;
+        }
+        
+        .hero-section p {
+            font-size: 0.85rem !important;
+        }
+        
+        .hero-stats {
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .stat-number {
+            font-size: 1.25rem !important;
+        }
+        
+        .stat-label {
+            font-size: 0.65rem !important;
+        }
+        
+        /* Filtros */
+        .filter-section {
+            padding: 0.85rem !important;
+            margin-bottom: 1rem !important;
+            margin-top: 1.5rem !important;
+        }
+        
+        .filter-title {
+            font-size: 0.9rem !important;
+            margin-bottom: 0.65rem !important;
+        }
+        
+        .form-label {
+            font-size: 0.8rem !important;
+            margin-bottom: 0.35rem !important;
+        }
+        
+        .form-control, .form-select {
+            padding: 0.6rem !important;
+            font-size: 0.85rem !important;
+            min-height: 40px !important;
+        }
+        
+        .btn-filter {
+            padding: 0.6rem 0.75rem !important;
+            font-size: 0.85rem !important;
+            min-height: 40px !important;
+        }
+        
+        /* Cards de vagas */
+        .vagas-grid {
+            gap: 0.75rem !important;
+        }
+        
+        .vaga-card {
+            padding: 0.85rem !important;
+            min-height: 280px !important;
+        }
+        
+        .vaga-title {
+            font-size: 0.95rem !important;
+        }
+        
+        .vaga-badge {
+            padding: 0.2rem 0.5rem !important;
+            font-size: 0.65rem !important;
+        }
+        
+        .info-item {
+            font-size: 0.8rem !important;
+            margin-bottom: 0.4rem !important;
+        }
+        
+        .info-item i {
+            font-size: 0.75rem !important;
+        }
+        
+        .vaga-description {
+            font-size: 0.8rem !important;
+        }
+        
+        .btn-candidatar {
+            padding: 0.55rem 0.75rem !important;
+            font-size: 0.8rem !important;
+            min-height: 38px !important;
+        }
+        
+        .btn-ver-detalhes {
+            padding: 0.55rem 0.75rem !important;
+            font-size: 0.75rem !important;
+            min-height: 38px !important;
+        }
+        
+        /* Modal */
+        .modal-title {
+            font-size: 1.1rem !important;
+        }
+        
+        .modal-body {
+            padding: 1rem !important;
+        }
+        
+        .detail-section h6 {
+            font-size: 0.9rem !important;
+        }
+        
+        .detail-section p,
+        .detail-section ul {
+            font-size: 0.85rem !important;
+        }
+        
+        /* Empty state */
+        .empty-state h3 {
+            font-size: 1.1rem !important;
+        }
+        
+        .empty-state p {
+            font-size: 0.85rem !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ==================== HERO SECTION ==================== -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center justify-content-center">
+            <div class="col-12">
+                <h1>Oportunidades de Monitoria</h1>
+                <p>Faça parte do programa de monitorias da Universidade Tiradentes e desenvolva suas habilidades acadêmicas.</p>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">{{ total_vagas }}</span>
+                        <span class="stat-label">Vagas Disponíveis</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ total_cursos }}</span>
+                        <span class="stat-label">Cursos Atendidos</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ total_disciplinas }}</span>
+                        <span class="stat-label">Disciplinas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== FILTROS ==================== -->
+<div class="container">
+    <div class="filter-section">
+        <h2 class="filter-title">
+            <i class="fas fa-filter"></i>
+            Filtrar Vagas
+        </h2>
+        
+        <form method="GET" action="{% url 'portal_vagas' %}">
+            <div class="row g-3">
+                <div class="col-12 col-md-4">
+                    <label class="form-label fw-semibold">Pesquisar</label>
+                    <input type="search" 
+                           class="form-control" 
+                           name="busca" 
+                           placeholder="Nome da disciplina..."
+                           value="{{ request.GET.busca }}"
+                           autocomplete="off">
+                </div>
+                
+                <div class="col-12 col-md-3">
+                    <label class="form-label fw-semibold">Curso</label>
+                    <select class="form-select" name="curso">
+                        <option value="">Todos os cursos</option>
+                        {% for curso in cursos %}
+                            <option value="{{ curso.id }}" {% if request.GET.curso == curso.id|stringformat:"s" %}selected{% endif %}>
+                                {{ curso.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-12 col-md-3">
+                    <label class="form-label fw-semibold">Tipo de Vaga</label>
+                    <select class="form-select" name="tipo">
+                        <option value="">Todos os tipos</option>
+                        <option value="TEA" {% if request.GET.tipo == 'TEA' %}selected{% endif %}>TEA - Remunerada</option>
+                        <option value="Voluntaria" {% if request.GET.tipo == 'Voluntaria' %}selected{% endif %}>Voluntária</option>
+                    </select>
+                </div>
+                
+                <div class="col-12 col-md-2">
+                    <label class="form-label fw-semibold d-none d-md-block">&nbsp;</label>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-filter flex-grow-1">
+                            <i class="fas fa-search me-1"></i> 
+                            <span class="d-none d-sm-inline">Buscar</span>
+                            <span class="d-inline d-sm-none">OK</span>
+                        </button>
+                        <a href="{% url 'portal_vagas' %}" class="btn btn-clear" title="Limpar filtros">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==================== LISTA DE VAGAS ==================== -->
+<div class="container">
+    {% if vagas %}
+        <div class="vagas-grid">
+            {% for vaga in vagas %}
+            <div class="vaga-card">
+                <div class="vaga-header">
+                    <div>
+                        <h3 class="vaga-title">{{ vaga.disciplina.nome }}</h3>
+                        <p class="text-muted mb-0" style="font-size: 0.85rem;">{{ vaga.disciplina.codigo }}</p>
+                    </div>
+                    <div class="vaga-header-badges">
+                        <span class="vaga-badge {% if vaga.tipo_vaga == 'TEA' %}badge-tea{% else %}badge-voluntaria{% endif %}">
+                            {{ vaga.get_tipo_vaga_display }}
+                        </span>
+                        <span class="vaga-badge badge-vagas">
+                            <i class="fas fa-users"></i>
+                            <span>{{ vaga.numero_vagas }} vaga{% if vaga.numero_vagas != 1 %}s{% endif %}</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="vaga-info">
+                    <div class="info-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>{{ vaga.curso.nome }}</span>
+                    </div>
+                    
+                    {% if vaga.tipo_vaga == 'TEA' and vaga.valor_bolsa %}
+                        <div class="info-item">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>Bolsa: R$ {{ vaga.valor_bolsa }}</span>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="info-item">
+                        <i class="fas fa-user-tie"></i>
+                        <span>
+                            {% for coord in vaga.coordenadores.all %}
+                                {{ coord.nome }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="vaga-description">
+                    {{ vaga.descricao|truncatewords:20 }}
+                </div>
+                
+                <div class="vaga-footer">
+                    <a href="{% url 'candidatar_vaga' vaga.id %}" class="btn-candidatar">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Candidatar-se</span>
+                    </a>
+                    <button class="btn btn-ver-detalhes" onclick="verDetalhes({{ vaga.id }})" type="button">
+                        <i class="fas fa-info-circle"></i>
+                        Detalhes
+                    </button>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h3>Nenhuma vaga encontrada</h3>
+            <p>Não há vagas disponíveis no momento com os filtros selecionados.</p>
+            <a href="{% url 'portal_vagas' %}" class="btn btn-filter mt-3">
+                <i class="fas fa-redo me-1"></i> Limpar Filtros
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Modal Detalhes da Vaga -->
+<div class="modal fade" id="modalDetalhes" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Detalhes da Vaga</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function verDetalhes(vagaId) {
+    const modal = new bootstrap.Modal(document.getElementById('modalDetalhes'));
+    const modalBody = document.getElementById('modalBody');
+    const modalTitle = document.getElementById('modalTitle');
+    
+    modalBody.innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+        </div>
+    `;
+    
+    modal.show();
+    
+    fetch(`/api/vagas/${vagaId}/detalhes/`)
+        .then(response => response.json())
+        .then(data => {
+            modalTitle.textContent = data.disciplina_nome;
+            
+            modalBody.innerHTML = `
+                <div class="detail-section">
+                    <h6><i class="fas fa-info-circle"></i> Informações Gerais</h6>
+                    <p><strong>Disciplina:</strong> ${data.disciplina_nome} (${data.disciplina_codigo})</p>
+                    <p><strong>Curso:</strong> ${data.curso_nome}</p>
+                    <p><strong>Tipo:</strong> 
+                        <span class="vaga-badge ${data.tipo_vaga === 'TEA' ? 'badge-tea' : 'badge-voluntaria'}">
+                            ${data.tipo_vaga_display}
+                        </span>
+                    </p>
+                    ${data.valor_bolsa ? `<p><strong>Valor da Bolsa:</strong> R$ ${data.valor_bolsa}</p>` : ''}
+                    <p><strong>Número de Vagas:</strong> ${data.numero_vagas}</p>
+                </div>
+                
+                <div class="detail-section">
+                    <h6><i class="fas fa-align-left"></i> Descrição</h6>
+                    <p>${data.descricao}</p>
+                </div>
+                
+                ${data.requisitos ? `
+                    <div class="detail-section">
+                        <h6><i class="fas fa-check-circle"></i> Requisitos</h6>
+                        <p>${data.requisitos}</p>
+                    </div>
+                ` : ''}
+                
+                ${data.coordenadores && data.coordenadores.length > 0 ? `
+                    <div class="detail-section">
+                        <h6><i class="fas fa-user-tie"></i> Coordenadores</h6>
+                        <ul>
+                            ${data.coordenadores.map(coord => `<li>${coord.nome} - ${coord.email}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+                
+                <div class="d-grid gap-2 mt-4">
+                    <a href="#" id="btnCandidatarModal" class="btn btn-filter btn-lg">
+                        <i class="fas fa-paper-plane me-2"></i> Candidatar-se
+                    </a>
+                </div>
+            `;
+            
+            // Atualizar href do botão candidatar
+            document.getElementById('btnCandidatarModal').href = `/vagas/${vagaId}/candidatar/`;
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            modalBody.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Erro ao carregar detalhes da vaga. Tente novamente.
+                </div>
+            `;
+        });
+}
+</script>
+{% endblock %}

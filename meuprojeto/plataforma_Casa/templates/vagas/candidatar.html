@@ -371,15 +371,15 @@
                             {% endif %}
                         </div>
 
-                        <!-- Documentos Obrigatórios -->
+                        <!-- Documentos -->
                         <div class="documents-section">
                             <h5 class="section-title">
-                                <i class="fas fa-file-upload"></i> Documentos Obrigatórios
+                                <i class="fas fa-file-upload"></i> Envio de Documentos
                             </h5>
                             
                             <div class="upload-info">
                                 <i class="fas fa-info-circle"></i> 
-                                Por favor, envie os documentos nos formatos PDF, DOC ou DOCX
+                                <strong>Histórico Escolar é obrigatório.</strong> Os demais documentos são opcionais mas recomendados. Formatos aceitos: PDF, DOC ou DOCX
                             </div>
 
                             <!-- Histórico Escolar -->
@@ -400,39 +400,37 @@
                                 </small>
                             </div>
 
-                            <!-- Currículo -->
+                            <!-- Currículo (Opcional) -->
                             <div class="form-group-upload">
                                 <label for="documento_curriculo" class="form-label">
                                     <i class="fas fa-file-alt"></i> 
                                     Currículo 
-                                    <span class="required">*</span>
+                                    <span style="color: #6c757d; font-size: 0.85rem;">(Opcional)</span>
                                 </label>
                                 <input type="file" 
                                        class="form-control" 
                                        id="documento_curriculo" 
                                        name="documento_currículo" 
-                                       accept=".pdf,.doc,.docx"
-                                       required>
+                                       accept=".pdf,.doc,.docx">
                                 <small class="form-text">
-                                    Envie seu currículo atualizado
+                                    Envie seu currículo atualizado (opcional)
                                 </small>
                             </div>
 
-                            <!-- Carta de Motivação -->
+                            <!-- Carta de Motivação (Opcional) -->
                             <div class="form-group-upload">
                                 <label for="documento_carta_de_motivacao" class="form-label">
                                     <i class="fas fa-envelope"></i> 
                                     Carta de Motivação 
-                                    <span class="required">*</span>
+                                    <span style="color: #6c757d; font-size: 0.85rem;">(Opcional)</span>
                                 </label>
                                 <input type="file" 
                                        class="form-control" 
                                        id="documento_carta_de_motivacao" 
                                        name="documento_carta_de_motivação" 
-                                       accept=".pdf,.doc,.docx"
-                                       required>
+                                       accept=".pdf,.doc,.docx">
                                 <small class="form-text">
-                                    Explique sua motivação para ser monitor desta disciplina
+                                    Explique sua motivação para ser monitor desta disciplina (opcional)
                                 </small>
                             </div>
                         </div>
@@ -470,23 +468,15 @@
 
 {% block extra_js %}
 <script>
-// Validação adicional de arquivos
+// Validação adicional de documentos obrigatórios
 document.querySelector('form').addEventListener('submit', function(e) {
-    const fileInputs = document.querySelectorAll('input[type="file"]');
-    let hasFiles = true;
-    let missingFiles = [];
+    // Verificar apenas o documento obrigatório: Histórico Escolar
+    const historicoInput = document.getElementById('documento_historico_escolar');
     
-    fileInputs.forEach(input => {
-        if (!input.files || input.files.length === 0) {
-            hasFiles = false;
-            const label = input.previousElementSibling.textContent.trim();
-            missingFiles.push(label);
-        }
-    });
-    
-    if (!hasFiles) {
+    if (!historicoInput.files || historicoInput.files.length === 0) {
         e.preventDefault();
-        alert('Por favor, envie todos os documentos obrigatórios:\n\n' + missingFiles.join('\n'));
+        alert('❌ Por favor, envie o Histórico Escolar (obrigatório)!');
+        historicoInput.focus();
         return false;
     }
     
@@ -494,7 +484,17 @@ document.querySelector('form').addEventListener('submit', function(e) {
     const termo = document.getElementById('termo');
     if (!termo.checked) {
         e.preventDefault();
-        alert('Por favor, aceite os termos e responsabilidades da vaga!');
+        alert('❌ Por favor, aceite os termos e responsabilidades da vaga!');
+        termo.focus();
+        return false;
+    }
+    
+    // Confirmação antes de enviar
+    if (!confirm('✅ Confirma o envio da candidatura?\n\nDocumentos anexados:\n' +
+                 '• Histórico Escolar: ' + historicoInput.files[0].name +
+                 (document.getElementById('documento_curriculo').files.length > 0 ? '\n• Currículo: ' + document.getElementById('documento_curriculo').files[0].name : '') +
+                 (document.getElementById('documento_carta_de_motivacao').files.length > 0 ? '\n• Carta de Motivação: ' + document.getElementById('documento_carta_de_motivacao').files[0].name : ''))) {
+        e.preventDefault();
         return false;
     }
 });
@@ -504,11 +504,35 @@ document.querySelectorAll('input[type="file"]').forEach(input => {
     input.addEventListener('change', function() {
         const parent = this.closest('.form-group-upload');
         if (this.files && this.files.length > 0) {
-            parent.style.borderColor = '#1245FF';
-            parent.style.backgroundColor = 'rgba(18, 69, 255, 0.05)';
+            parent.style.borderColor = '#28a745';
+            parent.style.backgroundColor = 'rgba(40, 167, 69, 0.05)';
+            
+            // Mostrar nome do arquivo selecionado
+            let fileName = this.files[0].name;
+            let small = parent.querySelector('.form-text');
+            small.innerHTML = `<i class="fas fa-check-circle text-success"></i> Arquivo selecionado: <strong>${fileName}</strong>`;
+            small.style.color = '#28a745';
         } else {
             parent.style.borderColor = '';
             parent.style.backgroundColor = '';
+        }
+    });
+});
+
+// Validar tamanho dos arquivos (máximo 5MB)
+document.querySelectorAll('input[type="file"]').forEach(input => {
+    input.addEventListener('change', function() {
+        if (this.files && this.files.length > 0) {
+            const file = this.files[0];
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            
+            if (file.size > maxSize) {
+                alert('❌ O arquivo ' + file.name + ' é muito grande!\n\nTamanho máximo: 5MB\nTamanho do arquivo: ' + (file.size / 1024 / 1024).toFixed(2) + ' MB');
+                this.value = '';
+                const parent = this.closest('.form-group-upload');
+                parent.style.borderColor = '#dc3545';
+                parent.style.backgroundColor = 'rgba(220, 53, 69, 0.05)';
+            }
         }
     });
 });

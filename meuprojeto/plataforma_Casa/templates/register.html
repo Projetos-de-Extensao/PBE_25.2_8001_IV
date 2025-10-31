@@ -444,23 +444,120 @@
          * ========================================================================
          * RESPONSIVIDADE - MOBILE
          * ========================================================================
-         * Ajustes para telas menores (<600px)
+         * Ajustes para telas menores (<768px)
          */
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+            
             .register-container {
-                margin: 1rem;
+                padding: 1.25rem;
                 max-width: 100%;
-                padding: 1.5rem;
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            }
+            
+            .register-header {
+                margin-bottom: 1.25rem;
+            }
+            
+            .register-header i {
+                font-size: 2rem;
+                margin-bottom: 0.75rem;
             }
             
             .register-header h1 {
-                font-size: 1.5rem;
+                font-size: 1.35rem;
+                margin-bottom: 0.35rem;
+            }
+            
+            .register-header p {
+                font-size: 0.8rem;
+            }
+            
+            .form-group {
+                margin-bottom: 1rem;
+            }
+            
+            .form-group label {
+                font-size: 0.85rem;
+                margin-bottom: 0.35rem;
+            }
+            
+            .form-group input,
+            .form-group select {
+                padding: 0.65rem 0.85rem;
+                font-size: 0.875rem;
+                border-radius: 6px;
+            }
+            
+            .input-icon {
+                font-size: 0.875rem;
+                width: 35px;
+            }
+            
+            .input-group input,
+            .input-group select {
+                padding-left: 2.25rem;
+            }
+            
+            .password-toggle {
+                width: 35px;
+                font-size: 0.875rem;
+            }
+            
+            .input-group.password-field input {
+                padding-right: 2.25rem;
             }
             
             /* Em mobile, campos lado a lado viram uma coluna */
             .form-row {
                 grid-template-columns: 1fr;
                 gap: 0;
+            }
+            
+            .register-btn {
+                padding: 0.7rem 0.85rem;
+                font-size: 0.9rem;
+                margin-top: 0.75rem;
+            }
+            
+            .password-requirements {
+                font-size: 0.75rem;
+                padding: 0.65rem;
+                margin-top: 0.4rem;
+            }
+            
+            .requirement {
+                font-size: 0.75rem;
+                padding: 0.25rem 0;
+            }
+            
+            .terms-checkbox {
+                font-size: 0.8rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .terms-checkbox label {
+                font-size: 0.8rem;
+            }
+            
+            .register-footer {
+                margin-top: 1.25rem;
+                padding-top: 1.25rem;
+                font-size: 0.85rem;
+            }
+            
+            .register-footer .btn {
+                padding: 0.65rem 0.85rem !important;
+                font-size: 0.875rem !important;
+            }
+            
+            .alert {
+                font-size: 0.85rem;
+                padding: 0.65rem;
+                margin-bottom: 1rem;
             }
         }
     </style>
@@ -810,6 +907,27 @@
             Para usuários que já possuem conta
         -->
         <div class="register-footer">
+            <!-- Botão para ver vagas sem registro -->
+            <a href="{% url 'portal_vagas' %}" class="btn" style="
+                width: 100%;
+                padding: 0.75rem 1rem;
+                background: transparent;
+                color: #002555;
+                border: 2px solid #002555;
+                border-radius: 8px;
+                font-size: 0.95rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                margin-bottom: 1.5rem;
+                display: inline-block;
+                text-decoration: none;
+                text-align: center;
+            " onmouseover="this.style.background='#002555'; this.style.color='white';" 
+               onmouseout="this.style.background='transparent'; this.style.color='#002555';">
+                <i class="fas fa-briefcase"></i> Ver Vagas Disponíveis
+            </a>
+            
             <p>
                 Já tem conta?
                 <a href="{% url 'login' %}">

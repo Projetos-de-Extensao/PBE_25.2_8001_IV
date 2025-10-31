@@ -52,9 +52,9 @@
     ====================================================================
     CONTAINER PRINCIPAL DA PÁGINA DE PERFIL
     ====================================================================
-    Espaçamento vertical (mt-4 mb-5) para criar distância visual
+    Espaçamento vertical para criar distância visual e evitar sobreposição do header
 -->
-<div class="container mt-4 mb-5">
+<div class="container perfil-container">
     
     <!--
         ====================================================================
@@ -390,6 +390,18 @@
  * Componentes visuais para página de gerenciamento de perfil
  * Utiliza variáveis CSS e utility classes do Bootstrap
  */
+
+/* 
+ * ========================================================================
+ * CONTAINER PRINCIPAL
+ * ========================================================================
+ * Espaçamento adequado para evitar sobreposição do header fixo
+ */
+.perfil-container {
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+    margin-top: 0;
+}
 
 /* 
  * ========================================================================
@@ -837,6 +849,11 @@
  * ========================================================================
  */
 @media (max-width: 768px) {
+    .perfil-container {
+        padding-top: 2.5rem;    /* Aumentado para compensar header no mobile */
+        padding-bottom: 2rem;
+    }
+    
     .perfil-title {
         font-size: 1.5rem;
     }
@@ -844,10 +861,15 @@
     .profile-avatar-large {
         width: 100px;
         height: 100px;
+        margin-top: 1rem;       /* Espaço extra acima do avatar */
     }
     
     .profile-avatar-large i {
         font-size: 50px;
+    }
+    
+    .text-center.mb-5 {
+        margin-bottom: 2rem !important;
     }
     
     .form-actions {

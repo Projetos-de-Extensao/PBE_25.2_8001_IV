@@ -31,39 +31,39 @@ body {
  * ============================================================================
  */
 
-/* Escalas de tamanho otimizadas para mobile */
+/* Escalas de tamanho otimizadas para mobile - REDUZIDAS para melhor visualização */
 h1, .h1 {
-    font-size: 1.75rem; /* 28px */
+    font-size: 1.5rem; /* 24px - reduzido de 28px */
     line-height: 1.2;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem; /* reduzido de 1rem */
 }
 
 h2, .h2 {
-    font-size: 1.5rem; /* 24px */
+    font-size: 1.25rem; /* 20px - reduzido de 24px */
     line-height: 1.3;
-    margin-bottom: 0.875rem;
+    margin-bottom: 0.625rem; /* reduzido de 0.875rem */
 }
 
 h3, .h3 {
-    font-size: 1.25rem; /* 20px */
+    font-size: 1.125rem; /* 18px - reduzido de 20px */
     line-height: 1.4;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem; /* reduzido de 0.75rem */
 }
 
 h4, .h4 {
-    font-size: 1.125rem; /* 18px */
+    font-size: 1rem; /* 16px - reduzido de 18px */
     line-height: 1.4;
-    margin-bottom: 0.625rem;
+    margin-bottom: 0.5rem; /* reduzido de 0.625rem */
 }
 
 p, .text-body {
-    font-size: 0.9375rem; /* 15px */
-    line-height: 1.6;
-    margin-bottom: 1rem;
+    font-size: 0.875rem; /* 14px - reduzido de 15px */
+    line-height: 1.5; /* reduzido de 1.6 */
+    margin-bottom: 0.75rem; /* reduzido de 1rem */
 }
 
 small, .text-small {
-    font-size: 0.875rem; /* 14px */
+    font-size: 0.8125rem; /* 13px - reduzido de 14px */
 }
 
 /* ============================================================================
@@ -125,39 +125,39 @@ small, .text-small {
     display: block;
 }
 
-/* Main content sem margin no mobile */
+/* Main content sem margin no mobile - padding reduzido para mobile */
 .main-content {
     margin-left: 0 !important;
-    padding: 1rem;
+    padding: 0.75rem; /* reduzido de 1rem */
     width: 100%;
     max-width: 100%;
     min-height: calc(100vh - 56px);
 }
 
 /* ============================================================================
- * CARDS MOBILE - Componentes Responsivos
+ * CARDS MOBILE - Componentes Responsivos - OTIMIZADO PARA MOBILE
  * ============================================================================
  */
 
 .card {
-    margin-bottom: 1rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0.75rem; /* reduzido de 1rem */
+    border-radius: 0.5rem; /* reduzido de 0.75rem */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); /* sombra mais sutil */
     overflow: hidden;
 }
 
 .card-header {
-    padding: 1rem;
-    font-size: 1.125rem;
+    padding: 0.75rem; /* reduzido de 1rem */
+    font-size: 1rem; /* reduzido de 1.125rem */
     font-weight: 600;
 }
 
 .card-body {
-    padding: 1rem;
+    padding: 0.75rem; /* reduzido de 1rem */
 }
 
 .card-footer {
-    padding: 0.75rem 1rem;
+    padding: 0.625rem 0.75rem; /* reduzido de 0.75rem 1rem */
 }
 
 /* Cards em lista - stack vertical */
@@ -167,45 +167,45 @@ small, .text-small {
 }
 
 /* ============================================================================
- * FORMULÁRIOS MOBILE - Touch-Friendly
+ * FORMULÁRIOS MOBILE - Touch-Friendly - OTIMIZADO PARA MOBILE
  * ============================================================================
  */
 
-/* Inputs maiores para facilitar toque */
+/* Inputs otimizados para mobile */
 .form-control,
 .form-select {
-    font-size: 1rem;
-    padding: 0.75rem 1rem;
-    min-height: 44px; /* iOS touch target minimum */
-    border-radius: 0.5rem;
+    font-size: 0.9375rem; /* reduzido de 1rem */
+    padding: 0.625rem 0.75rem; /* reduzido de 0.75rem 1rem */
+    min-height: 42px; /* reduzido de 44px */
+    border-radius: 0.375rem; /* reduzido de 0.5rem */
 }
 
 .form-label {
-    font-size: 0.9375rem;
+    font-size: 0.875rem; /* reduzido de 0.9375rem */
     font-weight: 600;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.375rem; /* reduzido de 0.5rem */
 }
 
-/* Botões touch-friendly */
+/* Botões touch-friendly otimizados */
 .btn {
-    font-size: 1rem;
-    padding: 0.75rem 1.5rem;
-    min-height: 44px;
-    border-radius: 0.5rem;
+    font-size: 0.9375rem; /* reduzido de 1rem */
+    padding: 0.625rem 1.125rem; /* reduzido de 0.75rem 1.5rem */
+    min-height: 42px; /* reduzido de 44px */
+    border-radius: 0.375rem; /* reduzido de 0.5rem */
     font-weight: 600;
     transition: all 0.2s ease;
 }
 
 .btn-sm {
-    font-size: 0.875rem;
-    padding: 0.5rem 1rem;
-    min-height: 38px;
+    font-size: 0.8125rem; /* reduzido de 0.875rem */
+    padding: 0.5rem 0.875rem; /* reduzido de 0.5rem 1rem */
+    min-height: 36px; /* reduzido de 38px */
 }
 
 .btn-lg {
-    font-size: 1.125rem;
-    padding: 1rem 2rem;
-    min-height: 50px;
+    font-size: 1rem; /* reduzido de 1.125rem */
+    padding: 0.875rem 1.75rem; /* reduzido de 1rem 2rem */
+    min-height: 46px; /* reduzido de 50px */
 }
 
 /* Botões full-width em mobile */
@@ -267,14 +267,14 @@ small, .text-small {
 }
 
 /* ============================================================================
- * BADGES E STATUS - Otimizados para Mobile
+ * BADGES E STATUS - Otimizados para Mobile - TAMANHOS REDUZIDOS
  * ============================================================================
  */
 
 .badge {
-    font-size: 0.75rem;
-    padding: 0.375rem 0.75rem;
-    border-radius: 0.375rem;
+    font-size: 0.6875rem; /* reduzido de 0.75rem */
+    padding: 0.3125rem 0.625rem; /* reduzido de 0.375rem 0.75rem */
+    border-radius: 0.3125rem; /* reduzido de 0.375rem */
     font-weight: 600;
 }
 
@@ -396,6 +396,119 @@ img {
 /* Mostrar apenas em mobile */
 .d-mobile-only {
     display: block !important;
+}
+
+/* ============================================================================
+ * OTIMIZAÇÕES ADICIONAIS PARA MOBILE - Reduzir tamanhos gerais
+ * ============================================================================
+ */
+
+/* Container geral otimizado para mobile */
+.container,
+.container-fluid {
+    padding-left: 0.625rem !important; /* reduzido */
+    padding-right: 0.625rem !important; /* reduzido */
+}
+
+/* Títulos de página menores no mobile */
+.page-title h1,
+.dashboard-title,
+.vagas-title,
+.monitorias-title {
+    font-size: 1.375rem !important; /* máximo para mobile */
+    margin-bottom: 0.625rem !important;
+}
+
+/* Subtítulos menores */
+.page-subtitle,
+.dashboard-subtitle,
+.vagas-subtitle,
+.monitorias-subtitle {
+    font-size: 0.8125rem !important;
+    margin-bottom: 0.75rem !important;
+}
+
+/* Info cards menores no mobile */
+.info-card,
+.stat-card,
+.dashboard-card {
+    padding: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+}
+
+.stat-number,
+.info-number {
+    font-size: 1.5rem !important; /* reduzido */
+}
+
+.stat-label,
+.info-label {
+    font-size: 0.75rem !important;
+}
+
+/* Tabelas menores no mobile */
+.table {
+    font-size: 0.8125rem !important; /* ainda menor */
+}
+
+.table th,
+.table td {
+    padding: 0.5rem 0.375rem !important; /* reduzido */
+}
+
+/* Modais menores no mobile */
+.modal-header {
+    padding: 0.75rem !important;
+}
+
+.modal-body {
+    padding: 0.75rem !important;
+    font-size: 0.875rem !important;
+}
+
+.modal-footer {
+    padding: 0.625rem 0.75rem !important;
+}
+
+.modal-title {
+    font-size: 1.125rem !important;
+}
+
+/* Alerts menores */
+.alert {
+    padding: 0.625rem 0.75rem !important;
+    font-size: 0.8125rem !important;
+    margin-bottom: 0.75rem !important;
+}
+
+/* Listas menores */
+.list-group-item {
+    padding: 0.625rem 0.75rem !important;
+    font-size: 0.875rem !important;
+}
+
+/* Breadcrumbs menores */
+.breadcrumb {
+    font-size: 0.8125rem !important;
+    padding: 0.5rem 0 !important;
+    margin-bottom: 0.75rem !important;
+}
+
+/* Nav tabs menores */
+.nav-tabs .nav-link {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.875rem !important;
+}
+
+/* Accordion menores */
+.accordion-button {
+    padding: 0.75rem !important;
+    font-size: 0.9375rem !important;
+}
+
+.accordion-body {
+    padding: 0.75rem !important;
+    font-size: 0.875rem !important;
 }
 
 /* ============================================================================

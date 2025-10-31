@@ -12,7 +12,14 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
+        gap: 1rem;
         margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .page-header-info {
+        flex: 1;
+        min-width: 0;
     }
     
     .page-header h1 {
@@ -20,12 +27,14 @@
         font-weight: 600;
         color: #002555;
         margin: 0 0 0.5rem 0;
+        line-height: 1.3;
     }
     
     .page-header p {
         color: #6c757d;
         font-size: 0.875rem;
         margin: 0;
+        line-height: 1.5;
     }
     
     .breadcrumb {
@@ -52,7 +61,7 @@
     
     /* Botão Voltar */
     .btn-voltar {
-        background: #6c757d;
+        background: #002555;
         color: white;
         border: none;
         border-radius: 8px;
@@ -61,15 +70,24 @@
         font-size: 0.875rem;
         transition: all 0.3s ease;
         text-decoration: none;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+        height: fit-content;
+        flex-shrink: 0;
     }
     
     .btn-voltar:hover {
-        background: #5a6268;
+        background: #003d7a;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.25);
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.25);
         color: white;
         text-decoration: none;
+    }
+    
+    .btn-voltar i {
+        font-size: 0.875rem;
     }
     
     /* Cards de Estatísticas */
@@ -588,6 +606,141 @@
         from { transform: rotate(0deg); }
         to { transform: rotate(360deg); }
     }
+    
+    /* Responsividade Mobile */
+    @media (max-width: 768px) {
+        .page-header-top {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .page-header-info {
+            order: 1;
+        }
+        
+        .page-header h1 {
+            font-size: 1.25rem;
+        }
+        
+        .page-header p {
+            font-size: 0.8125rem;
+        }
+        
+        .btn-voltar {
+            order: 2;
+            width: 100%;
+            justify-content: center;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+        }
+        
+        .btn-voltar i {
+            font-size: 0.875rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            padding: 0.875rem;
+            border-left-width: 3px;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.6875rem;
+        }
+        
+        .candidatos-header {
+            padding: 1rem;
+            font-size: 0.9375rem;
+        }
+        
+        .candidatos-list {
+            padding: 1rem;
+        }
+        
+        .candidato-card {
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+        }
+        
+        .candidato-info h3 {
+            font-size: 1rem;
+        }
+        
+        .candidato-info p {
+            font-size: 0.8125rem;
+        }
+        
+        .candidato-status {
+            padding: 0.5rem 1rem;
+            font-size: 0.6875rem;
+        }
+        
+        .candidato-details {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        
+        .detail-item {
+            font-size: 0.8125rem;
+        }
+        
+        .candidato-actions {
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+        
+        .btn-action {
+            width: 100%;
+            padding: 0.625rem 1rem;
+            font-size: 0.8125rem;
+            justify-content: center;
+        }
+        
+        .empty-state {
+            padding: 3rem 1.5rem;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.125rem;
+        }
+        
+        .empty-state p {
+            font-size: 0.875rem;
+        }
+        
+        .status-modal {
+            max-width: 280px;
+            padding: 1.5rem;
+        }
+        
+        .status-modal-header h3 {
+            font-size: 0.9375rem;
+        }
+        
+        .status-modal-header p {
+            font-size: 0.75rem;
+        }
+        
+        .status-option {
+            padding: 0.75rem 0.875rem;
+            font-size: 0.875rem;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -602,7 +755,7 @@
 
 <div class="page-header">
     <div class="page-header-top">
-        <div>
+        <div class="page-header-info">
             <h1>{{ vaga.nome }}</h1>
             <p>{{ vaga.curso.nome }} • Coordenadores: 
                 {% for coord in vaga.coordenadores.all %}
@@ -613,7 +766,8 @@
             </p>
         </div>
         <a href="{% url 'listar_vagas' %}" class="btn-voltar">
-            <i class="fas fa-arrow-left"></i> Voltar
+            <i class="fas fa-arrow-left"></i>
+            <span>Voltar</span>
         </a>
     </div>
 </div>

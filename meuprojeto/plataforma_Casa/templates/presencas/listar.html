@@ -1,6 +1,102 @@
 {% extends 'base.html' %}
 {% block title %}Presenças - Plataforma Casa{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Mobile cards - hidden on desktop */
+    .mobile-cards {
+        display: none;
+    }
+    
+    @media (max-width: 768px) {
+        .desktop-table {
+            display: none !important;
+        }
+        
+        .mobile-cards {
+            display: block;
+        }
+        
+        .presenca-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 37, 85, 0.08);
+            border: 1px solid rgba(0, 37, 85, 0.06);
+        }
+        
+        .presenca-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .presenca-card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #002555;
+            margin: 0 0 0.25rem 0;
+        }
+        
+        .presenca-card-subtitle {
+            font-size: 0.8125rem;
+            color: #6c757d;
+            margin: 0;
+        }
+        
+        .presenca-card-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            color: #002555;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-value {
+            font-size: 0.875rem;
+            color: #495057;
+        }
+        
+        .presenca-card-actions {
+            padding-top: 0.75rem;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .mobile-action-btn {
+            width: 100%;
+            padding: 0.625rem;
+            font-size: 0.875rem;
+            border-radius: 6px;
+        }
+        
+        .page-title {
+            padding-top: 2.5rem;
+        }
+        
+        .page-title h1 {
+            font-size: 1.25rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -52,7 +148,8 @@
 
 <div class="card">
     <div class="card-body">
-        <div class="table-responsive">
+        <!-- Desktop Table -->
+        <div class="table-responsive desktop-table">
             <table class="table table-hover">
                 <thead>
                     <tr>
@@ -95,6 +192,49 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="mobile-cards">
+            {% for presenca in presencas %}
+                <div class="presenca-card">
+                    <div class="presenca-card-header">
+                        <div>
+                            <div class="presenca-card-title">{{ presenca.aluno.nome }}</div>
+                            <div class="presenca-card-subtitle">{{ presenca.turma.nome }}</div>
+                        </div>
+                        <span class="badge {% if presenca.presente %}status-active{% else %}status-inactive{% endif %}">
+                            {% if presenca.presente %}
+                                <i class="fas fa-check"></i> Presente
+                            {% else %}
+                                <i class="fas fa-times"></i> Ausente
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="presenca-card-body">
+                        <div class="info-item">
+                            <span class="info-label">ID</span>
+                            <span class="info-value">#{{ presenca.id }}</span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">Data</span>
+                            <span class="info-value">{{ presenca.data|date:"d/m/Y" }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="presenca-card-actions">
+                        <a href="{% url 'editar_presenca' presenca.id %}" class="btn btn-outline-primary mobile-action-btn">
+                            <i class="fas fa-edit"></i> Editar Presença
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="text-center text-muted py-4">
+                    Nenhuma presença registrada.
+                </div>
+            {% endfor %}
         </div>
     </div>
 </div>

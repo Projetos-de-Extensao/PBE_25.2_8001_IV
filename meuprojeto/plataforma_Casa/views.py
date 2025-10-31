@@ -1520,27 +1520,83 @@ def sql_view(request):
 
 
 # ==================== PORTAL DE VAGAS APRIMORADO ====================
-@login_required(login_url='login')
 def portal_vagas(request):
     """
-    View para portal público de vagas
+    ✨ View para portal PÚBLICO de vagas (Landing Page)
     
-    ⚠️ CORREÇÃO: Protege contra erros quando disciplina não existe
+    ✅ ACESSÍVEL SEM LOGIN: Permite visualização de vagas por visitantes
+    
+    Funcionalidades:
+    - Listagem de todas as vagas ativas
+    - Filtros: busca por texto, curso, tipo de vaga (TEA/Voluntária)
+    - Estatísticas: total de vagas, cursos e disciplinas
+    - Usuários não logados: podem ver vagas mas precisam se cadastrar para se candidatar
+    - Usuários logados: podem ver vagas e se candidatar diretamente
+    
+    Fluxo de candidatura:
+    1. Visitante vê vaga → clica em "Candidatar-se"
+    2. Sistema verifica se está logado
+    3. Se NÃO logado: redireciona para registro → login → candidatura
+    4. Se logado: verifica perfil completo → candidatura
     """
     try:
-        vagas = Vaga.objects.filter(ativo=True).select_related('curso', 'disciplina').prefetch_related('coordenadores', 'professores').annotate(
+        from django.db.models import Count, Q
+        
+        # Buscar todas as vagas ativas
+        vagas = Vaga.objects.filter(ativo=True).select_related(
+            'curso', 
+            'disciplina'
+        ).prefetch_related(
+            'coordenadores', 
+            'professores'
+        ).annotate(
             total_inscritos=Count('inscricao')
         )
         
-        # Filtros
+        # ==================== FILTROS ====================
+        
+        # Filtro 1: Busca por texto (nome da disciplina ou código)
+        busca = request.GET.get('busca', '').strip()
+        if busca:
+            vagas = vagas.filter(
+                Q(disciplina__nome__icontains=busca) |
+                Q(disciplina__codigo__icontains=busca) |
+                Q(nome__icontains=busca) |
+                Q(descricao__icontains=busca)
+            )
+        
+        # Filtro 2: Por curso
         curso_filtro = request.GET.get('curso')
         if curso_filtro:
             vagas = vagas.filter(curso__id=curso_filtro)
         
+        # Filtro 3: Por tipo de vaga (TEA ou Voluntária)
+        tipo_filtro = request.GET.get('tipo')
+        if tipo_filtro:
+            vagas = vagas.filter(tipo_vaga=tipo_filtro)
+        
+        # ==================== ESTATÍSTICAS ====================
+        
+        # Total de vagas ativas (antes dos filtros para mostrar total geral)
+        total_vagas = Vaga.objects.filter(ativo=True).count()
+        
+        # Total de cursos com vagas ativas
+        total_cursos = Vaga.objects.filter(ativo=True).values('curso').distinct().count()
+        
+        # Total de disciplinas com vagas ativas
+        total_disciplinas = Vaga.objects.filter(ativo=True).values('disciplina').distinct().count()
+        
+        # Todos os cursos para o filtro
+        cursos = Curso.objects.filter(ativo=True).order_by('nome')
+        
         context = {
             'vagas': vagas,
-            'cursos': Curso.objects.filter(ativo=True),
+            'cursos': cursos,
+            'total_vagas': total_vagas,
+            'total_cursos': total_cursos,
+            'total_disciplinas': total_disciplinas,
         }
+        
     except Exception as e:
         # Log do erro para debug
         print(f"❌ ERRO no portal_vagas: {str(e)}")
@@ -1551,17 +1607,43 @@ def portal_vagas(request):
         context = {
             'vagas': [],
             'cursos': Curso.objects.filter(ativo=True),
+            'total_vagas': 0,
+            'total_cursos': 0,
+            'total_disciplinas': 0,
             'erro': str(e)
         }
     
-    return render(request, 'vagas/portal.html', context)
+    # ==================== ESCOLHER TEMPLATE ====================
+    # Se usuário logado: usa template com sidebar
+    # Se não logado: usa landing page sem sidebar
+    if request.user.is_authenticated:
+        template = 'vagas/portal_logged.html'
+    else:
+        template = 'vagas/portal_landing.html'
+    
+    return render(request, template, context)
 
 
-@login_required
+# ==================== SOBRE O PROGRAMA ====================
+def sobre_programa(request):
+    """
+    ✨ View para página "Sobre o Programa de Monitoria"
+    
+    ✅ ACESSÍVEL SEM LOGIN: Página informativa pública
+    
+    Exibe informações detalhadas sobre:
+    - O que é o Programa de Monitoria
+    - Modalidades: TEA (Remunerada) e Voluntária
+    - Requisitos e benefícios
+    - Diferenças entre as modalidades
+    """
+    return render(request, 'vagas/sobre_programa.html')
+
+
 def api_detalhes_vaga(request, vaga_id):
     """
     ✨ API ENDPOINT: Retorna detalhes da vaga em JSON
-    ✅ ACESSÍVEL: Alunos, Monitores, Professores, Admins
+    ✅ ACESSÍVEL: Público (sem necessidade de login)
     
     Retorna informações públicas sobre a vaga para exibição em modal
     """
@@ -1571,15 +1653,35 @@ def api_detalhes_vaga(request, vaga_id):
     total_inscritos = Inscricao.objects.filter(vaga=vaga).count()
     vagas_disponiveis = vaga.vagas_disponiveis()
     
+    # Preparar dados de coordenadores
+    coordenadores_list = []
+    for coord in vaga.coordenadores.all():
+        coordenadores_list.append({
+            'nome': coord.nome,
+            'email': coord.email if hasattr(coord, 'email') else ''
+        })
+    
+    # Preparar dados de professores
+    professores_list = []
+    for prof in vaga.professores.all():
+        professores_list.append({
+            'nome': prof.nome,
+            'email': prof.email if hasattr(prof, 'email') else ''
+        })
+    
     data = {
         'id': vaga.id,
         'nome': vaga.nome,
-        'curso': vaga.curso.nome,
-        'disciplina': vaga.disciplina.nome if vaga.disciplina else 'Não especificada',
-        'coordenadores': [coord.nome for coord in vaga.coordenadores.all()],
-        'professores': [prof.nome for prof in vaga.professores.all()],
-        'descricao': vaga.descricao,
-        'requisitos': vaga.requisitos,
+        'disciplina_nome': vaga.disciplina.nome if vaga.disciplina else 'Não especificada',
+        'disciplina_codigo': vaga.disciplina.codigo if vaga.disciplina else '',
+        'curso_nome': vaga.curso.nome if vaga.curso else 'Não especificado',
+        'tipo_vaga': vaga.tipo_vaga if hasattr(vaga, 'tipo_vaga') else 'VOLUNTARIA',
+        'tipo_vaga_display': vaga.get_tipo_vaga_display() if hasattr(vaga, 'get_tipo_vaga_display') else 'Monitoria Voluntária',
+        'valor_bolsa': str(vaga.valor_bolsa) if hasattr(vaga, 'valor_bolsa') and vaga.valor_bolsa else None,
+        'coordenadores': coordenadores_list,
+        'professores': professores_list,
+        'descricao': vaga.descricao or 'Descrição não disponível',
+        'requisitos': vaga.requisitos or None,
         'responsabilidades': vaga.responsabilidades or 'Não especificadas',
         'numero_vagas': vaga.numero_vagas,
         'vagas_disponiveis': vagas_disponiveis,
@@ -1589,50 +1691,135 @@ def api_detalhes_vaga(request, vaga_id):
     return JsonResponse(data)
 
 
+@login_required(login_url='login')
 def candidatar_vaga(request, vaga_id):
     """
-    View para candidatura a uma vaga
+    ✨ View para candidatura a uma vaga de monitoria
+    
+    ⚠️ REQUER LOGIN: Usuário deve estar autenticado
+    
+    Fluxo de candidatura:
+    1. Verificar se usuário está autenticado
+    2. Verificar se é aluno (não professor/admin)
+    3. Validar perfil completo (dados obrigatórios)
+    4. Verificar se já está inscrito nesta vaga
+    5. Exibir formulário de candidatura
+    6. Processar upload de documentos obrigatórios
+    
+    Dados obrigatórios para candidatura:
+    - Histórico Escolar (arquivo)
+    - Curso cadastrado
+    - Período informado
+    - CR (Coeficiente de Rendimento)
+    
+    Dados opcionais:
+    - Currículo
+    - Carta de Motivação
+    - Outros documentos
     """
     vaga = get_object_or_404(Vaga, id=vaga_id, ativo=True)
     
-    # Verificar se é aluno
+    # ==================== VERIFICAR SE É ALUNO ====================
     try:
         aluno = get_aluno_by_email(request.user.email)
         if not aluno:
-            raise Exception("Aluno não encontrado")
-    except:
-        # messages.error(request, 'Apenas alunos podem se candidatar!')
+            messages.error(request, '❌ Apenas alunos podem se candidatar a vagas de monitoria!')
+            return redirect('portal_vagas')
+    except Exception as e:
+        messages.error(request, '❌ Erro ao verificar perfil de aluno. Por favor, entre em contato com o suporte.')
         return redirect('portal_vagas')
     
-    # Verificar se já está inscrito
-    if Inscricao.objects.filter(aluno=aluno, vaga=vaga).exists():
-        # messages.warning(request, 'Você já se candidatou a esta vaga!')
-        return redirect('minhas_inscricoes')
+    # ==================== VALIDAR PERFIL COMPLETO ====================
+    perfil_incompleto = []
     
-    if request.method == 'POST':
-        # Criar inscrição
-        inscricao = Inscricao.objects.create(
-            aluno=aluno,
-            vaga=vaga,
-            status='Pendente'
+    # Validar dados obrigatórios
+    if not aluno.curso:
+        perfil_incompleto.append('Curso não cadastrado')
+    
+    if not aluno.periodo or aluno.periodo <= 0:
+        perfil_incompleto.append('Período não informado')
+    
+    if not aluno.cr_geral or aluno.cr_geral <= 0:
+        perfil_incompleto.append('CR (Coeficiente de Rendimento) não informado')
+    
+    # Se perfil incompleto, redirecionar para completar
+    if perfil_incompleto:
+        messages.error(
+            request, 
+            f'❌ Seu perfil está incompleto! Complete as seguintes informações antes de se candidatar:\n' +
+            '\n'.join([f'• {item}' for item in perfil_incompleto]) +
+            '\n\nVá para: Perfil → Editar Dados'
         )
-        
-        # Upload de documentos
-        documentos_tipos = ['Histórico Escolar', 'Currículo', 'Carta de Motivação']
-        for tipo in documentos_tipos:
-            arquivo = request.FILES.get(f'documento_{tipo.lower().replace(" ", "_")}')
-            if arquivo:
-                Documento.objects.create(
-                    inscricao=inscricao,
-                    tipo=tipo,
-                    arquivo=arquivo,
-                    nome_arquivo=arquivo.name
-                )
-        
-        # messages.success(request, 'Candidatura enviada com sucesso!')
+        return redirect('perfil')
+    
+    # ==================== VERIFICAR SE JÁ ESTÁ INSCRITO ====================
+    if Inscricao.objects.filter(aluno=aluno, vaga=vaga).exists():
+        messages.warning(request, '⚠️ Você já se candidatou a esta vaga! Acompanhe o status na página "Minhas Inscrições".')
         return redirect('minhas_inscricoes')
     
-    context = {'vaga': vaga}
+    # ==================== VERIFICAR SE HÁ VAGAS DISPONÍVEIS ====================
+    if vaga.vagas_disponiveis() <= 0:
+        messages.error(request, '❌ Esta vaga não possui mais vagas disponíveis.')
+        return redirect('portal_vagas')
+    
+    # ==================== PROCESSAR CANDIDATURA ====================
+    if request.method == 'POST':
+        try:
+            # Validar documento obrigatório: Histórico Escolar
+            historico = request.FILES.get('documento_histórico_escolar')
+            if not historico:
+                messages.error(request, '❌ O Histórico Escolar é obrigatório para candidatura!')
+                return render(request, 'vagas/candidatar.html', {'vaga': vaga, 'aluno': aluno})
+            
+            # Criar inscrição
+            inscricao = Inscricao.objects.create(
+                aluno=aluno,
+                vaga=vaga,
+                status='Pendente'
+            )
+            
+            # Upload de documento obrigatório: Histórico Escolar
+            Documento.objects.create(
+                inscricao=inscricao,
+                tipo='Histórico Escolar',
+                arquivo=historico,
+                nome_arquivo=historico.name
+            )
+            
+            # Upload de documentos opcionais
+            documentos_opcionais = {
+                'documento_currículo': 'Currículo',
+                'documento_carta_de_motivação': 'Carta de Motivação',
+            }
+            
+            for field_name, tipo_doc in documentos_opcionais.items():
+                arquivo = request.FILES.get(field_name)
+                if arquivo:
+                    Documento.objects.create(
+                        inscricao=inscricao,
+                        tipo=tipo_doc,
+                        arquivo=arquivo,
+                        nome_arquivo=arquivo.name
+                    )
+            
+            messages.success(
+                request, 
+                f'✅ Candidatura enviada com sucesso para a vaga de {vaga.disciplina.nome}!\n' +
+                'Acompanhe o status da sua inscrição em "Minhas Inscrições".'
+            )
+            return redirect('minhas_inscricoes')
+            
+        except Exception as e:
+            messages.error(request, f'❌ Erro ao processar candidatura: {str(e)}')
+            print(f"Erro ao processar candidatura: {e}")
+            import traceback
+            traceback.print_exc()
+    
+    # ==================== EXIBIR FORMULÁRIO ====================
+    context = {
+        'vaga': vaga,
+        'aluno': aluno,
+    }
     return render(request, 'vagas/candidatar.html', context)
 
 

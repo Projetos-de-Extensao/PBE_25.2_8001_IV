@@ -44,13 +44,22 @@ urlpatterns = [
     path('register/', views.register_view, name='register'),
     
     # ============================================================================
-    # 2. DASHBOARD - PÁGINA INICIAL
+    # 1. PÁGINA INICIAL - PORTAL DE VAGAS (LANDING PAGE)
     # ============================================================================
-    # Rota raiz da aplicação - exibe o dashboard com resumo geral
+    # Rota raiz da aplicação - Portal público de vagas (landing page)
     # Método HTTP: GET
     # URL: http://localhost:8000/
+    # Nome: 'home' - Página inicial do sistema
+    path('', views.portal_vagas, name='home'),
+    
+    # ============================================================================
+    # 2. DASHBOARD - ÁREA LOGADA
+    # ============================================================================
+    # Rota do dashboard para usuários logados
+    # Método HTTP: GET
+    # URL: http://localhost:8000/dashboard/
     # Nome: 'dashboard' (usado em templates com {% url 'dashboard' %})
-    path('', views.dashboard, name='dashboard'),
+    path('dashboard/', views.dashboard, name='dashboard'),
     
     # ============================================================================
     # 2. MÓDULO DE USUÁRIOS - CRUD COMPLETO
@@ -326,6 +335,10 @@ urlpatterns = [
     # --- Portal Público de Vagas ---
     # Portal para visualização e candidatura às vagas de monitoria
     path('portal-vagas/', views.portal_vagas, name='portal_vagas'),
+    
+    # --- Sobre o Programa de Monitoria ---
+    # Página informativa sobre TEA e Monitoria Voluntária
+    path('sobre-programa/', views.sobre_programa, name='sobre_programa'),
     
     # --- API: Detalhes da Vaga (JSON) ---
     # Endpoint para carregar detalhes de uma vaga em modal
