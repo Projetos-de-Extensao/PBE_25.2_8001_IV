@@ -1,6 +1,7 @@
 # Generated manually to fix disciplina field
 
-from django.db import migrations
+from django.db import migrations, models
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -10,7 +11,13 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Renomear disciplina_nova para disciplina
+        # Passo 1: Remover o campo disciplina antigo (VARCHAR)
+        migrations.RemoveField(
+            model_name='vaga',
+            name='disciplina',
+        ),
+        
+        # Passo 2: Renomear disciplina_nova para disciplina
         migrations.RenameField(
             model_name='vaga',
             old_name='disciplina_nova',
