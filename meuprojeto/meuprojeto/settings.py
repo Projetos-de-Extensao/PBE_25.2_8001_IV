@@ -75,6 +75,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ⚠️ IMPORTANTE: Deve vir logo após SecurityMiddleware
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -186,8 +187,10 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Diretórios adicionais onde Django procura por arquivos estáticos
 STATICFILES_DIRS = []
 
-# Configuração do WhiteNoise para compressão e cache de arquivos estáticos
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Configuração do WhiteNoise para servir arquivos estáticos em produção
+# Usa CompressedStaticFilesStorage em vez de CompressedManifestStaticFilesStorage
+# para evitar erros com arquivos não encontrados
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Media files (uploads)
 MEDIA_URL = '/media/'
