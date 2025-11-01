@@ -1,6 +1,136 @@
 {% extends 'base.html' %}
 {% block title %}Alunos - Plataforma Casa{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Cabeçalho */
+    .d-flex.justify-content-between {
+        margin-bottom: 1.5rem;
+    }
+    
+    .page-title h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0;
+        line-height: 1.2;
+        color: #002555;
+        font-weight: 700;
+    }
+    
+    .page-title h1 i {
+        margin-right: 0.5rem;
+    }
+    
+    /* Mobile cards - hidden on desktop */
+    .mobile-cards {
+        display: none;
+    }
+    
+    @media (max-width: 768px) {
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .page-title {
+            padding-top: 2.5rem;
+        }
+        
+        .page-title h1 {
+            font-size: 1.25rem;
+        }
+        
+        .btn.btn-primary {
+            width: 100%;
+        }
+        
+        .desktop-table {
+            display: none !important;
+        }
+        
+        .mobile-cards {
+            display: block;
+        }
+        
+        .aluno-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 37, 85, 0.08);
+            border: 1px solid rgba(0, 37, 85, 0.06);
+        }
+        
+        .aluno-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .aluno-card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #002555;
+            margin: 0 0 0.25rem 0;
+        }
+        
+        .aluno-card-subtitle {
+            font-size: 0.8125rem;
+            color: #6c757d;
+            margin: 0;
+        }
+        
+        .aluno-card-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-item.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .info-label {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            color: #002555;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-value {
+            font-size: 0.875rem;
+            color: #495057;
+        }
+        
+        .aluno-card-actions {
+            padding-top: 0.75rem;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .mobile-action-btn {
+            flex: 1;
+            padding: 0.625rem;
+            font-size: 0.875rem;
+            border-radius: 6px;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -20,7 +150,8 @@
 
 <div class="card">
     <div class="card-body">
-        <div class="table-responsive">
+        <!-- Desktop Table -->
+        <div class="table-responsive desktop-table">
             <table class="table table-hover">
                 <thead>
                     <tr>
@@ -68,6 +199,63 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="mobile-cards">
+            {% for aluno in alunos %}
+                <div class="aluno-card">
+                    <div class="aluno-card-header">
+                        <div>
+                            <div class="aluno-card-title">{{ aluno.nome }}</div>
+                            <div class="aluno-card-subtitle">{{ aluno.curso.nome }}</div>
+                        </div>
+                        <span class="badge {% if aluno.ativo %}status-active{% else %}status-inactive{% endif %}">
+                            {% if aluno.ativo %}Ativo{% else %}Inativo{% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="aluno-card-body">
+                        <div class="info-item">
+                            <span class="info-label">ID</span>
+                            <span class="info-value">#{{ aluno.id }}</span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">Matrícula</span>
+                            <span class="info-value">{{ aluno.matricula }}</span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">Período</span>
+                            <span class="info-value">{{ aluno.periodo }}º</span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">CR</span>
+                            <span class="info-value">{{ aluno.cr_geral }}</span>
+                        </div>
+                        
+                        <div class="info-item full-width">
+                            <span class="info-label">Email</span>
+                            <span class="info-value">{{ aluno.email }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="aluno-card-actions">
+                        <a href="{% url 'editar_aluno' aluno.id %}" class="btn btn-outline-primary mobile-action-btn">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a href="{% url 'deletar_aluno' aluno.id %}" class="btn btn-outline-danger mobile-action-btn" onclick="return confirm('Tem certeza?')">
+                            <i class="fas fa-trash"></i> Deletar
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="text-center text-muted py-4">
+                    Nenhum aluno encontrado.
+                </div>
+            {% endfor %}
         </div>
     </div>
 </div>

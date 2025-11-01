@@ -375,16 +375,102 @@
          * ========================================================================
          * RESPONSIVIDADE - MOBILE
          * ========================================================================
-         * Ajustes para telas pequenas (< 480px)
+         * Ajustes para telas pequenas (< 768px)
          */
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+            
             .login-container {
-                margin: 1rem;                       /* Espaço lateral em mobile */
+                padding: 1.25rem;
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
                 max-width: 100%;
             }
             
+            .login-header {
+                margin-bottom: 1.25rem;
+            }
+            
+            .login-header i {
+                font-size: 2rem;
+                margin-bottom: 0.75rem;
+            }
+            
             .login-header h1 {
-                font-size: 1.5rem;                  /* Título menor */
+                font-size: 1.35rem;
+                margin-bottom: 0.35rem;
+            }
+            
+            .login-header p {
+                font-size: 0.8rem;
+            }
+            
+            .form-group {
+                margin-bottom: 1rem;
+            }
+            
+            .form-group label {
+                font-size: 0.85rem;
+                margin-bottom: 0.35rem;
+            }
+            
+            .form-group input {
+                padding: 0.65rem 0.85rem;
+                font-size: 0.875rem;
+                border-radius: 6px;
+            }
+            
+            .input-icon {
+                font-size: 0.875rem;
+                width: 35px;
+            }
+            
+            .input-group input {
+                padding-left: 2.25rem;
+            }
+            
+            .password-toggle {
+                width: 35px;
+                font-size: 0.875rem;
+            }
+            
+            .input-group.password-field input {
+                padding-right: 2.25rem;
+            }
+            
+            .login-btn {
+                padding: 0.7rem 0.85rem;
+                font-size: 0.9rem;
+                margin-top: 0.75rem;
+            }
+            
+            .remember-me {
+                font-size: 0.8rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .forgot-password {
+                font-size: 0.8rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .login-footer {
+                margin-top: 1.25rem;
+                padding-top: 1.25rem;
+                font-size: 0.85rem;
+            }
+            
+            .login-footer .btn {
+                padding: 0.65rem 0.85rem !important;
+                font-size: 0.875rem !important;
+            }
+            
+            .alert {
+                font-size: 0.85rem;
+                padding: 0.65rem;
+                margin-bottom: 1rem;
             }
         }
     </style>
@@ -531,6 +617,27 @@
             Convida usuários que não possuem conta a se cadastrar
         -->
         <div class="login-footer">
+            <!-- Botão para ver vagas sem login -->
+            <a href="{% url 'portal_vagas' %}" class="btn" style="
+                width: 100%;
+                padding: 0.75rem 1rem;
+                background: transparent;
+                color: #002555;
+                border: 2px solid #002555;
+                border-radius: 8px;
+                font-size: 0.95rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                margin-bottom: 1.5rem;
+                display: inline-block;
+                text-decoration: none;
+                text-align: center;
+            " onmouseover="this.style.background='#002555'; this.style.color='white';" 
+               onmouseout="this.style.background='transparent'; this.style.color='#002555';">
+                <i class="fas fa-briefcase"></i> Ver Vagas Disponíveis
+            </a>
+            
             <p style="text-align: center; color: #7f8c8d; font-size: 0.85rem;">
                 <!-- Link para página de registro com tooltip -->
                 Não tem conta? 

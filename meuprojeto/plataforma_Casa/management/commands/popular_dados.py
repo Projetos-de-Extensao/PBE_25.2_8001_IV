@@ -295,6 +295,8 @@ class Command(BaseCommand):
         """Cria vagas de monitoria"""
         self.stdout.write("\n📢 Criando vagas de monitoria...")
         
+        from plataforma_Casa.models import Disciplina
+        
         cursos = list(Curso.objects.all())
         coordenadores = list(Funcionario.objects.all())
         
@@ -306,43 +308,137 @@ class Command(BaseCommand):
             self.stdout.write("  ⚠️  Nenhum curso disponível")
             return
         
+        # Primeiro, criar as disciplinas
+        disciplinas_data = [
+            {
+                'codigo': 'CC101',
+                'nome': 'Programação I',
+                'carga_horaria': 80,
+                'periodo_sugerido': 1,
+                'ementa': 'Introdução à lógica de programação e algoritmos'
+            },
+            {
+                'codigo': 'CC201',
+                'nome': 'Estruturas de Dados',
+                'carga_horaria': 80,
+                'periodo_sugerido': 3,
+                'ementa': 'Estruturas de dados lineares e não-lineares'
+            },
+            {
+                'codigo': 'CC301',
+                'nome': 'Banco de Dados',
+                'carga_horaria': 60,
+                'periodo_sugerido': 4,
+                'ementa': 'Modelagem e implementação de bancos de dados'
+            },
+            {
+                'codigo': 'CC102',
+                'nome': 'Cálculo I',
+                'carga_horaria': 80,
+                'periodo_sugerido': 1,
+                'ementa': 'Limites, derivadas e aplicações'
+            },
+            {
+                'codigo': 'CC103',
+                'nome': 'Física I',
+                'carga_horaria': 80,
+                'periodo_sugerido': 2,
+                'ementa': 'Mecânica clássica e cinemática'
+            },
+        ]
+        
+        for disc_data in disciplinas_data:
+            curso = random.choice(cursos)
+            disciplina, created = Disciplina.objects.get_or_create(
+                codigo=disc_data['codigo'],
+                defaults={
+                    'nome': disc_data['nome'],
+                    'curso': curso,
+                    'carga_horaria': disc_data['carga_horaria'],
+                    'periodo_sugerido': disc_data['periodo_sugerido'],
+                    'ementa': disc_data['ementa'],
+                }
+            )
+            if created:
+                self.stdout.write(f"  ✅ Disciplina '{disc_data['nome']}' criada")
+        
+        # Agora criar as vagas usando as disciplinas
         vagas_data = [
             {
                 'nome': 'Monitor de Programação I',
-                'disciplina': 'Programação I',
+                'disciplina_codigo': 'CC101',
                 'descricao': 'Auxiliar alunos em exercícios de lógica de programação',
                 'requisitos': 'CR mínimo 8.0, ter cursado a disciplina',
                 'numero_vagas': 2,
+                'tipo_vaga': 'TEA',
+                'valor_bolsa': 1500.00,
             },
             {
                 'nome': 'Monitor de Estruturas de Dados',
-                'disciplina': 'Estruturas de Dados',
+                'disciplina_codigo': 'CC201',
                 'descricao': 'Apoio em listas, árvores, grafos e algoritmos',
                 'requisitos': 'CR mínimo 8.5',
                 'numero_vagas': 1,
+                'tipo_vaga': 'TEA',
+                'valor_bolsa': 1500.00,
             },
             {
                 'nome': 'Monitor de Banco de Dados',
-                'disciplina': 'Banco de Dados',
+                'disciplina_codigo': 'CC301',
                 'descricao': 'Ajuda com SQL, modelagem e normalização',
                 'requisitos': 'CR mínimo 7.5',
                 'numero_vagas': 2,
+                'tipo_vaga': 'Voluntaria',
+            },
+            {
+                'nome': 'Monitor de Cálculo I',
+                'disciplina_codigo': 'CC102',
+                'descricao': 'Apoio em exercícios de derivadas e limites',
+                'requisitos': 'CR mínimo 8.0',
+                'numero_vagas': 2,
+                'tipo_vaga': 'Voluntaria',
+            },
+            {
+                'nome': 'Monitor de Física I',
+                'disciplina_codigo': 'CC103',
+                'descricao': 'Auxílio em problemas de mecânica e cinemática',
+                'requisitos': 'CR mínimo 7.5',
+                'numero_vagas': 1,
+                'tipo_vaga': 'TEA',
+                'valor_bolsa': 1500.00,
             },
         ]
         
         for vaga_data in vagas_data:
-            if not Vaga.objects.filter(disciplina=vaga_data['disciplina']).exists():
-                Vaga.objects.create(
-                    nome=vaga_data['nome'],
-                    disciplina=vaga_data['disciplina'],
-                    descricao=vaga_data['descricao'],
-                    requisitos=vaga_data['requisitos'],
-                    responsabilidades=vaga_data['descricao'],
-                    numero_vagas=vaga_data['numero_vagas'],
-                    curso=random.choice(cursos),
-                    coordenador=random.choice(coordenadores)
-                )
-                self.stdout.write(f"  ✅ Vaga '{vaga_data['nome']}' criada")
+            try:
+                disciplina = Disciplina.objects.get(codigo=vaga_data['disciplina_codigo'])
+                
+                if not Vaga.objects.filter(disciplina=disciplina, nome=vaga_data['nome']).exists():
+                    vaga_params = {
+                        'nome': vaga_data['nome'],
+                        'disciplina': disciplina,
+                        'descricao': vaga_data['descricao'],
+                        'requisitos': vaga_data['requisitos'],
+                        'responsabilidades': vaga_data['descricao'],
+                        'numero_vagas': vaga_data['numero_vagas'],
+                        'curso': disciplina.curso,
+                    }
+                    
+                    # Adicionar coordenadores
+                    coordenador = random.choice(coordenadores)
+                    
+                    # Adicionar tipo de vaga e valor da bolsa se TEA
+                    if 'tipo_vaga' in vaga_data:
+                        vaga_params['tipo_vaga'] = vaga_data['tipo_vaga']
+                    if 'valor_bolsa' in vaga_data:
+                        vaga_params['valor_bolsa'] = vaga_data['valor_bolsa']
+                    
+                    vaga = Vaga.objects.create(**vaga_params)
+                    vaga.coordenadores.add(coordenador)
+                    
+                    self.stdout.write(f"  ✅ Vaga '{vaga_data['nome']}' criada")
+            except Disciplina.DoesNotExist:
+                self.stdout.write(f"  ⚠️  Disciplina {vaga_data['disciplina_codigo']} não encontrada")
 
     def criar_turmas(self):
         """Cria turmas de monitoria"""
@@ -363,20 +459,25 @@ class Command(BaseCommand):
             return
         
         for i, vaga in enumerate(vagas[:3]):
+            # Pular vagas sem disciplina
+            if not hasattr(vaga, 'disciplina') or not vaga.disciplina:
+                self.stdout.write(f"  ⚠️  Vaga '{vaga.nome}' sem disciplina associada - pulando")
+                continue
+                
             if not Turma.objects.filter(vaga=vaga).exists():
                 Turma.objects.create(
-                    nome=f'Turma {vaga.disciplina} - 2024.2',
+                    nome=f'Turma {vaga.disciplina.nome} - 2024.2',
                     vaga=vaga,
                     monitor=monitor,
                     sala=salas[i % len(salas)],
                     curso=vaga.curso,
-                    descricao=f'Monitoria de {vaga.disciplina}',
+                    descricao=f'Monitoria de {vaga.disciplina.nome}',
                     data_inicio=date.today() - timedelta(days=30),
                     data_fim=date.today() + timedelta(days=90),
                     dias_da_semana='Segunda e Quarta',
                     horario='14:00 - 16:00'
                 )
-                self.stdout.write(f"  ✅ Turma de '{vaga.disciplina}' criada")
+                self.stdout.write(f"  ✅ Turma de '{vaga.disciplina.nome}' criada")
 
     def criar_inscricoes(self):
         """Cria inscrições em vagas"""

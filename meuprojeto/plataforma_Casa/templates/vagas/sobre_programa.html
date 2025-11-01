@@ -1,0 +1,676 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="description" content="Sobre o Programa de Monitoria da Universidade Tiradentes - Conheça as modalidades TEA e Voluntária">
+    <meta name="theme-color" content="#002555">
+    <title>Sobre o Programa de Monitoria | UNIT</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512'><path fill='%23F5AC00' d='M320 32c-8.1 0-16.1 1.4-23.7 4.1L15.8 137.4C6.3 140.9 0 149.9 0 160s6.3 19.1 15.8 22.6l57.9 20.9C57.3 229.3 48 259.8 48 291.9v28.1c0 28.4-10.8 57.7-22.3 80.8c-6.5 13-13.9 25.8-22.5 37.6C0 442.7-.9 448.3 .9 453.4s6 8.9 11.2 10.2l64 16c4.2 1.1 8.7 .3 12.4-2s6.3-6.1 7.1-10.4c8.6-42.8 4.3-81.2-2.1-108.7C90.3 344.3 86 329.8 80 316.5V291.9c0-30.2 10.2-58.7 27.9-81.5c12.9-15.5 29.6-28 49.2-35.7l157-61.7c8.2-3.2 17.5 .8 20.7 9s-.8 17.5-9 20.7l-157 61.7c-12.4 4.9-23.3 12.4-32.2 21.6l159.6 57.6c7.6 2.7 15.6 4.1 23.7 4.1s16.1-1.4 23.7-4.1L624.2 182.6c9.5-3.4 15.8-12.5 15.8-22.6s-6.3-19.1-15.8-22.6L343.7 36.1C336.1 33.4 328.1 32 320 32zM128 408c0 35.3 86 72 192 72s192-36.7 192-72L496.7 262.6 354.5 314c-11.1 4-22.8 6-34.5 6s-23.5-2-34.5-6L143.3 262.6 128 408z'/></svg>" type="image/svg+xml">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-blue: #002555;
+            --accent-yellow: #F5AC00;
+            --light-blue: #1245FF;
+            --text-dark: #2c3e50;
+            --text-medium: #7f8c8d;
+            --bg-light: #f8f9fa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+        
+        /* Navbar */
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #003a7a 100%);
+            box-shadow: 0 4px 20px rgba(0, 37, 85, 0.15);
+            padding: 1rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .navbar-brand i {
+            color: var(--accent-yellow);
+            font-size: 1.8rem;
+        }
+        
+        .nav-link-custom {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link-custom:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white !important;
+        }
+        
+        .btn-login {
+            background: rgba(255, 255, 255, 0.2);
+            color: white !important;
+            border: 2px solid white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-height: 44px;
+        }
+        
+        .btn-login:hover {
+            background: white;
+            color: var(--primary-blue) !important;
+        }
+        
+        .btn-register {
+            background: var(--accent-yellow);
+            color: var(--primary-blue) !important;
+            border: 2px solid var(--accent-yellow);
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-height: 44px;
+        }
+        
+        .btn-register:hover {
+            background: #ffc107;
+            border-color: #ffc107;
+        }
+        
+        /* Mobile menu improvements */
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                padding: 1.5rem 0 1rem 0;
+                background: var(--primary-blue);
+                margin-top: 1rem;
+                border-radius: 12px;
+            }
+            
+            .navbar-nav {
+                gap: 0;
+                padding: 0 1rem;
+            }
+            
+            .navbar-nav .nav-item {
+                width: 100%;
+            }
+            
+            .navbar-nav .nav-link-custom {
+                padding: 0.875rem 1rem !important;
+                margin-bottom: 0.5rem;
+                display: block;
+                width: 100%;
+                text-align: left;
+            }
+            
+            .navbar-nav .nav-link-custom:hover {
+                background: rgba(255, 255, 255, 0.15);
+            }
+            
+            /* Separator between links and buttons */
+            .navbar-nav .nav-item:nth-child(2) {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                padding-bottom: 1rem;
+                margin-bottom: 1rem !important;
+            }
+            
+            .navbar-nav .btn-login,
+            .navbar-nav .btn-register {
+                width: 100%;
+                padding: 0.875rem;
+                margin: 0 0 0.75rem 0 !important;
+                font-size: 1rem;
+                min-height: 48px;
+                display: block;
+                text-align: center;
+            }
+            
+            .navbar-nav .nav-item:last-child .btn-register {
+                margin-bottom: 0 !important;
+            }
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #003a7a 100%);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 3rem;
+        }
+        
+        @media (min-width: 768px) {
+            .hero-section {
+                padding: 4rem 0;
+            }
+        }
+        
+        .hero-section h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .hero-section h1 {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .hero-section h1 {
+                font-size: 3rem;
+            }
+        }
+        
+        .hero-section p {
+            font-size: 1rem;
+            opacity: 0.95;
+            max-width: 700px;
+        }
+        
+        @media (min-width: 768px) {
+            .hero-section p {
+                font-size: 1.15rem;
+            }
+        }
+        
+        /* Content Section */
+        .content-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+        
+        @media (min-width: 768px) {
+            .content-section {
+                padding: 2.5rem;
+            }
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        @media (min-width: 768px) {
+            .section-title {
+                font-size: 1.75rem;
+            }
+        }
+        
+        .section-title i {
+            color: var(--accent-yellow);
+        }
+        
+        .lead {
+            font-size: 1.1rem;
+            font-weight: 400;
+            line-height: 1.8;
+        }
+        
+        @media (max-width: 768px) {
+            .lead {
+                font-size: 1rem;
+            }
+        }
+        
+        /* Cards */
+        .card {
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .vaga-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-tea {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-voluntaria {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #003a7a 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            /* Navbar */
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+            
+            .navbar-brand span {
+                font-size: 1.1rem;
+            }
+            
+            .navbar-brand i {
+                font-size: 1.3rem;
+            }
+            
+            .nav-link-custom {
+                font-size: 0.9rem;
+                padding: 0.65rem 0.85rem !important;
+            }
+            
+            .btn-login,
+            .btn-register {
+                font-size: 0.9rem;
+                padding: 0.6rem 1.25rem;
+                min-height: 42px;
+            }
+            
+            /* Hero */
+            .hero-section {
+                padding: 2rem 0 !important;
+            }
+            
+            .hero-section h1 {
+                font-size: 1.6rem !important;
+                margin-bottom: 0.75rem !important;
+            }
+            
+            .hero-section p {
+                font-size: 0.9rem !important;
+            }
+            
+            /* Content sections */
+            .content-section {
+                padding: 1.5rem !important;
+                margin-bottom: 1.5rem !important;
+            }
+            
+            .section-title {
+                font-size: 1.3rem !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            .section-title i {
+                font-size: 1.1rem !important;
+            }
+            
+            .lead {
+                font-size: 0.9rem !important;
+                line-height: 1.6 !important;
+            }
+            
+            /* Cards */
+            .card {
+                margin-bottom: 1rem;
+            }
+            
+            .card-body {
+                padding: 1rem !important;
+            }
+            
+            .card-title {
+                font-size: 1rem !important;
+            }
+            
+            .card-text {
+                font-size: 0.85rem !important;
+            }
+            
+            .vaga-badge {
+                padding: 0.2rem 0.6rem;
+                font-size: 0.7rem;
+            }
+            
+            /* Listas */
+            ul li {
+                font-size: 0.85rem !important;
+                margin-bottom: 0.4rem !important;
+            }
+            
+            /* Call to action */
+            .btn-lg {
+                padding: 0.75rem 2rem !important;
+                font-size: 0.95rem !important;
+            }
+            
+            /* Footer */
+            .footer {
+                padding: 1.5rem 0;
+                margin-top: 2.5rem;
+                font-size: 0.85rem;
+            }
+            
+            .footer p {
+                font-size: 0.85rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'portal_vagas' %}">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Portal de Vagas</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" style="border: 2px solid white;">
+                <i class="fas fa-bars text-white"></i>
+            </button>
+            
+                        <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link-custom" href="{% url 'portal_vagas' %}">Vagas Disponíveis</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link-custom" href="{% url 'sobre_programa' %}" style="color: var(--accent-yellow) !important;">Sobre o Programa</a>
+                    </li>
+                                        <li class="nav-item">
+                        <a class="btn-login" href="{% url 'login' %}">Entrar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn-register" href="{% url 'register' %}">Cadastrar-se</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-10 mx-auto text-center">
+                    <h1><i class="fas fa-info-circle me-3"></i>Sobre o Programa de Monitoria</h1>
+                    <p class="mx-auto">
+                        Conheça as oportunidades e benefícios do Programa de Monitoria DA IBMEC - BARRA
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <div class="container mb-5">
+        
+        <!-- Introdução -->
+        <div class="content-section">
+            <p class="lead">
+                O Programa de Monitoria da Universidade Tiradentes tem como objetivo principal apoiar o processo de ensino-aprendizagem, 
+                proporcionando aos alunos monitores a oportunidade de desenvolver habilidades didáticas, aprofundar conhecimentos e 
+                contribuir para o sucesso acadêmico de outros estudantes.
+            </p>
+        </div>
+        
+        <!-- Pilares do Programa -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="text-center p-4" style="background: linear-gradient(135deg, var(--primary-blue) 0%, #003a7a 100%); border-radius: 12px; height: 100%; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); color: white;">
+                    <i class="fas fa-graduation-cap fa-3x mb-3" style="color: var(--accent-yellow);"></i>
+                    <h5 class="fw-bold mb-3" style="color: white;">Desenvolvimento Acadêmico</h5>
+                    <p style="color: rgba(255, 255, 255, 0.9);">Aprimore suas habilidades e conhecimentos auxiliando outros alunos no aprendizado das disciplinas.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="text-center p-4" style="background: linear-gradient(135deg, var(--primary-blue) 0%, #003a7a 100%); border-radius: 12px; height: 100%; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); color: white;">
+                    <i class="fas fa-chalkboard-teacher fa-3x mb-3" style="color: var(--accent-yellow);"></i>
+                    <h5 class="fw-bold mb-3" style="color: white;">Experiência Docente</h5>
+                    <p style="color: rgba(255, 255, 255, 0.9);">Desenvolva competências pedagógicas e habilidades de comunicação essenciais para a carreira profissional.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="text-center p-4" style="background: linear-gradient(135deg, var(--primary-blue) 0%, #003a7a 100%); border-radius: 12px; height: 100%; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); color: white;">
+                    <i class="fas fa-certificate fa-3x mb-3" style="color: var(--accent-yellow);"></i>
+                    <h5 class="fw-bold mb-3" style="color: white;">Certificação</h5>
+                    <p style="color: rgba(255, 255, 255, 0.9);">Receba certificado de monitoria ao final do programa, enriquecendo seu currículo acadêmico.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modalidades de Monitoria -->
+        <div class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-list-ul"></i>
+                Modalidades de Monitoria
+            </h2>
+            
+            <div class="row g-4">
+                <!-- TEA - Monitoria Remunerada -->
+                <div class="col-lg-6">
+                    <div class="card h-100" style="border: 2px solid #d4edda; border-radius: 12px; overflow: hidden;">
+                        <div class="card-header" style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border: none; padding: 1.5rem;">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-money-bill-wave fa-2x me-3" style="color: #155724;"></i>
+                                <div>
+                                    <h4 class="mb-1 fw-bold" style="color: #155724;">Monitoria TEA (Remunerada)</h4>
+                                    <span class="vaga-badge badge-tea">Bolsa Auxílio</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-3" style="color: var(--primary-blue);">
+                                <i class="fas fa-info-circle me-2"></i>O que é TEA?
+                            </h6>
+                            <p style="color: var(--text-medium); line-height: 1.8;">
+                                <strong>TEA</strong> significa <strong>Trabalho Efetivo Acadêmico</strong>. É a modalidade de monitoria remunerada, 
+                                onde o estudante recebe uma bolsa auxílio de <strong>R$ 1.500,00 por semestre</strong> para dedicar-se às atividades de monitoria.
+                            </p>
+                            
+                            <h6 class="fw-bold mb-3 mt-4" style="color: var(--primary-blue);">
+                                <i class="fas fa-check-circle me-2"></i>Características
+                            </h6>
+                            <ul style="color: var(--text-medium); line-height: 1.8;">
+                                <li><strong>Bolsa semestral:</strong> R$ 1.500,00 pagos ao longo do semestre letivo</li>
+                                <li><strong>Carga horária:</strong> 12 horas semanais de dedicação</li>
+                                <li><strong>Compromisso:</strong> Maior disponibilidade e responsabilidade</li>
+                                <li><strong>Seleção rigorosa:</strong> Processo seletivo baseado em desempenho acadêmico</li>
+                            </ul>
+                            
+                            <h6 class="fw-bold mb-3 mt-4" style="color: var(--primary-blue);">
+                                <i class="fas fa-clipboard-list me-2"></i>Requisitos
+                            </h6>
+                            <ul style="color: var(--text-medium); line-height: 1.8;">
+                                <li>Ter sido aprovado na disciplina com nota mínima 8,0</li>
+                                <li>Estar regularmente matriculado</li>
+                                <li>Não estar em período de trancamento</li>
+                                <li>Disponibilidade de horário compatível</li>
+                            </ul>
+                            
+                            <div class="alert alert-success mt-4 mb-0" style="border-left: 4px solid #155724;">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                <strong>Ideal para:</strong> Estudantes que podem dedicar mais tempo e buscam experiência acadêmica remunerada.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Monitoria Voluntária -->
+                <div class="col-lg-6">
+                    <div class="card h-100" style="border: 2px solid #cce5ff; border-radius: 12px; overflow: hidden;">
+                        <div class="card-header" style="background: linear-gradient(135deg, #cce5ff 0%, #b8daff 100%); border: none; padding: 1.5rem;">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-heart fa-2x me-3" style="color: #004085;"></i>
+                                <div>
+                                    <h4 class="mb-1 fw-bold" style="color: #004085;">Monitoria Voluntária</h4>
+                                    <span class="vaga-badge badge-voluntaria">Sem Remuneração</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-3" style="color: var(--primary-blue);">
+                                <i class="fas fa-info-circle me-2"></i>O que é Monitoria Voluntária?
+                            </h6>
+                            <p style="color: var(--text-medium); line-height: 1.8;">
+                                É a modalidade de monitoria <strong>não remunerada</strong>, onde o estudante se dedica ao programa por motivação 
+                                acadêmica e pessoal, contribuindo para o ensino sem receber bolsa auxílio.
+                            </p>
+                            
+                            <h6 class="fw-bold mb-3 mt-4" style="color: var(--primary-blue);">
+                                <i class="fas fa-check-circle me-2"></i>Características
+                            </h6>
+                            <ul style="color: var(--text-medium); line-height: 1.8;">
+                                <li><strong>Sem remuneração:</strong> Atividade voluntária e não remunerada</li>
+                                <li><strong>Carga horária flexível:</strong> Geralmente 8 horas semanais</li>
+                                <li><strong>Certificação:</strong> Recebe certificado de monitoria ao final</li>
+                                <li><strong>Flexibilidade:</strong> Maior adaptação aos horários do estudante</li>
+                            </ul>
+                            
+                            <h6 class="fw-bold mb-3 mt-4" style="color: var(--primary-blue);">
+                                <i class="fas fa-clipboard-list me-2"></i>Requisitos
+                            </h6>
+                            <ul style="color: var(--text-medium); line-height: 1.8;">
+                                <li>Ter sido aprovado na disciplina com nota mínima 7,0</li>
+                                <li>Estar regularmente matriculado</li>
+                                <li>Demonstrar interesse e motivação pela docência</li>
+                                <li>Comprometimento com as atividades propostas</li>
+                            </ul>
+                            
+                            <div class="alert alert-info mt-4 mb-0" style="border-left: 4px solid #004085;">
+                                <i class="fas fa-star me-2"></i>
+                                <strong>Ideal para:</strong> Estudantes que buscam experiência acadêmica e enriquecer o currículo sem compromisso financeiro.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Benefícios do Programa -->
+        <div class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-gift"></i>
+                Benefícios do Programa
+            </h2>
+            
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-3">
+                    <div class="text-center p-3" style="background: white; border: 2px solid var(--accent-yellow); border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
+                        <i class="fas fa-trophy fa-2x mb-2" style="color: var(--accent-yellow);"></i>
+                        <h6 class="fw-bold mb-1" style="color: var(--primary-blue);">Destaque Acadêmico</h6>
+                        <p class="small mb-0" style="color: var(--text-medium);">Diferencial no currículo</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="text-center p-3" style="background: white; border: 2px solid var(--accent-yellow); border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
+                        <i class="fas fa-users fa-2x mb-2" style="color: var(--accent-yellow);"></i>
+                        <h6 class="fw-bold mb-1" style="color: var(--primary-blue);">Network</h6>
+                        <p class="small mb-0" style="color: var(--text-medium);">Contato com professores</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="text-center p-3" style="background: white; border: 2px solid var(--accent-yellow); border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
+                        <i class="fas fa-brain fa-2x mb-2" style="color: var(--accent-yellow);"></i>
+                        <h6 class="fw-bold mb-1" style="color: var(--primary-blue);">Aprendizado</h6>
+                        <p class="small mb-0" style="color: var(--text-medium);">Aprofundamento teórico</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="text-center p-3" style="background: white; border: 2px solid var(--accent-yellow); border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
+                        <i class="fas fa-briefcase fa-2x mb-2" style="color: var(--accent-yellow);"></i>
+                        <h6 class="fw-bold mb-1" style="color: var(--primary-blue);">Carreira</h6>
+                        <p class="small mb-0" style="color: var(--text-medium);">Preparo profissional</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Call to Action -->
+        <div class="text-center mt-5">
+            <a href="{% url 'portal_vagas' %}" class="btn btn-lg" style="background: var(--primary-blue); color: white; padding: 1rem 3rem; border-radius: 10px; font-weight: 600;">
+                <i class="fas fa-search me-2"></i> Ver Vagas Disponíveis
+            </a>
+        </div>
+        
+    </div>
+    
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="footer">
+        <div class="container text-center">
+            <p>&copy; 2025 Universidade Tiradentes - UNIT. Todos os direitos reservados.</p>
+            <p class="mt-2">
+                <i class="fas fa-graduation-cap me-2"></i>
+                Portal de Vagas de Monitoria
+            </p>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Smooth Scroll -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

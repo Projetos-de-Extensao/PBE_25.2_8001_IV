@@ -609,6 +609,17 @@
         
         /* MOBILE (base - até 768px) */
         @media (max-width: 768px) {
+            /* Navbar fixo menor no mobile */
+            .navbar {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                z-index: 1050 !important; /* Aumentar z-index para garantir que fique acima */
+                height: 56px !important; /* Altura menor no mobile */
+                min-height: 56px !important;
+            }
+            
             /* Sidebar oculta por padrão no mobile */
             .sidebar {
                 width: 280px;
@@ -620,7 +631,7 @@
                 left: 0;
                 top: 0;
                 height: 100vh;
-                z-index: 999;
+                z-index: 1049; /* Abaixo do navbar */
             }
             
             /* Sidebar visível quando tem classe show (mobile) */
@@ -633,9 +644,11 @@
                 margin-left: 0 !important;
                 max-width: 100% !important;
                 width: 100% !important;
-                padding: 1rem;
-                padding-top: calc(56px + 1rem); /* Navbar height + padding */
+                padding: 0.5rem !important; /* ainda mais reduzido */
+                padding-top: 75px !important; /* Espaço ainda maior - 56px navbar + 19px margem */
                 min-height: 100vh;
+                position: relative;
+                z-index: 1; /* Abaixo do navbar */
             }
             
             .main-content.sidebar-collapsed {
@@ -702,49 +715,248 @@
                 font-size: 1.25rem;
             }
             
-            /* Títulos de página menores */
+            /* Títulos de página menores - OTIMIZADO PARA MOBILE */
             .page-title h1 {
-                font-size: 1.5rem;
+                font-size: 1.375rem !important; /* reduzido */
             }
             
-            /* Cards responsivos */
+            h1, .h1 {
+                font-size: 1.5rem !important; /* reduzido */
+            }
+            
+            h2, .h2 {
+                font-size: 1.25rem !important; /* reduzido */
+            }
+            
+            h3, .h3 {
+                font-size: 1.125rem !important; /* reduzido */
+            }
+            
+            /* Cards responsivos - tamanhos reduzidos */
             .card {
-                margin-bottom: 1rem;
-                border-radius: 0.75rem;
+                margin-bottom: 0.75rem !important; /* reduzido */
+                border-radius: 0.5rem !important; /* reduzido */
+            }
+            
+            .card-header {
+                padding: 0.75rem !important; /* reduzido */
+                font-size: 1rem !important; /* reduzido */
             }
             
             .card-body {
-                padding: 1rem;
+                padding: 0.75rem !important; /* reduzido */
             }
             
-            /* Botões maiores (touch-friendly) */
+            .card-footer {
+                padding: 0.625rem 0.75rem !important; /* reduzido */
+            }
+            
+            /* Botões touch-friendly - otimizados */
             .btn {
-                min-height: 44px;
-                padding: 0.75rem 1.25rem;
+                min-height: 42px !important; /* reduzido */
+                padding: 0.625rem 1rem !important; /* reduzido */
+                font-size: 0.9375rem !important; /* reduzido */
             }
             
-            /* Forms touch-friendly */
+            .btn-sm {
+                min-height: 36px !important;
+                padding: 0.5rem 0.875rem !important;
+                font-size: 0.8125rem !important;
+            }
+            
+            /* Forms touch-friendly - otimizados */
             .form-control,
             .form-select {
-                min-height: 44px;
-                font-size: 1rem;
+                min-height: 42px !important; /* reduzido */
+                font-size: 0.9375rem !important; /* reduzido */
+                padding: 0.625rem 0.75rem !important; /* reduzido */
             }
             
-            /* Tabelas scroll horizontal */
+            .form-label {
+                font-size: 0.875rem !important; /* reduzido */
+                margin-bottom: 0.375rem !important; /* reduzido */
+            }
+            
+            /* Tabelas scroll horizontal - otimizadas */
             .table-responsive {
                 -webkit-overflow-scrolling: touch;
             }
             
-            /* Dashboard cards stack */
+            .table {
+                font-size: 0.8125rem !important; /* reduzido */
+            }
+            
+            .table th,
+            .table td {
+                padding: 0.5rem 0.375rem !important; /* reduzido */
+            }
+            
+            /* Dashboard cards stack - otimizados */
             .dashboard-card {
-                margin-bottom: 1rem;
+                margin-bottom: 0.75rem !important; /* reduzido */
+                padding: 0.75rem !important; /* reduzido */
             }
             
             /* Container padding reduzido */
             .container,
             .container-fluid {
-                padding-left: 0.75rem;
-                padding-right: 0.75rem;
+                padding-left: 0.625rem !important; /* reduzido */
+                padding-right: 0.625rem !important; /* reduzido */
+            }
+            
+            /* Stat cards menores */
+            .stat-number {
+                font-size: 1.5rem !important; /* reduzido */
+            }
+            
+            .stat-label {
+                font-size: 0.75rem !important; /* reduzido */
+            }
+            
+            /* Badges menores */
+            .badge {
+                font-size: 0.6875rem !important;
+                padding: 0.3125rem 0.625rem !important;
+            }
+            
+            /* Alerts menores */
+            .alert {
+                padding: 0.625rem 0.75rem !important;
+                font-size: 0.8125rem !important;
+            }
+            
+            /* Main content - padding otimizado */
+            .main-content {
+                padding: 0.75rem !important;
+            }
+            
+            /* Parágrafos e texto menor */
+            p, .text-body {
+                font-size: 0.875rem !important;
+                line-height: 1.5 !important;
+            }
+            
+            /* ===== ESTILOS ESPECÍFICOS PARA ABAS ===== */
+            
+            /* Dashboard - tamanhos reduzidos */
+            .dashboard-title {
+                font-size: 1.375rem !important;
+            }
+            
+            .dashboard-subtitle {
+                font-size: 0.8125rem !important;
+            }
+            
+            /* Vagas/Portal - tamanhos reduzidos */
+            .vagas-title,
+            .portal-title,
+            .monitorias-title {
+                font-size: 1.375rem !important;
+            }
+            
+            .vagas-subtitle,
+            .portal-subtitle,
+            .monitorias-subtitle {
+                font-size: 0.8125rem !important;
+            }
+            
+            .vaga-nome,
+            .monitoria-nome {
+                font-size: 1rem !important;
+            }
+            
+            .vaga-description,
+            .monitoria-description {
+                font-size: 0.8125rem !important;
+            }
+            
+            /* Info grids menores */
+            .info-item,
+            .vaga-info-item,
+            .monitoria-info-item {
+                font-size: 0.8125rem !important;
+                padding: 0.5rem !important;
+            }
+            
+            /* Seções de descrição menores */
+            .description-section,
+            .vaga-description-section,
+            .monitoria-description-section {
+                padding: 0.75rem !important;
+                font-size: 0.875rem !important;
+            }
+            
+            /* Listas menores */
+            .list-group-item {
+                padding: 0.625rem 0.75rem !important;
+                font-size: 0.875rem !important;
+            }
+            
+            /* Nav items menores */
+            .nav-link {
+                padding: 0.5rem 0.75rem !important;
+                font-size: 0.875rem !important;
+            }
+            
+            /* Breadcrumb menor */
+            .breadcrumb {
+                font-size: 0.8125rem !important;
+                padding: 0.5rem 0 !important;
+            }
+            
+            /* Accordion menor */
+            .accordion-button {
+                padding: 0.75rem !important;
+                font-size: 0.9375rem !important;
+            }
+            
+            .accordion-body {
+                padding: 0.75rem !important;
+                font-size: 0.875rem !important;
+            }
+            
+            /* Info cards específicos */
+            .info-card-header,
+            .stat-card-header {
+                font-size: 0.875rem !important;
+                padding: 0.625rem 0.75rem !important;
+            }
+            
+            .info-card-body,
+            .stat-card-body {
+                padding: 0.75rem !important;
+            }
+            
+            /* Presença/frequência cards */
+            .presenca-item,
+            .frequencia-item {
+                padding: 0.625rem !important;
+                font-size: 0.875rem !important;
+            }
+            
+            /* Status badges específicos */
+            .status-badge,
+            .vaga-status,
+            .monitoria-status {
+                font-size: 0.6875rem !important;
+                padding: 0.25rem 0.5rem !important;
+            }
+            
+            /* Documentos/uploads menores */
+            .documento-item,
+            .upload-item {
+                padding: 0.625rem !important;
+                font-size: 0.875rem !important;
+            }
+            
+            /* Row spacing reduzido */
+            .row {
+                margin-bottom: 0.75rem !important;
+            }
+            
+            .col, [class*="col-"] {
+                padding-left: 0.375rem !important;
+                padding-right: 0.375rem !important;
             }
         }
         
@@ -782,7 +994,326 @@
             .sidebar.show {
                 width: 250px;
             }
-        }        .main-content {
+            
+            /* Títulos maiores no desktop */
+            .monitorias-title,
+            .vagas-title,
+            .portal-title {
+                font-size: 2.5rem !important;
+            }
+            
+            .monitorias-subtitle,
+            .vagas-subtitle,
+            .portal-subtitle {
+                font-size: 1.1rem !important;
+            }
+        }
+        
+        /* ============================================================================
+         * MODAIS - MOBILE FIRST APPROACH
+         * ============================================================================
+         * Estilos completos para modais Bootstrap com abordagem mobile-first
+         * Base: otimizado para mobile, breakpoints para desktop
+         */
+        
+        /* Modal backdrop - overlay escuro */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            opacity: 0;
+            transition: opacity 0.15s linear;
+        }
+        
+        .modal-backdrop.show {
+            opacity: 1;
+        }
+        
+        /* Container do modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1050;
+            overflow-x: hidden;
+            overflow-y: auto;
+            outline: 0;
+            display: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .modal.show {
+            display: block;
+        }
+        
+        /* Dialog do modal - Mobile First */
+        .modal-dialog {
+            position: relative;
+            width: auto;
+            margin: 0.5rem;
+            pointer-events: none;
+            min-height: calc(100% - 1rem);
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Content do modal */
+        .modal-content {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            pointer-events: auto;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 0.5rem;
+            outline: 0;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            max-height: calc(100vh - 1rem);
+            overflow: hidden;
+        }
+        
+        /* Header do modal - Mobile */
+        .modal-header {
+            display: flex;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #dee2e6;
+            border-top-left-radius: calc(0.5rem - 1px);
+            border-top-right-radius: calc(0.5rem - 1px);
+            background: linear-gradient(135deg, #002555 0%, #1245FF 100%);
+        }
+        
+        /* Título do modal - Mobile */
+        .modal-title {
+            margin: 0;
+            line-height: 1.4;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+        
+        /* Botão de fechar - Mobile */
+        .modal-header .btn-close {
+            padding: 0.5rem;
+            margin: -0.5rem -0.5rem -0.5rem auto;
+            background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+            border: 0;
+            border-radius: 0.25rem;
+            opacity: 0.9;
+            width: 1.5rem;
+            height: 1.5rem;
+            box-sizing: content-box;
+        }
+        
+        .modal-header .btn-close:hover {
+            opacity: 1;
+        }
+        
+        .modal-header .btn-close:focus {
+            outline: 0;
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+            opacity: 1;
+        }
+        
+        /* Body do modal - Mobile */
+        .modal-body {
+            position: relative;
+            flex: 1 1 auto;
+            padding: 1rem;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            max-height: calc(100vh - 10rem);
+        }
+        
+        /* Footer do modal - Mobile */
+        .modal-footer {
+            display: flex;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0.75rem;
+            border-top: 1px solid #dee2e6;
+            border-bottom-right-radius: calc(0.5rem - 1px);
+            border-bottom-left-radius: calc(0.5rem - 1px);
+            gap: 0.5rem;
+        }
+        
+        .modal-footer > * {
+            margin: 0;
+        }
+        
+        /* Variantes de tamanho do modal - Mobile First */
+        .modal-sm {
+            max-width: 300px;
+        }
+        
+        .modal-lg {
+            max-width: 800px;
+        }
+        
+        .modal-xl {
+            max-width: 1140px;
+        }
+        
+        /* Modal centralizado */
+        .modal-dialog-centered {
+            display: flex;
+            align-items: center;
+            min-height: calc(100% - 1rem);
+        }
+        
+        /* Modal com scroll interno */
+        .modal-dialog-scrollable {
+            height: calc(100% - 1rem);
+        }
+        
+        .modal-dialog-scrollable .modal-content {
+            max-height: 100%;
+            overflow: hidden;
+        }
+        
+        .modal-dialog-scrollable .modal-body {
+            overflow-y: auto;
+        }
+        
+        /* Animações do modal */
+        .modal.fade .modal-dialog {
+            transition: transform 0.3s ease-out;
+            transform: translate(0, -50px);
+        }
+        
+        .modal.show .modal-dialog {
+            transform: none;
+        }
+        
+        /* ===== BREAKPOINT: TABLET (576px+) ===== */
+        @media (min-width: 576px) {
+            .modal-dialog {
+                max-width: 500px;
+                margin: 1.75rem auto;
+            }
+            
+            .modal-dialog-centered {
+                min-height: calc(100% - 3.5rem);
+            }
+            
+            .modal-dialog-scrollable {
+                height: calc(100% - 3.5rem);
+            }
+            
+            .modal-sm {
+                max-width: 300px;
+            }
+        }
+        
+        /* ===== BREAKPOINT: DESKTOP (768px+) ===== */
+        @media (min-width: 768px) {
+            .modal-dialog {
+                max-width: 600px;
+            }
+            
+            .modal-header {
+                padding: 1rem 1.25rem;
+            }
+            
+            .modal-title {
+                font-size: 1.25rem;
+            }
+            
+            .modal-body {
+                padding: 1.25rem;
+                max-height: calc(100vh - 8rem);
+            }
+            
+            .modal-footer {
+                padding: 1rem 1.25rem;
+            }
+        }
+        
+        /* ===== BREAKPOINT: LARGE DESKTOP (992px+) ===== */
+        @media (min-width: 992px) {
+            .modal-lg,
+            .modal-xl {
+                max-width: 800px;
+            }
+        }
+        
+        /* ===== BREAKPOINT: EXTRA LARGE DESKTOP (1200px+) ===== */
+        @media (min-width: 1200px) {
+            .modal-xl {
+                max-width: 1140px;
+            }
+        }
+        
+        /* Estilos específicos para conteúdo do modal */
+        .modal-body h1,
+        .modal-body h2,
+        .modal-body h3,
+        .modal-body h4,
+        .modal-body h5,
+        .modal-body h6 {
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+            color: #002555;
+        }
+        
+        .modal-body p {
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+        
+        .modal-body p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .modal-body ul,
+        .modal-body ol {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+        }
+        
+        .modal-body ul li,
+        .modal-body ol li {
+            margin-bottom: 0.25rem;
+        }
+        
+        /* Botões dentro do modal footer */
+        .modal-footer .btn {
+            min-width: 80px;
+        }
+        
+        @media (max-width: 575px) {
+            .modal-footer {
+                flex-direction: column;
+            }
+            
+            .modal-footer .btn {
+                width: 100%;
+            }
+        }
+        
+        /* Prevenir scroll do body quando modal está aberto */
+        body.modal-open {
+            overflow: hidden;
+            padding-right: 0 !important;
+        }
+        
+        .main-content {
             padding: 1.25rem; /* Espaçamento confortável - não muito apertado */
             background-color: #fafaf8;
             margin-left: 250px;

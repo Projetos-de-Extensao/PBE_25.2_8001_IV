@@ -1,6 +1,102 @@
 {% extends 'base.html' %}
 {% block title %}Participações - Plataforma Casa{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Mobile cards - hidden on desktop */
+    .mobile-cards {
+        display: none;
+    }
+    
+    @media (max-width: 768px) {
+        .desktop-table {
+            display: none !important;
+        }
+        
+        .mobile-cards {
+            display: block;
+        }
+        
+        .participacao-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 37, 85, 0.08);
+            border: 1px solid rgba(0, 37, 85, 0.06);
+        }
+        
+        .participacao-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .participacao-card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #002555;
+            margin: 0 0 0.25rem 0;
+        }
+        
+        .participacao-card-subtitle {
+            font-size: 0.8125rem;
+            color: #6c757d;
+            margin: 0;
+        }
+        
+        .participacao-card-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            font-size: 0.6875rem;
+            font-weight: 700;
+            color: #002555;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-value {
+            font-size: 0.875rem;
+            color: #495057;
+        }
+        
+        .participacao-card-actions {
+            padding-top: 0.75rem;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .mobile-action-btn {
+            width: 100%;
+            padding: 0.625rem;
+            font-size: 0.875rem;
+            border-radius: 6px;
+        }
+        
+        .page-title {
+            padding-top: 2.5rem;
+        }
+        
+        .page-title h1 {
+            font-size: 1.25rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -30,7 +126,8 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="table-responsive">
+        <!-- Desktop Table -->
+        <div class="table-responsive desktop-table">
             <table class="table table-hover">
                 <thead>
                     <tr>
@@ -93,6 +190,77 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="mobile-cards">
+            {% for participacao in participacoes %}
+                <div class="participacao-card">
+                    <div class="participacao-card-header">
+                        <div>
+                            <div class="participacao-card-title">{{ participacao.aluno.nome }}</div>
+                            <div class="participacao-card-subtitle">{{ participacao.turma.nome }}</div>
+                        </div>
+                        <span class="badge bg-secondary">#{{ participacao.id }}</span>
+                    </div>
+                    
+                    <div class="participacao-card-body">
+                        <div class="info-item">
+                            <span class="info-label">AP1</span>
+                            <span class="info-value">
+                                {% if participacao.ap1 %}
+                                    <span class="badge bg-info">{{ participacao.ap1 }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">AP2</span>
+                            <span class="info-value">
+                                {% if participacao.ap2 %}
+                                    <span class="badge bg-info">{{ participacao.ap2 }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">CR</span>
+                            <span class="info-value">
+                                {% if participacao.cr %}
+                                    <span class="badge bg-success">{{ participacao.cr }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">Média</span>
+                            <span class="info-value">
+                                {% if participacao.ap1 and participacao.ap2 %}
+                                    <strong>{{ media }}</strong>
+                                {% else %}
+                                    <span class="text-muted">Pendente</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="participacao-card-actions">
+                        <a href="{% url 'editar_participacao' participacao.id %}" class="btn btn-outline-primary mobile-action-btn">
+                            <i class="fas fa-edit"></i> Editar Participação
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="text-center text-muted py-4">
+                    Nenhuma participação encontrada.
+                </div>
+            {% endfor %}
         </div>
     </div>
 </div>

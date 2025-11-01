@@ -10,6 +10,7 @@
         padding: 2rem;
         border-radius: 12px;
         margin-bottom: 2rem;
+        margin-top: 2rem;
         border-left: 4px solid #F5AC00;
         box-shadow: 0 4px 12px rgba(0, 37, 85, 0.15);
     }
@@ -143,6 +144,18 @@
         font-size: 3rem;
         color: #1245FF;
         margin-bottom: 1rem;
+    }
+
+    /* Responsivo - Mobile */
+    @media (max-width: 768px) {
+        .page-header {
+            margin-top: 3rem;
+            padding: 1.5rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
     }
 </style>
 {% endblock %}
