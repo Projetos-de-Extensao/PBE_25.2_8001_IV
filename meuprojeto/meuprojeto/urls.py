@@ -70,21 +70,7 @@ API REST completa para gerenciamento de monitoria acadêmica, incluindo:
 - **Controle**: Presenças, Horas, Pagamentos
 - **Conteúdo**: Materiais de Apoio, Documentos
 - **Análise**: Estatísticas do Sistema
-
----
-**Suporte**: suporte@plataformacasa.com.br  
-**Documentação**: [API Guide](https://github.com/Projetos-de-Extensao/PBE_25.2_8001_IV)
         """,
-        terms_of_service="https://www.unifeso.edu.br/",
-        contact=openapi.Contact(
-            name="Equipe Plataforma CASA",
-            email="suporte@plataformacasa.com.br",
-            url="https://www.unifeso.edu.br"
-        ),
-        license=openapi.License(
-            name="MIT License",
-            url="https://opensource.org/licenses/MIT"
-        ),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
