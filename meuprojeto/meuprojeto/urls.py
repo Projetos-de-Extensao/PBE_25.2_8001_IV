@@ -10,13 +10,13 @@ Documentação: https://docs.djangoproject.com/en/5.2/topics/http/urls/
 ================================================================================
 """
 
+from django.contrib import admin
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
-from django.contrib import admin
-from django.urls import include, path, re_path
-from drf_yasg import openapi
-from drf_yasg.views import get_schema_view
 from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
 # ================================================================================
 # DOCUMENTAÇÃO SWAGGER (DRF-YASG)
@@ -70,21 +70,7 @@ API REST completa para gerenciamento de monitoria acadêmica, incluindo:
 - **Controle**: Presenças, Horas, Pagamentos
 - **Conteúdo**: Materiais de Apoio, Documentos
 - **Análise**: Estatísticas do Sistema
-
----
-**Suporte**: suporte@plataformacasa.com.br  
-**Documentação**: [API Guide](https://github.com/Projetos-de-Extensao/PBE_25.2_8001_IV)
         """,
-        terms_of_service="https://www.ibmec.br/",
-        contact=openapi.Contact(
-            name="Equipe Plataforma CASA",
-            email="suporte@plataformacasa.com.br",
-            url="https://www.ibmec.br"
-        ),
-        license=openapi.License(
-            name="MIT License",
-            url="https://opensource.org/licenses/MIT"
-        ),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
