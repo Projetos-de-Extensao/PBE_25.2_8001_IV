@@ -1,0 +1,589 @@
+/* Vagas Portal Styles */
+
+/* Variables */
+:root {
+    --primary-blue: #002555;
+    --accent-yellow: #F5AC00;
+    --light-blue: #1245FF;
+    --text-dark: #2c3e50;
+    --text-medium: #7f8c8d;
+    --bg-light: #f8f9fa;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    color: var(--text-dark);
+}
+
+/* Navbar */
+.navbar-custom {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, #003a7a 100%);
+    box-shadow: 0 4px 20px rgba(0, 37, 85, 0.15);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: white !important;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.navbar-brand i {
+    color: var(--accent-yellow);
+    font-size: 1.8rem;
+}
+
+.nav-link-custom {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.nav-link-custom:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white !important;
+}
+
+.btn-login {
+    background: rgba(255, 255, 255, 0.2);
+    color: white !important;
+    border: 2px solid white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-height: 44px;
+}
+
+.btn-login:hover {
+    background: white;
+    color: var(--primary-blue) !important;
+}
+
+.btn-register {
+    background: var(--accent-yellow);
+    color: var(--primary-blue) !important;
+    border: 2px solid var(--accent-yellow);
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-height: 44px;
+}
+
+.btn-register:hover {
+    background: #ffc107;
+    border-color: #ffc107;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, #003a7a 100%);
+    color: white;
+    padding: 2rem 0;
+}
+
+.hero-section h1 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: #f8f9fa;
+    text-align: center;
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.hero-section h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 4px;
+    background: var(--accent-yellow);
+    border-radius: 2px;
+}
+
+.hero-section p {
+    font-size: 1rem;
+    opacity: 0.95;
+    max-width: 600px;
+}
+
+.hero-stats {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.stat-item {
+    text-align: center;
+    flex: 1;
+    min-width: 80px;
+}
+
+.stat-number {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--accent-yellow);
+    display: block;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+}
+
+/* Filtros */
+.filter-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.5rem;
+}
+
+.filter-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-title i {
+    color: var(--accent-yellow);
+}
+
+.form-control,
+.form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    min-height: 44px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(0, 37, 85, 0.1);
+}
+
+.btn-filter {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 0.875rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-height: 44px;
+    font-size: 0.95rem;
+}
+
+.btn-filter:hover {
+    background: #003a7a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 37, 85, 0.2);
+}
+
+.btn-clear {
+    background: transparent;
+    color: var(--text-medium);
+    border: 2px solid #dee2e6;
+    padding: 0.875rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-height: 44px;
+}
+
+.btn-clear:hover {
+    border-color: var(--text-medium);
+    color: var(--text-dark);
+}
+
+/* Cards de Vagas */
+.vagas-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 0 0.5rem;
+}
+
+.vaga-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 420px;
+}
+
+.vaga-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-blue), var(--accent-yellow));
+}
+
+.vaga-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 37, 85, 0.15);
+    border-color: var(--primary-blue);
+}
+
+.vaga-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.vaga-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 0.25rem;
+    line-height: 1.3;
+}
+
+.vaga-curso {
+    font-size: 0.875rem;
+    color: var(--text-medium);
+    font-weight: 500;
+}
+
+.badge-status {
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-aberta {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.badge-fechada {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.vaga-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: var(--bg-light);
+    border-radius: 8px;
+}
+
+.info-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 37, 85, 0.1);
+    border-radius: 6px;
+    color: var(--primary-blue);
+    font-size: 0.875rem;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-label {
+    font-size: 0.7rem;
+    color: var(--text-medium);
+    text-transform: uppercase;
+    font-weight: 600;
+    margin: 0;
+}
+
+.info-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.vaga-description {
+    background: rgba(245, 172, 0, 0.08);
+    border-left: 3px solid var(--accent-yellow);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    flex: 1;
+}
+
+.vaga-description p {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.vaga-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: auto;
+}
+
+.btn-candidatar {
+    flex: 1;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--light-blue) 100%);
+    color: white;
+    border: none;
+    padding: 0.875rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.btn-candidatar:hover {
+    background: linear-gradient(135deg, #001a3d 0%, var(--primary-blue) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(18, 69, 255, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-detalhes {
+    background: transparent;
+    color: var(--primary-blue);
+    border: 2px solid var(--primary-blue);
+    padding: 0.875rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-detalhes:hover {
+    background: var(--primary-blue);
+    color: white;
+    text-decoration: none;
+}
+
+/* Small text utilities */
+.text-muted-small {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+    .hero-section {
+        padding: 3rem 0;
+    }
+
+    .hero-section h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-section h1::after {
+        width: 150px;
+    }
+
+    .hero-section p {
+        font-size: 1.15rem;
+    }
+
+    .hero-stats {
+        gap: 2rem;
+        margin-top: 2rem;
+        justify-content: center;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+    }
+
+    .filter-section {
+        padding: 1.75rem;
+        border-radius: 14px;
+    }
+
+    .filter-title {
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .vagas-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+        padding: 0;
+    }
+
+    .vaga-card {
+        padding: 1.5rem;
+        border-radius: 16px;
+        min-height: 450px;
+    }
+
+    .vaga-title {
+        font-size: 1.25rem;
+    }
+}
+
+@media (min-width: 992px) {
+    .navbar-nav .nav-item:has(.btn-login) {
+        margin-right: 1rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero-section {
+        padding: 4rem 0;
+    }
+
+    .hero-section h1 {
+        font-size: 3rem;
+    }
+
+    .hero-section h1::after {
+        width: 200px;
+        height: 5px;
+    }
+
+    .hero-section p {
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-stats {
+        gap: 3rem;
+    }
+
+    .filter-section {
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .vagas-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    .vaga-card {
+        min-height: 430px;
+    }
+}
+
+/* Mobile menu improvements */
+@media (max-width: 991px) {
+    .navbar-collapse {
+        padding: 1.5rem 0 1rem 0;
+        background: var(--primary-blue);
+        margin-top: 1rem;
+        border-radius: 12px;
+    }
+
+    .navbar-nav {
+        gap: 0;
+        padding: 0 1rem;
+    }
+
+    .navbar-nav .nav-item {
+        width: 100%;
+    }
+
+    .navbar-nav .nav-link-custom {
+        padding: 0.875rem 1rem !important;
+        margin-bottom: 0.5rem;
+        display: block;
+        width: 100%;
+        text-align: left;
+    }
+
+    .navbar-nav .nav-link-custom:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .navbar-nav .nav-item:nth-child(2) {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding-bottom: 1rem;
+        margin-bottom: 1rem !important;
+    }
+
+    .navbar-nav .btn-login,
+    .navbar-nav .btn-register {
+        width: 100%;
+        padding: 0.875rem;
+        margin: 0 0 0.75rem 0 !important;
+        font-size: 1rem;
+        min-height: 48px;
+        display: block;
+        text-align: center;
+    }
+
+    .navbar-nav .nav-item:last-child .btn-register {
+        margin-bottom: 0 !important;
+    }
+}
+
+/* Additional utility classes */
+.navbar-toggler-custom {
+    border: 2px solid white;
+}
+
+.container-custom {
+    margin-top: -2rem;
+    position: relative;
+    z-index: 10;
+}
