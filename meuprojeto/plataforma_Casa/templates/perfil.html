@@ -55,7 +55,7 @@
     Espaçamento vertical para criar distância visual e evitar sobreposição do header
 -->
 <div class="container perfil-container">
-    
+
     <!--
         ====================================================================
         SEÇÃO: HEADER DO PERFIL
@@ -68,7 +68,7 @@
         <div class="profile-avatar-large">
             <i class="fas fa-user-circle"></i>
         </div>
-        
+
         <!-- 
             Nome do usuário com fallback em cascata:
             1. Nome do cadastro de Aluno (se existir)
@@ -76,7 +76,7 @@
             3. Username (última opção)
         -->
         <h1 class="perfil-title mt-3">{{ aluno.nome|default:usuario.get_full_name|default:usuario.username }}</h1>
-        
+
         <!-- Email do usuário para contato -->
         <p class="perfil-subtitle">{{ usuario.email }}</p>
     </div>
@@ -90,7 +90,7 @@
     -->
     <div class="row justify-content-center">
         <div class="col-lg-10">
-            
+
             <!--
                 ====================================================================
                 CARD PRINCIPAL DO PERFIL
@@ -99,16 +99,16 @@
                 Estrutura em seções para melhor organização
             -->
             <div class="perfil-card">
-                
+
                 <!-- Header do card com ícone e título -->
                 <div class="perfil-card-header">
                     <i class="fas fa-user-edit"></i>
                     <span>Informações Pessoais</span>
                 </div>
-                
+
                 <!-- Corpo do card com conteúdo -->
                 <div class="perfil-card-body">
-                    
+
                     <!--
                         ====================================================================
                         FORMULÁRIO PRINCIPAL DE EDIÇÃO
@@ -118,7 +118,7 @@
                     -->
                     <form method="post">
                         {% csrf_token %}
-                        
+
                         <!--
                             ====================================================================
                             SEÇÃO 1: DADOS BÁSICOS (EDITÁVEIS)
@@ -132,17 +132,16 @@
                                 <!-- Campo: Nome Completo -->
                                 <div class="col-md-6">
                                     <label for="nome" class="form-label-custom">Nome Completo</label>
-                                    <input type="text" class="form-control-custom" id="nome" name="nome" 
-                                           value="{{ aluno.nome|default:usuario.get_full_name|default:usuario.username }}" 
-                                           required>
+                                    <input type="text" class="form-control-custom" id="nome" name="nome"
+                                        value="{{ aluno.nome|default:usuario.get_full_name|default:usuario.username }}"
+                                        required>
                                 </div>
-                                
+
                                 <!-- Campo: Email -->
                                 <div class="col-md-6">
                                     <label for="email" class="form-label-custom">Email</label>
-                                    <input type="email" class="form-control-custom" id="email" name="email" 
-                                           value="{{ usuario.email }}" 
-                                           required>
+                                    <input type="email" class="form-control-custom" id="email" name="email"
+                                        value="{{ usuario.email }}" required>
                                 </div>
                             </div>
                         </div>
@@ -158,7 +157,7 @@
                             - Se é professor: exibir dados profissionais (departamento, função)
                             - Senão: exibir mensagem genérica
                         -->
-                        
+
                         {# Exibir dados acadêmicos sempre que houver objeto Aluno (alunos e monitores) #}
                         {% if aluno %}
                         <div class="form-section">
@@ -169,14 +168,14 @@
                                     <label class="form-label-custom">Matrícula</label>
                                     <div class="form-value-readonly">{{ aluno.matricula }}</div>
                                 </div>
-                                
+
                                 <!-- Curso (readonly) -->
                                 <div class="col-md-6">
                                     <label class="form-label-custom">Curso</label>
                                     <div class="form-value-readonly">{{ aluno.curso.nome }}</div>
                                 </div>
                             </div>
-                            
+
                             <!-- Segunda linha de informações -->
                             <div class="row g-3 mt-2">
                                 <!-- Período (readonly) -->
@@ -184,7 +183,7 @@
                                     <label class="form-label-custom">Período</label>
                                     <div class="form-value-readonly">{{ aluno.periodo }}º Período</div>
                                 </div>
-                                
+
                                 <!-- CR Geral (readonly) - Coeficiente de Rendimento -->
                                 <div class="col-md-6">
                                     <label class="form-label-custom">CR Geral</label>
@@ -192,7 +191,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Alternativa: Se é professor, exibir dados profissionais -->
                         {% elif is_professor and professor %}
                         <div class="form-section">
@@ -203,7 +202,7 @@
                                     <label class="form-label-custom">Departamento</label>
                                     <div class="form-value-readonly">{{ professor.departamento }}</div>
                                 </div>
-                                
+
                                 <!-- Função (readonly) -->
                                 <div class="col-md-6">
                                     <label class="form-label-custom">Função</label>
@@ -211,7 +210,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Fallback: Usuário sem informações vinculadas -->
                         {% else %}
                         <div class="form-section">
@@ -254,7 +253,7 @@
                             <a href="{% url 'dashboard' %}" class="btn-action btn-secondary-custom">
                                 <i class="fas fa-times"></i> Cancelar
                             </a>
-                            
+
                             <!-- Botão Salvar -->
                             <button type="submit" class="btn-action btn-primary-custom">
                                 <i class="fas fa-save"></i> Salvar Alterações
@@ -283,7 +282,7 @@
 <div class="modal fade" id="modalSenha" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content modal-custom">
-            
+
             <!--
                 Header customizado do modal
                 Com ícone, título e botão de fechar
@@ -293,16 +292,16 @@
                 <div class="modal-icon">
                     <i class="fas fa-key"></i>
                 </div>
-                
+
                 <!-- Título do modal -->
                 <h5 class="modal-title-custom">Alterar Senha</h5>
-                
+
                 <!-- Botão de fechar -->
                 <button type="button" class="btn-close-custom" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
+
             <!--
                 Formulário separado para alteração de senha
                 Enviado para URL específica (alterar_senha)
@@ -310,10 +309,10 @@
             -->
             <form method="post" action="{% url 'alterar_senha' %}">
                 {% csrf_token %}
-                
+
                 <!-- Body do modal com campos de senha -->
                 <div class="modal-body-custom">
-                    
+
                     <!--
                         CAMPO 1: SENHA ATUAL
                         Validação de acesso - user deve confirmar senha antiga
@@ -323,10 +322,10 @@
                         <label for="senhaAtual" class="form-label-modal">
                             <i class="fas fa-lock"></i> Senha Atual
                         </label>
-                        <input type="password" class="form-control-modal" id="senhaAtual" 
-                               name="senha_atual" placeholder="Digite sua senha atual" required>
+                        <input type="password" class="form-control-modal" id="senhaAtual" name="senha_atual"
+                            placeholder="Digite sua senha atual" required>
                     </div>
-                    
+
                     <!--
                         CAMPO 2: NOVA SENHA
                         Deverá atender aos requisitos de força
@@ -336,10 +335,10 @@
                         <label for="senhaNova" class="form-label-modal">
                             <i class="fas fa-key"></i> Nova Senha
                         </label>
-                        <input type="password" class="form-control-modal" id="senhaNova" 
-                               name="senha_nova" placeholder="Digite a nova senha" required>
+                        <input type="password" class="form-control-modal" id="senhaNova" name="senha_nova"
+                            placeholder="Digite a nova senha" required>
                     </div>
-                    
+
                     <!--
                         CAMPO 3: CONFIRMAÇÃO DE NOVA SENHA
                         Evita erros de digitação
@@ -349,10 +348,10 @@
                         <label for="senhaConfirmar" class="form-label-modal">
                             <i class="fas fa-check-circle"></i> Confirmar Nova Senha
                         </label>
-                        <input type="password" class="form-control-modal" id="senhaConfirmar" 
-                               name="senha_confirmar" placeholder="Confirme a nova senha" required>
+                        <input type="password" class="form-control-modal" id="senhaConfirmar" name="senha_confirmar"
+                            placeholder="Confirme a nova senha" required>
                     </div>
-                    
+
                     <!--
                         DICA DE SEGURANÇA
                         Informa requisitos mínimos de senha ao usuário
@@ -363,14 +362,14 @@
                         <span>Use pelo menos 8 caracteres com letras e números</span>
                     </div>
                 </div>
-                
+
                 <!-- Footer do modal com botões de ação -->
                 <div class="modal-footer-custom">
                     <!-- Botão Cancelar -->
                     <button type="button" class="btn-modal btn-cancel" data-bs-dismiss="modal">
                         Cancelar
                     </button>
-                    
+
                     <!-- Botão Confirmar alteração -->
                     <button type="submit" class="btn-modal btn-confirm">
                         <i class="fas fa-check"></i> Alterar Senha
@@ -382,509 +381,6 @@
 </div>
 
 {% block extra_css %}
-<style>
-/*
- * ========================================================================
- * ESTILOS DO PERFIL
- * ========================================================================
- * Componentes visuais para página de gerenciamento de perfil
- * Utiliza variáveis CSS e utility classes do Bootstrap
- */
-
-/* 
- * ========================================================================
- * CONTAINER PRINCIPAL
- * ========================================================================
- * Espaçamento adequado para evitar sobreposição do header fixo
- */
-.perfil-container {
-    padding-top: 2rem;
-    padding-bottom: 3rem;
-    margin-top: 0;
-}
-
-/* 
- * ========================================================================
- * SEÇÃO: AVATAR DO USUÁRIO
- * ========================================================================
- * Exibição visual circular com degradê
- */
-.profile-avatar-large {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto;
-    background: linear-gradient(135deg, #003366 0%, #005599 100%);
-    border-radius: 50%;                 /* Circular */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 8px 24px rgba(0, 51, 102, 0.2);
-}
-
-.profile-avatar-large i {
-    font-size: 60px;
-    color: #ffffff;
-}
-
-/* 
- * ========================================================================
- * TÍTULOS E SUBTÍTULOS DE PERFIL
- * ========================================================================
- */
-.perfil-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 0.5rem;
-}
-
-.perfil-subtitle {
-    font-size: 1rem;
-    color: #7f8c8d;
-    margin-bottom: 1rem;
-}
-
-.perfil-badge {
-    display: inline-block;
-    padding: 0.5rem 1.25rem;
-    background: linear-gradient(135deg, #003366 0%, #005599 100%);
-    color: #ffffff;
-    border-radius: 20px;
-    font-size: 0.875rem;
-    font-weight: 600;
-}
-
-/* 
- * ========================================================================
- * CARD PRINCIPAL DO PERFIL
- * ========================================================================
- */
-.perfil-card {
-    background: #ffffff;
-    border: 1px solid #e0e6ed;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-.perfil-card-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1.25rem 1.5rem;
-    background: #f8fafc;
-    border-bottom: 1px solid #e0e6ed;
-    font-weight: 600;
-    color: #334155;
-    font-size: 1rem;
-}
-
-.perfil-card-header i {
-    color: #003366;
-    font-size: 1.125rem;
-}
-
-.perfil-card-body {
-    padding: 1.5rem;
-}
-
-/* 
- * ========================================================================
- * SEÇÕES DO FORMULÁRIO
- * ========================================================================
- * Organização visual das informações em agrupamentos temáticos
- */
-.form-section {
-    margin-bottom: 2rem;
-}
-
-.form-section:last-child {
-    margin-bottom: 0;
-}
-
-.section-title {
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #e0e6ed;
-}
-
-/* 
- * ========================================================================
- * LABELS E INPUTS CUSTOMIZADOS
- * ========================================================================
- */
-.form-label-custom {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #475569;
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
-.form-control-custom {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    font-size: 0.9375rem;
-    color: #334155;
-    background: #ffffff;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.form-control-custom:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* 
- * ========================================================================
- * CAMPOS READONLY
- * ========================================================================
- * Exibição de dados que não podem ser alterados (académicos/profissionais)
- */
-.form-value-readonly {
-    padding: 0.75rem 1rem;
-    font-size: 0.9375rem;
-    color: #64748b;
-    background: #f8fafc;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 8px;
-    font-weight: 500;
-}
-
-.form-value-highlight {
-    padding: 0.75rem 1rem;
-    font-size: 1.125rem;
-    color: #003366;
-    background: #eff6ff;
-    border: 1.5px solid #bfdbfe;
-    border-radius: 8px;
-    font-weight: 700;
-}
-
-/* 
- * ========================================================================
- * BOTÕES DE AÇÃO
- * ========================================================================
- */
-.form-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #e0e6ed;
-}
-
-.btn-action {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.btn-secondary-custom {
-    background: #f1f5f9;
-    color: #64748b;
-}
-
-.btn-secondary-custom:hover {
-    background: #e2e8f0;
-    color: #475569;
-}
-
-.btn-primary-custom {
-    background: #3b82f6;
-    color: #ffffff;
-}
-
-.btn-primary-custom:hover {
-    background: #2563eb;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-/* 
- * ========================================================================
- * BOTÃO DE ALTERAÇÃO DE SENHA
- * ========================================================================
- * Botão estilizado que abre modal de alteração
- */
-.btn-senha {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: #ffffff;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-senha:hover {
-    background: #fef2f2;
-    border-color: #fca5a5;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
-}
-
-.btn-senha > i:first-child {
-    font-size: 1.5rem;
-    color: #ef4444;
-}
-
-.btn-senha-title {
-    font-weight: 600;
-    color: #334155;
-    font-size: 0.9375rem;
-}
-
-.btn-senha-desc {
-    font-size: 0.8125rem;
-    color: #94a3b8;
-    margin-top: 0.25rem;
-}
-
-.btn-senha > i:last-child {
-    margin-left: auto;
-    color: #cbd5e1;
-}
-
-/* 
- * ========================================================================
- * MODAL CUSTOMIZADO
- * ========================================================================
- */
-.modal-custom {
-    border: none;
-    border-radius: 16px;
-    overflow: hidden;
-}
-
-.modal-header-custom {
-    padding: 2rem 2rem 1.5rem;
-    background: linear-gradient(135deg, #003366 0%, #005599 100%);
-    border: none;
-    position: relative;
-    text-align: center;
-}
-
-.modal-icon {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 1rem;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-icon i {
-    font-size: 28px;
-    color: #ffffff;
-}
-
-.modal-title-custom {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #ffffff;
-    margin: 0;
-}
-
-.btn-close-custom {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    width: 32px;
-    height: 32px;
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    border-radius: 50%;
-    color: #ffffff;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.btn-close-custom:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.modal-body-custom {
-    padding: 2rem;
-}
-
-.form-group-modal {
-    margin-bottom: 1.5rem;
-}
-
-.form-group-modal:last-of-type {
-    margin-bottom: 0;
-}
-
-.form-label-modal {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #475569;
-    margin-bottom: 0.5rem;
-}
-
-.form-label-modal i {
-    color: #64748b;
-    font-size: 0.875rem;
-}
-
-.form-control-modal {
-    width: 100%;
-    padding: 0.875rem 1rem;
-    font-size: 0.9375rem;
-    color: #334155;
-    background: #f8fafc;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.form-control-modal:focus {
-    outline: none;
-    background: #ffffff;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.form-control-modal::placeholder {
-    color: #cbd5e1;
-}
-
-.senha-dica {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem;
-    background: #f0f9ff;
-    border-left: 3px solid #3b82f6;
-    border-radius: 6px;
-    margin-top: 1.5rem;
-}
-
-.senha-dica i {
-    color: #3b82f6;
-    font-size: 1rem;
-}
-
-.senha-dica span {
-    font-size: 0.8125rem;
-    color: #1e40af;
-}
-
-.modal-footer-custom {
-    padding: 1.5rem 2rem;
-    background: #f8fafc;
-    border-top: 1px solid #e0e6ed;
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-}
-
-.btn-modal {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.btn-cancel {
-    background: #ffffff;
-    color: #64748b;
-    border: 1.5px solid #e2e8f0;
-}
-
-.btn-cancel:hover {
-    background: #f8fafc;
-    color: #475569;
-}
-
-.btn-confirm {
-    background: #ef4444;
-    color: #ffffff;
-}
-
-.btn-confirm:hover {
-    background: #dc2626;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-}
-
-/* 
- * ========================================================================
- * RESPONSIVIDADE - MOBILE
- * ========================================================================
- */
-@media (max-width: 768px) {
-    .perfil-container {
-        padding-top: 2.5rem;    /* Aumentado para compensar header no mobile */
-        padding-bottom: 2rem;
-    }
-    
-    .perfil-title {
-        font-size: 1.5rem;
-    }
-    
-    .profile-avatar-large {
-        width: 100px;
-        height: 100px;
-        margin-top: 1rem;       /* Espaço extra acima do avatar */
-    }
-    
-    .profile-avatar-large i {
-        font-size: 50px;
-    }
-    
-    .text-center.mb-5 {
-        margin-bottom: 2rem !important;
-    }
-    
-    .form-actions {
-        flex-direction: column;
-    }
-    
-    .btn-action {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .modal-body-custom,
-    .modal-header-custom {
-        padding: 1.5rem;
-    }
-}
-</style>
+<link rel="stylesheet" href="{% static 'css/common.css' %}">
+<link rel="stylesheet" href="{% static 'css/perfil.css' %}">
 {% endblock %}
