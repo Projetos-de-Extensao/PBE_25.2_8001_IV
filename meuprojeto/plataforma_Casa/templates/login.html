@@ -9,7 +9,7 @@
     Implementa interface de formulário de login responsiva e acessível.
     
     Funcionalidades Principais:
-    - Autenticação por usuário ou email
+    - Autenticação por matrícula ou email
     - Toggle de visualização de senha
     - Opção "Lembrar-me" para manter sessão
     - Validação de credenciais pelo Django
@@ -23,7 +23,7 @@
     - Envio de credenciais apenas via HTTPS em produção
     
     Fluxo de Usuário:
-    1. Usuário insere credenciais (username/email + password)
+    1. Usuário insere credenciais (matrícula/email + password)
     2. Django autentica credenciais no backend configurado
     3. Se sucesso: redireciona para dashboard baseado em perfil (aluno/monitor/professor/admin)
     4. Se falha: exibe mensagem de erro e permite nova tentativa
@@ -529,17 +529,17 @@
             <div class="form-group">
                 <label for="username">
                     <!-- Ícone de usuário para melhor UX -->
-                    <i class="fas fa-user"></i> Usuário ou Email
+                    <i class="fas fa-id-card"></i> Matrícula ou Email
                 </label>
                 <div class="input-group">
                     <!-- Ícone dentro do input -->
-                    <i class="fas fa-user input-icon"></i>
+                    <i class="fas fa-id-card input-icon"></i>
                     <!-- Campo de entrada com focus automático (autofocus) -->
                     <input 
                         type="text" 
                         id="username" 
                         name="username" 
-                        placeholder="Digite seu usuário ou email"
+                        placeholder="Digite sua matrícula ou email"
                         required
                         autofocus
                     >

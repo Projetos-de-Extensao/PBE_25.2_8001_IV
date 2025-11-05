@@ -336,6 +336,10 @@ urlpatterns = [
     # Portal para visualização e candidatura às vagas de monitoria
     path('portal-vagas/', views.portal_vagas, name='portal_vagas'),
     
+    # --- Atualizar Perfil Rápido (AJAX) ---
+    # Endpoint AJAX para atualizar perfil do aluno rapidamente
+    path('atualizar-perfil-rapido/', views.atualizar_perfil_rapido, name='atualizar_perfil_rapido'),
+    
     # --- Sobre o Programa de Monitoria ---
     # Página informativa sobre TEA e Monitoria Voluntária
     path('sobre-programa/', views.sobre_programa, name='sobre_programa'),

@@ -193,17 +193,21 @@ def register_view(request):
             email = request.POST.get('email', '').strip()
             matricula = request.POST.get('matricula', '').strip()
             curso_id = request.POST.get('curso')
-            periodo = request.POST.get('periodo')
-            cr_geral = request.POST.get('cr_geral')
-            username = request.POST.get('username', '').strip()
             password = request.POST.get('password', '')
             password_confirm = request.POST.get('password_confirm', '')
             terms = request.POST.get('terms')
             
+            # Gerar username automaticamente a partir do email
+            username = email.split('@')[0] if email else ''
+            
+            # Valores padrão para campos removidos
+            periodo = 1  # Valor padrão
+            cr_geral = 0.0  # Valor padrão
+            
             # ==================== VALIDAÇÕES ====================
             
             # Validar campos obrigatórios
-            if not all([nome, email, matricula, curso_id, periodo, cr_geral, username, password]):
+            if not all([nome, email, matricula, curso_id, password]):
                 messages.error(request, '❌ Por favor, preencha todos os campos obrigatórios.')
                 return redirect('register')
             
@@ -234,11 +238,6 @@ def register_view(request):
                 messages.error(request, '❌ A senha deve conter pelo menos 1 número.')
                 return redirect('register')
             
-            # Validar se username já existe
-            if User.objects.filter(username=username).exists():
-                messages.error(request, '❌ Este nome de usuário já está em uso. Escolha outro.')
-                return redirect('register')
-            
             # Validar se email já existe
             if User.objects.filter(email=email).exists():
                 messages.error(request, '❌ Este email já está cadastrado.')
@@ -256,23 +255,12 @@ def register_view(request):
                 messages.error(request, '❌ Curso inválido.')
                 return redirect('register')
             
-            # Validar período (deve ser entre 1 e 8)
-            try:
-                periodo = int(periodo)
-                if periodo < 1 or periodo > 8:
-                    raise ValueError
-            except (ValueError, TypeError):
-                messages.error(request, '❌ Período inválido.')
-                return redirect('register')
-            
-            # Validar CR (deve estar entre 0 e 10)
-            try:
-                cr_geral = float(cr_geral)
-                if cr_geral < 0 or cr_geral > 10:
-                    raise ValueError
-            except (ValueError, TypeError):
-                messages.error(request, '❌ CR deve estar entre 0 e 10.')
-                return redirect('register')
+            # Garantir username único (adicionar número se necessário)
+            base_username = username
+            counter = 1
+            while User.objects.filter(username=username).exists():
+                username = f"{base_username}{counter}"
+                counter += 1
             
             # ==================== CRIAR USUÁRIO ====================
             
@@ -1597,6 +1585,25 @@ def portal_vagas(request):
             'total_disciplinas': total_disciplinas,
         }
         
+        # ==================== DADOS DO ALUNO (se autenticado) ====================
+        if request.user.is_authenticated:
+            try:
+                aluno = get_aluno_by_email(request.user.email)
+                context['aluno'] = aluno
+                
+                # Verificar se há dados na sessão sobre perfil incompleto
+                perfil_incompleto = request.session.pop('perfil_incompleto', None)
+                vaga_tentada = request.session.pop('vaga_tentada', None)
+                
+                if perfil_incompleto:
+                    context['perfil_incompleto'] = perfil_incompleto
+                if vaga_tentada:
+                    context['vaga_tentada'] = vaga_tentada
+                    
+            except Exception as e:
+                print(f"⚠️ Erro ao buscar dados do aluno: {str(e)}")
+                context['aluno'] = None
+        
     except Exception as e:
         # Log do erro para debug
         print(f"❌ ERRO no portal_vagas: {str(e)}")
@@ -1622,6 +1629,113 @@ def portal_vagas(request):
         template = 'vagas/portal_landing.html'
     
     return render(request, template, context)
+
+
+@login_required(login_url='login')
+def atualizar_perfil_rapido(request):
+    """
+    ✨ View AJAX para atualizar perfil rapidamente
+    
+    ⚠️ REQUER LOGIN: Usuário deve estar autenticado
+    ⚠️ AJAX ONLY: Aceita apenas requisições AJAX/fetch
+    
+    Atualiza informações básicas do perfil do aluno:
+    - Curso
+    - Período
+    - CR Geral
+    - Celular
+    
+    Retorna JSON com status de sucesso/erro
+    """
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Método não permitido'}, status=405)
+    
+    if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'success': False, 'message': 'Apenas requisições AJAX são permitidas'}, status=400)
+    
+    try:
+        # Buscar aluno do usuário logado
+        aluno = get_aluno_by_email(request.user.email)
+        
+        if not aluno:
+            return JsonResponse({
+                'success': False,
+                'message': 'Aluno não encontrado. Entre em contato com o suporte.'
+            }, status=404)
+        
+        # Obter dados do formulário
+        curso_id = request.POST.get('curso')
+        periodo = request.POST.get('periodo')
+        cr_geral = request.POST.get('cr_geral')
+        celular = request.POST.get('celular')
+        
+        # Validar campos obrigatórios
+        if not all([curso_id, periodo, cr_geral, celular]):
+            return JsonResponse({
+                'success': False,
+                'message': 'Todos os campos são obrigatórios.'
+            }, status=400)
+        
+        # Validar e buscar curso
+        try:
+            curso = Curso.objects.get(id=curso_id, ativo=True)
+        except Curso.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Curso inválido.'
+            }, status=400)
+        
+        # Validar período
+        try:
+            periodo = int(periodo)
+            if periodo < 1 or periodo > 10:
+                raise ValueError()
+        except (ValueError, TypeError):
+            return JsonResponse({
+                'success': False,
+                'message': 'Período inválido. Deve ser entre 1 e 10.'
+            }, status=400)
+        
+        # Validar CR
+        try:
+            cr_geral = float(cr_geral)
+            if cr_geral < 0 or cr_geral > 10:
+                raise ValueError()
+        except (ValueError, TypeError):
+            return JsonResponse({
+                'success': False,
+                'message': 'CR inválido. Deve ser entre 0 e 10.'
+            }, status=400)
+        
+        # Validar celular (apenas números)
+        celular_numeros = ''.join(filter(str.isdigit, celular))
+        if len(celular_numeros) < 10 or len(celular_numeros) > 11:
+            return JsonResponse({
+                'success': False,
+                'message': 'Celular inválido. Informe um número válido com DDD.'
+            }, status=400)
+        
+        # Atualizar aluno
+        aluno.curso = curso
+        aluno.periodo = periodo
+        aluno.cr_geral = cr_geral
+        aluno.celular = celular
+        aluno.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Perfil atualizado com sucesso!'
+        })
+        
+    except Exception as e:
+        print(f"❌ ERRO ao atualizar perfil: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
+        return JsonResponse({
+            'success': False,
+            'message': f'Erro ao atualizar perfil: {str(e)}'
+        }, status=500)
 
 
 # ==================== SOBRE O PROGRAMA ====================
@@ -1742,15 +1856,18 @@ def candidatar_vaga(request, vaga_id):
     if not aluno.cr_geral or aluno.cr_geral <= 0:
         perfil_incompleto.append('CR (Coeficiente de Rendimento) não informado')
     
-    # Se perfil incompleto, redirecionar para completar
+    if not aluno.celular:
+        perfil_incompleto.append('Celular não informado')
+    
+    # Se perfil incompleto, armazenar na sessão e redirecionar para portal
     if perfil_incompleto:
-        messages.error(
+        request.session['perfil_incompleto'] = perfil_incompleto
+        request.session['vaga_tentada'] = vaga_id
+        messages.warning(
             request, 
-            f'❌ Seu perfil está incompleto! Complete as seguintes informações antes de se candidatar:\n' +
-            '\n'.join([f'• {item}' for item in perfil_incompleto]) +
-            '\n\nVá para: Perfil → Editar Dados'
+            '⚠️ Complete seu perfil para se candidatar a esta vaga!'
         )
-        return redirect('perfil')
+        return redirect('portal_vagas')
     
     # ==================== VERIFICAR SE JÁ ESTÁ INSCRITO ====================
     if Inscricao.objects.filter(aluno=aluno, vaga=vaga).exists():

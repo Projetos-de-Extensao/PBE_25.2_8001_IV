@@ -390,6 +390,14 @@ if not DEBUG:
     # SameSite cookie attribute (proteção contra CSRF)
     CSRF_COOKIE_SAMESITE = 'Lax'  # 'Lax' é mais permissivo que 'Strict'
     SESSION_COOKIE_SAMESITE = 'Lax'
+else:
+    # Em desenvolvimento (DEBUG=True), não exigir HTTPS para cookies
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_HTTPONLY = False
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SAMESITE = 'Lax'
 
 # ============================================================================
 # CONFIGURAÇÕES CSRF (CROSS-SITE REQUEST FORGERY)

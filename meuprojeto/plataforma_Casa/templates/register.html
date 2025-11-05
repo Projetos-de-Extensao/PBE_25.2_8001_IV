@@ -692,114 +692,25 @@
                 {% endif %}
             </div>
             
-            <!-- 
-                CAMPOS: CURSO E PERÍODO (lado a lado em desktop)
-                Informações acadêmicas essenciais para categorização de alunos
-            -->
-            <div class="form-row">
-                <!-- Dropdown de Curso -->
-                <div class="form-group">
-                    <label for="curso">
-                        <i class="fas fa-book"></i> Curso
-                    </label>
-                    <div class="input-group">
-                        <i class="fas fa-book input-icon"></i>
-                        <select id="curso" name="curso" required>
-                            <option value="">Selecione um curso</option>
-                            {% for curso in cursos %}
-                                <option value="{{ curso.id }}" {% if form.curso.value == curso.id %}selected{% endif %}>
-                                    {{ curso.nome }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    {% if form.curso.errors %}
-                        <div class="text-danger" style="font-size: 0.85rem; margin-top: 0.25rem;">
-                            {{ form.curso.errors.0 }}
-                        </div>
-                    {% endif %}
-                </div>
-                
-                <!-- Dropdown de Período (1º a 8º) -->
-                <div class="form-group">
-                    <label for="periodo">
-                        <i class="fas fa-calendar"></i> Período
-                    </label>
-                    <div class="input-group">
-                        <i class="fas fa-calendar input-icon"></i>
-                        <select id="periodo" name="periodo" required>
-                            <option value="">Selecione</option>
-                            <option value="1" {% if form.periodo.value == "1" %}selected{% endif %}>1º Período</option>
-                            <option value="2" {% if form.periodo.value == "2" %}selected{% endif %}>2º Período</option>
-                            <option value="3" {% if form.periodo.value == "3" %}selected{% endif %}>3º Período</option>
-                            <option value="4" {% if form.periodo.value == "4" %}selected{% endif %}>4º Período</option>
-                            <option value="5" {% if form.periodo.value == "5" %}selected{% endif %}>5º Período</option>
-                            <option value="6" {% if form.periodo.value == "6" %}selected{% endif %}>6º Período</option>
-                            <option value="7" {% if form.periodo.value == "7" %}selected{% endif %}>7º Período</option>
-                            <option value="8" {% if form.periodo.value == "8" %}selected{% endif %}>8º Período</option>
-                        </select>
-                    </div>
-                    {% if form.periodo.errors %}
-                        <div class="text-danger" style="font-size: 0.85rem; margin-top: 0.25rem;">
-                            {{ form.periodo.errors.0 }}
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <!-- 
-                CAMPO: CR GERAL (Coeficiente de Rendimento)
-                Histórico acadêmico importante para seleção de monitores
-                Range: 0-10 com incremento de 0.01
-            -->
+            <!-- CAMPO: CURSO -->
             <div class="form-group">
-                <label for="cr_geral">
-                    <i class="fas fa-percentage"></i> CR Geral
+                <label for="curso">
+                    <i class="fas fa-book"></i> Curso
                 </label>
                 <div class="input-group">
-                    <i class="fas fa-percentage input-icon"></i>
-                    <input 
-                        type="number" 
-                        id="cr_geral" 
-                        name="cr_geral" 
-                        placeholder="Ex: 7.5"
-                        value="{{ form.cr_geral.value|default:'' }}"
-                        step="0.01"
-                        min="0"
-                        max="10"
-                        required
-                    >
+                    <i class="fas fa-book input-icon"></i>
+                    <select id="curso" name="curso" required>
+                        <option value="">Selecione um curso</option>
+                        {% for curso in cursos %}
+                            <option value="{{ curso.id }}" {% if form.curso.value == curso.id %}selected{% endif %}>
+                                {{ curso.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
                 </div>
-                {% if form.cr_geral.errors %}
+                {% if form.curso.errors %}
                     <div class="text-danger" style="font-size: 0.85rem; margin-top: 0.25rem;">
-                        {{ form.cr_geral.errors.0 }}
-                    </div>
-                {% endif %}
-            </div>
-            
-            <!-- 
-                CAMPO: USERNAME
-                Identificador único para login (além de email)
-                Deve ser único no banco de dados
-            -->
-            <div class="form-group">
-                <label for="username">
-                    <i class="fas fa-at"></i> Usuário
-                </label>
-                <div class="input-group">
-                    <i class="fas fa-at input-icon"></i>
-                    <input 
-                        type="text" 
-                        id="username" 
-                        name="username" 
-                        placeholder="Escolha um nome de usuário"
-                        value="{{ form.username.value|default:'' }}"
-                        required
-                    >
-                </div>
-                {% if form.username.errors %}
-                    <div class="text-danger" style="font-size: 0.85rem; margin-top: 0.25rem;">
-                        {{ form.username.errors.0 }}
+                        {{ form.curso.errors.0 }}
                     </div>
                 {% endif %}
             </div>

@@ -64,10 +64,11 @@ class Funcionario(Usuario):
 
 class Aluno(Usuario):
     matricula = models.CharField(max_length=20, unique=True)
-    curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE, null=True, blank=True)
     data_ingresso = models.DateField()
-    periodo = models.IntegerField()
-    cr_geral = models.FloatField()
+    periodo = models.IntegerField(null=True, blank=True)
+    cr_geral = models.FloatField(null=True, blank=True)
+    celular = models.CharField(max_length=20, blank=True, null=True, help_text="Celular para contato (com DDD)")
 
     def __str__(self):
         return f"{self.nome} (Aluno)"
