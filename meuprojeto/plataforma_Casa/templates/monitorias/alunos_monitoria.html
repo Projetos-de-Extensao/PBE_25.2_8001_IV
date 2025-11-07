@@ -2,8 +2,6 @@
 
 {% block title %}Alunos da {{ turma.nome }} - Monitor{% endblock %}
 
-{% csrf_token %}
-
 {% block extra_css %}
 <style>
     /* Header da página */
@@ -213,8 +211,14 @@
     
     .presenca-toggle input {
         opacity: 0;
-        width: 0;
-        height: 0;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin: 0;
+        cursor: pointer;
+        z-index: 2;
     }
     
     .toggle-slider {
@@ -227,6 +231,8 @@
         background-color: #dc3545;
         transition: .3s;
         border-radius: 15px;
+        z-index: 1;
+        pointer-events: none;
     }
     
     .toggle-slider:before {
@@ -240,6 +246,7 @@
         transition: .3s;
         border-radius: 50%;
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        pointer-events: none;
     }
     
     input:checked + .toggle-slider {
@@ -275,6 +282,10 @@
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
+        cursor: pointer;
+        width: 100%;
+        justify-content: center;
+        margin-top: 0.75rem;
     }
     
     .btn-ver-detalhes:hover {
@@ -283,6 +294,8 @@
         color: white;
         text-decoration: none;
     }
+    
+
     
     .btn-voltar {
         background: #6c757d;
@@ -334,67 +347,71 @@
         font-size: 1rem;
     }
     
-    /* Modal de detalhes */
-    .modal-content {
-        border: none;
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(0, 37, 85, 0.2);
-    }
-    
-    .modal-header {
-        background: linear-gradient(135deg, #002555 0%, #1245FF 100%);
-        border-top-left-radius: 16px;
-        border-top-right-radius: 16px;
-        border-bottom: 3px solid #F5AC00;
-        padding: 1.5rem;
-    }
-    
-    .modal-title {
-        color: #fafaf8 !important;
-        font-weight: 700;
-        font-size: 1.25rem;
-    }
-    
-    .modal-body {
-        padding: 2rem;
-    }
-    
-    .modal-info-label {
-        color: #6c757d;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        font-weight: 600;
-        margin-bottom: 0.25rem;
-    }
-    
-    .modal-info-value {
-        color: #002555;
-        font-weight: 600;
-        font-size: 1rem;
-        margin-bottom: 1rem;
-    }
-    
     /* Toast notifications */
     .toast-container {
         position: fixed;
         top: 20px;
         right: 20px;
         z-index: 9999;
+        max-width: 400px;
+        min-width: 300px;
+    }
+
+    .toast-container .alert {
+        margin-bottom: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border: none;
+        border-radius: 8px;
+    }
+
+    .toast-container .alert-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+
+    .toast-container .alert-danger {
+        background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+        color: white;
+    }
+
+    .toast-container .btn-close {
+        filter: brightness(0) invert(1);
     }
     
-    /* Responsividade */
+    /* Responsividade Mobile - Compacto */
     @media (max-width: 768px) {
-        .alunos-grid {
-            grid-template-columns: 1fr;
+        /* Container */
+        .container-fluid {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
         }
-        
-        .page-header h1 {
-            font-size: 1.5rem;
+
+        /* Header compacto */
+        .page-header {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border-left-width: 3px;
         }
-        
+
         .page-header-content {
             flex-direction: column;
             align-items: stretch;
+            gap: 0.75rem;
+        }
+        
+        .page-header h1 {
+            font-size: 1.15rem;
+            gap: 0.5rem;
+        }
+
+        .page-header h1 i {
+            font-size: 1.1rem;
+        }
+
+        .page-subtitle {
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
         }
         
         .header-actions {
@@ -405,29 +422,218 @@
         .btn-materiais {
             width: 100%;
             justify-content: center;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            border-radius: 8px;
+        }
+
+        /* Info da turma compacta */
+        .turma-info {
+            padding: 0.85rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border-left-width: 3px;
         }
         
         .info-grid {
             grid-template-columns: 1fr;
+            gap: 0.6rem;
+        }
+
+        .info-item {
+            font-size: 0.75rem;
+            gap: 0.5rem;
+        }
+
+        .info-icon {
+            width: 16px;
+            font-size: 0.75rem;
+        }
+        
+        /* Grid de alunos compacto */
+        .alunos-grid {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Cards de alunos compactos */
+        .aluno-card {
+            padding: 0.85rem;
+            border-radius: 10px;
+            border-width: 1px;
+        }
+
+        .aluno-card::before {
+            height: 3px;
         }
         
         .aluno-header {
-            flex-direction: column;
-            text-align: center;
-            gap: 0.75rem;
+            flex-direction: row;
+            text-align: left;
+            gap: 0.65rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .aluno-avatar {
+            width: 45px;
+            height: 45px;
+            font-size: 1.15rem;
         }
         
+        .aluno-nome {
+            font-size: 0.95rem;
+            margin-bottom: 0.15rem;
+        }
+
+        .aluno-matricula {
+            font-size: 0.75rem;
+        }
+
+        /* Detalhes compactos */
+        .aluno-detalhes {
+            gap: 0.4rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .detalhe-item {
+            font-size: 0.75rem;
+            gap: 0.4rem;
+        }
+
+        .detalhe-icon {
+            width: 14px;
+            font-size: 0.7rem;
+        }
+        
+        /* Controles de presença compactos */
         .presenca-controls {
-            flex-direction: column;
-            gap: 0.75rem;
-            text-align: center;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 0.5rem;
+            text-align: left;
+            padding: 0.75rem;
+            border-radius: 8px;
+        }
+
+        .presenca-label {
+            font-size: 0.75rem;
+            gap: 0.4rem;
+        }
+
+        .presenca-label i {
+            font-size: 0.75rem;
+        }
+
+        .presenca-toggle {
+            width: 52px;
+            height: 26px;
+        }
+
+        .toggle-slider:before {
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Botões compactos */
+        .btn-ver-detalhes {
+            padding: 0.4rem 0.85rem;
+            font-size: 0.75rem;
+            border-radius: 6px;
+        }
+
+        .btn-voltar {
+            padding: 0.6rem 1.25rem;
+            font-size: 0.8rem;
+            border-radius: 8px;
+        }
+        
+
+        
+        .detalhes-section {
+            margin-bottom: 1rem;
+        }
+        
+        .detalhes-section-title {
+            font-size: 0.9rem;
+        }
+        
+        .info-row {
+            padding: 0.4rem 0;
+            font-size: 0.85rem;
+        }
+        
+        .presenca-stats {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+        
+        .stat-card {
+            padding: 0.75rem;
+        }
+        
+        .stat-icon {
+            font-size: 1.25rem;
+        }
+        
+        .stat-value {
+            font-size: 1.25rem;
+        }
+        
+        .stat-label {
+            font-size: 0.7rem;
+        }
+
+        /* Empty state compacto */
+        .empty-state {
+            padding: 2rem 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .empty-state-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state-title {
+            font-size: 1.15rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .empty-state-text {
+            font-size: 0.85rem;
+            margin-bottom: 1.25rem;
+        }
+
+        /* Toast */
+        .toast-container {
+            top: 10px;
+            right: 10px;
+            left: 10px;
+        }
+
+        .toast-container .alert {
+            font-size: 0.8rem;
+            padding: 0.75rem;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid" style="padding: 2rem;">
+<!-- Formulário hidden para CSRF token -->
+<form id="csrf-form" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<div class="container-fluid" style="margin-top: 4rem;">
     <!-- Header -->
     <div class="page-header">
         <div class="page-header-content">
@@ -530,76 +736,14 @@
                 <div class="presenca-toggle">
                     <input type="checkbox" 
                            id="presenca_{{ participacao.aluno.id }}" 
-                           {% if participacao.aluno.id in presencas_hoje %}checked{% endif %}
-                           onchange="marcarPresenca({{ turma.id }}, {{ participacao.aluno.id }}, this.checked)">
+                           data-turma-id="{{ turma.id }}"
+                           data-aluno-id="{{ participacao.aluno.id }}"
+                           {% if participacao.aluno.id in presencas_hoje %}checked{% endif %}>
                     <span class="toggle-slider"></span>
                 </div>
             </div>
+
             
-            <!-- Ações -->
-            <div style="margin-top: 1rem; text-align: center;">
-                <button class="btn-ver-detalhes" data-bs-toggle="modal" 
-                        data-bs-target="#alunoModal{{ participacao.id }}">
-                    <i class="fas fa-eye"></i> Ver Detalhes
-                </button>
-            </div>
-        </div>
-
-        <!-- Modal com Detalhes Completos do Aluno -->
-        <div class="modal fade" id="alunoModal{{ participacao.id }}" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <i class="fas fa-user-graduate"></i> {{ participacao.aluno.nome }}
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" 
-                                data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="modal-info-label">Matrícula</div>
-                                <div class="modal-info-value">{{ participacao.aluno.matricula }}</div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="modal-info-label">Email</div>
-                                <div class="modal-info-value">{{ participacao.aluno.email }}</div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="modal-info-label">Curso</div>
-                                <div class="modal-info-value">{{ participacao.aluno.curso.nome }}</div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="modal-info-label">Período</div>
-                                <div class="modal-info-value">{{ participacao.aluno.periodo }}º</div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="modal-info-label">Data de Ingresso</div>
-                                <div class="modal-info-value">{{ participacao.aluno.data_ingresso|date:"d/m/Y" }}</div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="modal-info-label">Status na Monitoria</div>
-                                <div class="modal-info-value">
-                                    <span class="badge bg-success">Participando</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr style="border-color: #e9ecef; margin: 1.5rem 0;">
-
-                        <div class="modal-info-label">Turma de Monitoria</div>
-                        <div class="modal-info-value">{{ participacao.turma.nome }}</div>
-                        <small style="color: #6c757d;">{{ participacao.turma.vaga.nome }}</small>
-                    </div>
-                </div>
-            </div>
         </div>
         {% endfor %}
     </div>
@@ -641,39 +785,111 @@
     {% endif %}
 </div>
 
+
+
+
+
+
+
 <!-- Toast Container -->
 <div class="toast-container"></div>
 
 <script>
+// Função para obter CSRF token
+function getCsrfToken() {
+    // Tentar pegar do formulário hidden
+    let token = document.querySelector('#csrf-form [name=csrfmiddlewaretoken]')?.value;
+    
+    // Se não encontrar, tentar pegar de qualquer lugar
+    if (!token) {
+        token = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    }
+    
+    // Se ainda não encontrar, tentar dos cookies
+    if (!token) {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            ?.split('=')[1];
+        token = cookieValue;
+    }
+    
+    console.log('CSRF Token encontrado:', token ? 'Sim' : 'Não');
+    return token;
+}
+
 // Função para marcar presença via AJAX
 function marcarPresenca(turmaId, alunoId, presente) {
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
-                     document.querySelector('meta[name=csrf-token]')?.getAttribute('content');
+    console.log('=== INICIANDO MARCAÇÃO DE PRESENÇA ===');
+    console.log('Dados:', { turmaId, alunoId, presente });
     
-    fetch(`/monitorias/${turmaId}/alunos/${alunoId}/presenca/`, {
+    // Obter CSRF token
+    const csrfToken = getCsrfToken();
+    
+    if (!csrfToken) {
+        console.error('❌ CSRF token não encontrado!');
+        showToast('Erro: Token de segurança não encontrado. Recarregue a página.', 'error');
+        const checkbox = document.getElementById(`presenca_${alunoId}`);
+        if (checkbox) checkbox.checked = !presente;
+        return;
+    }
+    
+    console.log('✓ CSRF token obtido');
+    
+    // Construir URL e FormData
+    const url = `/monitorias/${turmaId}/alunos/${alunoId}/presenca/`;
+    
+    // Usar FormData para garantir formato correto
+    const formData = new URLSearchParams();
+    formData.append('presente', presente ? 'true' : 'false');
+    
+    console.log('URL:', url);
+    console.log('Presente:', presente ? 'true' : 'false');
+    console.log('🚀 Enviando requisição...');
+    
+    // Fazer requisição AJAX
+    fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
         },
-        body: `presente=${presente}`
+        body: formData.toString(),
+        credentials: 'same-origin'
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('✓ Resposta recebida - Status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        
+        return response.json();
+    })
     .then(data => {
+        console.log('📦 Dados da resposta:', data);
+        
         if (data.success) {
+            console.log('✓ Sucesso!');
             showToast(data.message, 'success');
         } else {
-            showToast(data.message, 'error');
+            console.error('❌ Erro:', data.message);
+            showToast(data.message || 'Erro ao marcar presença', 'error');
             // Reverter o checkbox em caso de erro
-            document.getElementById(`presenca_${alunoId}`).checked = !presente;
+            const checkbox = document.getElementById(`presenca_${alunoId}`);
+            if (checkbox) checkbox.checked = !presente;
         }
     })
     .catch(error => {
-        console.error('Erro:', error);
-        showToast('Erro ao marcar presença', 'error');
+        console.error('❌ ERRO:', error);
+        showToast(`Erro: ${error.message}`, 'error');
         // Reverter o checkbox em caso de erro
-        document.getElementById(`presenca_${alunoId}`).checked = !presente;
+        const checkbox = document.getElementById(`presenca_${alunoId}`);
+        if (checkbox) checkbox.checked = !presente;
     });
+    
+    console.log('=== FIM DA FUNÇÃO ===');
 }
 
 // Função para mostrar toast notifications
@@ -682,9 +898,10 @@ function showToast(message, type = 'info') {
     
     const toast = document.createElement('div');
     toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+    toast.style.cssText = 'margin-bottom: 0.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15);';
     toast.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <strong>${type === 'success' ? '✓' : '✗'}</strong> ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
     
     toastContainer.appendChild(toast);
@@ -692,20 +909,82 @@ function showToast(message, type = 'info') {
     // Auto remover após 5 segundos
     setTimeout(() => {
         if (toast.parentNode) {
-            toast.remove();
+            toast.classList.remove('show');
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 150);
         }
     }, 5000);
 }
 
-// Adicionar CSRF token como meta tag se não existir
-if (!document.querySelector('meta[name=csrf-token]')) {
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-    if (csrfToken) {
-        const meta = document.createElement('meta');
-        meta.name = 'csrf-token';
-        meta.content = csrfToken;
-        document.head.appendChild(meta);
+// Inicializar sistema de presença
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔧 Sistema de presença inicializado');
+    
+    // Verificar CSRF token
+    const csrfToken = getCsrfToken();
+    if (!csrfToken) {
+        console.error('❌ CSRF token não encontrado!');
+        showToast('Erro: Token de segurança não encontrado. Recarregue a página.', 'error');
+        return;
     }
+    
+    console.log('✓ CSRF token disponível');
+    
+    // Adicionar event listeners a todos os checkboxes de presença
+    const checkboxes = document.querySelectorAll('input[type="checkbox"][id^="presenca_"]');
+    console.log(`✓ Encontrados ${checkboxes.length} checkbox(es) de presença`);
+    
+    if (checkboxes.length === 0) {
+        console.warn('⚠️ Nenhum checkbox encontrado! Verifique se há alunos na monitoria.');
+    }
+    
+    checkboxes.forEach(function(checkbox, index) {
+        const turmaId = checkbox.getAttribute('data-turma-id');
+        const alunoId = checkbox.getAttribute('data-aluno-id');
+        
+        console.log(`  📌 Checkbox ${index + 1}:`, {
+            id: checkbox.id,
+            turmaId: turmaId,
+            alunoId: alunoId,
+            checked: checkbox.checked
+        });
+        
+        // Adicionar listener de change
+        checkbox.addEventListener('change', function(event) {
+            console.log(`🔔 CHANGE detectado: Aluno ${alunoId}, Novo estado: ${event.target.checked}`);
+            marcarPresenca(turmaId, alunoId, event.target.checked);
+        });
+        
+        // Adicionar listener de click para debug
+        checkbox.addEventListener('click', function(event) {
+            console.log(`👆 CLICK detectado no checkbox ${checkbox.id}`);
+        });
+        
+        // Adicionar listener no container também (backup)
+        const toggleContainer = checkbox.closest('.presenca-toggle');
+        if (toggleContainer) {
+            toggleContainer.addEventListener('click', function(event) {
+                console.log(`👆 CLICK no container do toggle`);
+            });
+        }
+    });
+    
+    console.log('✅ Sistema pronto - Clique em qualquer toggle para testar');
+});
+
+// Função handler para presença (auxiliar)
+function handlePresencaChange(event) {
+    const checkbox = event.target;
+    const turmaId = checkbox.getAttribute('data-turma-id');
+    const alunoId = checkbox.getAttribute('data-aluno-id');
+    marcarPresenca(turmaId, alunoId, checkbox.checked);
 }
+
+
+
+
 </script>
 {% endblock %}

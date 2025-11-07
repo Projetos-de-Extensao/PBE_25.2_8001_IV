@@ -514,15 +514,26 @@
     
     /* Modal */
     .modal {
-        z-index: 1050;
+        z-index: 1055 !important;
     }
     
     .modal-backdrop {
-        z-index: 1040;
+        z-index: 1050 !important;
     }
     
     .modal-dialog {
         margin: 0.75rem auto;
+    }
+    
+    @media (max-width: 576px) {
+        .modal-dialog {
+            margin: 0.5rem;
+            max-width: calc(100% - 1rem);
+        }
+        
+        .modal-dialog-scrollable .modal-body {
+            max-height: calc(100vh - 150px);
+        }
     }
     
     .modal-content {
@@ -530,6 +541,12 @@
         border: none;
         overflow: hidden;
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    @media (max-width: 576px) {
+        .modal-content {
+            border-radius: 12px;
+        }
     }
     
     .modal-header {
@@ -902,7 +919,7 @@
     {% if vagas %}
         <div class="vagas-grid">
             {% for vaga in vagas %}
-            <div class="vaga-card">
+            <div class="vaga-card" data-vaga-id="{{ vaga.id }}">
                 <div class="vaga-header">
                     <div>
                         <h3 class="vaga-title">{{ vaga.disciplina.nome }}</h3>
@@ -992,81 +1009,435 @@
     </div>
 </div>
 
-<script>
-function verDetalhes(vagaId) {
-    const modal = new bootstrap.Modal(document.getElementById('modalDetalhes'));
-    const modalBody = document.getElementById('modalBody');
-    const modalTitle = document.getElementById('modalTitle');
-    
-    modalBody.innerHTML = `
-        <div class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Carregando...</span>
+<!-- ==================== MODAL COMPLETAR PERFIL ==================== -->
+<div class="modal fade" id="modalCompletarPerfil" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden;">
+            <!-- Header compacto -->
+            <div class="modal-header" style="background: linear-gradient(135deg, #002555 0%, #003a7a 100%); color: white; padding: 1.25rem; border: none;">
+                <div style="width: 100%;">
+                    <h5 class="modal-title" style="font-weight: 700; font-size: 1.1rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-user-edit" style="color: #F5AC00;"></i>
+                        Complete seu Perfil
+                    </h5>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; opacity: 0.9;">
+                        Precisamos de mais algumas informações para continuar
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Body compacto -->
+            <div class="modal-body" style="padding: 1.25rem;">
+                <form id="formCompletarPerfil" method="POST">
+                    {% csrf_token %}
+                    
+                    <!-- Curso -->
+                    <div class="mb-3">
+                        <label class="form-label" style="font-weight: 600; font-size: 0.9rem; color: #002555; margin-bottom: 0.5rem;">
+                            <i class="fas fa-graduation-cap" style="color: #F5AC00; margin-right: 0.25rem;"></i>
+                            Curso *
+                        </label>
+                        <select class="form-select" name="curso" required style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem; font-size: 0.9rem;">
+                            <option value="">Selecione seu curso</option>
+                            {% for curso in cursos %}
+                                <option value="{{ curso.id }}" {% if aluno and aluno.curso.id == curso.id %}selected{% endif %}>
+                                    {{ curso.nome }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Período e CR na mesma linha (mobile-first) -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label" style="font-weight: 600; font-size: 0.9rem; color: #002555; margin-bottom: 0.5rem;">
+                                <i class="fas fa-calendar-alt" style="color: #F5AC00; margin-right: 0.25rem;"></i>
+                                Período *
+                            </label>
+                            <select class="form-select" name="periodo" required style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem; font-size: 0.9rem;">
+                                <option value="">Selecione</option>
+                                {% for i in "12345678910" %}
+                                    <option value="{{ forloop.counter }}" {% if aluno and aluno.periodo == forloop.counter %}selected{% endif %}>
+                                        {{ forloop.counter }}º
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-6">
+                            <label class="form-label" style="font-weight: 600; font-size: 0.9rem; color: #002555; margin-bottom: 0.5rem;">
+                                <i class="fas fa-chart-line" style="color: #F5AC00; margin-right: 0.25rem;"></i>
+                                CR *
+                            </label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   name="cr_geral" 
+                                   step="0.1" 
+                                   min="0" 
+                                   max="10" 
+                                   placeholder="0.0"
+                                   value="{% if aluno and aluno.cr_geral %}{{ aluno.cr_geral }}{% endif %}"
+                                   required 
+                                   style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem; font-size: 0.9rem;">
+                        </div>
+                    </div>
+                    
+                    <!-- Celular -->
+                    <div class="mb-3">
+                        <label class="form-label" style="font-weight: 600; font-size: 0.9rem; color: #002555; margin-bottom: 0.5rem;">
+                            <i class="fas fa-phone" style="color: #F5AC00; margin-right: 0.25rem;"></i>
+                            Celular (com DDD) *
+                        </label>
+                        <input type="tel" 
+                               class="form-control" 
+                               name="celular" 
+                               placeholder="(21) 99999-9999"
+                               value="{% if aluno and aluno.celular %}{{ aluno.celular }}{% endif %}"
+                               required 
+                               style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem; font-size: 0.9rem;">
+                    </div>
+                    
+                    <!-- Alert de erro (oculto por padrão) -->
+                    <div id="alertErro" class="alert alert-danger d-none" role="alert" style="border-radius: 8px; padding: 0.75rem; font-size: 0.85rem; margin-bottom: 1rem;">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <span id="mensagemErro"></span>
+                    </div>
+                    
+                    <!-- Alert de sucesso (oculto por padrão) -->
+                    <div id="alertSucesso" class="alert alert-success d-none" role="alert" style="border-radius: 8px; padding: 0.75rem; font-size: 0.85rem; margin-bottom: 1rem;">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Perfil atualizado com sucesso!
+                    </div>
+                    
+                    <!-- Botões -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn" style="background: #002555; color: white; padding: 0.875rem; font-size: 0.95rem; font-weight: 600; border: none; border-radius: 8px;">
+                            <i class="fas fa-save me-2"></i>
+                            Salvar e Continuar
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
-    `;
+    </div>
+</div>
+
+<!-- Estilos adicionais para o modal -->
+<style>
+    /* Modal responsivo */
+    @media (max-width: 576px) {
+        #modalCompletarPerfil .modal-dialog {
+            margin: 0.5rem;
+        }
+        
+        #modalCompletarPerfil .modal-header {
+            padding: 1rem !important;
+        }
+        
+        #modalCompletarPerfil .modal-header h5 {
+            font-size: 1rem !important;
+        }
+        
+        #modalCompletarPerfil .modal-header p {
+            font-size: 0.8rem !important;
+        }
+        
+        #modalCompletarPerfil .modal-body {
+            padding: 1rem !important;
+        }
+        
+        #modalCompletarPerfil .form-label {
+            font-size: 0.85rem !important;
+        }
+        
+        #modalCompletarPerfil .form-control,
+        #modalCompletarPerfil .form-select {
+            padding: 0.65rem !important;
+            font-size: 0.85rem !important;
+        }
+        
+        #modalCompletarPerfil button[type="submit"] {
+            padding: 0.75rem !important;
+            font-size: 0.9rem !important;
+        }
+    }
     
-    modal.show();
+    /* Foco nos inputs */
+    #modalCompletarPerfil .form-control:focus,
+    #modalCompletarPerfil .form-select:focus {
+        border-color: #002555;
+        box-shadow: 0 0 0 0.2rem rgba(0, 37, 85, 0.15);
+    }
     
-    fetch(`/api/vagas/${vagaId}/detalhes/`)
-        .then(response => response.json())
-        .then(data => {
-            modalTitle.textContent = data.disciplina_nome;
-            
-            modalBody.innerHTML = `
-                <div class="detail-section">
-                    <h6><i class="fas fa-info-circle"></i> Informações Gerais</h6>
-                    <p><strong>Disciplina:</strong> ${data.disciplina_nome} (${data.disciplina_codigo})</p>
-                    <p><strong>Curso:</strong> ${data.curso_nome}</p>
-                    <p><strong>Tipo:</strong> 
-                        <span class="vaga-badge ${data.tipo_vaga === 'TEA' ? 'badge-tea' : 'badge-voluntaria'}">
-                            ${data.tipo_vaga_display}
-                        </span>
-                    </p>
-                    ${data.valor_bolsa ? `<p><strong>Valor da Bolsa:</strong> R$ ${data.valor_bolsa}</p>` : ''}
-                    <p><strong>Número de Vagas:</strong> ${data.numero_vagas}</p>
-                </div>
-                
-                <div class="detail-section">
-                    <h6><i class="fas fa-align-left"></i> Descrição</h6>
-                    <p>${data.descricao}</p>
-                </div>
-                
-                ${data.requisitos ? `
-                    <div class="detail-section">
-                        <h6><i class="fas fa-check-circle"></i> Requisitos</h6>
-                        <p>${data.requisitos}</p>
-                    </div>
-                ` : ''}
-                
-                ${data.coordenadores && data.coordenadores.length > 0 ? `
-                    <div class="detail-section">
-                        <h6><i class="fas fa-user-tie"></i> Coordenadores</h6>
-                        <ul>
-                            ${data.coordenadores.map(coord => `<li>${coord.nome} - ${coord.email}</li>`).join('')}
-                        </ul>
-                    </div>
-                ` : ''}
-                
-                <div class="d-grid gap-2 mt-4">
-                    <a href="#" id="btnCandidatarModal" class="btn btn-filter btn-lg">
-                        <i class="fas fa-paper-plane me-2"></i> Candidatar-se
-                    </a>
-                </div>
-            `;
-            
-            // Atualizar href do botão candidatar
-            document.getElementById('btnCandidatarModal').href = `/vagas/${vagaId}/candidatar/`;
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            modalBody.innerHTML = `
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    Erro ao carregar detalhes da vaga. Tente novamente.
-                </div>
-            `;
+    /* Loading state */
+    #modalCompletarPerfil button[type="submit"]:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+</style>
+
+<script>
+// Função para ver detalhes da vaga (com suporte melhorado para mobile)
+function verDetalhes(vagaId) {
+    console.log('verDetalhes chamado com vagaId:', vagaId); // Debug
+    
+    try {
+        const modalElement = document.getElementById('modalDetalhes');
+        const modalBody = document.getElementById('modalBody');
+        const modalTitle = document.getElementById('modalTitle');
+        
+        if (!modalElement || !modalBody || !modalTitle) {
+            console.error('Elementos do modal não encontrados');
+            return;
+        }
+        
+        // Criar instância do modal
+        const modal = new bootstrap.Modal(modalElement, {
+            backdrop: true,
+            keyboard: true,
+            focus: true
         });
+        
+        // Resetar conteúdo
+        modalTitle.textContent = 'Detalhes da Vaga';
+        modalBody.innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Carregando...</span>
+                </div>
+                <p class="mt-3 text-muted">Carregando informações...</p>
+            </div>
+        `;
+        
+        // Mostrar modal
+        modal.show();
+        console.log('Modal exibido'); // Debug
+        
+        // Buscar dados da vaga
+        fetch(`/api/vagas/${vagaId}/detalhes/`)
+            .then(response => {
+                console.log('Resposta recebida:', response.status); // Debug
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Dados recebidos:', data); // Debug
+                modalTitle.textContent = data.disciplina_nome;
+                
+                modalBody.innerHTML = `
+                    <div class="detail-section">
+                        <h6><i class="fas fa-info-circle"></i> Informações Gerais</h6>
+                        <p><strong>Disciplina:</strong> ${data.disciplina_nome} ${data.disciplina_codigo ? '(' + data.disciplina_codigo + ')' : ''}</p>
+                        <p><strong>Curso:</strong> ${data.curso_nome}</p>
+                        <p><strong>Tipo:</strong> 
+                            <span class="vaga-badge ${data.tipo_vaga === 'TEA' ? 'badge-tea' : 'badge-voluntaria'}">
+                                ${data.tipo_vaga_display}
+                            </span>
+                        </p>
+                        ${data.valor_bolsa ? `<p><strong>Valor da Bolsa:</strong> R$ ${data.valor_bolsa}</p>` : ''}
+                        <p><strong>Número de Vagas:</strong> ${data.numero_vagas}</p>
+                        ${data.vagas_disponiveis !== undefined ? `<p><strong>Vagas Disponíveis:</strong> ${data.vagas_disponiveis}</p>` : ''}
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h6><i class="fas fa-align-left"></i> Descrição</h6>
+                        <p>${data.descricao}</p>
+                    </div>
+                    
+                    ${data.requisitos ? `
+                        <div class="detail-section">
+                            <h6><i class="fas fa-check-circle"></i> Requisitos</h6>
+                            <p>${data.requisitos}</p>
+                        </div>
+                    ` : ''}
+                    
+                    ${data.responsabilidades && data.responsabilidades !== 'Não especificadas' ? `
+                        <div class="detail-section">
+                            <h6><i class="fas fa-tasks"></i> Responsabilidades</h6>
+                            <p>${data.responsabilidades}</p>
+                        </div>
+                    ` : ''}
+                    
+                    ${data.coordenadores && data.coordenadores.length > 0 ? `
+                        <div class="detail-section">
+                            <h6><i class="fas fa-chalkboard-teacher"></i> Professor(es) Coordenador(es)</h6>
+                            <ul>
+                                ${data.coordenadores.map(coord => `<li>${coord.nome}${coord.email ? ' - ' + coord.email : ''}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    ${data.professores && data.professores.length > 0 ? `
+                        <div class="detail-section">
+                            <h6><i class="fas fa-user-tie"></i> Professor(es)</h6>
+                            <ul>
+                                ${data.professores.map(prof => `<li>${prof.nome}${prof.email ? ' - ' + prof.email : ''}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <a href="/vagas/${data.id}/candidatar/" class="btn btn-filter btn-lg">
+                            <i class="fas fa-paper-plane me-2"></i> Candidatar-se
+                        </a>
+                    </div>
+                `;
+            })
+            .catch(error => {
+                console.error('Erro ao carregar detalhes:', error);
+                modalTitle.textContent = 'Erro';
+                modalBody.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Erro ao carregar detalhes da vaga.</strong><br>
+                        <small>${error.message}</small><br>
+                        <small class="text-muted">Por favor, tente novamente ou entre em contato com o suporte.</small>
+                    </div>
+                    <div class="d-grid gap-2 mt-3">
+                        <button class="btn btn-secondary" onclick="location.reload()">
+                            <i class="fas fa-redo me-2"></i> Recarregar Página
+                        </button>
+                    </div>
+                `;
+            });
+    } catch (error) {
+        console.error('Erro crítico na função verDetalhes:', error);
+        alert('Erro ao abrir detalhes da vaga. Por favor, recarregue a página.');
+    }
 }
+
+// ==================== MODAL COMPLETAR PERFIL ====================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM carregado'); // Debug
+    
+    // Adicionar event listeners aos botões de detalhes (fallback para mobile)
+    document.querySelectorAll('.btn-ver-detalhes').forEach(button => {
+        // Remover qualquer listener existente
+        button.removeAttribute('onclick');
+        
+        // Adicionar novo listener
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const vagaCard = this.closest('.vaga-card');
+            const vagaId = vagaCard ? vagaCard.getAttribute('data-vaga-id') : null;
+            
+            console.log('Botão clicado, vagaId:', vagaId); // Debug
+            
+            if (vagaId) {
+                verDetalhes(vagaId);
+            } else {
+                console.error('VagaId não encontrado');
+                alert('Erro ao abrir detalhes. Por favor, tente novamente.');
+            }
+        });
+        
+        // Adicionar suporte para touch (mobile)
+        button.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.click();
+        });
+    });
+    
+    console.log('Event listeners adicionados a', document.querySelectorAll('.btn-ver-detalhes').length, 'botões'); // Debug
+
+    {% if perfil_incompleto %}
+        // Abrir modal automaticamente se perfil incompleto
+        const modalCompletarPerfil = new bootstrap.Modal(document.getElementById('modalCompletarPerfil'));
+        modalCompletarPerfil.show();
+    {% endif %}
+    
+    // Handler do formulário de completar perfil
+    const formCompletarPerfil = document.getElementById('formCompletarPerfil');
+    if (formCompletarPerfil) {
+        formCompletarPerfil.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const alertErro = document.getElementById('alertErro');
+            const alertSucesso = document.getElementById('alertSucesso');
+            const mensagemErro = document.getElementById('mensagemErro');
+            const btnSubmit = this.querySelector('button[type="submit"]');
+            
+            // Ocultar alertas
+            alertErro.classList.add('d-none');
+            alertSucesso.classList.add('d-none');
+            
+            // Desabilitar botão e mostrar loading
+            btnSubmit.disabled = true;
+            const textoOriginal = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Salvando...';
+            
+            // Obter dados do formulário
+            const formData = new FormData(this);
+            
+            // Enviar via AJAX
+            fetch('{% url "atualizar_perfil_rapido" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Sucesso - mostrar mensagem e recarregar página
+                    alertSucesso.classList.remove('d-none');
+                    
+                    setTimeout(() => {
+                        // Recarregar para aplicar mudanças
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    // Erro - mostrar mensagem
+                    mensagemErro.textContent = data.message || 'Erro ao salvar perfil.';
+                    alertErro.classList.remove('d-none');
+                    
+                    // Reabilitar botão
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = textoOriginal;
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                mensagemErro.textContent = 'Erro de conexão. Tente novamente.';
+                alertErro.classList.remove('d-none');
+                
+                // Reabilitar botão
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = textoOriginal;
+            });
+        });
+    }
+    
+    // Máscara de celular
+    const inputCelular = document.querySelector('input[name="celular"]');
+    if (inputCelular) {
+        inputCelular.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length > 11) {
+                value = value.slice(0, 11);
+            }
+            
+            if (value.length >= 11) {
+                value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+            } else if (value.length >= 7) {
+                value = value.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+            } else if (value.length >= 3) {
+                value = value.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+            } else if (value.length >= 1) {
+                value = value.replace(/^(\d*)/, '($1');
+            }
+            
+            e.target.value = value;
+        });
+    }
+});
 </script>
 {% endblock %}

@@ -3,6 +3,17 @@
 
 {% block extra_css %}
 <style>
+    /* ========== GARANTIR QUE MODAL FIQUE ACIMA DA SIDEBAR ========== */
+    /* Força o modal a ficar acima de TUDO no documento */
+    body.modal-open {
+        overflow: hidden !important;
+    }
+    
+    body.modal-open .sidebar {
+        filter: blur(2px);
+        pointer-events: none;
+    }
+    
     /* Header da Página */
     .page-header {
         margin-bottom: 2rem;
@@ -375,21 +386,25 @@
     
     /* Mini Modal Minimalista */
     .status-modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.4);
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: rgba(0, 0, 0, 0.6) !important;
         display: none;
         align-items: center;
         justify-content: center;
-        z-index: 9999;
+        z-index: 999999 !important; /* Acima de TUDO - sidebar, navbar, etc */
         animation: fadeIn 0.2s ease;
+        margin: 0 !important;
+        padding: 0 !important;
     }
     
     .status-modal-overlay.show {
-        display: flex;
+        display: flex !important;
     }
     
     .status-modal {
@@ -398,9 +413,11 @@
         padding: 1.75rem;
         width: 90%;
         max-width: 320px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
         animation: slideUp 0.25s ease;
         position: relative;
+        z-index: 1000000 !important; /* Modal ainda mais acima do overlay */
+        pointer-events: auto !important; /* Garante que é clicável */
     }
     
     @keyframes fadeIn {
@@ -445,7 +462,7 @@
         border: none;
         font-size: 1.25rem;
         color: #6c757d;
-        cursor: pointer;
+        cursor: pointer !important;
         width: 28px;
         height: 28px;
         border-radius: 50%;
@@ -453,6 +470,8 @@
         align-items: center;
         justify-content: center;
         transition: all 0.2s ease;
+        z-index: 1000001 !important; /* Acima de tudo no modal */
+        pointer-events: auto !important;
     }
     
     .status-modal-close:hover {
@@ -469,7 +488,7 @@
     .status-option {
         padding: 0.875rem 1rem;
         border-radius: 8px;
-        cursor: pointer;
+        cursor: pointer !important;
         transition: all 0.15s ease;
         display: flex;
         align-items: center;
@@ -479,6 +498,9 @@
         color: #495057;
         font-size: 0.9375rem;
         font-weight: 500;
+        z-index: 1000001 !important;
+        pointer-events: auto !important;
+        position: relative;
     }
     
     .status-option:hover {
@@ -609,6 +631,10 @@
     
     /* Responsividade Mobile */
     @media (max-width: 768px) {
+        body {
+            padding: 1rem;
+        }
+        
         .page-header-top {
             flex-direction: column;
             align-items: stretch;
@@ -894,6 +920,7 @@
         </div>
     </div>
 </div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -902,54 +929,115 @@
 
     // Inicializa os event listeners
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('🔄 Inicializando modal...');
+        
         const modal = document.getElementById('statusModal');
-        const closeBtn = document.getElementById('closeModal');
+        
+        if (!modal) {
+            console.error('❌ ERRO: Modal #statusModal não encontrado no DOM!');
+            return;
+        }
+        
+        console.log('✅ Modal encontrado:', modal);
+        
+        // Move modal para o body (fora da estrutura da sidebar)
+        if (modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+            console.log('📦 Modal movido para document.body');
+        }
         
         // Event listeners para os badges de status
         const badges = document.querySelectorAll('.candidato-status');
-        badges.forEach(badge => {
-            badge.addEventListener('click', function() {
+        console.log(`📋 Encontrados ${badges.length} badges de status`);
+        
+        badges.forEach((badge, index) => {
+            badge.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
                 inscricaoAtualId = this.getAttribute('data-inscricao-id');
+                console.log(`🖱️ Badge ${index + 1} clicado - Inscrição ID: ${inscricaoAtualId}`);
                 abrirModal();
             });
         });
         
         // Event listeners para as opções do modal
         const opcoes = document.querySelectorAll('.status-option');
+        console.log(`🎯 Encontradas ${opcoes.length} opções de status`);
+        
         opcoes.forEach(opcao => {
-            opcao.addEventListener('click', function() {
+            opcao.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
                 const novoStatus = this.getAttribute('data-status');
+                console.log(`📝 Opção selecionada: ${novoStatus}`);
                 mudarStatus(novoStatus);
             });
         });
         
-        // Fechar modal
-        closeBtn.addEventListener('click', fecharModal);
+        // Botão fechar
+        const closeBtn = document.getElementById('closeModal');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('❌ Botão fechar clicado');
+                fecharModal();
+            });
+        }
         
         // Fechar ao clicar no overlay
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
+                console.log('🖱️ Clicou no overlay');
                 fecharModal();
             }
         });
         
         // Fechar com ESC
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
+            if (e.key === 'Escape' && modal.classList.contains('show')) {
+                console.log('⌨️ ESC pressionado');
                 fecharModal();
             }
         });
+        
+        console.log('✅ Todos os event listeners configurados com sucesso!');
     });
 
     function abrirModal() {
+        console.log('🚀 Tentando abrir modal...');
         const modal = document.getElementById('statusModal');
+        
+        if (!modal) {
+            console.error('❌ Modal não encontrado!');
+            return;
+        }
+        
+        console.log('📍 Modal encontrado:', modal);
         modal.classList.add('show');
+        console.log('✅ Classe "show" adicionada');
+        
+        // Adiciona classe ao body para aplicar efeitos
+        document.body.classList.add('modal-open');
+        document.body.style.overflow = 'hidden';
+        
+        // Garante que o modal está no topo de tudo
+        modal.style.zIndex = '999999';
+        
+        console.log('✅ Modal aberto - sidebar bloqueada');
+        console.log('📊 Inscrição ID atual:', inscricaoAtualId);
     }
 
     function fecharModal() {
         const modal = document.getElementById('statusModal');
         modal.classList.remove('show');
         inscricaoAtualId = null;
+        
+        // Remove classe do body
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        
+        console.log('✅ Modal fechado - sidebar restaurada');
     }
 
     function mudarStatus(novoStatus) {
@@ -962,7 +1050,7 @@
         const opcoes = document.querySelectorAll('.status-option');
         opcoes.forEach(op => op.disabled = true);
 
-        fetch(`/candidatos/${inscricaoAtualId}/status/`, {
+        fetch(`/inscricoes/${inscricaoAtualId}/atualizar-status/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

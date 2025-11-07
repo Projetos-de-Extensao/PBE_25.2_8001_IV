@@ -1,0 +1,447 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ disciplina.nome }} - Detalhes{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #002555 0%, #1245FF 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #F5AC00;
+    }
+    
+    .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .disciplina-codigo {
+        background: #F5AC00;
+        color: #002555;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.875rem;
+        margin-left: auto;
+    }
+    
+    .info-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.1);
+        border-left: 4px solid #1245FF;
+        transition: all 0.3s ease;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(18, 69, 255, 0.15);
+    }
+    
+    .info-card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #002555;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-bottom: 2px solid #F5AC00;
+        padding-bottom: 0.5rem;
+    }
+    
+    .info-card-icon {
+        color: #1245FF;
+        font-size: 1.2rem;
+    }
+    
+    .info-item {
+        margin-bottom: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .info-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+    
+    .info-value {
+        font-weight: 600;
+        color: #002555;
+        font-size: 0.875rem;
+    }
+    
+    .info-value.highlight {
+        color: #1245FF;
+        font-size: 1rem;
+    }
+    
+    .ementa-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.1);
+        border-left: 4px solid #F5AC00;
+        margin-bottom: 2rem;
+    }
+    
+    .ementa-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #002555;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-bottom: 2px solid #F5AC00;
+        padding-bottom: 0.5rem;
+    }
+    
+    .ementa-content {
+        line-height: 1.6;
+        color: #495057;
+        font-size: 1rem;
+    }
+    
+    .pre-requisitos-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.1);
+        border-left: 4px solid #1245FF;
+        margin-bottom: 2rem;
+    }
+    
+    .pre-requisito-item {
+        background: linear-gradient(135deg, rgba(18, 69, 255, 0.05) 0%, rgba(0, 37, 85, 0.05) 100%);
+        border: 1px solid #1245FF;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .pre-requisito-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .pre-requisito-codigo {
+        background: #1245FF;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-weight: 700;
+        font-size: 0.75rem;
+    }
+    
+    .pre-requisito-nome {
+        color: #002555;
+        font-weight: 600;
+        flex-grow: 1;
+    }
+    
+    .vagas-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.1);
+        border-left: 4px solid #F5AC00;
+        margin-bottom: 2rem;
+    }
+    
+    .vaga-item {
+        background: linear-gradient(135deg, rgba(245, 172, 0, 0.05) 0%, rgba(255, 214, 102, 0.05) 100%);
+        border: 1px solid #F5AC00;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .vaga-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .vaga-nome {
+        font-weight: 700;
+        color: #002555;
+        margin-bottom: 0.5rem;
+    }
+    
+    .vaga-info {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .actions-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.1);
+        border-left: 4px solid #28a745;
+        text-align: center;
+    }
+    
+    .btn-action {
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+        margin: 0.5rem;
+    }
+    
+    .btn-editar {
+        background: linear-gradient(135deg, #F5AC00 0%, #ffd666 100%);
+        color: #002555;
+    }
+    
+    .btn-editar:hover {
+        background: linear-gradient(135deg, #ffd666 0%, #F5AC00 100%);
+        color: #002555;
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(245, 172, 0, 0.3);
+    }
+    
+    .btn-voltar {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-voltar:hover {
+        background: #5a6268;
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+        font-style: italic;
+    }
+    
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1rem;
+        }
+        
+        .page-header h1 {
+            font-size: 1.25rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        
+        .disciplina-codigo {
+            margin-left: 0;
+        }
+        
+        .info-cards {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .info-card, .ementa-card, .pre-requisitos-card, .vagas-card, .actions-card {
+            padding: 1rem;
+        }
+        
+        .btn-action {
+            width: 100%;
+            justify-content: center;
+            margin: 0.25rem 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="margin-top: 4rem;">
+    <!-- Header -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-book"></i> {{ disciplina.nome }}
+            <span class="disciplina-codigo">{{ disciplina.codigo }}</span>
+        </h1>
+        <p style="margin: 0; opacity: 0.9;">
+            Detalhes completos da disciplina
+        </p>
+    </div>
+
+    <!-- Cards de Informações -->
+    <div class="info-cards">
+        <!-- Informações Básicas -->
+        <div class="info-card">
+            <h3 class="info-card-title">
+                <i class="fas fa-info-circle info-card-icon"></i>
+                Informações Básicas
+            </h3>
+            <div class="info-item">
+                <span class="info-label">Curso:</span>
+                <span class="info-value">{{ disciplina.curso.nome }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Carga Horária:</span>
+                <span class="info-value highlight">{{ disciplina.carga_horaria }}h</span>
+            </div>
+            {% if disciplina.periodo_sugerido %}
+            <div class="info-item">
+                <span class="info-label">Período Sugerido:</span>
+                <span class="info-value highlight">{{ disciplina.periodo_sugerido }}º</span>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Dados de Criação -->
+        <div class="info-card">
+            <h3 class="info-card-title">
+                <i class="fas fa-calendar info-card-icon"></i>
+                Dados de Criação
+            </h3>
+            <div class="info-item">
+                <span class="info-label">Criada em:</span>
+                <span class="info-value">{{ disciplina.criado_em|date:"d/m/Y H:i" }}</span>
+            </div>
+            {% if disciplina.criado_por %}
+            <div class="info-item">
+                <span class="info-label">Criada por:</span>
+                <span class="info-value">{{ disciplina.criado_por.nome }}</span>
+            </div>
+            {% endif %}
+            <div class="info-item">
+                <span class="info-label">Última atualização:</span>
+                <span class="info-value">{{ disciplina.atualizado_em|date:"d/m/Y H:i" }}</span>
+            </div>
+        </div>
+        
+        <!-- Estatísticas -->
+        <div class="info-card">
+            <h3 class="info-card-title">
+                <i class="fas fa-chart-bar info-card-icon"></i>
+                Estatísticas
+            </h3>
+            <div class="info-item">
+                <span class="info-label">Vagas Criadas:</span>
+                <span class="info-value highlight">{{ total_vagas }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Total de Inscritos:</span>
+                <span class="info-value highlight">{{ total_inscritos }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Status:</span>
+                <span class="info-value" style="color: #28a745;">Ativa</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ementa -->
+    {% if disciplina.ementa %}
+    <div class="ementa-card">
+        <h3 class="ementa-title">
+            <i class="fas fa-file-alt" style="color: #F5AC00;"></i>
+            Ementa
+        </h3>
+        <div class="ementa-content">
+            {{ disciplina.ementa|linebreaks }}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Pré-requisitos -->
+    <div class="pre-requisitos-card">
+        <h3 class="info-card-title">
+            <i class="fas fa-link info-card-icon"></i>
+            Pré-requisitos
+        </h3>
+        {% if disciplina.pre_requisitos.all %}
+            {% for pre_req in disciplina.pre_requisitos.all %}
+            <div class="pre-requisito-item">
+                <span class="pre-requisito-codigo">{{ pre_req.codigo }}</span>
+                <span class="pre-requisito-nome">{{ pre_req.nome }}</span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                Esta disciplina não possui pré-requisitos.
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Vagas Relacionadas -->
+    <div class="vagas-card">
+        <h3 class="info-card-title">
+            <i class="fas fa-briefcase" style="color: #F5AC00;"></i>
+            Vagas de Monitoria ({{ total_vagas }})
+        </h3>
+        {% if vagas %}
+            {% for vaga in vagas %}
+            <div class="vaga-item">
+                <div class="vaga-nome">{{ vaga.nome }}</div>
+                <div class="vaga-info">
+                    <span><i class="fas fa-users"></i> {{ vaga.numero_vagas }} vaga{{ vaga.numero_vagas|pluralize }}</span>
+                    <span><i class="fas fa-calendar"></i> {{ vaga.criado_em|date:"d/m/Y" }}</span>
+                    <span style="color: {% if vaga.ativo %}#28a745{% else %}#dc3545{% endif %};">
+                        <i class="fas fa-circle" style="font-size: 0.5rem;"></i>
+                        {% if vaga.ativo %}Ativa{% else %}Inativa{% endif %}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                Ainda não há vagas de monitoria criadas para esta disciplina.
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Ações -->
+    <div class="actions-card">
+        <h3 class="info-card-title" style="justify-content: center; border-bottom: 2px solid #28a745;">
+            <i class="fas fa-cogs" style="color: #28a745;"></i>
+            Ações
+        </h3>
+        
+        <div style="margin-top: 1rem;">
+            {% if disciplina.criado_por.email == request.user.email or request.user.is_staff %}
+            <a href="{% url 'editar_disciplina' disciplina.id %}" class="btn-action btn-editar">
+                <i class="fas fa-edit"></i> Editar Disciplina
+            </a>
+            {% endif %}
+            <a href="{% url 'listar_disciplinas' %}" class="btn-action btn-voltar">
+                <i class="fas fa-arrow-left"></i> Voltar à Lista
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

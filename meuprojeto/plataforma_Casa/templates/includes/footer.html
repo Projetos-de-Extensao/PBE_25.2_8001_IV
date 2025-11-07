@@ -1,4 +1,5 @@
-<!-- ==================== FOOTER PLATAFORMA CASA ==================== -->
+<!-- ==================== FOOTER PLATAFORMA CASA (apenas para usuários não logados) ==================== -->
+{% if not user.is_authenticated %}
 <footer style="background: linear-gradient(135deg, #002555 0%, #003a7a 100%); color: #fafaf8; margin-top: 4rem; box-shadow: 0 -4px 20px rgba(0, 37, 85, 0.1);">
     <div class="container">
         <!-- Footer Main Content -->
@@ -205,3 +206,4 @@
         }
     }
 </style>
+{% endif %}

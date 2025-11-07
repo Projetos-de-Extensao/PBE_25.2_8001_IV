@@ -12,13 +12,14 @@ from datetime import datetime, timedelta
 from .models import (
     Usuario, Aluno, Funcionario, Curso, Sala, Vaga, Turma, 
     ParticipacaoMonitoria, Presenca, Inscricao, TipoUsuario,
-    Documento, RegistroHoras, StatusPagamento, MaterialApoio
+    Documento, RegistroHoras, StatusPagamento, MaterialApoio, Disciplina
 )
 from .repository import (
     listar_usuarios, listar_alunos, listar_cursos, listar_funcionarios, 
     listar_inscricoes, listar_turmas, listar_participacoes_monitoria, 
     listar_presencas, listar_salas, listar_tipos_usuario
 )
+from .forms import MaterialApoioForm, DisciplinaForm
 from functools import wraps
 from .forms import MaterialApoioForm
 
@@ -57,6 +58,8 @@ def requer_grupo(*grupos_permitidos):
         @requer_grupo('Aluno', 'Monitor')
         def minha_view(request):
             ...
+    
+    ⚡ ADMINS/SUPERUSERS TÊM ACESSO TOTAL A TUDO!
     """
     def decorator(view_func):
         @wraps(view_func)
@@ -66,6 +69,10 @@ def requer_grupo(*grupos_permitidos):
             if not request.user.is_authenticated:
                 messages.error(request, '❌ Você precisa estar autenticado.')
                 return redirect('login')
+            
+            # ⚡ ADMIN/SUPERUSER TEM ACESSO TOTAL!
+            if request.user.is_staff or request.user.is_superuser:
+                return view_func(request, *args, **kwargs)
             
             # ✅ VERIFICAÇÃO: Usuário tem um dos grupos permitidos?
             if not request.user.groups.filter(name__in=grupos_permitidos).exists():
@@ -959,6 +966,94 @@ def avaliar_candidato(request, inscricao_id):
     return render(request, 'vagas/avaliar_candidato.html', context)
 
 
+@login_required
+def atualizar_status_inscricao(request, inscricao_id):
+    """
+    API endpoint para atualizar o status de uma inscrição via AJAX
+    Retorna JSON com resultado da operação
+    """
+    import json
+    
+    # Verificar se é uma requisição POST
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Método não permitido'}, status=405)
+    
+    try:
+        # Buscar a inscrição
+        inscricao = get_object_or_404(Inscricao, id=inscricao_id)
+        
+        # Verificar permissões (apenas admin ou coordenador da vaga)
+        user = request.user
+        tem_permissao = False
+        
+        if user.is_staff or user.is_superuser:
+            tem_permissao = True
+        else:
+            try:
+                funcionario = Funcionario.objects.get(email=user.email)
+                if funcionario in inscricao.vaga.coordenadores.all() or funcionario in inscricao.vaga.professores.all():
+                    tem_permissao = True
+            except Funcionario.DoesNotExist:
+                pass
+        
+        if not tem_permissao:
+            return JsonResponse({'success': False, 'error': 'Sem permissão para atualizar esta inscrição'}, status=403)
+        
+        # Ler dados do corpo da requisição
+        data = json.loads(request.body)
+        novo_status = data.get('status')
+        
+        # Validar status
+        status_validos = ['Pendente', 'Entrevista', 'Aprovado', 'Não Aprovado']
+        if novo_status not in status_validos:
+            return JsonResponse({'success': False, 'error': 'Status inválido'}, status=400)
+        
+        # Atualizar status
+        status_anterior = inscricao.status
+        inscricao.status = novo_status
+        
+        # Se aprovar: adicionar aos monitores e ao grupo
+        if novo_status == 'Aprovado':
+            inscricao.vaga.monitores.add(inscricao.aluno)
+            
+            try:
+                User = get_user_model()
+                user_aluno = User.objects.get(email=inscricao.aluno.email)
+                grupo_monitor, _ = Group.objects.get_or_create(name='Monitor')
+                user_aluno.groups.add(grupo_monitor)
+                user_aluno.save()
+            except User.DoesNotExist:
+                pass
+            except Exception as e:
+                print(f"Erro ao adicionar ao grupo Monitor: {e}")
+        
+        # Se reprovar e estava aprovado antes: remover dos monitores e do grupo
+        elif novo_status == 'Não Aprovado' and status_anterior == 'Aprovado':
+            inscricao.vaga.monitores.remove(inscricao.aluno)
+            
+            try:
+                User = get_user_model()
+                user_aluno = User.objects.get(email=inscricao.aluno.email)
+                grupo_monitor = Group.objects.get(name='Monitor')
+                user_aluno.groups.remove(grupo_monitor)
+                user_aluno.save()
+            except (User.DoesNotExist, Group.DoesNotExist):
+                pass
+        
+        inscricao.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Status atualizado de "{status_anterior}" para "{novo_status}"',
+            'novo_status': novo_status
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'JSON inválido'}, status=400)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+
 @requer_admin_ou_coordenador
 def criar_vaga(request):
     """
@@ -974,9 +1069,11 @@ def criar_vaga(request):
     if request.method == 'POST':
         nome = request.POST.get('nome')
         curso_id = request.POST.get('curso')
+        disciplina_id = request.POST.get('disciplina')
         coordenador_id = request.POST.get('coordenador')
         descricao = request.POST.get('descricao')
         requisitos = request.POST.get('requisitos')
+        numero_vagas = request.POST.get('vagas_disponiveis')
         
         # ✅ VALIDAÇÃO: Professor só pode criar vaga para si mesmo
         if not (user.is_staff or user.is_superuser):
@@ -992,16 +1089,23 @@ def criar_vaga(request):
         
         try:
             curso = Curso.objects.get(id=curso_id)
+            disciplina = Disciplina.objects.get(id=disciplina_id)
             coordenador = Funcionario.objects.get(id=coordenador_id)
             
             vaga = Vaga.objects.create(
                 nome=nome,
                 curso=curso,
-                coordenador=coordenador,
+                disciplina=disciplina,
                 descricao=descricao,
                 requisitos=requisitos,
+                numero_vagas=int(numero_vagas) if numero_vagas else 1,
                 ativo=True
             )
+            
+            # Adicionar coordenador ao ManyToManyField
+            vaga.coordenadores.add(coordenador)
+            
+            messages.success(request, '✅ Vaga criada com sucesso!')
             return redirect('listar_vagas')
         except Exception as e:
             messages.error(request, f'❌ Erro ao criar vaga: {str(e)}')
@@ -1022,6 +1126,7 @@ def criar_vaga(request):
     
     context = {
         'cursos': Curso.objects.filter(ativo=True),
+        'disciplinas': Disciplina.objects.filter(ativo=True).select_related('curso'),
         'coordenadores': coordenadores,
     }
     return render(request, 'vagas/criar.html', context)
@@ -1249,17 +1354,37 @@ def deletar_turma(request, turma_id):
 
 # ==================== MONITORIAS ====================
 @requer_admin_ou_coordenador
+@requer_professor
+@requer_admin_ou_coordenador
 def listar_monitorias(request):
     """
-    View para listar participações em monitorias
+    View para professor listar suas monitorias (turmas)
     """
-    participacoes = ParticipacaoMonitoria.objects.all().select_related('aluno', 'turma')
-    turmas = Turma.objects.filter(ativo=True)
-    
-    # Filtro por turma
-    turma_filtro = request.GET.get('turma')
-    if turma_filtro:
-        participacoes = participacoes.filter(turma__id=turma_filtro)
+    try:
+        # Buscar o funcionário (professor) pelo email do usuário logado
+        professor = Funcionario.objects.get(email=request.user.email)
+        
+        # Buscar turmas das vagas onde o professor está associado
+        turmas = Turma.objects.filter(
+            vaga__professores=professor,
+            ativo=True
+        ).select_related('vaga', 'monitor', 'curso', 'sala').order_by('-criado_em')
+        
+        # Buscar participações nessas turmas
+        participacoes = ParticipacaoMonitoria.objects.filter(
+            turma__in=turmas
+        ).select_related('aluno', 'turma')
+        
+        # Filtro por turma
+        turma_filtro = request.GET.get('turma')
+        if turma_filtro:
+            participacoes = participacoes.filter(turma__id=turma_filtro)
+            turmas = turmas.filter(id=turma_filtro)
+        
+    except Funcionario.DoesNotExist:
+        # Se professor não encontrado, não mostra nenhuma monitoria
+        turmas = Turma.objects.none()
+        participacoes = ParticipacaoMonitoria.objects.none()
     
     context = {
         'participacoes': participacoes,
@@ -1268,6 +1393,7 @@ def listar_monitorias(request):
     return render(request, 'monitorias/listar.html', context)
 
 
+@requer_admin_ou_coordenador
 def editar_participacao(request, participacao_id):
     """
     View para editar participação em monitoria
@@ -1452,22 +1578,42 @@ def perfil(request):
     return render(request, 'perfil.html', context)
 
 
+@login_required(login_url='login')
 def alterar_senha(request):
     """
     View para alterar senha do usuário
+    Valida senha atual antes de permitir alteração
     """
     if request.method == 'POST':
+        senha_atual = request.POST.get('senha_atual')
         senha_nova = request.POST.get('senha_nova')
         senha_confirmar = request.POST.get('senha_confirmar')
         
-        if senha_nova == senha_confirmar:
-            request.user.set_password(senha_nova)
-            request.user.save()
-            # messages.success(request, 'Senha alterada com sucesso!')
+        # Validar senha atual
+        if not request.user.check_password(senha_atual):
+            messages.error(request, 'Senha atual incorreta!')
             return redirect('perfil')
-        else:
-            # messages.error(request, 'As senhas não coincidem!')
+        
+        # Validar se as senhas novas coincidem
+        if senha_nova != senha_confirmar:
+            messages.error(request, 'As senhas não coincidem!')
             return redirect('perfil')
+        
+        # Validar tamanho mínimo da senha
+        if len(senha_nova) < 8:
+            messages.error(request, 'A senha deve ter no mínimo 8 caracteres!')
+            return redirect('perfil')
+        
+        # Alterar senha
+        request.user.set_password(senha_nova)
+        request.user.save()
+        
+        # Fazer login novamente para manter sessão ativa
+        from django.contrib.auth import update_session_auth_hash
+        update_session_auth_hash(request, request.user)
+        
+        messages.success(request, 'Senha alterada com sucesso!')
+        return redirect('perfil')
     
     return redirect('perfil')
 
@@ -2301,45 +2447,149 @@ def materiais_monitoria(request, turma_id):
     return render(request, 'monitorias/materiais_monitoria.html', context)
 
 
+@requer_monitor
+def estatisticas_presenca_aluno(request, turma_id, aluno_id):
+    """
+    View para buscar estatísticas de presença de um aluno em uma monitoria
+    Retorna: total de presenças, ausências e percentual
+    """
+    try:
+        # Verificar monitor
+        monitor = get_monitor_by_email(request.user.email)
+        if not monitor:
+            return JsonResponse({
+                'success': False,
+                'message': 'Monitor não encontrado'
+            }, status=403)
+        
+        # Verificar turma
+        turma = get_object_or_404(Turma, id=turma_id, monitor=monitor)
+        
+        # Verificar aluno
+        aluno = get_object_or_404(Aluno, id=aluno_id)
+        
+        # Buscar todas as presenças do aluno nesta turma
+        presencas = Presenca.objects.filter(turma=turma, aluno=aluno)
+        
+        # Calcular estatísticas
+        total_registros = presencas.count()
+        total_presencas = presencas.filter(presente=True).count()
+        total_ausencias = presencas.filter(presente=False).count()
+        
+        # Calcular percentual de presença
+        percentual = 0
+        if total_registros > 0:
+            percentual = (total_presencas / total_registros) * 100
+        
+        return JsonResponse({
+            'success': True,
+            'presencas': total_presencas,
+            'ausencias': total_ausencias,
+            'total': total_registros,
+            'percentual': round(percentual, 1)
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'Erro ao buscar estatísticas: {str(e)}'
+        }, status=500)
+
+
 @requer_monitor  
 def marcar_presenca_aluno(request, turma_id, aluno_id):
     """
     View para MONITOR marcar presença de um aluno
     """
-    if request.method == 'POST':
-        try:
-            monitor = get_monitor_by_email(request.user.email)
-            if not monitor:
-                raise Exception("Monitor não encontrado")
-            turma = get_object_or_404(Turma, id=turma_id, monitor=monitor)
-            aluno = get_object_or_404(Aluno, id=aluno_id)
-            
-            hoje = timezone.now().date()
-            presente = request.POST.get('presente') == 'true'
-            
-            # Criar ou atualizar presença
-            presenca, created = Presenca.objects.get_or_create(
-                turma=turma,
-                aluno=aluno,
-                data=hoje,
-                defaults={'presente': presente}
-            )
-            
-            if not created:
-                presenca.presente = presente
-                presenca.save()
-            
-            return JsonResponse({
-                'success': True,
-                'message': f'Presença {"marcada" if presente else "desmarcada"} para {aluno.nome}'
-            })
-        except Exception as e:
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Método não permitido'}, status=405)
+    
+    try:
+        # Log inicial
+        print(f"\n=== MARCAR PRESENÇA ===")
+        print(f"User: {request.user.email}")
+        print(f"Turma ID: {turma_id}")
+        print(f"Aluno ID: {aluno_id}")
+        print(f"POST data: {request.POST}")
+        
+        # Verificar monitor
+        monitor = get_monitor_by_email(request.user.email)
+        if not monitor:
+            print("❌ Monitor não encontrado")
             return JsonResponse({
                 'success': False,
-                'message': f'Erro ao marcar presença: {str(e)}'
-            })
-    
-    return JsonResponse({'success': False, 'message': 'Método não permitido'})
+                'message': 'Monitor não encontrado'
+            }, status=403)
+        
+        print(f"✓ Monitor: {monitor.nome}")
+        
+        # Verificar turma
+        turma = get_object_or_404(Turma, id=turma_id, monitor=monitor)
+        print(f"✓ Turma: {turma.nome}")
+        
+        # Verificar aluno
+        aluno = get_object_or_404(Aluno, id=aluno_id)
+        print(f"✓ Aluno: {aluno.nome}")
+        
+        # Verificar se o aluno participa da monitoria
+        participa = ParticipacaoMonitoria.objects.filter(
+            turma=turma,
+            aluno=aluno
+        ).exists()
+        
+        if not participa:
+            print("❌ Aluno não participa desta monitoria")
+            return JsonResponse({
+                'success': False,
+                'message': 'Aluno não participa desta monitoria'
+            }, status=400)
+        
+        print("✓ Aluno participa da monitoria")
+        
+        # Converter string para boolean corretamente
+        hoje = timezone.now().date()
+        presente_str = request.POST.get('presente', 'false').lower()
+        presente = presente_str in ['true', '1', 'yes', 'on']
+        
+        print(f"Presente (string): '{presente_str}'")
+        print(f"Presente (bool): {presente}")
+        print(f"Data: {hoje}")
+        
+        # Criar ou atualizar presença
+        presenca, created = Presenca.objects.get_or_create(
+            turma=turma,
+            aluno=aluno,
+            data=hoje,
+            defaults={'presente': presente}
+        )
+        
+        if not created:
+            presenca.presente = presente
+            presenca.save()
+            print("✓ Presença atualizada")
+        else:
+            print("✓ Presença criada")
+        
+        status_msg = "✓ Presente" if presente else "✗ Ausente"
+        print(f"Resultado: {status_msg}")
+        print("=== FIM ===\n")
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'{status_msg} - {aluno.nome}'
+        })
+        
+    except Exception as e:
+        import traceback
+        error_msg = str(e)
+        error_trace = traceback.format_exc()
+        print(f"❌ Erro ao marcar presença: {error_msg}")
+        print(error_trace)
+        print("=== FIM COM ERRO ===\n")
+        return JsonResponse({
+            'success': False,
+            'message': f'Erro ao marcar presença: {error_msg}'
+        }, status=500)
 
 
 @requer_monitor
@@ -3076,3 +3326,179 @@ def mudar_status_candidato(request, inscricao_id):
             'success': False,
             'error': str(e)
         }, status=500)
+
+
+# ============================================================================
+# 15. GERENCIAMENTO DE DISCIPLINAS (PROFESSOR)
+# ============================================================================
+
+@requer_grupo('Professor', 'Coordenador')
+def listar_disciplinas(request):
+    """
+    Lista todas as disciplinas para professores
+    Permite filtrar e buscar disciplinas
+    """
+    try:
+        # Buscar todas as disciplinas
+        disciplinas = Disciplina.objects.select_related('curso', 'criado_por').filter(ativo=True).order_by('curso__nome', 'periodo_sugerido', 'nome')
+        
+        # Filtros
+        curso_filtro = request.GET.get('curso', '')
+        periodo_filtro = request.GET.get('periodo', '')
+        busca = request.GET.get('busca', '')
+        
+        if curso_filtro:
+            disciplinas = disciplinas.filter(curso_id=curso_filtro)
+        
+        if periodo_filtro:
+            disciplinas = disciplinas.filter(periodo_sugerido=periodo_filtro)
+        
+        if busca:
+            disciplinas = disciplinas.filter(
+                Q(nome__icontains=busca) | 
+                Q(codigo__icontains=busca) |
+                Q(ementa__icontains=busca)
+            )
+        
+        # Dados para filtros
+        cursos = Curso.objects.filter(ativo=True).order_by('nome')
+        periodos = range(1, 11)  # 1 a 10
+        
+        context = {
+            'disciplinas': disciplinas,
+            'cursos': cursos,
+            'periodos': periodos,
+            'filtros': {
+                'curso': curso_filtro,
+                'periodo': periodo_filtro,
+                'busca': busca,
+            }
+        }
+        return render(request, 'professor/disciplinas/listar.html', context)
+        
+    except Exception as e:
+        messages.error(request, f'Erro ao carregar disciplinas: {str(e)}')
+        return render(request, 'professor/disciplinas/listar.html', {'disciplinas': []})
+
+
+@requer_grupo('Professor', 'Coordenador')
+def criar_disciplina(request):
+    """
+    Permite que professores criem novas disciplinas
+    """
+    if request.method == 'POST':
+        form = DisciplinaForm(request.POST)
+        if form.is_valid():
+            try:
+                disciplina = form.save(commit=False)
+                
+                # Definir o professor como criador
+                try:
+                    funcionario = Funcionario.objects.get(email=request.user.email)
+                    disciplina.criado_por = funcionario
+                except Funcionario.DoesNotExist:
+                    # Se não encontrar o funcionário, continua sem definir criado_por
+                    pass
+                
+                disciplina.save()
+                form.save_m2m()  # Salvar pré-requisitos
+                
+                messages.success(request, f'Disciplina "{disciplina.nome}" criada com sucesso!')
+                return redirect('listar_disciplinas')
+                
+            except Exception as e:
+                messages.error(request, f'Erro ao criar disciplina: {str(e)}')
+        else:
+            # Mostrar erros do formulário
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{form.fields[field].label}: {error}')
+    else:
+        form = DisciplinaForm()
+    
+    context = {
+        'form': form,
+        'title': 'Nova Disciplina',
+    }
+    return render(request, 'professor/disciplinas/criar.html', context)
+
+
+@requer_grupo('Professor', 'Coordenador')
+def editar_disciplina(request, disciplina_id):
+    """
+    Permite que professores editem disciplinas que criaram
+    """
+    try:
+        disciplina = get_object_or_404(Disciplina, id=disciplina_id, ativo=True)
+        
+        # Verificar se o professor pode editar (criou a disciplina ou é admin)
+        pode_editar = False
+        
+        if request.user.is_staff or request.user.is_superuser:
+            pode_editar = True
+        else:
+            try:
+                funcionario = Funcionario.objects.get(email=request.user.email)
+                if disciplina.criado_por == funcionario:
+                    pode_editar = True
+            except Funcionario.DoesNotExist:
+                pass
+        
+        if not pode_editar:
+            messages.error(request, 'Você só pode editar disciplinas que você criou.')
+            return redirect('listar_disciplinas')
+        
+        if request.method == 'POST':
+            form = DisciplinaForm(request.POST, instance=disciplina)
+            if form.is_valid():
+                try:
+                    form.save()
+                    messages.success(request, f'Disciplina "{disciplina.nome}" atualizada com sucesso!')
+                    return redirect('listar_disciplinas')
+                except Exception as e:
+                    messages.error(request, f'Erro ao atualizar disciplina: {str(e)}')
+            else:
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, f'{form.fields[field].label}: {error}')
+        else:
+            form = DisciplinaForm(instance=disciplina)
+        
+        context = {
+            'form': form,
+            'disciplina': disciplina,
+            'title': f'Editar - {disciplina.nome}',
+        }
+        return render(request, 'professor/disciplinas/editar.html', context)
+        
+    except Exception as e:
+        messages.error(request, f'Erro ao carregar disciplina: {str(e)}')
+        return redirect('listar_disciplinas')
+
+
+@requer_grupo('Professor', 'Coordenador') 
+def detalhes_disciplina(request, disciplina_id):
+    """
+    Mostra detalhes completos de uma disciplina
+    """
+    try:
+        disciplina = get_object_or_404(Disciplina, id=disciplina_id, ativo=True)
+        
+        # Buscar vagas relacionadas
+        vagas = disciplina.vagas.filter(ativo=True).order_by('-criado_em')
+        
+        # Estatísticas
+        total_vagas = vagas.count()
+        total_inscritos = sum(vaga.inscricao_set.count() for vaga in vagas)
+        
+        context = {
+            'disciplina': disciplina,
+            'vagas': vagas,
+            'total_vagas': total_vagas,
+            'total_inscritos': total_inscritos,
+        }
+        return render(request, 'professor/disciplinas/detalhes.html', context)
+        
+    except Exception as e:
+        messages.error(request, f'Erro ao carregar disciplina: {str(e)}')
+        return redirect('listar_disciplinas')

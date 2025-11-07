@@ -1,7 +1,303 @@
 {% extends 'base.html' %}
 {% block title %}Nova Vaga - Plataforma Casa{% endblock %}
 
+{% block extra_css %}
+<style>
+    :root {
+        --primary-blue: #002555;
+        --accent-yellow: #F5AC00;
+    }
+    
+    .page-container {
+        padding: 1rem 0.75rem;
+    }
+    
+    @media (min-width: 768px) {
+        .page-container {
+            padding: 1.5rem 1rem;
+        }
+    }
+    
+    .breadcrumb {
+        background: transparent;
+        padding: 0 0 0.75rem 0;
+        margin: 0;
+        font-size: 0.8rem;
+    }
+    
+    @media (min-width: 768px) {
+        .breadcrumb {
+            font-size: 0.875rem;
+            padding: 0 0 1rem 0;
+        }
+    }
+    
+    .breadcrumb-item a {
+        color: var(--primary-blue);
+        text-decoration: none;
+    }
+    
+    .page-title h1 {
+        font-size: 1.25rem;
+        color: var(--primary-blue);
+        font-weight: 700;
+        margin-bottom: 1rem;
+        line-height: 1.3;
+    }
+    
+    @media (min-width: 768px) {
+        .page-title h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+    }
+    
+    .page-title h1 i {
+        margin-right: 0.4rem;
+        font-size: 1rem;
+    }
+    
+    @media (min-width: 768px) {
+        .page-title h1 i {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+    }
+    
+    .card {
+        border-radius: 10px;
+        border: 1px solid rgba(0, 37, 85, 0.1);
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.08);
+    }
+    
+    @media (min-width: 768px) {
+        .card {
+            border-radius: 12px;
+        }
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, var(--primary-blue), #003a7a);
+        border-bottom: none;
+        padding: 0.85rem 1rem;
+        border-radius: 10px 10px 0 0 !important;
+    }
+    
+    @media (min-width: 768px) {
+        .card-header {
+            padding: 1rem 1.25rem;
+            border-radius: 12px 12px 0 0 !important;
+        }
+    }
+    
+    .card-header h5 {
+        color: white;
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    @media (min-width: 768px) {
+        .card-header h5 {
+            font-size: 1.1rem;
+        }
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    @media (min-width: 768px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+    }
+    
+    .form-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--primary-blue);
+        margin-bottom: 0.35rem;
+    }
+    
+    @media (min-width: 768px) {
+        .form-label {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.5rem 0.65rem;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+        min-height: 36px;
+    }
+    
+    @media (min-width: 768px) {
+        .form-control, .form-select {
+            padding: 0.75rem 0.9rem;
+            font-size: 0.9rem;
+            min-height: 42px;
+        }
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.2rem rgba(0, 37, 85, 0.1);
+    }
+    
+    .form-text {
+        font-size: 0.75rem;
+        margin-top: 0.3rem;
+    }
+    
+    @media (min-width: 768px) {
+        .form-text {
+            font-size: 0.8rem;
+        }
+    }
+    
+    .text-danger {
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
+    
+    @media (min-width: 768px) {
+        .text-danger {
+            font-size: 0.8rem;
+        }
+    }
+    
+    .btn {
+        padding: 0.5rem 0.85rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        min-height: 36px;
+    }
+    
+    @media (min-width: 768px) {
+        .btn {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.9rem;
+            min-height: 42px;
+        }
+    }
+    
+    .btn-primary {
+        background: var(--primary-blue);
+        border-color: var(--primary-blue);
+    }
+    
+    .btn-primary:hover {
+        background: #003a7a;
+        border-color: #003a7a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.2);
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        border: 2px solid #6c757d;
+        color: #f8f9fa;
+    }
+    
+    .btn-secondary:hover {
+        background: #5a6268;
+        border-color: #5a6268;
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+    }
+    
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    @media (min-width: 768px) {
+        .d-flex.justify-content-between {
+            flex-direction: row;
+            gap: 0;
+        }
+    }
+    
+    .d-flex.justify-content-between .btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+    }
+    
+    @media (min-width: 768px) {
+        .d-flex.justify-content-between .btn {
+            width: auto;
+        }
+    }
+    
+    .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+    
+    @media (min-width: 768px) {
+        .mb-3 {
+            margin-bottom: 1rem !important;
+        }
+    }
+    
+    textarea.form-control {
+        resize: vertical;
+        min-height: 80px;
+    }
+    
+    @media (min-width: 768px) {
+        textarea.form-control {
+            min-height: 100px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cursoSelect = document.getElementById('curso');
+    const disciplinaSelect = document.getElementById('disciplina');
+    const todasDisciplinas = Array.from(disciplinaSelect.options);
+    
+    function filtrarDisciplinas() {
+        const cursoSelecionado = cursoSelect.value;
+        
+        // Limpar disciplinas
+        disciplinaSelect.innerHTML = '<option value="">-- Selecione uma disciplina --</option>';
+        
+        if (cursoSelecionado) {
+            // Filtrar disciplinas por curso
+            todasDisciplinas.forEach(option => {
+                if (option.dataset.curso === cursoSelecionado) {
+                    disciplinaSelect.appendChild(option.cloneNode(true));
+                }
+            });
+        }
+    }
+    
+    cursoSelect.addEventListener('change', filtrarDisciplinas);
+    
+    // Filtrar na carga inicial se houver curso selecionado
+    if (cursoSelect.value) {
+        filtrarDisciplinas();
+    }
+});
+</script>
+{% endblock %}
+
 {% block content %}
+<div class="container page-container">
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
@@ -11,7 +307,7 @@
 </nav>
 
 <div class="page-title">
-    <h1><i class="fas fa-plus-circle"></i> Criar Nova Vaga de Monitoria</h1>
+    <h1><i class="fas fa-plus-circle"></i> Criar Nova Vaga</h1>
 </div>
 
 <div class="card">
@@ -50,6 +346,22 @@
             </div>
             
             <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="disciplina" class="form-label">Disciplina *</label>
+                    <select class="form-select" id="disciplina" name="disciplina" required>
+                        <option value="">-- Selecione uma disciplina --</option>
+                        {% for disciplina in disciplinas %}
+                            <option value="{{ disciplina.id }}" data-curso="{{ disciplina.curso.id }}"
+                                {% if form.disciplina.value == disciplina.id|stringformat:"s" %}selected{% endif %}>
+                                {{ disciplina.codigo }} - {{ disciplina.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.disciplina.errors %}
+                        <div class="text-danger small">{{ form.disciplina.errors }}</div>
+                    {% endif %}
+                </div>
+                
                 <div class="col-md-6 mb-3">
                     <label for="coordenador" class="form-label">Coordenador *</label>
                     <select class="form-select" id="coordenador" name="coordenador" required>
@@ -138,14 +450,15 @@
             </div>
             
             <div class="d-flex justify-content-between mt-4">
-                <a href="{% url 'listar_vagas' %}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Cancelar
-                </a>
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary order-1 order-md-2">
                     <i class="fas fa-save"></i> Salvar Vaga
                 </button>
+                <a href="{% url 'listar_vagas' %}" class="btn btn-secondary order-2 order-md-1">
+                    <i class="fas fa-arrow-left"></i> Cancelar
+                </a>
             </div>
         </form>
     </div>
+</div>
 </div>
 {% endblock %}
