@@ -51,6 +51,9 @@ watchdog==6.0.0
 # Django Framework
 Django==5.2
 
+# Django Extensions
+django-extensions==3.2.3
+
 # API e documentação
 djangorestframework==3.15.2
 drf-yasg==1.21.7
