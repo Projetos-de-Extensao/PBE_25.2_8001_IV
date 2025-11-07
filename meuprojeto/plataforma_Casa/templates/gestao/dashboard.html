@@ -5,547 +5,1071 @@
 
 {% block extra_css %}
 <style>
-    /* ===== DESKTOP - Layout Compacto ===== */
-    .dashboard-container { 
-        padding: 1.5rem 0; 
-        max-width: 1400px; 
-        margin: 0 auto;
+    /* ===== RESET PARA MODO ESCURO ===== */
+    * {
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     }
     
-    /* KPI Cards - Compactos */
-    .kpi-card { 
-        background: white; 
-        border-radius: 8px; 
-        padding: 1rem; 
-        box-shadow: 0 2px 4px rgba(0, 37, 85, 0.08); 
-        border-left: 3px solid; 
-        transition: all 0.2s ease;
-        min-height: 100px;
+    /* ===== TEMA CLARO/ESCURO ===== */
+    :root, html {
+        --primary: #1A2B5F;
+        --secondary: #F4A261;
+        --bg-color: #F8FAFC;
+        --text-primary: #2C2C2C;
+        --text-secondary: #6B7280;
+        --card-bg: #FFFFFF;
+        --border-color: #E5E7EB;
+        --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        --hover-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+    
+    html[data-theme="dark"], [data-theme="dark"] {
+        --primary: #6B8BC3;
+        --secondary: #F4A261;
+        --bg-color: #121212;
+        --text-primary: #E5E7EB;
+        --text-secondary: #9CA3AF;
+        --card-bg: #1E1E1E;
+        --border-color: #333333;
+        --shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        --hover-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    }
+    
+    html[data-theme="dark"] body,
+    body {
+        background-color: var(--bg-color) !important;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        color: var(--text-primary);
+    }
+    
+    /* Aplicar tema em elementos do Bootstrap/Base */
+    html[data-theme="dark"] .content-wrapper,
+    html[data-theme="dark"] .main-content {
+        background-color: var(--bg-color) !important;
+    }
+    
+    /* ===== HEADER FIXO ===== */
+    .dashboard-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--card-bg);
+        padding: 1.5rem 2rem;
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .header-content {
+        max-width: 1600px;
+        margin: 0 auto;
         display: flex;
-        flex-direction: column;
         justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
     }
+    
+    .header-title h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin: 0 0 0.25rem 0;
+        line-height: 1.2;
+    }
+    
+    .header-title p {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin: 0;
+    }
+    
+    .header-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .filter-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .filter-select {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background: var(--card-bg);
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    
+    .filter-select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(26, 43, 95, 0.1);
+    }
+    
+    .action-btn {
+        padding: 0.625rem 1.25rem;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background: var(--card-bg);
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .action-btn:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        transform: translateY(-1px);
+    }
+    
+    .action-btn.primary {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+    
+    .theme-toggle {
+        background: none;
+        border: 1px solid var(--border-color);
+        padding: 0.5rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1.25rem;
+        color: var(--text-primary);
+        transition: all 0.2s;
+    }
+    
+    .theme-toggle:hover {
+        background: var(--primary);
+        color: white;
+        transform: scale(1.1);
+    }
+    
+    html[data-theme="dark"] .theme-toggle {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    html[data-theme="dark"] .theme-toggle:hover {
+        background: var(--primary);
+        border-color: var(--primary);
+    }
+    
+    /* ===== CONTAINER PRINCIPAL ===== */
+    .dashboard-container { 
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 0 2rem 2rem 2rem;
+    }
+    
+    /* ===== SEÇÃO: RESUMO GERAL (5 CARDS PRINCIPAIS) ===== */
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    /* KPI Cards - Modernos */
+    .kpi-card { 
+        background: var(--card-bg);
+        border-radius: 8px; 
+        padding: 1.5rem; 
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .kpi-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--accent-color);
+        transition: width 0.3s ease;
+    }
+    
     .kpi-card:hover { 
-        transform: translateY(-2px); 
-        box-shadow: 0 4px 8px rgba(0, 37, 85, 0.12); 
+        transform: translateY(-4px); 
+        box-shadow: var(--hover-shadow);
     }
-    .kpi-card.primary { border-left-color: #002555; }
-    .kpi-card.success { border-left-color: #28a745; }
-    .kpi-card.info { border-left-color: #1245FF; }
-    .kpi-card.warning { border-left-color: #F5AC00; }
+    
+    .kpi-card:hover::before {
+        width: 8px;
+    }
+    
+    .kpi-card.verde { --accent-color: #10B981; }
+    .kpi-card.azul { --accent-color: #3B82F6; }
+    .kpi-card.azul-claro { --accent-color: #06B6D4; }
+    .kpi-card.azul-escuro { --accent-color: #1E40AF; }
+    .kpi-card.laranja { --accent-color: #F59E0B; }
+    .kpi-card.vermelho { --accent-color: #EF4444; }
+    
+    .kpi-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+    }
+    
+    .kpi-label { 
+        font-size: 0.875rem; 
+        color: var(--text-secondary); 
+        font-weight: 500;
+        text-transform: uppercase; 
+        letter-spacing: 0.5px;
+    }
+    
+    .kpi-icon { 
+        font-size: 1.75rem; 
+        color: var(--accent-color);
+        opacity: 0.7;
+    }
     
     .kpi-number { 
-        font-size: 1.75rem; 
+        font-size: 2.5rem; 
         font-weight: 700; 
-        color: #002555; 
-        margin: 0.25rem 0; 
-        line-height: 1.2;
-    }
-    .kpi-label { 
-        font-size: 0.75rem; 
-        color: #6c757d; 
-        font-weight: 600; 
-        text-transform: uppercase; 
-        letter-spacing: 0.3px;
-        line-height: 1.3;
-    }
-    .kpi-icon { 
-        font-size: 1.5rem; 
-        color: #e0e0e0; 
-        float: right; 
-        margin-top: -0.5rem;
+        color: var(--text-primary);
+        line-height: 1;
+        margin-bottom: 0.5rem;
     }
     
-    /* Chart Cards - Compactos */
+    .kpi-trend {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .kpi-trend.up {
+        color: #10B981;
+    }
+    
+    .kpi-trend.down {
+        color: #EF4444;
+    }
+    
+    /* ===== SEÇÃO: FINANCEIRO ===== */
+    .finance-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    .finance-card {
+        background: var(--card-bg);
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+    }
+    
+    .finance-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .finance-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+    
+    /* ===== SEÇÃO: MONITORIAS E HORAS ===== */
+    .monitoring-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    /* ===== SEÇÃO: AVALIAÇÕES E DOCUMENTOS ===== */
+    .alert-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    .alert-card {
+        background: var(--card-bg);
+        border-radius: 8px;
+        padding: 1.25rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .alert-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 4px;
+        height: 100%;
+        background: #EF4444;
+    }
+    
+    .alert-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: #EF4444;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    html[data-theme="dark"] .alert-badge {
+        background: #DC2626;
+    }
+    
+    .alert-icon {
+        font-size: 2rem;
+        color: #EF4444;
+        margin-bottom: 0.75rem;
+    }
+    
+    .alert-title {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .alert-count {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    /* ===== SEÇÃO: VISUALIZAÇÕES (GRÁFICOS) ===== */
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+    
     .chart-card { 
-        background: white; 
+        background: var(--card-bg);
         border-radius: 8px; 
-        padding: 1rem; 
-        box-shadow: 0 2px 4px rgba(0, 37, 85, 0.08); 
-        margin-bottom: 1.25rem; 
+        padding: 1.5rem; 
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
     }
+    
     .chart-title { 
-        font-size: 0.9375rem; 
+        font-size: 1rem; 
         font-weight: 600; 
-        color: #002555; 
-        margin-bottom: 1rem; 
-        padding-bottom: 0.75rem; 
-        border-bottom: 1px solid #f0f0f0; 
+        color: var(--text-primary);
+        margin-bottom: 1.5rem; 
+        padding-bottom: 1rem; 
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
+    
     .chart-container { 
         position: relative; 
-        height: 250px; 
-        margin-bottom: 0.5rem; 
+        height: 300px; 
     }
+    
     .chart-container-large { 
         position: relative; 
-        height: 300px; 
-        margin-bottom: 0.5rem; 
+        height: 350px; 
     }
     
-    /* Alert Cards - Compactos */
-    .alert-card { 
-        background: white; 
-        border-radius: 8px; 
-        padding: 0.875rem; 
-        box-shadow: 0 2px 4px rgba(0, 37, 85, 0.08); 
-        margin-bottom: 1rem; 
-        border-left: 3px solid #dc3545; 
-        min-height: 85px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-    .alert-title { 
-        font-size: 0.75rem; 
-        font-weight: 600; 
-        color: #002555; 
-        margin-bottom: 0.25rem; 
-        text-transform: uppercase;
-        line-height: 1.3;
-    }
-    .alert-count { 
-        font-size: 1.5rem; 
-        font-weight: 700; 
-        color: #dc3545; 
-        line-height: 1.2;
+    /* ===== MODO ESCURO: GRÁFICOS ===== */
+    html[data-theme="dark"] canvas {
+        filter: brightness(0.95);
     }
     
-    /* Header - Compacto */
-    .header-section { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        margin-bottom: 1.5rem; 
-        flex-wrap: wrap; 
-        gap: 1rem; 
+    /* ===== MODO ESCURO: SCROLLBAR ===== */
+    html[data-theme="dark"] ::-webkit-scrollbar {
+        width: 12px;
+        background-color: #1E1E1E;
     }
-    .header-info h1 { 
-        font-size: 3rem; /* Aumentado ainda mais no desktop */
-        color: #002555; 
-        margin: 0; 
-        font-weight: 700; 
-        line-height: 1.2;
-    }
-    .header-info p { 
-        color: #6c757d; 
-        margin: 0.25rem 0 0 0; 
-        font-size: 0.875rem;
-    }
-    .header-info small {
-        font-size: 0.75rem;
-        color: #999;
-    }
-    .export-buttons { 
-        display: flex; 
-        gap: 0.375rem; 
-        flex-wrap: wrap; 
-    }
-    .btn-export { 
-        background: transparent; 
-        border: 2px solid #1245FF; 
-        color: #1245FF; 
-        font-weight: 500; 
-        padding: 0.5rem 1rem; 
-        transition: all 0.2s ease; 
-        font-size: 0.8125rem;
+    
+    html[data-theme="dark"] ::-webkit-scrollbar-thumb {
+        background-color: #404040;
         border-radius: 6px;
     }
-    .btn-export:hover { 
-        background-color: #1245FF; 
-        color: white; 
+    
+    html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+        background-color: #4A4A4A;
     }
     
-    /* Grids Compactos */
-    .grid-2 { 
-        display: grid; 
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-        gap: 1rem; 
-        margin-bottom: 1.25rem; 
-    }
-    .grid-3 { 
-        display: grid; 
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
-        gap: 1rem; 
-        margin-bottom: 1.25rem; 
-    }
-    .grid-4 { 
-        display: grid; 
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-        gap: 1rem; 
-        margin-bottom: 1.25rem; 
-    }
-    
-    /* ===== MOBILE - Layout Super Compacto ===== */
+    /* ===== OTIMIZAÇÕES MOBILE ADICIONAIS ===== */
     @media (max-width: 768px) {
-        .dashboard-container { 
-            padding: 0.5rem 0 0 0; 
-        }
-        /* Garante espaçamento do topo para o header não sumir atrás do navbar */
-        .header-section {
-            padding-top: 2.5rem;
+        /* Remover margens desnecessárias */
+        .row {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
         }
         
-        /* Header Mobile - CORRIGIDO para não vazar */
-        .header-section { 
-            flex-direction: column; 
-            align-items: flex-start; 
-            margin-bottom: 1rem;
-            gap: 0.75rem;
-            width: 100%;
-            overflow: hidden;
-            background: white;
-            z-index: 10;
-            position: relative;
+        .col, [class*="col-"] {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
         }
-        .header-info {
-            width: 100%;
-            overflow: hidden;
-            display: block;
-        }
-        .header-info h1 {
-            display: block;
-            font-size: 1.5rem !important; /* Tamanho otimizado para mobile */
-            font-weight: 700;
-            color: #002555;
-            margin: 0 !important;
+        
+        /* Ajustar container principal */
+        .main-content,
+        .content-wrapper {
             padding: 0 !important;
-            line-height: 1.25 !important;
-            overflow-wrap: break-word;
-            word-wrap: break-word;
-            hyphens: auto;
-            background: white;
-            z-index: 11;
-            max-width: 100vw;
-            white-space: normal;
-        }
-        .header-info h1 i {
-            font-size: 0.75rem !important;
-            margin-right: 0.375rem;
-        }
-        .header-info p { 
-            font-size: 0.6875rem !important; /* Reduzido */
-            margin: 0.25rem 0 0 0 !important;
-            line-height: 1.3 !important;
-            overflow-wrap: break-word;
-        }
-        .header-info small {
-            font-size: 0.625rem !important; /* Reduzido */
-            display: block;
-            margin-top: 0.25rem;
+            margin: 0 !important;
         }
         
-        /* Export buttons mobile */
-        .export-buttons { 
-            width: 100%; 
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.375rem;
-        }
-        .btn-export { 
-            padding: 0.5rem 0.5rem; 
-            font-size: 0.75rem;
-            text-align: center;
-        }
-        .btn-export i {
-            font-size: 0.75rem;
-            margin-right: 0.25rem;
-        }
-        
-        /* KPI Cards - MUITO Compactos */
-        .kpi-card { 
-            padding: 0.625rem; 
-            border-radius: 6px;
-            min-height: 80px;
-        }
-        .kpi-number { 
-            font-size: 1.375rem; 
-            margin: 0.125rem 0;
-        }
-        .kpi-label { 
-            font-size: 0.6875rem; 
-            line-height: 1.2;
-        }
-        .kpi-icon { 
-            font-size: 1.125rem; 
-            margin-top: -0.25rem;
-        }
-        
-        /* Alert Cards Mobile */
-        .alert-card { 
-            padding: 0.625rem; 
-            min-height: 70px;
-            margin-bottom: 0.75rem;
-        }
-        .alert-title { 
-            font-size: 0.6875rem; 
-        }
-        .alert-title i {
-            font-size: 0.6875rem;
-        }
-        .alert-count { 
-            font-size: 1.25rem; 
-        }
-        
-        /* Charts Mobile - CORRIGIDO legendas e sobreposição */
-        .chart-card { 
-            padding: 0.75rem; 
-            margin-bottom: 1rem;
-            border-radius: 6px;
-            overflow: hidden;
-            width: 100%;
-        }
-        .chart-title { 
-            font-size: 0.8125rem !important; /* Reduzido */
-            margin-bottom: 0.625rem !important;
-            padding-bottom: 0.5rem;
-            line-height: 1.2 !important;
-            overflow-wrap: break-word;
-        }
-        .chart-title i {
-            font-size: 0.75rem !important;
-        }
-        .chart-container { 
-            height: 220px !important; /* Aumentado para caber legendas */
-            width: 100% !important;
-            position: relative;
-            overflow: visible;
-        }
-        .chart-container canvas {
-            max-width: 100% !important;
-            height: auto !important;
-        }
-        .chart-container-large { 
-            height: 280px !important; /* Altura otimizada para mobile */
-            width: 100% !important;
-            position: relative;
-            overflow: visible;
-            margin-bottom: 0 !important;
-        }
-        .chart-container-large canvas {
-            max-width: 100% !important;
-            height: 100% !important;
-        }
-        
-        /* Grids Mobile - 2 colunas para KPIs */
-        .grid-2 { 
-            grid-template-columns: 1fr !important; 
-            gap: 0.75rem; 
-            margin-bottom: 1rem;
-        }
-        .grid-3 { 
-            grid-template-columns: 1fr !important; 
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-        .grid-3[style*="minmax"] {
-            grid-template-columns: 1fr !important;
-        }
-        .grid-4 { 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        /* Análise Financeira Mobile */
-        .chart-card > div[style*="grid"] {
-            grid-template-columns: 1fr !important;
-            gap: 0.5rem !important;
-        }
-        .chart-card > div[style*="grid"] > div {
-            padding: 0.625rem !important;
-        }
-        .chart-card > div[style*="grid"] small {
-            font-size: 0.6875rem !important;
-        }
-        .chart-card > div[style*="grid"] div[style*="1.75rem"] {
-            font-size: 1.25rem !important;
-        }
-        
-        /* Ajustes gerais de espaçamento mobile */
-        .container-fluid {
-            padding-left: 0.5rem !important;
-            padding-right: 0.5rem !important;
+        /* Garantir que nada vaze horizontalmente */
+        html, body {
             overflow-x: hidden !important;
+            width: 100vw;
+            max-width: 100vw;
         }
         
-        /* Garantir que nada vaze da tela */
+        /* Prevenir zoom em inputs no iOS */
+        input, select, textarea {
+            font-size: 16px !important;
+        }
+        
+        /* Melhorar legibilidade de textos pequenos */
+        small, .small {
+            font-size: 0.75rem !important;
+        }
+    }
+    
+    /* ===== TOOLTIP ===== */
+    .tooltip-info {
+        position: relative;
+        display: inline-block;
+        cursor: help;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+    
+    .tooltip-info:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: 4px;
+        white-space: nowrap;
+        font-size: 0.75rem;
+        z-index: 1000;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* ===== RESPONSIVO: MOBILE E TABLET ===== */
+    @media (max-width: 768px) {
+        /* Reset de espaçamentos gerais */
         body {
             overflow-x: hidden !important;
         }
         
         * {
+            max-width: 100vw;
+        }
+        
+        /* Header Mobile - Compacto */
+        .dashboard-header {
+            padding: 0.75rem 0.875rem;
+            margin-bottom: 1rem;
+            position: relative;
+            top: auto;
+            margin-top: 3.5rem; /* Espaço para não ficar tampado pelo navbar */
+        }
+        
+        .header-content {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.875rem;
+        }
+        
+        .header-title h1 {
+            font-size: 1.25rem !important;
+            line-height: 1.3;
+            margin: 0 !important;
+            padding-top: 0.5rem; /* Espaço extra no topo do título */
+        }
+        
+        .header-title p {
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        
+        .header-actions {
+            width: 100%;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .filter-group {
+            width: 100%;
+            flex-direction: row;
+            gap: 0.5rem;
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8125rem;
+        }
+        
+        .action-btn {
+            width: 100%;
+            padding: 0.625rem 1rem;
+            font-size: 0.8125rem;
+            justify-content: center;
+        }
+        
+        .theme-toggle {
+            width: 100%;
+            padding: 0.625rem;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Container principal */
+        .dashboard-container {
+            padding: 0 0.875rem 1rem 0.875rem;
+        }
+        
+        /* Títulos de seção */
+        .section-title {
+            font-size: 0.9375rem;
+            margin-bottom: 0.75rem;
+            padding-left: 0.25rem;
+        }
+        
+        .section-title i {
+            font-size: 0.875rem;
+        }
+        
+        /* KPI Cards - Grid 2 colunas */
+        .metrics-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.625rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .kpi-card {
+            padding: 0.75rem;
+            min-height: auto;
+        }
+        
+        .kpi-header {
+            margin-bottom: 0.5rem;
+        }
+        
+        .kpi-label {
+            font-size: 0.6875rem;
+            line-height: 1.2;
+        }
+        
+        .kpi-number {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .kpi-icon {
+            font-size: 1.125rem;
+            opacity: 0.5;
+        }
+        
+        .kpi-trend {
+            font-size: 0.625rem;
+        }
+        
+        .kpi-trend i {
+            font-size: 0.625rem;
+        }
+        
+        /* Seção Financeira */
+        .finance-grid {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .finance-card {
+            padding: 1rem;
+        }
+        
+        .finance-label {
+            font-size: 0.75rem;
+        }
+        
+        .finance-value {
+            font-size: 1.5rem;
+        }
+        
+        /* Forçar gráfico de pagamentos em coluna única */
+        .finance-grid .chart-card {
+            grid-column: span 1 !important;
+        }
+        
+        /* Monitorias e Horas */
+        .monitoring-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.625rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Forçar gráfico de status em coluna única */
+        .monitoring-grid .chart-card {
+            grid-column: span 2 !important;
+        }
+        
+        /* Alertas */
+        .alert-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.625rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .alert-card {
+            padding: 0.875rem;
+        }
+        
+        .alert-badge {
+            top: 0.625rem;
+            right: 0.625rem;
+            padding: 0.1875rem 0.5rem;
+            font-size: 0.6875rem;
+        }
+        
+        .alert-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .alert-title {
+            font-size: 0.75rem;
+            margin-bottom: 0.375rem;
+        }
+        
+        .alert-count {
+            font-size: 1.5rem;
+        }
+        
+        /* Charts - CRÍTICO: Forçar 1 coluna e altura otimizada */
+        .charts-grid {
+            grid-template-columns: 1fr !important;
+            gap: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Forçar todos os gráficos em coluna única */
+        .charts-grid .chart-card {
+            grid-column: span 1 !important;
+        }
+        
+        .chart-card {
+            padding: 1rem;
+            margin-bottom: 0 !important;
+        }
+        
+        .chart-title {
+            font-size: 0.8125rem !important;
+            margin-bottom: 0.875rem !important;
+            padding-bottom: 0.625rem;
+        }
+        
+        .chart-title i {
+            font-size: 0.75rem;
+        }
+        
+        /* Altura dos gráficos otimizada para mobile */
+        .chart-container {
+            height: 220px !important;
+            width: 100% !important;
+            position: relative;
+        }
+        
+        .chart-container-large {
+            height: 240px !important;
+            width: 100% !important;
+            position: relative;
+        }
+        
+        /* Garantir que canvas não vaze */
+        .chart-container canvas,
+        .chart-container-large canvas {
             max-width: 100% !important;
-        }
-        
-        /* Legendas dos gráficos - compactar ainda mais em mobile */
-        canvas {
-            max-height: 180px !important;
-        }
-        
-        /* Títulos das páginas - ajuste para mobile */
-        .page-title, .page-header {
-            padding-top: 2.5rem;
-        }
-        .page-title h1, .page-header h1 {
-            font-size: 1.25rem;
+            max-height: 100% !important;
         }
     }
     
-    /* ===== TABLET (576px - 768px) ===== */
-    @media (min-width: 576px) and (max-width: 768px) {
-        .grid-2 { 
-            grid-template-columns: repeat(3, 1fr); 
+    /* ===== TABLET (769px - 1024px) ===== */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .dashboard-header {
+            padding: 1.25rem 1.5rem;
         }
-        .grid-4 { 
-            grid-template-columns: repeat(3, 1fr); 
+        
+        .header-title h1 {
+            font-size: 1.5rem;
         }
-        .export-buttons {
+        
+        .dashboard-container {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+        }
+        
+        .metrics-grid {
             grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .finance-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .monitoring-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .alert-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .charts-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .chart-container {
+            height: 280px;
+        }
+        
+        .chart-container-large {
+            height: 320px;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid dashboard-container">
-    <div class="header-section">
-        <div class="header-info">
-            <h1><i class="fas fa-chart-line"></i> Dashboard de Gestão</h1>
-            <p>Painel de controle completo do programa de monitoria</p>
-            <small><i class="fas fa-clock"></i> Atualizado em: {{ now|date:"d/m/Y H:i" }}</small>
+<!-- Header Fixo -->
+<div class="dashboard-header">
+    <div class="header-content">
+        <div class="header-title">
+            <h1>Dashboard de Gestão</h1>
+            <p>Painel completo do programa de monitoria acadêmica</p>
         </div>
-        <div class="export-buttons">
-            <button type="button" class="btn btn-export" onclick="exportarExcel()"><i class="fas fa-file-excel"></i> Excel</button>
-            <button type="button" class="btn btn-export" onclick="exportarPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
-            <button type="button" class="btn btn-export" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
-        </div>
-    </div>
-
-    <div class="grid-4">
-        <div class="kpi-card primary">
-            <div class="kpi-icon"><i class="fas fa-user-graduate"></i></div>
-            <div class="kpi-label">Monitores Ativos</div>
-            <div class="kpi-number">{{ total_monitores }}</div>
-        </div>
-        <div class="kpi-card success">
-            <div class="kpi-icon"><i class="fas fa-users"></i></div>
-            <div class="kpi-label">Total de Alunos</div>
-            <div class="kpi-number">{{ total_alunos }}</div>
-        </div>
-        <div class="kpi-card info">
-            <div class="kpi-icon"><i class="fas fa-briefcase"></i></div>
-            <div class="kpi-label">Vagas Ativas</div>
-            <div class="kpi-number">{{ total_vagas }}</div>
-        </div>
-        <div class="kpi-card warning">
-            <div class="kpi-icon"><i class="fas fa-percentage"></i></div>
-            <div class="kpi-label">Taxa de Aprovação</div>
-            <div class="kpi-number">{{ taxa_aprovacao }}%</div>
-        </div>
-    </div>
-
-    <div class="grid-4">
-        <div class="kpi-card primary">
-            <div class="kpi-icon"><i class="fas fa-clock"></i></div>
-            <div class="kpi-label">Horas no Mês</div>
-            <div class="kpi-number">{{ total_horas_mes }}</div>
-        </div>
-        <div class="kpi-card success">
-            <div class="kpi-icon"><i class="fas fa-dollar-sign"></i></div>
-            <div class="kpi-label">Pagamentos do Mês</div>
-            <div class="kpi-number">R$ {{ valor_total_mes }}</div>
-        </div>
-        <div class="kpi-card info">
-            <div class="kpi-icon"><i class="fas fa-book"></i></div>
-            <div class="kpi-label">Monitorias Ativas</div>
-            <div class="kpi-number">{{ total_turmas }}</div>
-        </div>
-        <div class="kpi-card warning">
-            <div class="kpi-icon"><i class="fas fa-chalkboard-teacher"></i></div>
-            <div class="kpi-label">Total de Inscrições</div>
-            <div class="kpi-number">{{ total_inscricoes }}</div>
-        </div>
-    </div>
-
-    <div class="grid-4">
-        <div class="alert-card">
-            <div class="alert-title"><i class="fas fa-exclamation-triangle"></i> Pagamentos Pendentes</div>
-            <div class="alert-count">{{ pagamentos_pendentes }}</div>
-        </div>
-        <div class="alert-card">
-            <div class="alert-title"><i class="fas fa-clock"></i> Avaliações Pendentes</div>
-            <div class="alert-count">{{ avaliacoes_pendentes }}</div>
-        </div>
-        <div class="alert-card">
-            <div class="alert-title"><i class="fas fa-hourglass-half"></i> Horas Pendentes</div>
-            <div class="alert-count">{{ horas_pendentes }}</div>
-        </div>
-        <div class="alert-card">
-            <div class="alert-title"><i class="fas fa-file"></i> Documentos Pendentes</div>
-            <div class="alert-count">{{ documentos_pendentes }}</div>
-        </div>
-    </div>
-
-    <div class="grid-3" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
-        <div class="chart-card">
-            <h3 class="chart-title"><i class="fas fa-chart-pie"></i> Status de Inscrições</h3>
-            <div class="chart-container"><canvas id="chartInscricoes"></canvas></div>
-        </div>
-        <div class="chart-card">
-            <h3 class="chart-title"><i class="fas fa-chart-doughnut"></i> Monitores por Curso</h3>
-            <div class="chart-container"><canvas id="chartCursos"></canvas></div>
-        </div>
-        <div class="chart-card">
-            <h3 class="chart-title"><i class="fas fa-chart-bar"></i> Status de Horas</h3>
-            <div class="chart-container"><canvas id="chartHorasStatus"></canvas></div>
-        </div>
-    </div>
-
-    <div class="grid-2">
-        <div class="chart-card">
-            <h3 class="chart-title"><i class="fas fa-chart-line"></i> Evolução de Inscrições (6 meses)</h3>
-            <div class="chart-container-large"><canvas id="chartTimelineInscricoes"></canvas></div>
+        <div class="header-actions">
+            <div class="filter-group">
+                <select class="filter-select" id="filterPeriodo">
+                    <option value="mes">Este mês</option>
+                    <option value="trimestre">Trimestre</option>
+                    <option value="semestre">Semestre</option>
+                    <option value="ano">Este ano</option>
+                </select>
+                <select class="filter-select" id="filterCurso">
+                    <option value="todos">Todos os cursos</option>
+                    <!-- Cursos serão carregados dinamicamente -->
+                </select>
+            </div>
+            <button class="action-btn" onclick="atualizarDados()">
+                <i class="fas fa-sync-alt"></i> Atualizar
+            </button>
+            <button class="action-btn" onclick="exportarExcel()">
+                <i class="fas fa-file-excel"></i> Exportar Excel
+            </button>
+            <button class="action-btn" onclick="exportarPDF()">
+                <i class="fas fa-file-pdf"></i> Gerar PDF
+            </button>
+            <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<div class="dashboard-container">
+    <!-- SEÇÃO 1: RESUMO GERAL -->
+    <h2 class="section-title"><i class="fas fa-chart-line"></i> Resumo Geral</h2>
+    <div class="metrics-grid">
+        <div class="kpi-card verde">
+            <div class="kpi-header">
+                <div class="kpi-label">Taxa de Aprovação</div>
+                <div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
+            </div>
+            <div class="kpi-number">{{ taxa_aprovacao }}%</div>
+            <div class="kpi-trend up">
+                <i class="fas fa-arrow-up"></i> 5% vs mês anterior
+            </div>
+        </div>
+        
+        <div class="kpi-card azul">
+            <div class="kpi-header">
+                <div class="kpi-label">Total de Inscrições</div>
+                <div class="kpi-icon"><i class="fas fa-file-alt"></i></div>
+            </div>
+            <div class="kpi-number">{{ total_inscricoes }}</div>
+            <div class="kpi-trend up">
+                <i class="fas fa-arrow-up"></i> 12 novas hoje
+            </div>
+        </div>
+        
+        <div class="kpi-card azul-claro">
+            <div class="kpi-header">
+                <div class="kpi-label">Total de Alunos</div>
+                <div class="kpi-icon"><i class="fas fa-users"></i></div>
+            </div>
+            <div class="kpi-number">{{ total_alunos }}</div>
+            <div class="kpi-trend">
+                <i class="fas fa-minus"></i> Estável
+            </div>
+        </div>
+        
+        <div class="kpi-card azul-escuro">
+            <div class="kpi-header">
+                <div class="kpi-label">Monitores Ativos</div>
+                <div class="kpi-icon"><i class="fas fa-user-graduate"></i></div>
+            </div>
+            <div class="kpi-number">{{ total_monitores }}</div>
+            <div class="kpi-trend up">
+                <i class="fas fa-arrow-up"></i> 3 novos
+            </div>
+        </div>
+        
+        <div class="kpi-card laranja">
+            <div class="kpi-header">
+                <div class="kpi-label">Vagas Ativas</div>
+                <div class="kpi-icon"><i class="fas fa-briefcase"></i></div>
+            </div>
+            <div class="kpi-number">{{ total_vagas }}</div>
+            <div class="kpi-trend">
+                <i class="fas fa-info-circle"></i> {{ total_vagas }} abertas
+            </div>
+        </div>
+    </div>
+    
+    <!-- SEÇÃO 2: FINANCEIRO -->
+    <h2 class="section-title"><i class="fas fa-dollar-sign"></i> Financeiro</h2>
+    <div class="finance-grid">
+        <div class="finance-card">
+            <div class="finance-label">Pagamentos do mês</div>
+            <div class="finance-value">R$ {{ valor_total_mes|floatformat:2 }}</div>
+        </div>
+        <div class="finance-card">
+            <div class="finance-label">Pagamentos pendentes</div>
+            <div class="finance-value" style="color: #EF4444;">{{ pagamentos_pendentes }}</div>
+        </div>
+        <div class="chart-card" style="grid-column: span 2;">
+            <h3 class="chart-title"><i class="fas fa-chart-bar"></i> Evolução de Pagamentos</h3>
+            <div class="chart-container">
+                <canvas id="chartPagamentos"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SEÇÃO 3: MONITORIAS E HORAS -->
+    <h2 class="section-title"><i class="fas fa-clock"></i> Monitorias e Horas</h2>
+    <div class="monitoring-grid">
+        <div class="kpi-card azul">
+            <div class="kpi-header">
+                <div class="kpi-label">Monitorias Ativas</div>
+                <div class="kpi-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+            </div>
+            <div class="kpi-number">{{ total_turmas }}</div>
+        </div>
+        <div class="kpi-card verde">
+            <div class="kpi-header">
+                <div class="kpi-label">Horas no Mês</div>
+                <div class="kpi-icon"><i class="fas fa-hourglass-half"></i></div>
+            </div>
+            <div class="kpi-number">{{ total_horas_mes|floatformat:0 }}</div>
+        </div>
+        <div class="kpi-card laranja">
+            <div class="kpi-header">
+                <div class="kpi-label">Horas Pendentes</div>
+                <div class="kpi-icon"><i class="fas fa-exclamation-circle"></i></div>
+            </div>
+            <div class="kpi-number">{{ horas_pendentes }}</div>
+        </div>
+        <div class="chart-card" style="grid-column: span 3;">
+            <h3 class="chart-title"><i class="fas fa-chart-bar"></i> Status das Horas</h3>
+            <div class="chart-container">
+                <canvas id="chartHorasStatus"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SEÇÃO 4: AVALIAÇÕES E DOCUMENTOS -->
+    <h2 class="section-title"><i class="fas fa-clipboard-check"></i> Avaliações e Documentos</h2>
+    <div class="alert-grid">
+        <div class="alert-card">
+            <div class="alert-badge">{{ avaliacoes_pendentes }}</div>
+            <div class="alert-icon"><i class="fas fa-clipboard-list"></i></div>
+            <div class="alert-title">Avaliações pendentes</div>
+            <div class="alert-count">{{ avaliacoes_pendentes }}</div>
+        </div>
+        <div class="alert-card">
+            <div class="alert-badge">{{ documentos_pendentes }}</div>
+            <div class="alert-icon"><i class="fas fa-file-alt"></i></div>
+            <div class="alert-title">Documentos pendentes</div>
+            <div class="alert-count">{{ documentos_pendentes }}</div>
+        </div>
+    </div>
+    
+    <!-- SEÇÃO 5: VISUALIZAÇÕES -->
+    <h2 class="section-title"><i class="fas fa-chart-pie"></i> Visualizações</h2>
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3 class="chart-title"><i class="fas fa-chart-pie"></i> Status de Inscrições</h3>
+            <div class="chart-container">
+                <canvas id="chartInscricoes"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <h3 class="chart-title"><i class="fas fa-chart-doughnut"></i> Monitores por Curso</h3>
+            <div class="chart-container">
+                <canvas id="chartCursos"></canvas>
+            </div>
+        </div>
+        <div class="chart-card" style="grid-column: span 2;">
+            <h3 class="chart-title"><i class="fas fa-chart-line"></i> Evolução de Inscrições (últimos 6 meses)</h3>
+            <div class="chart-container-large">
+                <canvas id="chartTimelineInscricoes"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
 
 <script>
+// ===== CONFIGURAÇÃO DE TEMA =====
+function toggleTheme() {
+    const html = document.documentElement;
+    const body = document.body;
+    const currentTheme = html.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    // Aplicar tema no HTML e BODY
+    html.setAttribute('data-theme', newTheme);
+    body.setAttribute('data-theme', newTheme);
+    
+    // Salvar no localStorage
+    localStorage.setItem('theme', newTheme);
+    
+    // Atualizar ícone
+    const icon = document.getElementById('themeIcon');
+    if (icon) {
+        icon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    
+    // Forçar re-render dos gráficos com novas cores
+    if (typeof Chart !== 'undefined') {
+        Chart.defaults.color = newTheme === 'dark' ? '#9CA3AF' : '#6B7280';
+    }
+    
+    console.log('✅ Tema alterado para:', newTheme);
+}
+
+// Aplicar tema salvo ANTES do DOM carregar (evita flash)
+(function() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+})();
+
+// Carregar tema salvo após DOM carregar
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    const html = document.documentElement;
+    const body = document.body;
+    
+    html.setAttribute('data-theme', savedTheme);
+    body.setAttribute('data-theme', savedTheme);
+    
+    const icon = document.getElementById('themeIcon');
+    if (icon) {
+        icon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    
+    console.log('🎨 Tema carregado:', savedTheme);
+});
+
+// ===== PALETA DE CORES =====
 const CORES = { 
-    primario: '#002555', 
-    secundo: '#1245FF', 
-    amarelo: '#F5AC00', 
-    sucesso: '#28a745', 
-    perigo: '#dc3545', 
-    cinza: '#6c757d',
-    info: '#17a2b8'
+    primario: '#1A2B5F',
+    secundario: '#F4A261',
+    verde: '#10B981',
+    azul: '#3B82F6',
+    azulClaro: '#06B6D4',
+    azulEscuro: '#1E40AF',
+    laranja: '#F59E0B',
+    vermelho: '#EF4444',
+    cinza: '#6B7280',
+    cinzaClaro: '#9CA3AF'
 };
 
-// Detectar se é mobile
+// Detectar dispositivo
 const isMobile = window.innerWidth <= 768;
+const isTablet = window.innerWidth > 768 && window.innerWidth <= 1024;
 
-// 1️⃣ Status de Inscrições - Doughnut interativo com suporte mobile
+// ===== CONFIGURAÇÃO GLOBAL DE GRÁFICOS =====
+Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
+Chart.defaults.color = '#6B7280';
+Chart.defaults.font.size = isMobile ? 10 : 12;
+
+// ===== GRÁFICO 1: STATUS DE INSCRIÇÕES (Pizza) =====
 new Chart(document.getElementById('chartInscricoes').getContext('2d'), {
     type: 'doughnut',
     data: { 
         labels: {{ status_labels|safe }}, 
         datasets: [{ 
             data: {{ status_values|safe }}, 
-            backgroundColor: [CORES.sucesso, CORES.amarelo, CORES.perigo, CORES.cinza],
-            borderColor: 'white', 
+            backgroundColor: [CORES.verde, CORES.laranja, CORES.vermelho, CORES.cinza],
+            borderColor: 'rgba(255, 255, 255, 0.8)', 
             borderWidth: isMobile ? 1 : 2,
-            hoverOffset: isMobile ? 5 : 10
+            hoverOffset: isMobile ? 6 : 12,
+            hoverBorderColor: 'white',
+            hoverBorderWidth: isMobile ? 2 : 3
         }] 
     },
     options: { 
         responsive: true, 
         maintainAspectRatio: false,
-        interaction: { mode: 'point', intersect: false },
+        cutout: isMobile ? '60%' : '65%',
         layout: {
             padding: isMobile ? 5 : 10
         },
@@ -554,42 +1078,56 @@ new Chart(document.getElementById('chartInscricoes').getContext('2d'), {
                 position: 'bottom',
                 align: 'start',
                 labels: { 
-                    font: { size: isMobile ? 9 : 11 }, 
-                    padding: isMobile ? 8 : 15, 
+                    font: { size: isMobile ? 9 : 12, weight: '500' }, 
+                    padding: isMobile ? 8 : 16, 
                     usePointStyle: true,
-                    boxWidth: isMobile ? 8 : 12,
-                    boxHeight: isMobile ? 8 : 12
+                    pointStyle: 'circle',
+                    boxWidth: isMobile ? 6 : 8,
+                    boxHeight: isMobile ? 6 : 8
                 }
             },
             tooltip: { 
-                enabled: !isMobile, // Desabilitar tooltip em mobile para evitar sobreposição
-                backgroundColor: 'rgba(0,0,0,0.8)',
-                titleFont: { size: 12 },
-                bodyFont: { size: 11 },
-                padding: 12,
-                displayColors: true
+                enabled: !isMobile,
+                backgroundColor: 'rgba(0,0,0,0.9)',
+                titleFont: { size: 11, weight: 'bold' },
+                bodyFont: { size: 10 },
+                padding: 10,
+                cornerRadius: 6,
+                displayColors: true,
+                callbacks: {
+                    label: function(ctx) {
+                        const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                        const percent = ((ctx.parsed / total) * 100).toFixed(1);
+                        return ` ${ctx.label}: ${ctx.parsed} (${percent}%)`;
+                    }
+                }
             }
         }
     }
 });
 
-// 2️⃣ Monitores por Curso - Doughnut interativo com cores variadas e suporte mobile
+// ===== GRÁFICO 2: MONITORES POR CURSO (Donut) =====
+const coresCursos = [CORES.primario, CORES.azul, CORES.azulClaro, CORES.verde, CORES.laranja, 
+                      '#EC4899', '#8B5CF6', '#06B6D4', '#10B981', '#F59E0B'];
+
 new Chart(document.getElementById('chartCursos').getContext('2d'), {
     type: 'doughnut',
     data: { 
         labels: {{ curso_labels|safe }}, 
         datasets: [{ 
             data: {{ curso_values|safe }}, 
-            backgroundColor: [CORES.primario, CORES.secundo, CORES.amarelo, CORES.sucesso, CORES.info, '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7'],
-            borderColor: 'white', 
+            backgroundColor: coresCursos,
+            borderColor: 'rgba(255, 255, 255, 0.8)', 
             borderWidth: isMobile ? 1 : 2,
-            hoverOffset: isMobile ? 5 : 10
+            hoverOffset: isMobile ? 6 : 12,
+            hoverBorderColor: 'white',
+            hoverBorderWidth: isMobile ? 2 : 3
         }] 
     },
     options: { 
         responsive: true, 
         maintainAspectRatio: false,
-        interaction: { mode: 'point', intersect: false },
+        cutout: isMobile ? '55%' : '60%',
         layout: {
             padding: isMobile ? 5 : 10
         },
@@ -598,101 +1136,184 @@ new Chart(document.getElementById('chartCursos').getContext('2d'), {
                 position: 'bottom',
                 align: 'start',
                 labels: { 
-                    font: { size: isMobile ? 9 : 11 }, 
-                    padding: isMobile ? 8 : 15, 
+                    font: { size: isMobile ? 9 : 12, weight: '500' }, 
+                    padding: isMobile ? 8 : 16, 
                     usePointStyle: true,
-                    boxWidth: isMobile ? 8 : 12,
-                    boxHeight: isMobile ? 8 : 12
+                    pointStyle: 'circle',
+                    boxWidth: isMobile ? 6 : 8,
+                    boxHeight: isMobile ? 6 : 8
                 }
             },
             tooltip: { 
-                enabled: !isMobile, // Desabilitar tooltip em mobile
-                backgroundColor: 'rgba(0,0,0,0.8)',
-                titleFont: { size: 12 },
-                bodyFont: { size: 11 },
-                padding: 12,
-                displayColors: true
+                enabled: !isMobile,
+                backgroundColor: 'rgba(0,0,0,0.9)',
+                titleFont: { size: 11, weight: 'bold' },
+                bodyFont: { size: 10 },
+                padding: 10,
+                cornerRadius: 6,
+                displayColors: true,
+                callbacks: {
+                    label: function(ctx) {
+                        return ` ${ctx.label}: ${ctx.parsed} monitores`;
+                    }
+                }
             }
         }
     }
 });
 
-// 3️⃣ Status de Horas - Horizontal Bar com interatividade e suporte mobile
+// ===== GRÁFICO 3: STATUS DE HORAS (Barras Horizontais) =====
 new Chart(document.getElementById('chartHorasStatus').getContext('2d'), {
     type: 'bar',
     data: { 
         labels: {{ horas_status_labels|safe }}, 
         datasets: [{ 
-            label: 'Quantidade de Horas',
+            label: 'Registros de Horas',
             data: {{ horas_status_values|safe }}, 
-            backgroundColor: [CORES.sucesso, CORES.amarelo, CORES.perigo, CORES.cinza],
-            borderColor: 'rgba(0,0,0,0.1)',
-            borderWidth: 1,
-            hoverBackgroundColor: [CORES.sucesso, CORES.amarelo, CORES.perigo, CORES.cinza],
-            hoverBorderWidth: 2,
-            hoverBorderColor: '#000'
+            backgroundColor: [CORES.verde, CORES.laranja, CORES.vermelho, CORES.cinza],
+            borderRadius: isMobile ? 4 : 6,
+            borderSkipped: false,
+            barThickness: isMobile ? 24 : 40
         }] 
     },
     options: { 
         indexAxis: 'y', 
         responsive: true, 
         maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
         layout: {
             padding: isMobile ? 5 : 10
         },
         plugins: { 
             legend: { 
-                display: !isMobile, // Ocultar legenda em mobile para economizar espaço
-                labels: { 
-                    padding: 15,
-                    font: { size: isMobile ? 9 : 11 }
-                } 
+                display: false
             },
             tooltip: { 
-                enabled: !isMobile, // Desabilitar tooltip em mobile
-                backgroundColor: 'rgba(0,0,0,0.8)',
-                padding: 12,
-                titleFont: { size: 12 },
-                bodyFont: { size: 11 }
+                enabled: !isMobile,
+                backgroundColor: 'rgba(0,0,0,0.9)',
+                padding: 10,
+                cornerRadius: 6,
+                titleFont: { size: 11, weight: 'bold' },
+                bodyFont: { size: 10 },
+                callbacks: {
+                    label: function(ctx) {
+                        return ` ${ctx.parsed.x} registros`;
+                    }
+                }
             }
         },
         scales: { 
             x: { 
-                beginAtZero: true, 
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.05)'
+                },
                 ticks: { 
-                    callback: function(v){ return v.toLocaleString('pt-BR'); },
-                    font: { size: isMobile ? 9 : 11 }
+                    font: { size: isMobile ? 9 : 12 },
+                    maxTicksLimit: isMobile ? 5 : 8
                 } 
             },
             y: {
+                grid: {
+                    display: false
+                },
                 ticks: {
-                    font: { size: isMobile ? 9 : 11 }
+                    font: { size: isMobile ? 9 : 12, weight: '500' }
                 }
             }
         }
     }
 });
 
-// 4️⃣ Evolução de Inscrições - Line chart com area e animação com suporte mobile
+// ===== GRÁFICO 4: EVOLUÇÃO DE PAGAMENTOS (Barras) =====
+new Chart(document.getElementById('chartPagamentos').getContext('2d'), {
+    type: 'bar',
+    data: { 
+        labels: {{ horas_labels|safe }}, 
+        datasets: [{ 
+            label: 'Valores Pagos (R$)',
+            data: {{ valores_pagamento|safe }}, 
+            backgroundColor: CORES.verde,
+            borderRadius: isMobile ? 4 : 6,
+            borderSkipped: false,
+            barThickness: isMobile ? 20 : 30
+        }] 
+    },
+    options: { 
+        responsive: true, 
+        maintainAspectRatio: false,
+        layout: {
+            padding: isMobile ? 5 : 10
+        },
+        plugins: { 
+            legend: { 
+                display: false
+            },
+            tooltip: { 
+                enabled: !isMobile,
+                backgroundColor: 'rgba(0,0,0,0.9)',
+                padding: 10,
+                cornerRadius: 6,
+                titleFont: { size: 11, weight: 'bold' },
+                bodyFont: { size: 10 },
+                callbacks: {
+                    label: function(ctx) {
+                        return ` R$ ${ctx.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+                    }
+                }
+            }
+        },
+        scales: { 
+            y: { 
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.05)'
+                },
+                ticks: { 
+                    callback: function(v){ 
+                        if (isMobile) {
+                            return 'R$' + (v >= 1000 ? (v/1000).toFixed(0) + 'k' : v);
+                        }
+                        return 'R$ ' + v.toLocaleString('pt-BR'); 
+                    },
+                    font: { size: isMobile ? 9 : 12 },
+                    maxTicksLimit: isMobile ? 5 : 8
+                } 
+            },
+            x: {
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    font: { size: isMobile ? 8 : 11 },
+                    maxRotation: isMobile ? 45 : 0,
+                    autoSkip: true,
+                    maxTicksLimit: isMobile ? 3 : 6
+                }
+            }
+        }
+    }
+});
+
+// ===== GRÁFICO 5: EVOLUÇÃO DE INSCRIÇÕES (Linha com área) =====
 new Chart(document.getElementById('chartTimelineInscricoes').getContext('2d'), {
     type: 'line',
     data: { 
         labels: {{ timeline_labels|safe }}, 
         datasets: [{ 
-            label: 'Inscrições Acumuladas',
+            label: 'Inscrições por Mês',
             data: {{ timeline_values|safe }}, 
-            borderColor: CORES.secundo, 
-            backgroundColor: 'rgba(18, 69, 255, 0.1)', 
+            borderColor: CORES.azul, 
+            backgroundColor: 'rgba(59, 130, 246, 0.1)', 
             borderWidth: isMobile ? 2 : 3, 
             tension: 0.4, 
             fill: true, 
             pointRadius: isMobile ? 3 : 6,
-            pointBackgroundColor: CORES.secundo,
+            pointBackgroundColor: CORES.azul,
             pointBorderColor: 'white',
             pointBorderWidth: isMobile ? 1 : 2,
-            hoverPointRadius: isMobile ? 5 : 8,
-            pointHoverBackgroundColor: CORES.amarelo
+            pointHoverRadius: isMobile ? 5 : 8,
+            pointHoverBackgroundColor: CORES.laranja,
+            pointHoverBorderWidth: isMobile ? 2 : 3
         }] 
     },
     options: { 
@@ -700,118 +1321,134 @@ new Chart(document.getElementById('chartTimelineInscricoes').getContext('2d'), {
         maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
         layout: {
-            padding: {
-                top: isMobile ? 5 : 10,
-                bottom: isMobile ? 5 : 10,
-                left: isMobile ? 5 : 10,
-                right: isMobile ? 5 : 10
-            }
+            padding: isMobile ? 5 : 10
         },
         plugins: {
             legend: {
-                display: true,
-                position: 'top',
-                align: 'start',
-                labels: {
-                    font: { size: isMobile ? 10 : 11 },
-                    padding: isMobile ? 8 : 15,
-                    usePointStyle: true,
-                    boxWidth: isMobile ? 10 : 12,
-                    boxHeight: isMobile ? 10 : 12
-                }
+                display: false
             },
             tooltip: { 
-                enabled: true,
-                backgroundColor: 'rgba(0,0,0,0.8)',
-                padding: isMobile ? 8 : 12,
-                titleFont: { size: isMobile ? 10 : 12 },
-                bodyFont: { size: isMobile ? 9 : 11 },
+                enabled: !isMobile,
+                backgroundColor: 'rgba(0,0,0,0.9)',
+                padding: 10,
+                cornerRadius: 6,
+                titleFont: { size: 11, weight: 'bold' },
+                bodyFont: { size: 10 },
                 callbacks: {
-                    label: function(ctx) { return 'Inscrições: ' + ctx.parsed.y.toLocaleString('pt-BR'); }
+                    label: function(ctx) { 
+                        return ' Inscrições: ' + ctx.parsed.y.toLocaleString('pt-BR'); 
+                    }
                 }
             }
         },
         scales: { 
             y: { 
                 beginAtZero: true,
-                grace: '5%',
+                grace: '10%',
+                grid: {
+                    color: 'rgba(0,0,0,0.05)'
+                },
                 ticks: { 
                     callback: function(v){ return v.toLocaleString('pt-BR'); },
-                    font: { size: isMobile ? 9 : 11 },
-                    maxTicksLimit: isMobile ? 5 : 8,
-                    padding: isMobile ? 5 : 5
-                },
-                grid: {
-                    display: true,
-                    drawBorder: true,
-                    color: 'rgba(0,0,0,0.05)'
+                    font: { size: isMobile ? 9 : 12 },
+                    maxTicksLimit: isMobile ? 5 : 8
                 }
             },
             x: {
-                ticks: {
-                    font: { size: isMobile ? 8 : 11 },
-                    maxRotation: isMobile ? 45 : 0,
-                    minRotation: isMobile ? 45 : 0,
-                    autoSkip: true,
-                    maxTicksLimit: isMobile ? 6 : 12,
-                    padding: isMobile ? 5 : 5
-                },
                 grid: {
                     display: false
+                },
+                ticks: {
+                    font: { size: isMobile ? 8 : 12 },
+                    maxRotation: isMobile ? 45 : 0,
+                    autoSkip: true,
+                    maxTicksLimit: isMobile ? 3 : 6
                 }
             }
         }
     }
 });
 
+// ===== FUNÇÃO: ATUALIZAR DADOS =====
+function atualizarDados() {
+    // Simular atualização (você pode fazer uma chamada AJAX aqui)
+    const btn = event.target;
+    const icon = btn.querySelector('i');
+    icon.classList.add('fa-spin');
+    
+    setTimeout(() => {
+        icon.classList.remove('fa-spin');
+        alert('Dados atualizados com sucesso!');
+    }, 1500);
+}
+
+// ===== FUNÇÃO: EXPORTAR EXCEL =====
 function exportarExcel() {
     const wb = XLSX.utils.book_new();
-    const wsData = [
+    
+    // Planilha 1: Resumo Geral
+    const wsResumo = XLSX.utils.aoa_to_sheet([
         ['DASHBOARD DE GESTÃO - PLATAFORMA CASA'],
         ['Relatório Gerado:', new Date().toLocaleString('pt-BR')],
         [],
         ['INDICADORES PRINCIPAIS'],
-        ['Monitores Ativos', {{ total_monitores }}],
-        ['Total de Alunos', {{ total_alunos }}],
-        ['Vagas Ativas', {{ total_vagas }}],
         ['Taxa de Aprovação', '{{ taxa_aprovacao }}%'],
-        [],
-        ['ESTATÍSTICAS MENSAIS'],
-        ['Horas Trabalhadas', {{ total_horas_mes }}],
-        ['Valor de Pagamentos', 'R$ {{ valor_total_mes }}'],
-        ['Monitorias Ativas', {{ total_turmas }}],
         ['Total de Inscrições', {{ total_inscricoes }}],
+        ['Total de Alunos', {{ total_alunos }}],
+        ['Monitores Ativos', {{ total_monitores }}],
+        ['Vagas Ativas', {{ total_vagas }}],
         [],
-        ['PENDÊNCIAS'],
+        ['FINANCEIRO'],
+        ['Pagamentos do Mês', 'R$ {{ valor_total_mes|floatformat:2 }}'],
         ['Pagamentos Pendentes', {{ pagamentos_pendentes }}],
-        ['Avaliações Pendentes', {{ avaliacoes_pendentes }}],
-        ['Horas Pendentes', {{ horas_pendentes }}],
-        ['Documentos Pendentes', {{ documentos_pendentes }}],
         [],
-        ['ANÁLISE FINANCEIRA'],
-        ['Total Pago (Ano)', 'R$ {{ total_pago_ano }}'],
-        ['Média Mensal', 'R$ {{ media_mensal }}'],
-        ['CR Médio', {{ cr_medio_monitores }}],
-        ['Horas/Monitor', '{{ media_horas_monitor }}h']
-    ];
+        ['MONITORIAS E HORAS'],
+        ['Monitorias Ativas', {{ total_turmas }}],
+        ['Horas no Mês', {{ total_horas_mes|floatformat:0 }}],
+        ['Horas Pendentes', {{ horas_pendentes }}],
+        [],
+        ['AVALIAÇÕES E DOCUMENTOS'],
+        ['Avaliações Pendentes', {{ avaliacoes_pendentes }}],
+        ['Documentos Pendentes', {{ documentos_pendentes }}]
+    ]);
+    wsResumo['!cols'] = [{ wch: 30 }, { wch: 20 }];
+    XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
     
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    ws['!cols'] = [{ wch: 25 }, { wch: 15 }];
-    XLSX.utils.book_append_sheet(wb, ws, 'Dashboard');
+    // Salvar arquivo
     XLSX.writeFile(wb, `dashboard-gestao-{{ now|date:"Y-m-d-His" }}.xlsx`);
+    
+    // Feedback visual
+    const btn = event.target.closest('.action-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check"></i> Exportado!';
+    btn.style.background = CORES.verde;
+    btn.style.borderColor = CORES.verde;
+    btn.style.color = 'white';
+    
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.style.background = '';
+        btn.style.borderColor = '';
+        btn.style.color = '';
+    }, 2000);
 }
 
+// ===== FUNÇÃO: EXPORTAR PDF =====
 function exportarPDF() {
-    const element = document.querySelector('.dashboard-container');
-    const opt = {
-        margin: 10,
-        filename: `dashboard-gestao-{{ now|date:"Y-m-d-His" }}.pdf`,
-        image: { type: 'png', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-    };
+    const btn = event.target.closest('.action-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
+    btn.disabled = true;
     
-    html2canvas(element).then(canvas => {
+    // Ocultar header fixo temporariamente
+    const header = document.querySelector('.dashboard-header');
+    header.style.position = 'relative';
+    
+    html2canvas(document.querySelector('.dashboard-container'), {
+        scale: 2,
+        useCORS: true,
+        logging: false
+    }).then(canvas => {
         const { jsPDF } = window.jspdf;
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'mm', 'a4');
@@ -820,20 +1457,54 @@ function exportarPDF() {
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
         
         let heightLeft = imgHeight;
-        let position = 0;
+        let position = 10;
         
-        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+        // Adicionar título
+        pdf.setFontSize(18);
+        pdf.setTextColor(26, 43, 95);
+        pdf.text('Dashboard de Gestão', 10, position);
+        position += 10;
         
+        // Adicionar data
+        pdf.setFontSize(10);
+        pdf.setTextColor(107, 114, 128);
+        pdf.text('Gerado em: {{ now|date:"d/m/Y às H:i" }}', 10, position);
+        position += 10;
+        
+        // Adicionar imagem
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, Math.min(imgHeight, pageHeight - position - 10));
+        heightLeft -= (pageHeight - position - 10);
+        
+        // Adicionar páginas extras se necessário
         while (heightLeft > 0) {
-            position = heightLeft - imgHeight;
             pdf.addPage();
-            pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
+            position = heightLeft - imgHeight + 10;
+            pdf.addImage(imgData, 'PNG', 10, position, imgWidth, Math.min(imgHeight, pageHeight - 20));
+            heightLeft -= (pageHeight - 20);
         }
         
-        pdf.save(opt.filename);
-    }).catch(err => alert('Erro ao gerar PDF: ' + err));
+        pdf.save(`dashboard-gestao-{{ now|date:"Y-m-d-His" }}.pdf`);
+        
+        // Restaurar estado
+        header.style.position = 'sticky';
+        btn.innerHTML = '<i class="fas fa-check"></i> PDF Gerado!';
+        btn.style.background = CORES.verde;
+        btn.style.borderColor = CORES.verde;
+        btn.style.color = 'white';
+        
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.style.background = '';
+            btn.style.borderColor = '';
+            btn.style.color = '';
+            btn.disabled = false;
+        }, 2000);
+    }).catch(err => {
+        alert('Erro ao gerar PDF: ' + err);
+        header.style.position = 'sticky';
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
 }
 
 </script>

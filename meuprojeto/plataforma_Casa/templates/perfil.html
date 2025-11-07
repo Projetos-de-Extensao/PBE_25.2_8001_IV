@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 <!--
     ============================================================================
     TEMPLATE: PERFIL DO USUÁRIO
@@ -55,6 +56,32 @@
     Espaçamento vertical para criar distância visual e evitar sobreposição do header
 -->
 <div class="container perfil-container">
+
+    <!--
+        ====================================================================
+        MENSAGENS DE FEEDBACK
+        ====================================================================
+        Exibe mensagens de sucesso, erro, aviso ou informação
+    -->
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {% if message.tags == 'success' %}
+                        <i class="fas fa-check-circle me-2"></i>
+                    {% elif message.tags == 'error' %}
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                    {% elif message.tags == 'warning' %}
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                    {% else %}
+                        <i class="fas fa-info-circle me-2"></i>
+                    {% endif %}
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <!--
         ====================================================================
@@ -221,30 +248,7 @@
 
                         <!--
                             ====================================================================
-                            SEÇÃO 3: SEGURANÇA - ALTERAÇÃO DE SENHA
-                            ====================================================================
-                            Botão que abre modal para alteração de senha
-                            Não é feita inline para aumentar segurança
-                        -->
-                        <div class="form-section">
-                            <h6 class="section-title">Segurança</h6>
-                            <!-- Botão com atributos Bootstrap para abrir modal -->
-                            <button type="button" class="btn-senha" data-bs-toggle="modal" data-bs-target="#modalSenha">
-                                <i class="fas fa-key"></i>
-                                <div>
-                                    <!-- Título do botão -->
-                                    <div class="btn-senha-title">Alterar Senha</div>
-                                    <!-- Descrição auxiliar -->
-                                    <div class="btn-senha-desc">Mantenha sua conta segura</div>
-                                </div>
-                                <!-- Seta de navegação -->
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-
-                        <!--
-                            ====================================================================
-                            SEÇÃO 4: BOTÕES DE AÇÃO
+                            SEÇÃO 3: BOTÕES DE AÇÃO
                             ====================================================================
                             Cancelar (voltar ao dashboard) ou Salvar alterações
                         -->
@@ -265,122 +269,78 @@
         </div>
     </div>
 </div>
+
 {% endblock %}
-
-<!--
-    ====================================================================
-    MODAL: ALTERAÇÃO DE SENHA
-    ====================================================================
-    Modal Bootstrap para alterar senha de forma segura
-    Isolado do formulário principal para melhor UX
-    
-    Atributos importantes:
-    - fade: Ativa animação de fade ao abrir/fechar
-    - tabindex=-1: Remove focus automático
-    - id="modalSenha": Referenciado em data-bs-target
--->
-<div class="modal fade" id="modalSenha" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content modal-custom">
-
-            <!--
-                Header customizado do modal
-                Com ícone, título e botão de fechar
-            -->
-            <div class="modal-header-custom">
-                <!-- Ícone visual do modal -->
-                <div class="modal-icon">
-                    <i class="fas fa-key"></i>
-                </div>
-
-                <!-- Título do modal -->
-                <h5 class="modal-title-custom">Alterar Senha</h5>
-
-                <!-- Botão de fechar -->
-                <button type="button" class="btn-close-custom" data-bs-dismiss="modal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <!--
-                Formulário separado para alteração de senha
-                Enviado para URL específica (alterar_senha)
-                Método POST com CSRF token
-            -->
-            <form method="post" action="{% url 'alterar_senha' %}">
-                {% csrf_token %}
-
-                <!-- Body do modal com campos de senha -->
-                <div class="modal-body-custom">
-
-                    <!--
-                        CAMPO 1: SENHA ATUAL
-                        Validação de acesso - user deve confirmar senha antiga
-                        Proteção contra alteração não-autorizada
-                    -->
-                    <div class="form-group-modal">
-                        <label for="senhaAtual" class="form-label-modal">
-                            <i class="fas fa-lock"></i> Senha Atual
-                        </label>
-                        <input type="password" class="form-control-modal" id="senhaAtual" name="senha_atual"
-                            placeholder="Digite sua senha atual" required>
-                    </div>
-
-                    <!--
-                        CAMPO 2: NOVA SENHA
-                        Deverá atender aos requisitos de força
-                        Será criptografada no backend
-                    -->
-                    <div class="form-group-modal">
-                        <label for="senhaNova" class="form-label-modal">
-                            <i class="fas fa-key"></i> Nova Senha
-                        </label>
-                        <input type="password" class="form-control-modal" id="senhaNova" name="senha_nova"
-                            placeholder="Digite a nova senha" required>
-                    </div>
-
-                    <!--
-                        CAMPO 3: CONFIRMAÇÃO DE NOVA SENHA
-                        Evita erros de digitação
-                        Backend verifica se são idênticas
-                    -->
-                    <div class="form-group-modal">
-                        <label for="senhaConfirmar" class="form-label-modal">
-                            <i class="fas fa-check-circle"></i> Confirmar Nova Senha
-                        </label>
-                        <input type="password" class="form-control-modal" id="senhaConfirmar" name="senha_confirmar"
-                            placeholder="Confirme a nova senha" required>
-                    </div>
-
-                    <!--
-                        DICA DE SEGURANÇA
-                        Informa requisitos mínimos de senha ao usuário
-                        Melhora experiência ao guiar sobre força da senha
-                    -->
-                    <div class="senha-dica">
-                        <i class="fas fa-info-circle"></i>
-                        <span>Use pelo menos 8 caracteres com letras e números</span>
-                    </div>
-                </div>
-
-                <!-- Footer do modal com botões de ação -->
-                <div class="modal-footer-custom">
-                    <!-- Botão Cancelar -->
-                    <button type="button" class="btn-modal btn-cancel" data-bs-dismiss="modal">
-                        Cancelar
-                    </button>
-
-                    <!-- Botão Confirmar alteração -->
-                    <button type="submit" class="btn-modal btn-confirm">
-                        <i class="fas fa-check"></i> Alterar Senha
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/common.css' %}">
 <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+<style>
+    /* Mensagens de Feedback */
+    .messages-container {
+        margin-bottom: 1.5rem;
+    }
+    
+    .alert {
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .alert-success {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724;
+    }
+    
+    .alert-error,
+    .alert-danger {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        color: #721c24;
+    }
+    
+    .alert-warning {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        color: #856404;
+    }
+    
+    .alert-info {
+        background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+        color: #0c5460;
+    }
+    
+    .alert i {
+        font-size: 1.1rem;
+    }
+    
+    .btn-close {
+        opacity: 0.6;
+    }
+    
+    .btn-close:hover {
+        opacity: 1;
+    }
+    
+    /* Responsividade Mobile */
+    @media (max-width: 768px) {
+        .messages-container {
+            margin-bottom: 1rem;
+        }
+        
+        .alert {
+            padding: 0.85rem 1rem;
+            font-size: 0.85rem;
+        }
+        
+        .alert i {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
 {% endblock %}

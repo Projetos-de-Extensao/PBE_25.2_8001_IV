@@ -1,528 +1,1372 @@
-<!--
-    ============================================================================
-    TEMPLATE: DASHBOARD - PAINEL DE CONTROLE
-    ============================================================================
-    
-    DESCRIÇÃO:
-    Painel de controle com KPIs (Key Performance Indicators) e estatísticas
-    personalizadas por perfil de usuário. Exibe informações críticas para
-    tomada de decisão em tempo real.
-    
-    FUNCIONALIDADES PRINCIPAIS:
-    1. Dashboard do Professor: Vagas ativas, candidatos, monitores aprovados
-    2. Dashboard Admin: Visão geral do sistema com todas as métricas globais
-    3. Renderização condicional: Conteúdo diferente baseado em is_professor_dashboard
-    4. Tabelas de dados: Últimas inscrições, monitorias, dados pendentes
-    5. Cards com hover effects: Feedback visual ao interagir
-    6. Grid layout responsivo: 3 colunas → 1 coluna em mobile
-    
-    SEGURANÇA & PERMISSÕES:
-    - Acesso: Apenas usuários autenticados (Professor ou Admin)
-    - Dados: Context variables injetadas pela view filtra dados do usuário
-    - Templates condicionais: Usa is_professor_dashboard para garantir segurança
-    
-    VARIÁVEIS CONTEXT ESPERADAS (Professor):
-    - total_minhas_vagas: int - quantidade de vagas criadas
-    - total_candidatos: int - total de candidatos em todas as vagas
-    - monitores_aprovados: int - total de monitores aprovados
-    - candidatos_pendentes: int - inscrições não analisadas
-    - horas_pendentes: int - horas de trabalho aguardando validação
-    - ultimas_inscricoes: QuerySet - últimas 5-10 inscrições (ordering: -data_inscricao)
-    - vagas_populares: QuerySet - vagas ordenadas por numero de candidatos
-    - minhas_turmas: QuerySet - turmas do professor (status ativo)
-    
-    VARIÁVEIS CONTEXT ESPERADAS (Admin):
-    - total_usuarios: int - quantidade de usuários registrados
-    - total_alunos: int - quantidade de alunos
-    - total_turmas: int - turmas ativas no sistema
-    - total_vagas: int - vagas abertas
-    - ultimas_monitorias: QuerySet - últimas monitorias criadas
-    - inscricoes_pendentes: QuerySet - inscrições com status pendente
-    
-    PADRÕES DE DESIGN:
-    - Card-based layout: Cada métrica em seu próprio card
-    - Color coding: Cores representam tipos (amarelo=warning, azul=info, verde=success)
-    - Empty states: Mensagens amigáveis quando não há dados
-    - Tables responsive: <table-responsive> para scroll em mobile
-    - Badge styles: Status badges com cores padronizadas
-    
-    PERFORMANCE:
-    - Dados pré-filtrados na view (não na template)
-    - Limite de registros em tabelas (últimas 5-10)
-    - Grid layout com media queries para responsividade
-    
-    AUTOR: Equipe de Desenvolvimento
-    DATA: Outubro 2025
-    ============================================================================
--->
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Dashboard - Plataforma Casa{% endblock %}
+{% block title %}Dashboard do Professor - Plataforma Casa{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/common.css' %}">
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+    /* ===== RESET PARA MODO ESCURO ===== */
+    * {
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+    
+    /* ===== TEMA CLARO/ESCURO ===== */
+    :root, html {
+        --primary: #1A2B5F;
+        --secondary: #F4A261;
+        --bg-color: #F8FAFC;
+        --text-primary: #2C2C2C;
+        --text-secondary: #6B7280;
+        --card-bg: #FFFFFF;
+        --border-color: #E5E7EB;
+        --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        --hover-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+    
+    html[data-theme="dark"], [data-theme="dark"] {
+        --primary: #6B8BC3;
+        --secondary: #F4A261;
+        --bg-color: #121212;
+        --text-primary: #E5E7EB;
+        --text-secondary: #9CA3AF;
+        --card-bg: #1E1E1E;
+        --border-color: #333333;
+        --shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        --hover-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    }
+    
+    html[data-theme="dark"] body,
+    body {
+        background-color: var(--bg-color) !important;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        color: var(--text-primary);
+    }
+    
+    /* Aplicar tema em elementos do Bootstrap/Base */
+    html[data-theme="dark"] .content-wrapper,
+    html[data-theme="dark"] .main-content {
+        background-color: var(--bg-color) !important;
+    }
+    
+    /* FORÇA MODO ESCURO GLOBAL EM TODOS OS ELEMENTOS */
+    html[data-theme="dark"] * {
+        border-color: var(--border-color);
+    }
+    
+    html[data-theme="dark"] .dashboard-container,
+    html[data-theme="dark"] .dashboard-container * {
+        color: var(--text-primary);
+    }
+    
+    html[data-theme="dark"] .content-card,
+    html[data-theme="dark"] .kpi-card,
+    html[data-theme="dark"] .alert-card {
+        background: var(--card-bg) !important;
+        border-color: var(--border-color) !important;
+    }
+    
+    html[data-theme="dark"] div[class*="card"] {
+        background: var(--card-bg) !important;
+    }
+    
+    html[data-theme="dark"] .content-card *,
+    html[data-theme="dark"] .kpi-card *,
+    html[data-theme="dark"] .alert-card * {
+        border-color: var(--border-color) !important;
+    }
+    
+    /* ===== HEADER FIXO ===== */
+    .dashboard-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--card-bg);
+        padding: 1.5rem 2rem;
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .header-content {
+        max-width: 1600px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+    
+    .header-title {
+        flex: 1;
+    }
+    
+    .header-title h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin: 0 0 0.25rem 0;
+        line-height: 1.2;
+    }
+    
+    .header-title p {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin: 0;
+    }
+    
+    .header-actions {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .theme-toggle {
+        background: none;
+        border: 1px solid var(--border-color);
+        padding: 0.5rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1.25rem;
+        color: var(--text-primary);
+        transition: all 0.2s;
+    }
+    
+    .theme-toggle:hover {
+        background: var(--primary);
+        color: white;
+        transform: scale(1.1);
+    }
+    
+    html[data-theme="dark"] .theme-toggle {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    html[data-theme="dark"] .theme-toggle:hover {
+        background: var(--primary);
+        border-color: var(--primary);
+    }
+    
+    /* ===== CONTAINER PRINCIPAL ===== */
+    .dashboard-container { 
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 0 2rem 2rem 2rem;
+    }
+    
+    /* ===== SEÇÃO: KPI CARDS ===== */
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    /* KPI Cards */
+    .kpi-card { 
+        background: var(--card-bg);
+        border-radius: 8px; 
+        padding: 1.5rem; 
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .kpi-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--primary);
+        transition: width 0.3s ease;
+    }
+    
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--hover-shadow);
+    }
+    
+    .kpi-card:hover::before {
+        width: 6px;
+    }
+    
+    .kpi-card.blue::before { background: #1245FF; }
+    .kpi-card.green::before { background: #10B981; }
+    .kpi-card.yellow::before { background: #F59E0B; }
+    .kpi-card.orange::before { background: #F97316; }
+    .kpi-card.purple::before { background: #8B5CF6; }
+    
+    .kpi-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+    }
+    
+    .kpi-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+    
+    .kpi-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: var(--bg-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: var(--text-secondary);
+        opacity: 0.6;
+    }
+    
+    .kpi-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* ===== CONTENT CARDS ===== */
+    .content-section {
+        margin-bottom: 2rem;
+    }
+    
+    .content-card {
+        background: var(--card-bg) !important;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+        margin-bottom: 1.5rem;
+    }
+    
+    html[data-theme="dark"] .content-card {
+        background: var(--card-bg) !important;
+        border-color: var(--border-color) !important;
+    }
+    
+    /* Remove qualquer background inline ou de classe que possa estar forçando branco */
+    html[data-theme="dark"] [style*="background: white"],
+    html[data-theme="dark"] [style*="background-color: white"],
+    html[data-theme="dark"] [style*="background: #fff"],
+    html[data-theme="dark"] [style*="background-color: #fff"],
+    html[data-theme="dark"] [style*="background-color: rgb(255, 255, 255)"] {
+        background: var(--card-bg) !important;
+        background-color: var(--card-bg) !important;
+    }
+    
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    html[data-theme="dark"] .card-header {
+        border-bottom-color: var(--border-color) !important;
+    }
+    
+    .card-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary) !important;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .card-title i {
+        color: var(--secondary) !important;
+    }
+    
+    html[data-theme="dark"] .card-title {
+        color: var(--text-primary) !important;
+    }
+    
+    html[data-theme="dark"] .card-title i {
+        color: var(--secondary) !important;
+    }
+    
+    /* ===== TABELAS ===== */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        background: transparent !important;
+    }
+    
+    .table {
+        width: 100%;
+        font-size: 0.875rem;
+        color: var(--text-primary) !important;
+        background: transparent !important;
+    }
+    
+    .table thead {
+        background: var(--bg-color) !important;
+        border-bottom: 2px solid var(--border-color);
+    }
+    
+    .table thead th {
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary) !important;
+        border: none;
+        background: transparent !important;
+    }
+    
+    .table tbody {
+        background: transparent !important;
+    }
+    
+    .table tbody tr {
+        background: transparent !important;
+    }
+    
+    .table tbody td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-primary) !important;
+        background: transparent !important;
+    }
+    
+    .table tbody tr:hover {
+        background: var(--bg-color) !important;
+    }
+    
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    /* Força cores em elementos inline da tabela */
+    .table tbody td strong {
+        color: var(--text-primary) !important;
+    }
+    
+    .table tbody td small,
+    .table tbody td .text-muted {
+        color: var(--text-secondary) !important;
+    }
+    
+    html[data-theme="dark"] .table {
+        color: var(--text-primary) !important;
+        background: transparent !important;
+    }
+    
+    html[data-theme="dark"] .table thead {
+        background: var(--bg-color) !important;
+    }
+    
+    html[data-theme="dark"] .table thead th {
+        color: var(--text-secondary) !important;
+        background: transparent !important;
+        border-color: var(--border-color) !important;
+    }
+    
+    html[data-theme="dark"] .table tbody {
+        background: transparent !important;
+    }
+    
+    html[data-theme="dark"] .table tbody tr {
+        background: transparent !important;
+    }
+    
+    html[data-theme="dark"] .table tbody td {
+        color: var(--text-primary) !important;
+        background: transparent !important;
+        border-color: var(--border-color) !important;
+    }
+    
+    html[data-theme="dark"] .table tbody tr:hover {
+        background: var(--bg-color) !important;
+    }
+    
+    html[data-theme="dark"] .table tbody td strong {
+        color: var(--text-primary) !important;
+    }
+    
+    html[data-theme="dark"] .table tbody td small,
+    html[data-theme="dark"] .table tbody td .text-muted {
+        color: var(--text-secondary) !important;
+    }
+    
+    /* ===== BADGES ===== */
+    .badge {
+        display: inline-block;
+        padding: 0.375rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .badge-pendente {
+        background: rgba(245, 158, 11, 0.1);
+        color: #F59E0B;
+    }
+    
+    .badge-aprovado, .badge-validado, .badge-ativo {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10B981;
+    }
+    
+    .badge-rejeitado, .badge-inativo {
+        background: rgba(239, 68, 68, 0.1);
+        color: #EF4444;
+    }
+    
+    html[data-theme="dark"] .badge-pendente {
+        background: rgba(245, 158, 11, 0.2);
+        color: #FCD34D;
+    }
+    
+    html[data-theme="dark"] .badge-aprovado,
+    html[data-theme="dark"] .badge-validado,
+    html[data-theme="dark"] .badge-ativo {
+        background: rgba(16, 185, 129, 0.2);
+        color: #6EE7B7;
+    }
+    
+    html[data-theme="dark"] .badge-rejeitado,
+    html[data-theme="dark"] .badge-inativo {
+        background: rgba(239, 68, 68, 0.2);
+        color: #FCA5A5;
+    }
+    
+    .badge-info {
+        background: rgba(18, 69, 255, 0.1);
+        color: #1245FF;
+    }
+    
+    html[data-theme="dark"] .badge-info {
+        background: rgba(18, 69, 255, 0.2);
+        color: #6B8BC3;
+    }
+    
+    /* ===== GRID 2 COLUNAS ===== */
+    .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+    
+    /* ===== LIST ITEMS ===== */
+    .list-item {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.2s;
+        background: transparent !important;
+    }
+    
+    .list-item:hover {
+        background: var(--bg-color) !important;
+    }
+    
+    .list-item:last-child {
+        border-bottom: none;
+    }
+    
+    .list-item-title {
+        font-weight: 600;
+        color: var(--text-primary) !important;
+        margin-bottom: 0.25rem;
+    }
+    
+    .list-item-meta {
+        font-size: 0.8125rem;
+        color: var(--text-secondary) !important;
+    }
+    
+    html[data-theme="dark"] .list-item {
+        background: transparent !important;
+        border-color: var(--border-color) !important;
+    }
+    
+    html[data-theme="dark"] .list-item:hover {
+        background: var(--bg-color) !important;
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-secondary) !important;
+        background: transparent !important;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        opacity: 0.3;
+        margin-bottom: 1rem;
+        display: block;
+        color: var(--text-secondary) !important;
+    }
+    
+    .empty-state p {
+        color: var(--text-secondary) !important;
+        margin: 0;
+    }
+    
+    html[data-theme="dark"] .empty-state {
+        color: var(--text-secondary) !important;
+        background: transparent !important;
+    }
+    
+    html[data-theme="dark"] .empty-state i {
+        color: var(--text-secondary) !important;
+    }
+    
+    html[data-theme="dark"] .empty-state p {
+        color: var(--text-secondary) !important;
+    }   margin-bottom: 1rem;
+        display: block;
+    }
+    
+    .empty-state p {
+        color: var(--text-secondary);
+    }
+    
+    html[data-theme="dark"] .empty-state p {
+        color: var(--text-secondary) !important;
+    }
+    
+    /* ===== BUTTONS ===== */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+    
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.8125rem;
+    }
+    
+    .btn-outline-primary {
+        background: transparent;
+        border: 1px solid var(--primary);
+        color: var(--primary);
+    }
+    
+    .btn-outline-primary:hover {
+        background: var(--primary);
+        color: white;
+    }
+    
+    /* ===== ALERT CARDS ===== */
+    .alert-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    .alert-card {
+        background: var(--card-bg);
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+        border-left: 4px solid var(--alert-color);
+    }
+    
+    .alert-card.warning {
+        --alert-color: #F59E0B;
+    }
+    
+    .alert-card.info {
+        --alert-color: #06B6D4;
+    }
+    
+    .alert-title {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .alert-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--alert-color);
+        line-height: 1;
+    }
+    
+    /* ===== RESPONSIVO ===== */
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 1rem;
+            margin-top: 3.5rem;
+        }
+        
+        .header-content {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+        
+        .header-title {
+            flex: 1;
+        }
+        
+        .header-title h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.125rem;
+        }
+        
+        .header-title h1 i {
+            font-size: 1rem;
+        }
+        
+        .header-title p {
+            font-size: 0.75rem;
+            margin: 0;
+        }
+        
+        .header-actions {
+            flex-shrink: 0;
+        }
+        
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            padding: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .dashboard-container {
+            padding: 0 1rem 1rem 1rem;
+        }
+        
+        .metrics-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .kpi-card {
+            padding: 1rem;
+        }
+        
+        .kpi-header {
+            margin-bottom: 0.5rem;
+        }
+        
+        .kpi-label {
+            font-size: 0.6875rem;
+        }
+        
+        .kpi-icon {
+            width: 32px;
+            height: 32px;
+            font-size: 1rem;
+        }
+        
+        .kpi-value {
+            font-size: 1.5rem;
+        }
+        
+        .grid-2, .alert-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .alert-card {
+            padding: 1rem;
+        }
+        
+        .alert-title {
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .alert-value {
+            font-size: 2rem;
+        }
+        
+        .content-card {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card-header {
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        
+        .card-title {
+            font-size: 1rem;
+        }
+        
+        .card-title i {
+            font-size: 0.875rem;
+        }
+        
+        .table-responsive {
+            margin: 0 -1rem;
+            padding: 0 1rem;
+        }
+        
+        .table {
+            font-size: 0.8125rem;
+        }
+        
+        .table thead th {
+            padding: 0.625rem 0.5rem;
+            font-size: 0.6875rem;
+        }
+        
+        .table tbody td {
+            padding: 0.75rem 0.5rem;
+        }
+        
+        .table tbody td strong {
+            font-size: 0.875rem;
+        }
+        
+        .table tbody td small {
+            font-size: 0.75rem;
+        }
+        
+        .list-item {
+            padding: 0.75rem;
+        }
+        
+        .list-item-title {
+            font-size: 0.875rem;
+            margin-bottom: 0.125rem;
+        }
+        
+        .list-item-meta {
+            font-size: 0.75rem;
+        }
+        
+        .badge {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.6875rem;
+        }
+        
+        .badge-info {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.6875rem;
+        }
+        
+        .empty-state {
+            padding: 2rem 1rem;
+        }
+        
+        .empty-state i {
+            font-size: 2rem;
+        }
+        
+        .empty-state p {
+            font-size: 0.875rem;
+        }
+        
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+    }
+    
+    /* Responsivo para tablets */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .metrics-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .alert-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid dashboard-container">
+<div class="dashboard-header">
+    <div class="header-content">
+        <div class="header-title">
+            <h1><i class="fas fa-chart-bar"></i> Dashboard do Professor</h1>
+            <p>Painel de controle de suas vagas e inscrições</p>
+        </div>
+        <div class="header-actions">
+            <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </div>
+</div>
 
-    <!-- 
-        ========================================================================
-        RENDERIZAÇÃO CONDICIONAL: DASHBOARD DO PROFESSOR vs ADMIN
-        ========================================================================
-        
-        Este bloco renderiza conteúdo completamente diferente baseado no tipo de usuário:
-        
-        - is_professor_dashboard == True: Dashboard do Professor (foco em suas vagas)
-        - is_professor_dashboard == False: Dashboard Admin (visão global do sistema)
-        
-        SEGURANÇA: Esta separação garante que professor não veja dados globais
-        e admin tem visão gerencial completa.
-    -->
-
+<div class="dashboard-container">
+    
     {% if is_professor_dashboard %}
-    <!-- 
-        ====================================================================
-        DASHBOARD DO PROFESSOR
-        ====================================================================
-        
-        Conteúdo específico para professores coordenadores de monitoria
-        Foca em: Vagas criadas, candidatos, monitores, inscrições pendentes
-        
-        Permissão: is_professor_dashboard (setado na view por is_professor check)
-        
-        KPIs Exibidos:
-        1. Minhas Vagas Ativas: Quantas vagas estão abertas
-        2. Total de Candidatos: Soma de candidatos em todas as vagas
-        3. Monitores Aprovados: Quantos foram selecionados/aprovados
-        4. Candidatos Pendentes: Inscrições aguardando análise
-        5. Horas Pendentes: Horas de trabalho não validadas
-        
-        Tabelas:
-        1. Últimas Inscrições: Últimas 10 inscrições (com status)
-        2. Vagas Mais Procuradas: Ordenadas por numero de candidatos
-        3. Minhas Turmas Ativas: Turmas vinculadas às monitorias
-    -->
-
-    <!-- Cabeçalho da página -->
-    <div class="dashboard-header">
-        <h1>
-            <i class="fas fa-chart-bar"></i> Dashboard do Professor
-        </h1>
-        <p>
-            <small><i class="fas fa-clock"></i> Painel de controle de suas vagas e inscrições</small>
-        </p>
-    </div>
-
-    <!-- 
-        ====================================================================
-        KPIs PRINCIPAIS - GRID 3 COLUNAS
-        ====================================================================
-        
-        Cards com métricas essenciais para professor
-        Cada card exibe: Label + Número grande + Ícone
-        
-        Variáveis de contexto:
-        - total_minhas_vagas: Contagem de vagas criadas pelo professor
-        - total_candidatos: SUM de inscrições em todas as vagas do professor
-        - monitores_aprovados: Contagem de monitores com status="aprovado"
-    -->
-    <div class="grid-dashboard">
-        <!-- Card 1: Vagas Ativas -->
-        <div class="dashboard-card">
-            <div class="stat-item">
-                <div>
-                    <div class="stat-label">Minhas Vagas Ativas</div>
-                    <div class="stat-number">{{ total_minhas_vagas }}</div>
+    <!-- ===== DASHBOARD DO PROFESSOR ===== -->
+    
+    <!-- KPI CARDS PRINCIPAIS -->
+    <div class="metrics-grid">
+        <div class="kpi-card blue">
+            <div class="kpi-header">
+                <div class="kpi-label">Minhas Vagas Ativas</div>
+                <div class="kpi-icon">
+                    <i class="fas fa-briefcase"></i>
                 </div>
-                <div class="icon-stat"><i class="fas fa-briefcase"></i></div>
             </div>
+            <div class="kpi-value">{{ total_minhas_vagas|default:0 }}</div>
         </div>
-
-        <!-- Card 2: Total de Candidatos -->
-        <div class="dashboard-card">
-            <div class="stat-item">
-                <div>
-                    <div class="stat-label">Total de Candidatos</div>
-                    <div class="stat-number">{{ total_candidatos }}</div>
+        
+        <div class="kpi-card green">
+            <div class="kpi-header">
+                <div class="kpi-label">Total de Candidatos</div>
+                <div class="kpi-icon">
+                    <i class="fas fa-users"></i>
                 </div>
-                <div class="icon-stat"><i class="fas fa-users"></i></div>
             </div>
+            <div class="kpi-value">{{ total_candidatos|default:0 }}</div>
         </div>
-
-        <!-- Card 3: Monitores Aprovados -->
-        <div class="dashboard-card">
-            <div class="stat-item">
-                <div>
-                    <div class="stat-label">Monitores Aprovados</div>
-                    <div class="stat-number">{{ monitores_aprovados }}</div>
+        
+        <div class="kpi-card purple">
+            <div class="kpi-header">
+                <div class="kpi-label">Monitores Aprovados</div>
+                <div class="kpi-icon">
+                    <i class="fas fa-check-circle"></i>
                 </div>
-                <div class="icon-stat"><i class="fas fa-check-circle"></i></div>
             </div>
+            <div class="kpi-value">{{ monitores_aprovados|default:0 }}</div>
         </div>
     </div>
-
-    <!-- 
-        ====================================================================
-        ALERTAS PENDENTES - GRID 2 COLUNAS
-        ====================================================================
-        
-        Destaques para itens que requerem ação do professor
-        Usa cores diferentes: amarelo (pendentes), azul (horas)
-        
-        Variáveis de contexto:
-        - candidatos_pendentes: Inscrições com status != "aprovado" e != "rejeitado"
-        - horas_pendentes: Registros de horas com status != "validado"
-    -->
-    <div class="grid-dashboard stats">
-        <!-- Alertas de Candidatos -->
-        <div class="dashboard-card dashboard-stat-card vagas-abertas">
-            <div class="card-title"><i class="fas fa-exclamation-triangle"></i> Candidatos Pendentes</div>
-            <div class="dashboard-stat-number vagas">
-                {{ candidatos_pendentes }}
+    
+    <!-- ALERTAS: PENDÊNCIAS -->
+    <div class="alert-grid">
+        <div class="alert-card warning">
+            <div class="alert-title">
+                <i class="fas fa-exclamation-triangle"></i>
+                Candidatos Pendentes
             </div>
+            <div class="alert-value">{{ candidatos_pendentes|default:0 }}</div>
         </div>
-
-        <!-- Alertas de Horas -->
-        <div class="dashboard-card dashboard-stat-card inscricoes-ativas">
-            <div class="card-title"><i class="fas fa-hourglass-half"></i> Horas Pendentes</div>
-            <div class="dashboard-stat-number inscricoes">
-                {{ horas_pendentes }}
+        
+        <div class="alert-card info">
+            <div class="alert-title">
+                <i class="fas fa-hourglass-half"></i>
+                Horas Pendentes
             </div>
+            <div class="alert-value">{{ horas_pendentes|default:0 }}</div>
         </div>
     </div>
-
-    <!-- 
-        ====================================================================
-        TABELA: ÚLTIMAS INSCRIÇÕES
-        ====================================================================
-        
-        Mostra inscrições recentes com detalhes:
-        - Candidato: Nome + Matrícula
-        - Vaga: Disciplina/Nome da vaga
-        - Data: Data e hora da inscrição
-        - Status: Badge com status (Pendente/Aprovado/Rejeitado)
-        
-        Variável de contexto:
-        - ultimas_inscricoes: QuerySet ordenado por -data_inscricao (DESC)
-                             Limite: ~10 últimos registros
-        
-        Atributos esperados:
-        - inscricao.aluno.nome
-        - inscricao.aluno.matricula
-        - inscricao.vaga.disciplina ou inscricao.vaga.nome (fallback)
-        - inscricao.data_inscricao
-        - inscricao.status (valor usado para classe CSS: status-{{ status|lower }})
-    -->
-    <div class="dashboard-card">
-        <div class="card-title-with-icon">
-            <i class="fas fa-list"></i>
-            <span>Últimas Inscrições</span>
-        </div>
-        {% if ultimas_inscricoes %}
-        <div class="table-responsive">
-            <table class="table table-custom table-hover">
-                <thead>
-                    <tr>
-                        <th>Candidato</th>
-                        <th>Vaga</th>
-                        <th>Data</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for inscricao in ultimas_inscricoes %}
-                    <tr>
-                        <td>
-                            <strong>{{ inscricao.aluno.nome }}</strong><br>
-                            <small class="text-muted-custom">{{ inscricao.aluno.matricula }}</small>
-                        </td>
-                        <td>{{ inscricao.vaga.disciplina|default:inscricao.vaga.nome }}</td>
-                        <td>{{ inscricao.data_inscricao|date:"d/m/Y H:i" }}</td>
-                        <td>
-                            <span class="status-badge status-{{ inscricao.status|lower }}">
-                                {{ inscricao.status }}
-                            </span>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <!-- Estado vazio: Nenhuma inscrição para exibir -->
-        <div class="dashboard-empty-state">
-            <i class="fas fa-inbox"></i>
-            <p>Nenhuma inscrição ainda</p>
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- 
-        ====================================================================
-        SEÇÃO PARALELA: VAGAS POPULARES + TURMAS ATIVAS
-        ====================================================================
-        
-        Grid com 2 cards lado a lado:
-        1. Vagas Mais Procuradas: Ordenadas por numero_candidatos DESC
-        2. Minhas Turmas Ativas: Turmas vinculadas ao professor com status=ativo
-        
-        Variáveis de contexto:
-        - vagas_populares: QuerySet ordenado por -num_candidatos
-        - minhas_turmas: QuerySet com turmas ativas do professor
-    -->
-    <div class="grid-dashboard content">
-        <!-- Card: Vagas Mais Procuradas -->
-        <div class="dashboard-card">
-            <div class="card-title"><i class="fas fa-star"></i> Vagas Mais Procuradas</div>
-            {% if vagas_populares %}
-            <div>
-                {% for vaga in vagas_populares %}
-                <!-- Cada vaga em um stat-item para alinhamento consistente -->
-                <div class="stat-item">
-                    <div>
-                        <strong>{{ vaga.disciplina|default:vaga.nome }}</strong><br>
-                        <small class="text-muted-custom">Curso: {{ vaga.curso.nome }}</small>
-                    </div>
-                    <!-- Badge com número de candidatos -->
-                    <span class="info-badge">{{ vaga.num_candidatos }} cand.</span>
+    
+    <!-- TABELA: ÚLTIMAS INSCRIÇÕES -->
+    <div class="content-section">
+        <div class="content-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-list"></i>
+                    Últimas Inscrições
                 </div>
-                {% endfor %}
+            </div>
+            
+            {% if ultimas_inscricoes %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Candidato</th>
+                            <th>Vaga</th>
+                            <th>Data</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inscricao in ultimas_inscricoes %}
+                        <tr>
+                            <td>
+                                <strong>{{ inscricao.aluno.nome }}</strong><br>
+                                <small class="text-muted">{{ inscricao.aluno.matricula }}</small>
+                            </td>
+                            <td>{{ inscricao.vaga.disciplina|default:inscricao.vaga.nome }}</td>
+                            <td>{{ inscricao.data_inscricao|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if inscricao.status == "Aprovado" %}
+                                <span class="badge badge-aprovado">{{ inscricao.status }}</span>
+                                {% elif inscricao.status == "Rejeitado" %}
+                                <span class="badge badge-rejeitado">{{ inscricao.status }}</span>
+                                {% else %}
+                                <span class="badge badge-pendente">{{ inscricao.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
             {% else %}
-            <!-- Estado vazio: Nenhuma vaga ativa -->
-            <div class="dashboard-empty-state">
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>Nenhuma inscrição ainda</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- GRID 2 COLUNAS: VAGAS POPULARES + TURMAS ATIVAS -->
+    <div class="grid-2">
+        <!-- Vagas Mais Procuradas -->
+        <div class="content-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-star"></i>
+                    Vagas Mais Procuradas
+                </div>
+            </div>
+            
+            {% if vagas_populares %}
+            {% for vaga in vagas_populares %}
+            <div class="list-item">
+                <div>
+                    <div class="list-item-title">{{ vaga.disciplina|default:vaga.nome }}</div>
+                    <div class="list-item-meta">Curso: {{ vaga.curso.nome }}</div>
+                </div>
+                <span class="badge badge-info">{{ vaga.num_candidatos }} cand.</span>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-state">
                 <p>Nenhuma vaga ativa</p>
             </div>
             {% endif %}
         </div>
-
-        <!-- Card: Minhas Turmas Ativas -->
-        <div class="dashboard-card">
-            <div class="card-title"><i class="fas fa-book"></i> Minhas Turmas Ativas</div>
-            {% if minhas_turmas %}
-            <div>
-                {% for turma in minhas_turmas %}
-                <!-- Cada turma em um stat-item -->
-                <div class="stat-item">
-                    <div>
-                        <strong>{{ turma.disciplina }}</strong><br>
-                        <small class="text-muted-custom">{{ turma.horario }}</small>
-                    </div>
-                    <!-- Badge com semestre/período -->
-                    <span class="turma-status-badge">
-                        {{ turma.semestre }}
-                    </span>
+        
+        <!-- Minhas Turmas Ativas -->
+        <div class="content-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-book"></i>
+                    Minhas Turmas Ativas
                 </div>
-                {% endfor %}
             </div>
+            
+            {% if minhas_turmas %}
+            {% for turma in minhas_turmas %}
+            <div class="list-item">
+                <div>
+                    <div class="list-item-title">{{ turma.disciplina }}</div>
+                    <div class="list-item-meta">{{ turma.horario }}</div>
+                </div>
+                <span class="badge badge-info">{{ turma.semestre }}</span>
+            </div>
+            {% endfor %}
             {% else %}
-            <!-- Estado vazio: Nenhuma turma ativa -->
-            <div class="dashboard-empty-state">
+            <div class="empty-state">
                 <p>Nenhuma turma ativa</p>
             </div>
             {% endif %}
         </div>
     </div>
-
+    
     {% else %}
-    <!-- 
-        ====================================================================
-        DASHBOARD ADMIN / GERAL
-        ====================================================================
-        
-        Conteúdo de nível administrativo/gestão
-        Visão global do sistema com todas as métricas
-        
-        Permissão: is_professor_dashboard == False (user.is_admin ou is_staff)
-        
-        KPIs Exibidos:
-        1. Total de Usuários: Contagem de User registrados
-        2. Total de Alunos: Contagem de Aluno registrados
-        3. Turmas Ativas: Contagem de Turma com status=ativo
-        4. Vagas Ativas: Contagem de Vaga com status=aberta ou similar
-        
-        Tabelas:
-        1. Últimas Monitorias: Últimas monitorias criadas
-        2. Inscrições Pendentes: Inscrições aguardando avaliação
-    -->
-
-    <!-- Cabeçalho da página -->
-    <div class="dashboard-header">
-        <h1>
-            <i class="fas fa-tachometer-alt"></i> Dashboard Geral
-        </h1>
-        <p>
-            <small><i class="fas fa-clock"></i> Visão geral do sistema</small>
-        </p>
-    </div>
-
-    <!-- 
-        ====================================================================
-        KPIs GLOBAIS - GRID 4 COLUNAS
-        ====================================================================
-        
-        Métricas de nível administrativo
-        
-        Variáveis de contexto:
-        - total_usuarios: COUNT(*) de User
-        - total_alunos: COUNT(*) de Aluno
-        - total_turmas: COUNT(*) de Turma com status=ativo
-        - total_vagas: COUNT(*) de Vaga abertas
-    -->
-    <div class="grid-dashboard">
-        <!-- Card 1: Total de Usuários -->
-        <div class="dashboard-card">
-            <div class="stat-item">
-                <div>
-                    <div class="stat-label">Total de Usuários</div>
-                    <div class="stat-number">{{ total_usuarios }}</div>
+    <!-- ===== DASHBOARD ADMIN ===== -->
+    
+    <!-- KPI CARDS PRINCIPAIS -->
+    <div class="metrics-grid">
+        <div class="kpi-card blue">
+            <div class="kpi-header">
+                <div class="kpi-label">Total de Usuários</div>
+                <div class="kpi-icon">
+                    <i class="fas fa-users"></i>
                 </div>
-                <div class="icon-stat"><i class="fas fa-users"></i></div>
             </div>
+            <div class="kpi-value">{{ total_usuarios|default:0 }}</div>
         </div>
-
-        <!-- Card 2: Total de Alunos -->
-        <div class="dashboard-card">
-            <div class="stat-item">
-                <div>
-                    <div class="stat-label">Total de Alunos</div>
-                    <div class="stat-number">{{ total_alunos }}</div>
+        
+        <div class="kpi-card green">
+            <div class="kpi-header">
+                <div class="kpi-label">Total de Alunos</div>
+                <div class="kpi-icon">
+                    <i class="fas fa-user-graduate"></i>
                 </div>
-                <div class="icon-stat"><i class="fas fa-user-graduate"></i></div>
             </div>
+            <div class="kpi-value">{{ total_alunos|default:0 }}</div>
         </div>
-
-        <!-- Card 3: Turmas Ativas -->
-        <div class="dashboard-card">
-            <div class="stat-item">
-                <div>
-                    <div class="stat-label">Turmas Ativas</div>
-                    <div class="stat-number">{{ total_turmas }}</div>
+        
+        <div class="kpi-card orange">
+            <div class="kpi-header">
+                <div class="kpi-label">Turmas Ativas</div>
+                <div class="kpi-icon">
+                    <i class="fas fa-book"></i>
                 </div>
-                <div class="icon-stat"><i class="fas fa-book"></i></div>
             </div>
+            <div class="kpi-value">{{ total_turmas|default:0 }}</div>
         </div>
-
-        <!-- Card 4: Vagas Ativas -->
-        <div class="dashboard-card">
-            <div class="stat-item">
-                <div>
-                    <div class="stat-label">Vagas Ativas</div>
-                    <div class="stat-number">{{ total_vagas }}</div>
+        
+        <div class="kpi-card purple">
+            <div class="kpi-header">
+                <div class="kpi-label">Vagas Ativas</div>
+                <div class="kpi-icon">
+                    <i class="fas fa-briefcase"></i>
                 </div>
-                <div class="icon-stat"><i class="fas fa-briefcase"></i></div>
             </div>
+            <div class="kpi-value">{{ total_vagas|default:0 }}</div>
         </div>
     </div>
-
-    <!-- 
-        ====================================================================
-        TABELA: ÚLTIMAS MONITORIAS
-        ====================================================================
-        
-        Mostra monitorias criadas recentemente com status
-        
-        Variável de contexto:
-        - ultimas_monitorias: QuerySet ordenado por -data_criacao
-                             Limite: ~10 últimos registros
-        
-        Atributos esperados:
-        - monitoria.disciplina
-        - monitoria.semestre
-        - monitoria.horario
-        - monitoria.ativo (boolean: campo para status ativo/inativo)
-    -->
-    <div class="dashboard-card">
-        <div class="card-title"><i class="fas fa-list"></i> Últimas Monitorias Cadastradas</div>
-        {% if ultimas_monitorias %}
-        <div class="table-responsive">
-            <table class="table table-custom table-hover">
-                <thead>
-                    <tr>
-                        <th>Disciplina</th>
-                        <th>Semestre</th>
-                        <th>Horário</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for monitoria in ultimas_monitorias %}
-                    <tr>
-                        <td><strong>{{ monitoria.disciplina }}</strong></td>
-                        <td>{{ monitoria.semestre }}</td>
-                        <td>{{ monitoria.horario }}</td>
-                        <td>
-                            <!-- Renderização condicional de status -->
-                            {% if monitoria.ativo %}
-                            <span class="status-badge status-aprovado">Ativa</span>
-                            {% else %}
-                            <span class="status-badge status-rejeitado">Inativa</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    
+    <!-- TABELA: ÚLTIMAS MONITORIAS -->
+    <div class="content-section">
+        <div class="content-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-list"></i>
+                    Últimas Monitorias Cadastradas
+                </div>
+            </div>
+            
+            {% if ultimas_monitorias %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Disciplina</th>
+                            <th>Semestre</th>
+                            <th>Horário</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for monitoria in ultimas_monitorias %}
+                        <tr>
+                            <td><strong>{{ monitoria.disciplina }}</strong></td>
+                            <td>{{ monitoria.semestre }}</td>
+                            <td>{{ monitoria.horario }}</td>
+                            <td>
+                                {% if monitoria.ativo %}
+                                <span class="badge badge-ativo">Ativa</span>
+                                {% else %}
+                                <span class="badge badge-inativo">Inativa</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>Nenhuma monitoria registrada</p>
+            </div>
+            {% endif %}
         </div>
-        {% else %}
-        <!-- Estado vazio: Nenhuma monitoria registrada -->
-        <div class="empty-state">
-            <p>Nenhuma monitoria registrada</p>
-        </div>
-        {% endif %}
     </div>
-
-    <!-- 
-        ====================================================================
-        TABELA: INSCRIÇÕES PENDENTES
-        ====================================================================
-        
-        Inscrições aguardando avaliação/análise
-        
-        Variável de contexto:
-        - inscricoes_pendentes: QuerySet filtrado por status="Pendente"
-                               Ordenado por -data_inscricao
-        
-        Atributos esperados:
-        - inscricao.aluno.nome
-        - inscricao.vaga.disciplina ou inscricao.vaga.nome
-        - inscricao.data_inscricao
-    -->
-    <div class="dashboard-card">
-        <div class="card-title"><i class="fas fa-hourglass-half"></i> Inscrições Pendentes</div>
-        {% if inscricoes_pendentes %}
-        <div class="table-responsive">
-            <table class="table table-custom table-hover">
-                <thead>
-                    <tr>
-                        <th>Candidato</th>
-                        <th>Vaga</th>
-                        <th>Data</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for inscricao in inscricoes_pendentes %}
-                    <tr>
-                        <td><strong>{{ inscricao.aluno.nome }}</strong></td>
-                        <td>{{ inscricao.vaga.disciplina|default:inscricao.vaga.nome }}</td>
-                        <td>{{ inscricao.data_inscricao|date:"d/m/Y" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    
+    <!-- TABELA: INSCRIÇÕES PENDENTES -->
+    <div class="content-section">
+        <div class="content-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fas fa-hourglass-half"></i>
+                    Inscrições Pendentes
+                </div>
+            </div>
+            
+            {% if inscricoes_pendentes %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Candidato</th>
+                            <th>Vaga</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inscricao in inscricoes_pendentes %}
+                        <tr>
+                            <td><strong>{{ inscricao.aluno.nome }}</strong></td>
+                            <td>{{ inscricao.vaga.disciplina|default:inscricao.vaga.nome }}</td>
+                            <td>{{ inscricao.data_inscricao|date:"d/m/Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>Nenhuma inscrição pendente</p>
+            </div>
+            {% endif %}
         </div>
-        {% else %}
-        <!-- Estado vazio: Nenhuma inscrição pendente -->
-        <div class="empty-state">
-            <p>Nenhuma inscrição pendente</p>
-        </div>
-        {% endif %}
     </div>
-
+    
     {% endif %}
-
+    
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ========== THEME TOGGLE ==========
+    (function() {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.body.setAttribute('data-theme', savedTheme);
+        
+        // Força aplicação imediata do tema escuro se necessário
+        if (savedTheme === 'dark') {
+            // Adiciona estilo inline para garantir aplicação imediata
+            const style = document.createElement('style');
+            style.id = 'force-dark-theme';
+            style.textContent = `
+                html[data-theme="dark"] .content-card,
+                html[data-theme="dark"] .kpi-card,
+                html[data-theme="dark"] .alert-card,
+                html[data-theme="dark"] div[class*="card"] {
+                    background-color: #1E1E1E !important;
+                    border-color: #333333 !important;
+                }
+                
+                html[data-theme="dark"] [style*="background: white"],
+                html[data-theme="dark"] [style*="background-color: white"],
+                html[data-theme="dark"] [style*="background: #fff"],
+                html[data-theme="dark"] [style*="background-color: #fff"] {
+                    background-color: #1E1E1E !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    })();
+    
+    function toggleTheme() {
+        const html = document.documentElement;
+        const body = document.body;
+        const currentTheme = html.getAttribute('data-theme') || 'light';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        html.setAttribute('data-theme', newTheme);
+        body.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        const icon = document.querySelector('.theme-toggle i');
+        if (icon) {
+            icon.className = newTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+        
+        // Força atualização visual
+        forceThemeUpdate(newTheme);
+    }
+    
+    function forceThemeUpdate(theme) {
+        const colors = {
+            dark: {
+                cardBg: '#1E1E1E',
+                border: '#333333',
+                textPrimary: '#E5E7EB',
+                textSecondary: '#9CA3AF',
+                bgColor: '#121212'
+            },
+            light: {
+                cardBg: '#FFFFFF',
+                border: '#E5E7EB',
+                textPrimary: '#2C2C2C',
+                textSecondary: '#6B7280',
+                bgColor: '#F8FAFC'
+            }
+        };
+        
+        const c = colors[theme];
+        
+        // Força todos os cards a respeitarem o tema
+        const cards = document.querySelectorAll('.content-card, .kpi-card, .alert-card');
+        cards.forEach(card => {
+            card.style.backgroundColor = c.cardBg;
+            card.style.borderColor = c.border;
+        });
+        
+        // Força todas as tabelas e seus elementos
+        const tables = document.querySelectorAll('.table');
+        tables.forEach(table => {
+            table.style.color = c.textPrimary;
+            table.style.background = 'transparent';
+        });
+        
+        // Força thead
+        const theads = document.querySelectorAll('.table thead');
+        theads.forEach(thead => {
+            thead.style.backgroundColor = c.bgColor;
+        });
+        
+        // Força th
+        const ths = document.querySelectorAll('.table thead th');
+        ths.forEach(th => {
+            th.style.color = c.textSecondary;
+            th.style.borderColor = c.border;
+            th.style.background = 'transparent';
+        });
+        
+        // Força tbody
+        const tbodys = document.querySelectorAll('.table tbody');
+        tbodys.forEach(tbody => {
+            tbody.style.background = 'transparent';
+        });
+        
+        // Força tr
+        const trs = document.querySelectorAll('.table tbody tr');
+        trs.forEach(tr => {
+            tr.style.background = 'transparent';
+        });
+        
+        // Força td
+        const tds = document.querySelectorAll('.table tbody td');
+        tds.forEach(td => {
+            td.style.color = c.textPrimary;
+            td.style.borderColor = c.border;
+            td.style.background = 'transparent';
+        });
+        
+        // Força strong nas tabelas
+        const strongs = document.querySelectorAll('.table tbody td strong');
+        strongs.forEach(strong => {
+            strong.style.color = c.textPrimary;
+        });
+        
+        // Força small e text-muted nas tabelas
+        const smalls = document.querySelectorAll('.table tbody td small, .table tbody td .text-muted');
+        smalls.forEach(small => {
+            small.style.color = c.textSecondary;
+        });
+        
+        // Força todos os textos
+        const textElements = document.querySelectorAll('.card-title, .list-item-title, .section-title, .alert-title');
+        textElements.forEach(el => {
+            el.style.color = c.textPrimary;
+        });
+        
+        // Força list-item-meta
+        const metas = document.querySelectorAll('.list-item-meta');
+        metas.forEach(meta => {
+            meta.style.color = c.textSecondary;
+        });
+        
+        // Força list-item
+        const listItems = document.querySelectorAll('.list-item');
+        listItems.forEach(item => {
+            item.style.background = 'transparent';
+            item.style.borderColor = c.border;
+        });
+        
+        // Força empty-state
+        const emptyStates = document.querySelectorAll('.empty-state');
+        emptyStates.forEach(state => {
+            state.style.color = c.textSecondary;
+            state.style.background = 'transparent';
+        });
+        
+        const emptyIcons = document.querySelectorAll('.empty-state i');
+        emptyIcons.forEach(icon => {
+            icon.style.color = c.textSecondary;
+        });
+        
+        const emptyTexts = document.querySelectorAll('.empty-state p');
+        emptyTexts.forEach(p => {
+            p.style.color = c.textSecondary;
+        });
+        
+        // Força card-header
+        const cardHeaders = document.querySelectorAll('.card-header');
+        cardHeaders.forEach(header => {
+            header.style.borderBottomColor = c.border;
+        });
+    }
+    
+    window.addEventListener('DOMContentLoaded', function() {
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        const icon = document.querySelector('.theme-toggle i');
+        if (icon) {
+            icon.className = currentTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+        
+        // Aplica tema ao carregar
+        forceThemeUpdate(currentTheme);
+        
+        // Força tema novamente após um pequeno delay para garantir
+        setTimeout(() => {
+            forceThemeUpdate(currentTheme);
+        }, 100);
+        
+        // Observer para forçar tema em elementos que mudam dinamicamente
+        const observer = new MutationObserver(() => {
+            const theme = localStorage.getItem('theme') || 'light';
+            if (theme === 'dark') {
+                // Força todos os content-cards
+                document.querySelectorAll('.content-card').forEach(card => {
+                    card.style.backgroundColor = '#1E1E1E';
+                    card.style.borderColor = '#333333';
+                });
+                
+                // Força todos os elementos com background branco
+                document.querySelectorAll('[style*="background"]').forEach(el => {
+                    if (el.style.backgroundColor === 'white' || 
+                        el.style.backgroundColor === 'rgb(255, 255, 255)' ||
+                        el.style.backgroundColor === '#fff' ||
+                        el.style.backgroundColor === '#ffffff') {
+                        el.style.backgroundColor = '#1E1E1E';
+                    }
+                });
+            }
+        });
+        
+        // Observa mudanças no DOM
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['style', 'class']
+        });
+    });
+</script>
 {% endblock %}

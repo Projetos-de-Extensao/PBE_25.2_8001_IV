@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erro - Plataforma CASA</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            color: #333;
+        }
+        
+        .error-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .error-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+        
+        .error-message {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        
+        .error-details {
+            font-size: 0.875rem;
+            color: #888;
+            margin-bottom: 2rem;
+            line-height: 1.4;
+        }
+        
+        .error-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #dee2e6;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+        
+        .mobile-tip {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8f9ff;
+            border-radius: 0.5rem;
+            border-left: 4px solid #3498db;
+        }
+        
+        .mobile-tip-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #3498db;
+            margin-bottom: 0.5rem;
+        }
+        
+        .mobile-tip-text {
+            font-size: 0.8125rem;
+            color: #666;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">📱💥</div>
+        
+        <h1 class="error-title">{{ error_message|default:"Ops! Algo deu errado" }}</h1>
+        
+        <p class="error-message">
+            {{ error_details|default:"Ocorreu um erro inesperado. Não se preocupe, nossa equipe foi notificada." }}
+        </p>
+        
+        <div class="error-actions">
+            <button class="btn btn-primary" onclick="window.location.reload()">
+                🔄 Recarregar Página
+            </button>
+            
+            <a href="/" class="btn btn-secondary">
+                🏠 Ir para Início
+            </a>
+        </div>
+        
+        <div class="mobile-tip">
+            <div class="mobile-tip-title">💡 Dica para Mobile</div>
+            <div class="mobile-tip-text">
+                Se o erro persistir:
+                <br>• Verifique sua conexão com a internet
+                <br>• Feche e abra o navegador novamente
+                <br>• Use <strong>localhost:8000</strong> na URL
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-reload após 30 segundos se não houver interação
+        setTimeout(function() {
+            if (confirm('Deseja recarregar automaticamente a página?')) {
+                window.location.reload();
+            }
+        }, 30000);
+        
+        // Detectar se está offline
+        if (!navigator.onLine) {
+            document.querySelector('.error-message').innerHTML = 
+                'Você está offline. Verifique sua conexão com a internet.';
+        }
+        
+        // Listener para quando voltar online
+        window.addEventListener('online', function() {
+            if (confirm('Conexão restaurada! Deseja recarregar a página?')) {
+                window.location.reload();
+            }
+        });
+    </script>
+</body>
+</html>

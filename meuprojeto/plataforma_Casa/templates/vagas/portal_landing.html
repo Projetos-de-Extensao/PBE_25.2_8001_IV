@@ -1,42 +1,1636 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
-    <meta name="description"
-        content="Portal de Vagas de Monitoria - Ibmec. Encontre oportunidades de monitoria nas diversas disciplinas.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="description" content="Portal de Vagas de Monitoria - IBMEC - RJ. Encontre oportunidades de monitoria nas diversas disciplinas.">
     <meta name="theme-color" content="#002555">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="format-detection" content="telephone=no">
-    <title>Portal de Vagas de Monitoria | IBMEC</title>
-
+    <title>Portal de Vagas de Monitoria | IBMEC - RJ</title>
+    
     <!-- Favicon -->
-    <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512'><path fill='%23F5AC00' d='M320 32c-8.1 0-16.1 1.4-23.7 4.1L15.8 137.4C6.3 140.9 0 149.9 0 160s6.3 19.1 15.8 22.6l57.9 20.9C57.3 229.3 48 259.8 48 291.9v28.1c0 28.4-10.8 57.7-22.3 80.8c-6.5 13-13.9 25.8-22.5 37.6C0 442.7-.9 448.3 .9 453.4s6 8.9 11.2 10.2l64 16c4.2 1.1 8.7 .3 12.4-2s6.3-6.1 7.1-10.4c8.6-42.8 4.3-81.2-2.1-108.7C90.3 344.3 86 329.8 80 316.5V291.9c0-30.2 10.2-58.7 27.9-81.5c12.9-15.5 29.6-28 49.2-35.7l157-61.7c8.2-3.2 17.5 .8 20.7 9s-.8 17.5-9 20.7l-157 61.7c-12.4 4.9-23.3 12.4-32.2 21.6l159.6 57.6c7.6 2.7 15.6 4.1 23.7 4.1s16.1-1.4 23.7-4.1L624.2 182.6c9.5-3.4 15.8-12.5 15.8-22.6s-6.3-19.1-15.8-22.6L343.7 36.1C336.1 33.4 328.1 32 320 32zM128 408c0 35.3 86 72 192 72s192-36.7 192-72L496.7 262.6 354.5 314c-11.1 4-22.8 6-34.5 6s-23.5-2-34.5-6L143.3 262.6 128 408z'/></svg>"
-        type="image/svg+xml">
-
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512'><path fill='%23F5AC00' d='M320 32c-8.1 0-16.1 1.4-23.7 4.1L15.8 137.4C6.3 140.9 0 149.9 0 160s6.3 19.1 15.8 22.6l57.9 20.9C57.3 229.3 48 259.8 48 291.9v28.1c0 28.4-10.8 57.7-22.3 80.8c-6.5 13-13.9 25.8-22.5 37.6C0 442.7-.9 448.3 .9 453.4s6 8.9 11.2 10.2l64 16c4.2 1.1 8.7 .3 12.4-2s6.3-6.1 7.1-10.4c8.6-42.8 4.3-81.2-2.1-108.7C90.3 344.3 86 329.8 80 316.5V291.9c0-30.2 10.2-58.7 27.9-81.5c12.9-15.5 29.6-28 49.2-35.7l157-61.7c8.2-3.2 17.5 .8 20.7 9s-.8 17.5-9 20.7l-157 61.7c-12.4 4.9-23.3 12.4-32.2 21.6l159.6 57.6c7.6 2.7 15.6 4.1 23.7 4.1s16.1-1.4 23.7-4.1L624.2 182.6c9.5-3.4 15.8-12.5 15.8-22.6s-6.3-19.1-15.8-22.6L343.7 36.1C336.1 33.4 328.1 32 320 32zM128 408c0 35.3 86 72 192 72s192-36.7 192-72L496.7 262.6 354.5 314c-11.1 4-22.8 6-34.5 6s-23.5-2-34.5-6L143.3 262.6 128 408z'/></svg>" type="image/svg+xml">
+    
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
-
-
-    <!-- CSS Customizado -->
-    <link rel="stylesheet" href="{% static 'css/common.css' %}">
-    <link rel="stylesheet" href="{% static 'css/vagas.css' %}">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Este é o CSS inline do portal_logged.html - copiado aqui para portal_landing.html */
+        :root {
+            --primary-blue: #002555;
+            --accent-yellow: #F5AC00;
+            --light-blue: #1245FF;
+            --text-dark: #2c3e50;
+            --text-medium: #7f8c8d;
+            --bg-light: #f8f9fa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+        
+        /* Navbar */
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #003a7a 100%);
+            box-shadow: 0 4px 20px rgba(0, 37, 85, 0.15);
+            padding: 1rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .navbar-brand i {
+            color: var(--accent-yellow);
+            font-size: 1.8rem;
+        }
+        
+        .nav-link-custom {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link-custom:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white !important;
+        }
+        
+        .btn-login {
+            background: rgba(255, 255, 255, 0.2);
+            color: white !important;
+            border: 2px solid white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-height: 44px;
+        }
+        
+        .btn-login:hover {
+            background: white;
+            color: var(--primary-blue) !important;
+        }
+        
+        .btn-register {
+            background: var(--accent-yellow);
+            color: var(--primary-blue) !important;
+            border: 2px solid var(--accent-yellow);
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-height: 44px;
+        }
+        
+        .btn-register:hover {
+            background: #ffc107;
+            border-color: #ffc107;
+        }
+        
+        /* Espaçamento entre botões no desktop */
+        @media (min-width: 992px) {
+            .navbar-nav .nav-item:has(.btn-login) {
+                margin-right: 1rem;
+            }
+        }
+        
+        /* Mobile menu improvements */
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                padding: 1.5rem 0 1rem 0;
+                background: var(--primary-blue);
+                margin-top: 1rem;
+                border-radius: 12px;
+            }
+            
+            .navbar-nav {
+                gap: 0;
+                padding: 0 1rem;
+            }
+            
+            .navbar-nav .nav-item {
+                width: 100%;
+            }
+            
+            .navbar-nav .nav-link-custom {
+                padding: 0.875rem 1rem !important;
+                margin-bottom: 0.5rem;
+                display: block;
+                width: 100%;
+                text-align: left;
+            }
+            
+            .navbar-nav .nav-link-custom:hover {
+                background: rgba(255, 255, 255, 0.15);
+            }
+            
+            /* Separator between links and buttons */
+            .navbar-nav .nav-item:nth-child(3) {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                padding-bottom: 1rem;
+                margin-bottom: 1rem !important;
+            }
+            
+            .navbar-nav .btn-login,
+            .navbar-nav .btn-register {
+                width: 100%;
+                padding: 0.875rem;
+                margin: 0 0 0.75rem 0 !important;
+                font-size: 1rem;
+                min-height: 48px;
+                display: block;
+                text-align: center;
+            }
+            
+            .navbar-nav .nav-item:last-child .btn-register {
+                margin-bottom: 0 !important;
+            }
+        }
+        
+        /* Hero Section Mobile First */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #003a7a 100%);
+            color: white;
+            padding: 2rem 0;
+        }
+        
+        @media (min-width: 768px) {
+            .hero-section {
+                padding: 3rem 0;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .hero-section {
+                padding: 4rem 0;
+            }
+        }
+        
+        .hero-section h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: #f8f9fa;
+            text-align: center;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+        
+        .hero-section h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 4px;
+            background: var(--accent-yellow);
+            border-radius: 2px;
+        }
+        
+        @media (min-width: 768px) {
+            .hero-section h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-section h1::after {
+                width: 150px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .hero-section h1 {
+                font-size: 3rem;
+            }
+            
+            .hero-section h1::after {
+                width: 200px;
+                height: 5px;
+            }
+        }
+        
+        .hero-section p {
+            font-size: 1rem;
+            opacity: 0.95;
+            max-width: 600px;
+        }
+        
+        @media (min-width: 768px) {
+            .hero-section p {
+                font-size: 1.15rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .hero-section p {
+                text-align: center;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+        
+        .hero-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        
+        @media (min-width: 768px) {
+            .hero-stats {
+                gap: 2rem;
+                margin-top: 2rem;
+                justify-content: center;
+                max-width: 700px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .hero-stats {
+                gap: 3rem;
+            }
+        }
+        
+        .stat-item {
+            text-align: center;
+            flex: 1;
+            min-width: 80px;
+        }
+        
+        .stat-number {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--accent-yellow);
+            display: block;
+            line-height: 1;
+        }
+        
+        @media (min-width: 768px) {
+            .stat-number {
+                font-size: 2.5rem;
+            }
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+        
+        /* Filtros Mobile First */
+        .filter-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .filter-section {
+                padding: 1.75rem;
+                border-radius: 14px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .filter-section {
+                padding: 2rem;
+                border-radius: 16px;
+                margin-bottom: 2rem;
+            }
+        }
+        
+        .filter-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .filter-title {
+                font-size: 1.25rem;
+                margin-bottom: 1.5rem;
+            }
+        }
+        
+        .filter-title i {
+            color: var(--accent-yellow);
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.875rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            min-height: 44px;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.2rem rgba(0, 37, 85, 0.1);
+        }
+        
+        .btn-filter {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-height: 44px;
+            font-size: 0.95rem;
+        }
+        
+        .btn-filter:hover {
+            background: #003a7a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 37, 85, 0.2);
+        }
+        
+        .btn-clear {
+            background: transparent;
+            color: var(--text-medium);
+            border: 2px solid #dee2e6;
+            padding: 0.875rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-height: 44px;
+        }
+        
+        .btn-clear:hover {
+            border-color: var(--text-medium);
+            color: var(--text-dark);
+        }
+        
+        /* Cards de Vagas Mobile First */
+        .vagas-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.9rem;
+            margin-bottom: 2rem;
+            padding: 0 0.25rem;
+            width: 100%;
+        }
+        
+        @media (min-width: 600px) {
+            .vagas-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+                padding: 0;
+            }
+        }
+        
+        @media (max-width: 599px) {
+            .container {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .vagas-grid {
+                gap: 1.25rem;
+            }
+        }
+        
+        @media (min-width: 1200px) {
+            .vagas-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        
+        .vaga-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 380px;
+        }
+        
+        @media (min-width: 600px) {
+            .vaga-card {
+                padding: 1.15rem;
+                border-radius: 12px;
+                min-height: 400px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .vaga-card {
+                padding: 1.35rem;
+                border-radius: 14px;
+                min-height: 420px;
+            }
+        }
+        
+        @media (min-width: 1200px) {
+            .vaga-card {
+                padding: 1.5rem;
+                border-radius: 16px;
+                min-height: 430px;
+            }
+        }
+        
+        .vaga-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-yellow));
+        }
+        
+        .vaga-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 37, 85, 0.15);
+            border-color: var(--primary-blue);
+        }
+        
+        .vaga-header {
+            display: block;
+            margin-bottom: 1rem;
+        }
+        
+        .vaga-header-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .vaga-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 0.25rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+        
+        @media (min-width: 768px) {
+            .vaga-title {
+                font-size: 1.15rem;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .vaga-title {
+                font-size: 1.25rem;
+            }
+        }
+        
+        .vaga-badge {
+            padding: 0.3rem 0.65rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            flex-shrink: 0;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+        
+        @media (min-width: 768px) {
+            .vaga-badge {
+                padding: 0.35rem 0.75rem;
+                font-size: 0.75rem;
+            }
+        }
+        
+        .badge-tea {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-voluntaria {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .badge-vagas {
+            background: #fff3cd;
+            color: #856404;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        
+        .vaga-info {
+            margin: 1rem 0;
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            margin-bottom: 0.65rem;
+            font-size: 0.85rem;
+            color: var(--text-medium);
+            line-height: 1.4;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .info-item i {
+            color: var(--accent-yellow);
+            width: 18px;
+            text-align: center;
+            flex-shrink: 0;
+            margin-top: 0.15rem;
+        }
+        
+        @media (min-width: 768px) {
+            .info-item {
+                font-size: 0.9rem;
+                gap: 0.75rem;
+            }
+            
+            .info-item i {
+                width: 20px;
+            }
+        }
+        
+        .vaga-description {
+            font-size: 0.85rem;
+            color: var(--text-medium);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex-grow: 1;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        @media (min-width: 768px) {
+            .vaga-description {
+                font-size: 0.9rem;
+                line-height: 1.6;
+            }
+        }
+        
+        .vaga-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        @media (min-width: 768px) {
+            .vaga-footer {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                gap: 0.75rem;
+                padding-top: 1.5rem;
+            }
+        }
+        
+        .btn-candidatar {
+            background: var(--accent-yellow);
+            color: var(--primary-blue);
+            border: 2px solid var(--accent-yellow);
+            padding: 0.55rem 0.9rem;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            min-height: 40px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            text-decoration: none;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+        
+        @media (min-width: 600px) {
+            .btn-candidatar {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+                min-height: 42px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .btn-candidatar {
+                padding: 0.7rem 1.3rem;
+                font-size: 0.9rem;
+                min-height: 46px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .btn-candidatar {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.95rem;
+                min-height: 48px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .btn-candidatar {
+                width: auto;
+                flex: 1;
+            }
+        }
+        
+        .btn-candidatar:hover {
+            background: #ffc107;
+            border-color: #ffc107;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 172, 0, 0.3);
+            color: var(--primary-blue);
+        }
+        
+        .btn-ver-detalhes {
+            background: transparent;
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+            padding: 0.55rem 0.8rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            min-height: 40px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+        
+        @media (min-width: 600px) {
+            .btn-ver-detalhes {
+                padding: 0.6rem 0.9rem;
+                font-size: 0.85rem;
+                min-height: 42px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .btn-ver-detalhes {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.9rem;
+                min-height: 46px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .btn-ver-detalhes {
+                width: auto;
+                padding: 0.75rem 1.5rem;
+                min-height: 48px;
+            }
+        }
+        
+        .btn-ver-detalhes:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1.5rem;
+            color: var(--text-medium);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--text-medium);
+            opacity: 0.3;
+            margin-bottom: 1.5rem;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+        
+        /* Modal */
+        .modal {
+            z-index: 1055 !important;
+        }
+        
+        .modal-backdrop {
+            z-index: 1050 !important;
+        }
+        
+        .modal-dialog {
+            margin: 1.75rem auto;
+        }
+        
+        @media (max-width: 576px) {
+            .modal-dialog {
+                margin: 0.5rem;
+                max-width: calc(100% - 1rem);
+            }
+            
+            .modal-dialog-scrollable .modal-body {
+                max-height: calc(100vh - 150px);
+            }
+        }
+        
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        @media (max-width: 576px) {
+            .modal-content {
+                border-radius: 12px;
+            }
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #003a7a 100%);
+            color: white;
+            border: none;
+            padding: 1.5rem 2rem;
+        }
+        
+        .modal-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin: 0;
+        }
+        
+        @media (min-width: 768px) {
+            .modal-title {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .btn-close {
+            filter: brightness(0) invert(1);
+            opacity: 1;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+        
+        @media (min-width: 768px) {
+            .modal-body {
+                padding: 2rem;
+            }
+        }
+        
+        .detail-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .detail-section:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .detail-section h6 {
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .detail-section h6 i {
+            color: var(--accent-yellow);
+            font-size: 1.2rem;
+        }
+        
+        .detail-section p {
+            color: var(--text-medium);
+            line-height: 1.8;
+            margin-bottom: 0.5rem;
+        }
+        
+        .detail-section ul {
+            color: var(--text-medium);
+            line-height: 1.8;
+            margin-bottom: 0;
+            padding-left: 1.5rem;
+        }
+        
+        .detail-section ul li {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Badge dentro do modal (detalhes) */
+        .detail-section .vaga-badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .detail-section .badge-tea {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        
+        .detail-section .badge-voluntaria {
+            background: linear-gradient(135deg, var(--light-blue) 0%, #0066ff 100%);
+            color: white;
+        }
+        
+        /* Sobre o Programa Section */
+        .sobre-programa-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 3rem 0;
+            margin-top: -1rem;
+        }
+        
+        .sobre-programa-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        
+        .sobre-programa-header h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        
+        .sobre-programa-header h2 i {
+            color: var(--accent-yellow);
+            font-size: 2.2rem;
+        }
+        
+        .sobre-programa-header p {
+            font-size: 1.1rem;
+            color: var(--text-medium);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+        
+        .programa-objetivo {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid var(--accent-yellow);
+        }
+        
+        .programa-objetivo p {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+            margin: 0;
+        }
+        
+        .programa-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .programa-cards {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        .programa-card {
+            background: var(--primary-blue);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 37, 85, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .programa-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-yellow);
+        }
+        
+        .programa-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 24px rgba(0, 37, 85, 0.25);
+        }
+        
+        .programa-card-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(245, 172, 0, 0.15);
+            border-radius: 50%;
+        }
+        
+        .programa-card-icon i {
+            font-size: 2.5rem;
+            color: var(--accent-yellow);
+        }
+        
+        .programa-card h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .programa-card p {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.7;
+            margin: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .sobre-programa-section {
+                padding: 2rem 0;
+            }
+            
+            .sobre-programa-header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .sobre-programa-header h2 i {
+                font-size: 1.6rem;
+            }
+            
+            .sobre-programa-header p {
+                font-size: 0.95rem;
+            }
+            
+            .programa-objetivo {
+                padding: 1.5rem;
+            }
+            
+            .programa-objetivo p {
+                font-size: 0.9rem;
+            }
+            
+            .programa-card {
+                padding: 1.5rem;
+            }
+            
+            .programa-card-icon {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 1rem;
+            }
+            
+            .programa-card-icon i {
+                font-size: 2rem;
+            }
+            
+            .programa-card h3 {
+                font-size: 1.15rem;
+            }
+            
+            .programa-card p {
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* Modalidades de Monitoria Section */
+        .modalidades-section {
+            background: white;
+            padding: 3rem 0;
+        }
+        
+        .modalidades-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        
+        .modalidades-header h2 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        
+        .modalidades-header h2 i {
+            color: var(--accent-yellow);
+            font-size: 2rem;
+        }
+        
+        .modalidades-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        @media (min-width: 992px) {
+            .modalidades-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .modalidade-card {
+            background: white;
+            border-radius: 16px;
+            padding: 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .modalidade-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .modalidade-card.tea {
+            border-color: #28a745;
+        }
+        
+        .modalidade-card.voluntaria {
+            border-color: #007bff;
+        }
+        
+        .modalidade-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .modalidade-header.tea {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+        
+        .modalidade-header.voluntaria {
+            background: linear-gradient(135deg, #cce5ff 0%, #b3d7ff 100%);
+        }
+        
+        .modalidade-icon {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 1.5rem;
+        }
+        
+        .modalidade-icon.tea {
+            background: #28a745;
+            color: white;
+        }
+        
+        .modalidade-icon.voluntaria {
+            background: #007bff;
+            color: white;
+        }
+        
+        .modalidade-title h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-dark);
+        }
+        
+        .modalidade-title p {
+            font-size: 0.85rem;
+            margin: 0.25rem 0 0 0;
+            color: var(--text-medium);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .modalidade-body {
+            padding: 1.5rem;
+        }
+        
+        .modalidade-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .modalidade-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .modalidade-section h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .modalidade-section h4 i {
+            font-size: 0.9rem;
+        }
+        
+        .modalidade-section p {
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            line-height: 1.7;
+            margin-bottom: 0.75rem;
+        }
+        
+        .modalidade-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .modalidade-section ul li {
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            line-height: 1.7;
+            padding-left: 1.5rem;
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+        
+        .modalidade-section ul li::before {
+            content: '•';
+            position: absolute;
+            left: 0.5rem;
+            color: var(--accent-yellow);
+            font-weight: bold;
+        }
+        
+        .modalidade-destaque {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+            border-left: 4px solid var(--accent-yellow);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .modalidade-destaque p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        
+        .modalidade-destaque i {
+            color: #856404;
+            margin-top: 0.25rem;
+            flex-shrink: 0;
+        }
+        
+        /* Benefícios Section */
+        .beneficios-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 3rem 0;
+        }
+        
+        .beneficios-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        
+        .beneficios-header h2 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        
+        .beneficios-header h2 i {
+            color: var(--accent-yellow);
+            font-size: 2rem;
+        }
+        
+        .beneficios-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+        }
+        
+        @media (min-width: 576px) {
+            .beneficios-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .beneficios-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .beneficio-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.75rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .beneficio-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent-yellow);
+        }
+        
+        .beneficio-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+            border-color: var(--accent-yellow);
+        }
+        
+        .beneficio-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--accent-yellow) 0%, #ffc107 100%);
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(245, 172, 0, 0.3);
+        }
+        
+        .beneficio-icon i {
+            font-size: 1.75rem;
+            color: white;
+        }
+        
+        .beneficio-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        .beneficio-card p {
+            font-size: 0.85rem;
+            color: var(--text-medium);
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        .btn-vagas-cta {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 37, 85, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            margin-top: 2rem;
+        }
+        
+        .btn-vagas-cta:hover {
+            background: #003a7a;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 37, 85, 0.4);
+            color: white;
+        }
+        
+        .cta-container {
+            text-align: center;
+            margin-top: 2.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .modalidades-section,
+            .beneficios-section {
+                padding: 2rem 0;
+            }
+            
+            .modalidades-header h2,
+            .beneficios-header h2 {
+                font-size: 1.35rem;
+            }
+            
+            .modalidades-header h2 i,
+            .beneficios-header h2 i {
+                font-size: 1.5rem;
+            }
+            
+            .modalidade-header {
+                padding: 1.25rem;
+            }
+            
+            .modalidade-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 1.25rem;
+            }
+            
+            .modalidade-title h3 {
+                font-size: 1.1rem;
+            }
+            
+            .modalidade-body {
+                padding: 1.25rem;
+            }
+            
+            .modalidade-section h4 {
+                font-size: 0.95rem;
+            }
+            
+            .modalidade-section p,
+            .modalidade-section ul li {
+                font-size: 0.85rem;
+            }
+            
+            .beneficio-card {
+                padding: 1.5rem 1.25rem;
+            }
+            
+            .beneficio-icon {
+                width: 55px;
+                height: 55px;
+            }
+            
+            .beneficio-icon i {
+                font-size: 1.5rem;
+            }
+            
+            .beneficio-card h4 {
+                font-size: 0.95rem;
+            }
+            
+            .beneficio-card p {
+                font-size: 0.8rem;
+            }
+            
+            .btn-vagas-cta {
+                padding: 0.875rem 2rem;
+                font-size: 0.95rem;
+            }
+        }
+        
+        /* Touch Optimizations */
+        * {
+            -webkit-tap-highlight-color: rgba(18, 69, 255, 0.2);
+        }
+        
+        @media (hover: none) {
+            .btn-filter:active,
+            .btn-clear:active,
+            .btn-ver-detalhes:active {
+                transform: scale(0.95);
+            }
+        }
+        
+        /* Prevenir zoom no iOS */
+        @supports (-webkit-touch-callout: none) {
+            input[type="text"],
+            input[type="search"],
+            select,
+            textarea {
+                font-size: 16px !important;
+            }
+        }
+        
+        /* Ajustes adicionais para mobile */
+        @media (max-width: 768px) {
+            /* Navbar */
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+            
+            .navbar-brand i {
+                font-size: 1.3rem;
+            }
+            
+            /* Hero */
+            .hero-section {
+                padding: 1.5rem 0 !important;
+                margin-bottom: 2rem !important;
+            }
+            
+            .hero-section h1 {
+                font-size: 1.5rem !important;
+                margin-bottom: 0.75rem !important;
+            }
+            
+            .hero-section p {
+                font-size: 0.85rem !important;
+            }
+            
+            .hero-stats {
+                margin-bottom: 0.5rem !important;
+            }
+            
+            .stat-number {
+                font-size: 1.25rem !important;
+            }
+            
+            .stat-label {
+                font-size: 0.65rem !important;
+            }
+            
+            /* Filtros */
+            .filter-section {
+                padding: 0.85rem !important;
+                margin-bottom: 1rem !important;
+                margin-top: 1.5rem !important;
+            }
+            
+            .filter-title {
+                font-size: 0.9rem !important;
+                margin-bottom: 0.65rem !important;
+            }
+            
+            .form-label {
+                font-size: 0.8rem !important;
+                margin-bottom: 0.35rem !important;
+            }
+            
+            .form-control, .form-select {
+                padding: 0.6rem !important;
+                font-size: 0.85rem !important;
+                min-height: 40px !important;
+            }
+            
+            .btn-filter {
+                padding: 0.6rem 0.75rem !important;
+                font-size: 0.85rem !important;
+                min-height: 40px !important;
+            }
+            
+            /* Cards de vagas */
+            .vagas-grid {
+                gap: 0.75rem !important;
+            }
+            
+            .vaga-card {
+                padding: 0.85rem !important;
+                min-height: 280px !important;
+            }
+            
+            .vaga-title {
+                font-size: 0.95rem !important;
+            }
+            
+            .vaga-badge {
+                padding: 0.2rem 0.5rem !important;
+                font-size: 0.65rem !important;
+            }
+            
+            .info-item {
+                font-size: 0.8rem !important;
+                margin-bottom: 0.4rem !important;
+            }
+            
+            .info-item i {
+                font-size: 0.75rem !important;
+            }
+            
+            .vaga-description {
+                font-size: 0.8rem !important;
+            }
+            
+            .btn-candidatar {
+                padding: 0.55rem 0.75rem !important;
+                font-size: 0.8rem !important;
+                min-height: 38px !important;
+            }
+            
+            .btn-ver-detalhes {
+                padding: 0.55rem 0.75rem !important;
+                font-size: 0.75rem !important;
+                min-height: 38px !important;
+            }
+            
+            /* Modal */
+            .modal-title {
+                font-size: 1.1rem !important;
+            }
+            
+            .modal-body {
+                padding: 1rem !important;
+            }
+            
+            .detail-section h6 {
+                font-size: 0.9rem !important;
+            }
+            
+            .detail-section p,
+            .detail-section ul {
+                font-size: 0.85rem !important;
+            }
+            
+            /* Empty state */
+            .empty-state h3 {
+                font-size: 1.1rem !important;
+            }
+            
+            .empty-state p {
+                font-size: 0.85rem !important;
+            }
+        }
+    </style>
 </head>
-
 <body>
     <!-- ==================== NAVBAR ==================== -->
     <nav class="navbar navbar-expand-lg navbar-custom">
@@ -45,19 +1639,21 @@
                 <i class="fas fa-graduation-cap"></i>
                 <span>Portal de Vagas</span>
             </a>
-
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                style="border: 2px solid white;">
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" style="border: 2px solid white;">
                 <i class="fas fa-bars text-white"></i>
             </button>
-
+            
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-lg-center">
                     <li class="nav-item">
                         <a class="nav-link-custom" href="{% url 'portal_vagas' %}#vagas">Vagas Disponíveis</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link-custom" href="{% url 'sobre_programa' %}">Sobre o Programa</a>
+                        <a class="nav-link-custom" href="#modalidades">Modalidades de Monitoria</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link-custom" href="#beneficios">Benefícios do Programa</a>
                     </li>
                     <li class="nav-item">
                         <a class="btn-login" href="{% url 'login' %}">
@@ -73,15 +1669,15 @@
             </div>
         </div>
     </nav>
-
+    
     <!-- ==================== HERO SECTION ==================== -->
     <section class="hero-section">
         <div class="container">
             <div class="row align-items-center justify-content-center">
                 <div class="col-12">
                     <h1>Oportunidades de Monitoria</h1>
-                    <p>Faça parte do programa de monitorias do Ibmec </p>
-
+                    <p>Faça parte do programa de monitorias da IBMEC - RJ</p>
+                    
                     <div class="hero-stats">
                         <div class="stat-item">
                             <span class="stat-number">{{ total_vagas }}</span>
@@ -100,54 +1696,108 @@
             </div>
         </div>
     </section>
-
+    
+    <!-- ==================== SOBRE O PROGRAMA ==================== -->
+    <section class="sobre-programa-section">
+        <div class="container">
+            <div class="sobre-programa-header">
+                <h2>
+                    <i class="fas fa-info-circle"></i>
+                    Sobre o Programa de Monitoria
+                </h2>
+                <p>Conheça as oportunidades e benefícios do Programa de Monitoria do Ibmec.</p>
+            </div>
+            
+            <div class="programa-objetivo">
+                <p>
+                    O Programa de Monitoria do Ibmec tem como objetivo principal apoiar o processo de ensino-aprendizagem, 
+                    proporcionando aos alunos monitores a <strong>oportunidade de desenvolver habilidades didáticas, 
+                    aprofundar conhecimentos e contribuir para o sucesso acadêmico de outros estudantes</strong>.
+                </p>
+            </div>
+            
+            <div class="programa-cards">
+                <div class="programa-card">
+                    <div class="programa-card-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>Desenvolvimento Acadêmico</h3>
+                    <p>
+                        Aprimore suas habilidades e conhecimentos auxiliando outros alunos no aprendizado das disciplinas.
+                    </p>
+                </div>
+                
+                <div class="programa-card">
+                    <div class="programa-card-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h3>Experiência Docente</h3>
+                    <p>
+                        Desenvolva competências pedagógicas e habilidades de comunicação essenciais para a carreira profissional.
+                    </p>
+                </div>
+                
+                <div class="programa-card">
+                    <div class="programa-card-icon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <h3>Certificação</h3>
+                    <p>
+                        Receba certificado de monitoria ao final do programa, enriquecendo seu currículo acadêmico.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
     <!-- ==================== MAIN CONTENT ==================== -->
-    <div class="container" style="margin-top: -2rem; position: relative; z-index: 10;">
-
+    <div class="container" style="margin-top: 2rem; position: relative; z-index: 10;">
+        
         <!-- ==================== FILTROS ==================== -->
         <div class="filter-section" id="vagas">
             <h2 class="filter-title">
                 <i class="fas fa-filter"></i>
                 Filtrar Vagas
             </h2>
-
+            
             <form method="GET" action="{% url 'portal_vagas' %}">
                 <div class="row g-3">
                     <div class="col-12 col-md-4">
                         <label class="form-label fw-semibold">Pesquisar</label>
-                        <input type="search" class="form-control" name="busca" placeholder="Nome da disciplina..."
-                            value="{{ request.GET.busca }}" autocomplete="off">
+                        <input type="search" 
+                               class="form-control" 
+                               name="busca" 
+                               placeholder="Nome da disciplina..."
+                               value="{{ request.GET.busca }}"
+                               autocomplete="off">
                     </div>
-
+                    
                     <div class="col-12 col-md-3">
                         <label class="form-label fw-semibold">Curso</label>
                         <select class="form-select" name="curso">
                             <option value="">Todos os cursos</option>
                             {% for curso in cursos %}
-                            <option value="{{ curso.id }}" {% if request.GET.curso==curso.id|stringformat:"s"
-                                %}selected{% endif %}>
-                                {{ curso.nome }}
-                            </option>
+                                <option value="{{ curso.id }}" {% if request.GET.curso == curso.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ curso.nome }}
+                                </option>
                             {% endfor %}
                         </select>
                     </div>
-
+                    
                     <div class="col-12 col-md-3">
                         <label class="form-label fw-semibold">Tipo de Vaga</label>
                         <select class="form-select" name="tipo">
                             <option value="">Todos os tipos</option>
-                            <option value="TEA" {% if request.GET.tipo=='TEA' %}selected{% endif %}>TEA - Remunerada
-                            </option>
-                            <option value="Voluntaria" {% if request.GET.tipo=='Voluntaria' %}selected{% endif %}>
-                                Voluntária</option>
+                            <option value="TEA" {% if request.GET.tipo == 'TEA' %}selected{% endif %}>TEA - Remunerada</option>
+                            <option value="Voluntaria" {% if request.GET.tipo == 'Voluntaria' %}selected{% endif %}>Voluntária</option>
                         </select>
                     </div>
-
+                    
                     <div class="col-12 col-md-2">
                         <label class="form-label fw-semibold d-none d-md-block">&nbsp;</label>
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-filter flex-grow-1">
-                                <i class="fas fa-search me-1"></i>
+                                <i class="fas fa-search me-1"></i> 
                                 <span class="d-none d-sm-inline">Buscar</span>
                                 <span class="d-inline d-sm-none">OK</span>
                             </button>
@@ -159,81 +1809,244 @@
                 </div>
             </form>
         </div>
-
+        
         <!-- ==================== LISTA DE VAGAS ==================== -->
         {% if vagas %}
-        <div class="vagas-grid">
-            {% for vaga in vagas %}
-            <div class="vaga-card" data-vaga-id="{{ vaga.id }}">
-                <div class="vaga-header">
-                    <div>
-                        <h3 class="vaga-title">{{ vaga.disciplina.nome }}</h3>
-                        <p class="text-muted mb-0" style="font-size: 0.85rem;">{{ vaga.disciplina.codigo }}</p>
+            <div class="vagas-grid">
+                {% for vaga in vagas %}
+                    <div class="vaga-card" data-vaga-id="{{ vaga.id }}">
+                        <div class="vaga-header">
+                            <div style="width: 100%;">
+                                <h3 class="vaga-title">{{ vaga.disciplina.nome }}</h3>
+                                <p class="text-muted mb-2" style="font-size: 0.8rem; word-wrap: break-word; overflow-wrap: break-word;">{{ vaga.disciplina.codigo }}</p>
+                                <div class="vaga-header-badges" style="margin-top: 0.75rem;">
+                                    <span class="vaga-badge {% if vaga.tipo_vaga == 'TEA' %}badge-tea{% else %}badge-voluntaria{% endif %}">
+                                        {{ vaga.get_tipo_vaga_display }}
+                                    </span>
+                                    <span class="vaga-badge badge-vagas">
+                                        <i class="fas fa-users"></i>
+                                        <span>{{ vaga.numero_vagas }} vaga{% if vaga.numero_vagas != 1 %}s{% endif %}</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="vaga-info">
+                            <div class="info-item">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span>{{ vaga.curso.nome }}</span>
+                            </div>
+                            
+                            {% if vaga.tipo_vaga == 'TEA' and vaga.valor_bolsa %}
+                                <div class="info-item">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Bolsa: R$ {{ vaga.valor_bolsa }}</span>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="info-item">
+                                <i class="fas fa-user-tie"></i>
+                                <span>
+                                    {% for coord in vaga.coordenadores.all %}
+                                        {{ coord.nome }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="vaga-description">
+                            {{ vaga.descricao|truncatewords:20 }}
+                        </div>
+                        
+                        <div class="vaga-footer">
+                            <a href="{% url 'register' %}?next=/vagas/{{ vaga.id }}/candidatar/" class="btn-candidatar">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Candidatar-se</span>
+                            </a>
+                            <button class="btn btn-ver-detalhes" onclick="verDetalhes({{ vaga.id }})" type="button">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Detalhes
+                            </button>
+                        </div>
                     </div>
-                    <div class="vaga-header-badges">
-                        <span
-                            class="vaga-badge {% if vaga.tipo_vaga == 'TEA' %}badge-tea{% else %}badge-voluntaria{% endif %}">
-                            {{ vaga.get_tipo_vaga_display }}
-                        </span>
-                        <span class="vaga-badge badge-vagas">
-                            <i class="fas fa-users"></i>
-                            <span>{{ vaga.numero_vagas }} vaga{% if vaga.numero_vagas != 1 %}s{% endif %}</span>
-                        </span>
-                    </div>
-                </div>
-
-                <div class="vaga-info">
-                    <div class="info-item">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>{{ vaga.curso.nome }}</span>
-                    </div>
-
-                    {% if vaga.tipo_vaga == 'TEA' and vaga.valor_bolsa %}
-                    <div class="info-item">
-                        <i class="fas fa-money-bill-wave"></i>
-                        <span>Bolsa: R$ {{ vaga.valor_bolsa }}</span>
-                    </div>
-                    {% endif %}
-
-                    <div class="info-item">
-                        <i class="fas fa-user-tie"></i>
-                        <span>
-                            {% for coord in vaga.coordenadores.all %}
-                            {{ coord.nome }}{% if not forloop.last %}, {% endif %}
-                            {% endfor %}
-                        </span>
-                    </div>
-                </div>
-
-                <div class="vaga-description">
-                    {{ vaga.descricao|truncatewords:20 }}
-                </div>
-
-                <div class="vaga-footer">
-                    <a href="{% url 'register' %}?next=/vagas/{{ vaga.id }}/candidatar/" class="btn-candidatar">
-                        <i class="fas fa-paper-plane"></i>
-                        <span>Candidatar-se</span>
-                    </a>
-                    <button class="btn btn-ver-detalhes" onclick="verDetalhes({{ vaga.id }})">
-                        <i class="fas fa-info-circle me-1"></i>
-                        Detalhes
-                    </button>
-                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
         {% else %}
-        <div class="empty-state">
-            <i class="fas fa-inbox"></i>
-            <h3>Nenhuma vaga encontrada</h3>
-            <p>Não há vagas disponíveis no momento com os filtros selecionados.</p>
-            <a href="{% url 'portal_vagas' %}" class="btn btn-filter mt-3">
-                <i class="fas fa-redo me-1"></i> Limpar Filtros
-            </a>
-        </div>
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>Nenhuma vaga encontrada</h3>
+                <p>Não há vagas disponíveis no momento com os filtros selecionados.</p>
+                <a href="{% url 'portal_vagas' %}" class="btn btn-filter mt-3">
+                    <i class="fas fa-redo me-1"></i> Limpar Filtros
+                </a>
+            </div>
         {% endif %}
     </div>
-
+    
+    <!-- ==================== MODALIDADES DE MONITORIA ==================== -->
+    <section class="modalidades-section" id="modalidades">
+        <div class="container">
+            <div class="modalidades-header">
+                <h2>
+                    <i class="fas fa-list-ul"></i>
+                    Modalidades de Monitoria
+                </h2>
+            </div>
+            
+            <div class="modalidades-grid">
+                <!-- TEA (Remunerada) -->
+                <div class="modalidade-card tea">
+                    <div class="modalidade-header tea">
+                        <div class="modalidade-icon tea">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="modalidade-title">
+                            <h3>Monitoria TEA (Remunerada)</h3>
+                            <p>Bolsa Auxílio</p>
+                        </div>
+                    </div>
+                    
+                    <div class="modalidade-body">
+                        <div class="modalidade-section">
+                            <h4><i class="fas fa-question-circle"></i> O que é TEA?</h4>
+                            <p>
+                                TEA significa <strong>Trabalho Efetivo Acadêmico</strong>. É a modalidade de monitoria remunerada, 
+                                onde o estudante recebe uma bolsa auxílio de <strong>R$ 1.500,00 por semestre</strong> 
+                                para dedicar-se às atividades de monitoria.
+                            </p>
+                        </div>
+                        
+                        <div class="modalidade-section">
+                            <h4><i class="fas fa-list-check"></i> Características</h4>
+                            <ul>
+                                <li><strong>Bolsa semestral:</strong> R$ 1.500,00 pagos ao longo do semestre letivo</li>
+                                <li><strong>Carga horária:</strong> 12 horas semanais de dedicação</li>
+                                <li><strong>Compromisso:</strong> Maior disponibilidade e responsabilidade</li>
+                                <li><strong>Seleção rigorosa:</strong> Processo seletivo baseado em desempenho acadêmico</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="modalidade-section">
+                            <h4><i class="fas fa-clipboard-check"></i> Requisitos</h4>
+                            <ul>
+                                <li>Ter sido aprovado na disciplina com nota mínima 8,0</li>
+                                <li>Estar regularmente matriculado</li>
+                                <li>Não estar em período de trancamento</li>
+                                <li>Disponibilidade de horário compatível</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="modalidade-destaque">
+                            <p>
+                                <i class="fas fa-lightbulb"></i>
+                                <strong>Ideal para:</strong> Estudantes que podem dedicar mais tempo e 
+                                buscam experiência acadêmica remunerada.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Voluntária -->
+                <div class="modalidade-card voluntaria">
+                    <div class="modalidade-header voluntaria">
+                        <div class="modalidade-icon voluntaria">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="modalidade-title">
+                            <h3>Monitoria Voluntária</h3>
+                            <p>Sem Remuneração</p>
+                        </div>
+                    </div>
+                    
+                    <div class="modalidade-body">
+                        <div class="modalidade-section">
+                            <h4><i class="fas fa-question-circle"></i> O que é Monitoria Voluntária?</h4>
+                            <p>
+                                É a modalidade de monitoria <strong>não remunerada</strong>, onde o estudante se 
+                                dedica ao programa por motivação acadêmica e pessoal, contribuindo 
+                                para o ensino sem receber bolsa auxílio.
+                            </p>
+                        </div>
+                        
+                        <div class="modalidade-section">
+                            <h4><i class="fas fa-list-check"></i> Características</h4>
+                            <ul>
+                                <li><strong>Sem remuneração:</strong> Atividade voluntária e não remunerada</li>
+                                <li><strong>Carga horária flexível:</strong> Geralmente 8 horas semanais</li>
+                                <li><strong>Certificação:</strong> Recebe certificado de monitoria ao final</li>
+                                <li><strong>Flexibilidade:</strong> Maior adaptação aos horários do estudante</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="modalidade-section">
+                            <h4><i class="fas fa-clipboard-check"></i> Requisitos</h4>
+                            <ul>
+                                <li>Ter sido aprovado na disciplina com nota mínima 7,0</li>
+                                <li>Estar regularmente matriculado</li>
+                                <li>Demonstrar interesse e motivação pela docência</li>
+                                <li>Comprometimento com as atividades propostas</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="modalidade-destaque">
+                            <p>
+                                <i class="fas fa-star"></i>
+                                <strong>Ideal para:</strong> Estudantes que buscam experiência acadêmica e 
+                                enriquecer o currículo sem compromisso financeiro.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- ==================== BENEFÍCIOS DO PROGRAMA ==================== -->
+    <section class="beneficios-section" id="beneficios">
+        <div class="container">
+            <div class="beneficios-header">
+                <h2>
+                    <i class="fas fa-gift"></i>
+                    Benefícios do Programa
+                </h2>
+            </div>
+            
+            <div class="beneficios-grid">
+                <div class="beneficio-card">
+                    <div class="beneficio-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h4>Destaque Acadêmico</h4>
+                    <p>Diferencial no currículo</p>
+                </div>
+                
+                <div class="beneficio-card">
+                    <div class="beneficio-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h4>Network</h4>
+                    <p>Contato com professores</p>
+                </div>
+                
+                <div class="beneficio-card">
+                    <div class="beneficio-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h4>Aprendizado</h4>
+                    <p>Aprofundamento teórico</p>
+                </div>
+                
+                <div class="beneficio-card">
+                    <div class="beneficio-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h4>Carreira</h4>
+                    <p>Preparo profissional</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
     <!-- ==================== MODAL DETALHES DA VAGA ==================== -->
     <div class="modal fade" id="modalDetalhes" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
@@ -253,100 +2066,658 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Scripts -->
-    <script>
-        function verDetalhes(vagaId) {
-            const modal = new bootstrap.Modal(document.getElementById('modalDetalhes'));
-            const modalBody = document.getElementById('modalBody');
-            const modalTitle = document.getElementById('modalTitle');
-
-            modalBody.innerHTML = `
-            <div class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Carregando...</span>
+    <!-- ==================== MODAL COMPLETAR PERFIL ==================== -->
+    <div class="modal fade" id="modalCompletarPerfil" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden;">
+                <!-- Header compacto -->
+                <div class="modal-header" style="background: linear-gradient(135deg, #002555 0%, #003a7a 100%); color: white; padding: 1.25rem; border: none;">
+                    <div style="width: 100%;">
+                        <h5 class="modal-title" style="font-weight: 700; font-size: 1.1rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-user-edit" style="color: #F5AC00;"></i>
+                            Complete seu Perfil
+                        </h5>
+                        <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; opacity: 0.9;">
+                            Precisamos de mais algumas informações para continuar
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Body compacto -->
+                <div class="modal-body" style="padding: 1.25rem;">
+                    <form id="formCompletarPerfil" method="POST">
+                        {% csrf_token %}
+                        
+                        <!-- Curso -->
+                        <div class="mb-3">
+                            <label class="form-label" style="font-weight: 600; font-size: 0.9rem; color: #002555; margin-bottom: 0.5rem;">
+                                <i class="fas fa-graduation-cap" style="color: #F5AC00; margin-right: 0.25rem;"></i>
+                                Curso *
+                            </label>
+                            <select class="form-select" name="curso" required style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem; font-size: 0.9rem;">
+                                <option value="">Selecione seu curso</option>
+                                {% for curso in cursos %}
+                                    <option value="{{ curso.id }}" {% if aluno.curso.id == curso.id %}selected{% endif %}>
+                                        {{ curso.nome }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Período e CR na mesma linha (mobile-first) -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label" style="font-weight: 600; font-size: 0.9rem; color: #002555; margin-bottom: 0.5rem;">
+                                    <i class="fas fa-calendar-alt" style="color: #F5AC00; margin-right: 0.25rem;"></i>
+                                    Período *
+                                </label>
+                                <select class="form-select" name="periodo" required style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem; font-size: 0.9rem;">
+                                    <option value="">Selecione</option>
+                                    {% for i in "12345678910" %}
+                                        <option value="{{ forloop.counter }}" {% if aluno.periodo == forloop.counter %}selected{% endif %}>
+                                            {{ forloop.counter }}º
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-6">
+                                <label class="form-label" style="font-weight: 600; font-size: 0.9rem; color: #002555; margin-bottom: 0.5rem;">
+                                    <i class="fas fa-chart-line" style="color: #F5AC00; margin-right: 0.25rem;"></i>
+                                    CR *
+                                </label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       name="cr_geral" 
+                                       step="0.1" 
+                                       min="0" 
+                                       max="10" 
+                                       placeholder="0.0"
+                                       value="{% if aluno.cr_geral %}{{ aluno.cr_geral }}{% endif %}"
+                                       required 
+                                       style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem; font-size: 0.9rem;">
+                            </div>
+                        </div>
+                        
+                        <!-- Celular -->
+                        <div class="mb-3">
+                            <label class="form-label" style="font-weight: 600; font-size: 0.9rem; color: #002555; margin-bottom: 0.5rem;">
+                                <i class="fas fa-phone" style="color: #F5AC00; margin-right: 0.25rem;"></i>
+                                Celular (com DDD) *
+                            </label>
+                            <input type="tel" 
+                                   class="form-control" 
+                                   name="celular" 
+                                   placeholder="(21) 99999-9999"
+                                   value="{% if aluno.celular %}{{ aluno.celular }}{% endif %}"
+                                   required 
+                                   style="border: 2px solid #e9ecef; border-radius: 8px; padding: 0.75rem; font-size: 0.9rem;">
+                        </div>
+                        
+                        <!-- Alert de erro (oculto por padrão) -->
+                        <div id="alertErro" class="alert alert-danger d-none" role="alert" style="border-radius: 8px; padding: 0.75rem; font-size: 0.85rem; margin-bottom: 1rem;">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <span id="mensagemErro"></span>
+                        </div>
+                        
+                        <!-- Alert de sucesso (oculto por padrão) -->
+                        <div id="alertSucesso" class="alert alert-success d-none" role="alert" style="border-radius: 8px; padding: 0.75rem; font-size: 0.85rem; margin-bottom: 1rem;">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Perfil atualizado com sucesso!
+                        </div>
+                        
+                        <!-- Botões -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-filter" style="padding: 0.875rem; font-size: 0.95rem; font-weight: 600;">
+                                <i class="fas fa-save me-2"></i>
+                                Salvar e Continuar
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
-        `;
-
+        </div>
+    </div>
+    
+    <!-- Estilos adicionais para o modal -->
+    <style>
+        /* Modal responsivo */
+        @media (max-width: 576px) {
+            #modalCompletarPerfil .modal-dialog {
+                margin: 0.5rem;
+            }
+            
+            #modalCompletarPerfil .modal-header {
+                padding: 1rem !important;
+            }
+            
+            #modalCompletarPerfil .modal-header h5 {
+                font-size: 1rem !important;
+            }
+            
+            #modalCompletarPerfil .modal-header p {
+                font-size: 0.8rem !important;
+            }
+            
+            #modalCompletarPerfil .modal-body {
+                padding: 1rem !important;
+            }
+            
+            #modalCompletarPerfil .form-label {
+                font-size: 0.85rem !important;
+            }
+            
+            #modalCompletarPerfil .form-control,
+            #modalCompletarPerfil .form-select {
+                padding: 0.65rem !important;
+                font-size: 0.85rem !important;
+            }
+            
+            #modalCompletarPerfil button[type="submit"] {
+                padding: 0.75rem !important;
+                font-size: 0.9rem !important;
+            }
+        }
+        
+        /* Foco nos inputs */
+        #modalCompletarPerfil .form-control:focus,
+        #modalCompletarPerfil .form-select:focus {
+            border-color: #002555;
+            box-shadow: 0 0 0 0.2rem rgba(0, 37, 85, 0.15);
+        }
+        
+        /* Loading state */
+        #modalCompletarPerfil button[type="submit"]:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts -->
+    <script>
+    // Função para ver detalhes da vaga (com suporte melhorado para mobile)
+    function verDetalhes(vagaId) {
+        console.log('verDetalhes chamado com vagaId:', vagaId); // Debug
+        
+        try {
+            const modalElement = document.getElementById('modalDetalhes');
+            const modalBody = document.getElementById('modalBody');
+            const modalTitle = document.getElementById('modalTitle');
+            
+            if (!modalElement || !modalBody || !modalTitle) {
+                console.error('Elementos do modal não encontrados');
+                return;
+            }
+            
+            // Criar instância do modal
+            const modal = new bootstrap.Modal(modalElement, {
+                backdrop: true,
+                keyboard: true,
+                focus: true
+            });
+            
+            // Resetar conteúdo
+            modalTitle.textContent = 'Detalhes da Vaga';
+            modalBody.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Carregando informações...</p>
+                </div>
+            `;
+            
+            // Mostrar modal
             modal.show();
-
+            console.log('Modal exibido'); // Debug
+            
+            // Buscar dados da vaga
             fetch(`/api/vagas/${vagaId}/detalhes/`)
+                .then(response => {
+                    console.log('Resposta recebida:', response.status); // Debug
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Dados recebidos:', data); // Debug
+                    modalTitle.textContent = data.disciplina_nome;
+                    
+                    modalBody.innerHTML = `
+                        <div class="detail-section">
+                            <h6><i class="fas fa-info-circle"></i> Informações Gerais</h6>
+                            <p><strong>Disciplina:</strong> ${data.disciplina_nome} ${data.disciplina_codigo ? '(' + data.disciplina_codigo + ')' : ''}</p>
+                            <p><strong>Curso:</strong> ${data.curso_nome}</p>
+                            <p><strong>Tipo:</strong> 
+                                <span class="vaga-badge ${data.tipo_vaga === 'TEA' ? 'badge-tea' : 'badge-voluntaria'}">
+                                    ${data.tipo_vaga_display}
+                                </span>
+                            </p>
+                            ${data.valor_bolsa ? `<p><strong>Valor da Bolsa:</strong> R$ ${data.valor_bolsa}</p>` : ''}
+                            <p><strong>Número de Vagas:</strong> ${data.numero_vagas}</p>
+                            ${data.vagas_disponiveis !== undefined ? `<p><strong>Vagas Disponíveis:</strong> ${data.vagas_disponiveis}</p>` : ''}
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h6><i class="fas fa-align-left"></i> Descrição</h6>
+                            <p>${data.descricao}</p>
+                        </div>
+                        
+                        ${data.requisitos ? `
+                            <div class="detail-section">
+                                <h6><i class="fas fa-check-circle"></i> Requisitos</h6>
+                                <p>${data.requisitos}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${data.responsabilidades && data.responsabilidades !== 'Não especificadas' ? `
+                            <div class="detail-section">
+                                <h6><i class="fas fa-tasks"></i> Responsabilidades</h6>
+                                <p>${data.responsabilidades}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${data.coordenadores && data.coordenadores.length > 0 ? `
+                            <div class="detail-section">
+                                <h6><i class="fas fa-chalkboard-teacher"></i> Professor(es) Coordenador(es)</h6>
+                                <ul>
+                                    ${data.coordenadores.map(coord => `<li>${coord.nome}${coord.email ? ' - ' + coord.email : ''}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${data.professores && data.professores.length > 0 ? `
+                            <div class="detail-section">
+                                <h6><i class="fas fa-user-tie"></i> Professor(es)</h6>
+                                <ul>
+                                    ${data.professores.map(prof => `<li>${prof.nome}${prof.email ? ' - ' + prof.email : ''}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <a href="{% url 'register' %}?next=/vagas/${data.id}/candidatar/" class="btn btn-filter btn-lg">
+                                <i class="fas fa-user-plus me-2"></i> Cadastrar-se para Candidatar
+                            </a>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar detalhes:', error);
+                    modalTitle.textContent = 'Erro';
+                    modalBody.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Erro ao carregar detalhes da vaga.</strong><br>
+                            <small>${error.message}</small><br>
+                            <small class="text-muted">Por favor, tente novamente ou entre em contato com o suporte.</small>
+                        </div>
+                        <div class="d-grid gap-2 mt-3">
+                            <button class="btn btn-secondary" onclick="location.reload()">
+                                <i class="fas fa-redo me-2"></i> Recarregar Página
+                            </button>
+                        </div>
+                    `;
+                });
+        } catch (error) {
+            console.error('Erro crítico na função verDetalhes:', error);
+            alert('Erro ao abrir detalhes da vaga. Por favor, recarregue a página.');
+        }
+    }
+    
+    // Smooth scroll
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM carregado'); // Debug
+        
+        // Adicionar event listeners aos botões de detalhes (fallback para mobile)
+        document.querySelectorAll('.btn-ver-detalhes').forEach(button => {
+            // Remover qualquer listener existente
+            button.removeAttribute('onclick');
+            
+            // Adicionar novo listener
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const vagaCard = this.closest('.vaga-card');
+                const vagaId = vagaCard ? vagaCard.getAttribute('data-vaga-id') : null;
+                
+                console.log('Botão clicado, vagaId:', vagaId); // Debug
+                
+                if (vagaId) {
+                    verDetalhes(vagaId);
+                } else {
+                    console.error('VagaId não encontrado');
+                    alert('Erro ao abrir detalhes. Por favor, tente novamente.');
+                }
+            });
+            
+            // Adicionar suporte para touch (mobile)
+            button.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.click();
+            });
+        });
+        
+        console.log('Event listeners adicionados a', document.querySelectorAll('.btn-ver-detalhes').length, 'botões'); // Debug
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // ==================== MODAL COMPLETAR PERFIL ====================
+        {% if perfil_incompleto %}
+            // Abrir modal automaticamente se perfil incompleto
+            const modalCompletarPerfil = new bootstrap.Modal(document.getElementById('modalCompletarPerfil'));
+            modalCompletarPerfil.show();
+        {% endif %}
+        
+        // Handler do formulário de completar perfil
+        const formCompletarPerfil = document.getElementById('formCompletarPerfil');
+        if (formCompletarPerfil) {
+            formCompletarPerfil.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const alertErro = document.getElementById('alertErro');
+                const alertSucesso = document.getElementById('alertSucesso');
+                const mensagemErro = document.getElementById('mensagemErro');
+                const btnSubmit = this.querySelector('button[type="submit"]');
+                
+                // Ocultar alertas
+                alertErro.classList.add('d-none');
+                alertSucesso.classList.add('d-none');
+                
+                // Desabilitar botão e mostrar loading
+                btnSubmit.disabled = true;
+                const textoOriginal = btnSubmit.innerHTML;
+                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Salvando...';
+                
+                // Obter dados do formulário
+                const formData = new FormData(this);
+                
+                // Enviar via AJAX
+                fetch('{% url "atualizar_perfil_rapido" %}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    }
+                })
                 .then(response => response.json())
                 .then(data => {
-                    modalTitle.textContent = data.disciplina_nome;
-
-                    modalBody.innerHTML = `
-                    <div class="detail-section">
-                        <h6><i class="fas fa-info-circle"></i> Informações Gerais</h6>
-                        <p><strong>Disciplina:</strong> ${data.disciplina_nome} (${data.disciplina_codigo})</p>
-                        <p><strong>Curso:</strong> ${data.curso_nome}</p>
-                        <p><strong>Tipo:</strong> 
-                            <span class="vaga-badge ${data.tipo_vaga === 'TEA' ? 'badge-tea' : 'badge-voluntaria'}">
-                                ${data.tipo_vaga_display}
-                            </span>
-                        </p>
-                        ${data.valor_bolsa ? `<p><strong>Valor da Bolsa:</strong> R$ ${data.valor_bolsa}</p>` : ''}
-                        <p><strong>Número de Vagas:</strong> ${data.numero_vagas}</p>
-                    </div>
-                    
-                    <div class="detail-section">
-                        <h6><i class="fas fa-align-left"></i> Descrição</h6>
-                        <p>${data.descricao}</p>
-                    </div>
-                    
-                    ${data.requisitos ? `
-                        <div class="detail-section">
-                            <h6><i class="fas fa-check-circle"></i> Requisitos</h6>
-                            <p>${data.requisitos}</p>
-                        </div>
-                    ` : ''}
-                    
-                    ${data.coordenadores && data.coordenadores.length > 0 ? `
-                        <div class="detail-section">
-                            <h6><i class="fas fa-user-tie"></i> Coordenadores</h6>
-                            <ul>
-                                ${data.coordenadores.map(coord => `<li>${coord.nome} - ${coord.email}</li>`).join('')}
-                            </ul>
-                        </div>
-                    ` : ''}
-                    
-                    <div class="d-grid gap-2 mt-4">
-                        <a href="{% url 'register' %}?next=/vagas/${data.id}/candidatar/" class="btn btn-filter btn-lg">
-                            <i class="fas fa-user-plus me-2"></i> Cadastrar-se para Candidatar
-                        </a>
-                    </div>
-                `;
+                    if (data.success) {
+                        // Sucesso - mostrar mensagem e recarregar página
+                        alertSucesso.classList.remove('d-none');
+                        
+                        setTimeout(() => {
+                            // Recarregar para aplicar mudanças
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        // Erro - mostrar mensagem
+                        mensagemErro.textContent = data.message || 'Erro ao salvar perfil.';
+                        alertErro.classList.remove('d-none');
+                        
+                        // Reabilitar botão
+                        btnSubmit.disabled = false;
+                        btnSubmit.innerHTML = textoOriginal;
+                    }
                 })
                 .catch(error => {
                     console.error('Erro:', error);
-                    modalBody.innerHTML = `
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        Erro ao carregar detalhes da vaga. Tente novamente.
-                    </div>
-                `;
-                });
-        }
-
-        // Smooth scroll
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
+                    mensagemErro.textContent = 'Erro de conexão. Tente novamente.';
+                    alertErro.classList.remove('d-none');
+                    
+                    // Reabilitar botão
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = textoOriginal;
                 });
             });
-        });
+        }
+        
+        // Máscara de celular
+        const inputCelular = document.querySelector('input[name="celular"]');
+        if (inputCelular) {
+            inputCelular.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                
+                if (value.length > 11) {
+                    value = value.slice(0, 11);
+                }
+                
+                if (value.length >= 11) {
+                    value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+                } else if (value.length >= 7) {
+                    value = value.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+                } else if (value.length >= 3) {
+                    value = value.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+                } else if (value.length >= 1) {
+                    value = value.replace(/^(\d*)/, '($1');
+                }
+                
+                e.target.value = value;
+            });
+        }
+    });
     </script>
+    
+    <!-- ==================== FOOTER ==================== -->
+    <footer style="background: linear-gradient(135deg, #002555 0%, #003a7a 100%); color: #fafaf8; margin-top: 4rem; box-shadow: 0 -4px 20px rgba(0, 37, 85, 0.1);">
+        <div class="container">
+            <!-- Footer Main Content -->
+            <div class="row py-5 g-4">
+                <!-- Sobre a Plataforma CASA -->
+                <div class="col-lg-4 col-md-6">
+                    <h5 style="color: #F5AC00; font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-graduation-cap"></i>
+                        Plataforma CASA
+                    </h5>
+                    <p style="line-height: 1.8; opacity: 0.95; margin-bottom: 1rem;">
+                        Sistema de Gestão do Programa de Monitoria do Ibmec/RJ. 
+                        Conectando alunos, monitores e professores para uma experiência acadêmica excepcional.
+                    </p>
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <a href="#" style="color: #fafaf8; font-size: 1.5rem; transition: all 0.3s ease;" 
+                           onmouseover="this.style.color='#F5AC00'" onmouseout="this.style.color='#fafaf8'">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" style="color: #fafaf8; font-size: 1.5rem; transition: all 0.3s ease;" 
+                           onmouseover="this.style.color='#F5AC00'" onmouseout="this.style.color='#fafaf8'">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" style="color: #fafaf8; font-size: 1.5rem; transition: all 0.3s ease;" 
+                           onmouseover="this.style.color='#F5AC00'" onmouseout="this.style.color='#fafaf8'">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" style="color: #fafaf8; font-size: 1.5rem; transition: all 0.3s ease;" 
+                           onmouseover="this.style.color='#F5AC00'" onmouseout="this.style.color='#fafaf8'">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Links Rápidos -->
+                <div class="col-lg-2 col-md-6">
+                    <h5 style="color: #F5AC00; font-weight: 700; margin-bottom: 1.25rem;">
+                        Links Rápidos
+                    </h5>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 0.75rem;">
+                            <a href="{% url 'portal_vagas' %}" style="color: rgba(250, 250, 248, 0.9); text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem;"
+                               onmouseover="this.style.color='#F5AC00'; this.style.paddingLeft='0.5rem'"
+                               onmouseout="this.style.color='rgba(250, 250, 248, 0.9)'; this.style.paddingLeft='0'">
+                                <i class="fas fa-chevron-right" style="font-size: 0.75rem;"></i>
+                                Portal de Vagas
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 0.75rem;">
+                            <a href="#modalidades" style="color: rgba(250, 250, 248, 0.9); text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem;"
+                               onmouseover="this.style.color='#F5AC00'; this.style.paddingLeft='0.5rem'"
+                               onmouseout="this.style.color='rgba(250, 250, 248, 0.9)'; this.style.paddingLeft='0'">
+                                <i class="fas fa-chevron-right" style="font-size: 0.75rem;"></i>
+                                Modalidades
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 0.75rem;">
+                            <a href="{% url 'login' %}" style="color: rgba(250, 250, 248, 0.9); text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem;"
+                               onmouseover="this.style.color='#F5AC00'; this.style.paddingLeft='0.5rem'"
+                               onmouseout="this.style.color='rgba(250, 250, 248, 0.9)'; this.style.paddingLeft='0'">
+                                <i class="fas fa-chevron-right" style="font-size: 0.75rem;"></i>
+                                Entrar
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 0.75rem;">
+                            <a href="{% url 'register' %}" style="color: rgba(250, 250, 248, 0.9); text-decoration: none; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem;"
+                               onmouseover="this.style.color='#F5AC00'; this.style.paddingLeft='0.5rem'"
+                               onmouseout="this.style.color='rgba(250, 250, 248, 0.9)'; this.style.paddingLeft='0'">
+                                <i class="fas fa-chevron-right" style="font-size: 0.75rem;"></i>
+                                Cadastrar-se
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Informações CASA -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 style="color: #F5AC00; font-weight: 700; margin-bottom: 1.25rem;">
+                        CASA - Ibmec/RJ
+                    </h5>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 0.75rem; display: flex; align-items: start; gap: 0.75rem;">
+                            <i class="fas fa-map-marker-alt" style="color: #F5AC00; margin-top: 0.25rem; font-size: 0.9rem;"></i>
+                            <span style="line-height: 1.6; opacity: 0.95;">
+                                Av. Armando Lombardi, 940<br>
+                                Barra da Tijuca, Rio de Janeiro - RJ, 22640-000
+                            </span>
+                        </li>
+                        <li style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem;">
+                            <i class="fas fa-envelope" style="color: #F5AC00; font-size: 0.9rem;"></i>
+                            <a href="mailto:casa@ibmec.edu.br" style="color: rgba(250, 250, 248, 0.95); text-decoration: none; transition: all 0.3s ease;"
+                               onmouseover="this.style.color='#F5AC00'; this.style.textDecoration='underline'"
+                               onmouseout="this.style.color='rgba(250, 250, 248, 0.95)'; this.style.textDecoration='none'">
+                                casa@ibmec.edu.br
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem;">
+                            <i class="fas fa-phone" style="color: #F5AC00; font-size: 0.9rem;"></i>
+                            <a href="tel:+552140037700" style="color: rgba(250, 250, 248, 0.95); text-decoration: none; transition: all 0.3s ease;"
+                               onmouseover="this.style.color='#F5AC00'"
+                               onmouseout="this.style.color='rgba(250, 250, 248, 0.95)'">
+                                (21) 4003-7700
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Campus -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 style="color: #F5AC00; font-weight: 700; margin-bottom: 1.25rem;">
+                        Campus Atendidos
+                    </h5>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem;">
+                            <i class="fas fa-building" style="color: #F5AC00; font-size: 0.9rem;"></i>
+                            <span style="opacity: 0.95;">Ibmec Barra</span>
+                        </li>
+                        <li style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.75rem;">
+                            <i class="fas fa-building" style="color: #F5AC00; font-size: 0.9rem;"></i>
+                            <span style="opacity: 0.95;">Ibmec Botafogo</span>
+                        </li>
+                    </ul>
+                    <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(245, 172, 0, 0.1); border-radius: 8px; border-left: 3px solid #F5AC00;">
+                        <p style="margin: 0; font-size: 0.875rem; line-height: 1.6;">
+                            <i class="fas fa-info-circle" style="color: #F5AC00; margin-right: 0.5rem;"></i>
+                            <strong>Horário de Atendimento:</strong><br>
+                            Segunda a Sexta: 8h às 22h
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer Bottom -->
+            <div style="border-top: 1px solid rgba(250, 250, 248, 0.2); padding: 1.5rem 0;">
+                <div class="row align-items-center">
+                    <div class="col-12 text-center">
+                        <p style="margin: 0; opacity: 0.9; font-size: 0.9rem;">
+                            © 2025 <strong>Ibmec/RJ</strong>. Todos os direitos reservados.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Footer Responsive Styles -->
+    <style>
+        @media (max-width: 768px) {
+            footer .row.py-5 {
+                padding-top: 2.5rem !important;
+                padding-bottom: 2.5rem !important;
+            }
+            
+            footer h5 {
+                font-size: 1.1rem !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            footer p, footer li, footer a {
+                font-size: 0.9rem !important;
+            }
+            
+            footer .col-lg-4, 
+            footer .col-lg-2, 
+            footer .col-lg-3 {
+                margin-bottom: 2rem;
+            }
+            
+            footer .col-lg-4:last-child,
+            footer .col-lg-2:last-child,
+            footer .col-lg-3:last-child {
+                margin-bottom: 0;
+            }
+            
+            footer [style*="font-size: 1.5rem"] {
+                font-size: 1.3rem !important;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            footer {
+                margin-top: 2.5rem !important;
+            }
+            
+            footer h5 {
+                font-size: 1rem !important;
+            }
+            
+            footer p, footer li, footer a {
+                font-size: 0.85rem !important;
+            }
+            
+            footer .row.py-5 {
+                padding-top: 2rem !important;
+                padding-bottom: 2rem !important;
+            }
+            
+            footer [style*="padding: 1.5rem 0"] {
+                padding: 1rem 0 !important;
+            }
+        }
+    </style>
 </body>
-
 </html>

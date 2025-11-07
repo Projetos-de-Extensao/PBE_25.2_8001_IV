@@ -60,6 +60,7 @@ CORS_ALLOW_CREDENTIALS = True
 # Application definition
 
 INSTALLED_APPS = [
+    'django_extensions',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -76,6 +77,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # ⚠️ IMPORTANTE: Deve vir logo após SecurityMiddleware
+    'plataforma_Casa.middleware.MobileCompatibilityMiddleware',  # Middleware para compatibilidade mobile
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -83,6 +85,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'plataforma_Casa.middleware.MobileOptimizationMiddleware',  # Otimizações mobile
 ]
 
 ROOT_URLCONF = 'meuprojeto.urls'
@@ -416,3 +419,31 @@ CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
 
 # Verificador de token CSRF (importante para AJAX e POST)
 # CSRF_FAILURE_VIEW = 'plataforma_Casa.views.csrf_failure_view'  # View customizada (opcional)
+
+# ============================================================================
+# CONFIGURAÇÕES DE LOGGING PARA MOBILE
+# ============================================================================
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '{levelname} {asctime} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+    },
+    'loggers': {
+        'plataforma_Casa.middleware': {
+            'handlers': ['console'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': True,
+        },
+    },
+}

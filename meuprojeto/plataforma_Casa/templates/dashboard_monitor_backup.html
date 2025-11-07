@@ -1,0 +1,1279 @@
+<!--
+    ============================================================================
+    TEMPLATE: DASHBOARD MONITOR - PAINEL DO MONITOR
+    ============================================================================
+    
+    Descrição: Dashboard personalizado para alunos que são monitores (aprovados)
+    Mostra: Monitorias, alunos, horas, estatísticas de presença e desempenho
+    
+    Variáveis de context esperadas:
+    - minhas_monitorias: QuerySet de monitorias do monitor
+    - total_horas: int - horas registradas no período
+    - presenca_media: float - taxa de presença (0-100)
+    - alunos_monitorados: int - quantidade de alunos
+    
+    Segurança: Apenas usuários com is_monitor=True acessam
+    ============================================================================
+-->
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Monitor{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ========== CORES INSTITUCIONAIS ========== */
+    :root {
+        --primary-dark: #002555;
+        --primary-light: #1245FF;
+        --accent-gold: #F5AC00;
+        --success-green: #28a745;
+        --danger-red: #dc3545;
+        --warning-yellow: #ffc107;
+        --info-blue: #17a2b8;
+        --gray-light: #f5f5f5;
+        --gray-medium: #e9ecef;
+        --gray-dark: #6c757d;
+        --border-radius: 8px;
+        --transition: all 0.3s ease;
+        
+        /* Theme variables */
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --text-primary: #002555;
+        --text-secondary: #6c757d;
+        --card-bg: #ffffff;
+        --card-border: #e9edf5;
+    }
+    
+    [data-theme="dark"] {
+        --primary-dark: #4a90e2 !important;
+        --bg-primary: #121212 !important;
+        --bg-secondary: #1e1e1e !important;
+        --text-primary: #e0e0e0 !important;
+        --text-secondary: #b0b0b0 !important;
+        --card-bg: #2a2a2a !important;
+        --card-border: #3a3a3a !important;
+        --gray-light: #2a2a2a !important;
+        --gray-medium: #3a3a3a !important;
+        --accent-gold: #FFC107 !important;
+        --primary-light: #4a90e2 !important;
+    }
+    
+    html[data-theme="dark"],
+    body[data-theme="dark"] {
+        background-color: #121212 !important;
+        color: #e0e0e0 !important;
+    }
+    
+    html,
+    body {
+        background-color: var(--bg-secondary) !important;
+        color: var(--text-primary) !important;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    /* Force dark theme on main content */
+    [data-theme="dark"] .main-content {
+        background-color: #121212 !important;
+        color: #e0e0e0 !important;
+    }
+    
+    [data-theme="dark"] .dashboard-container {
+        background-color: #121212 !important;
+        color: #e0e0e0 !important;
+    }
+
+    /* ========== LAYOUT ========== */
+    .theme-toggle {
+        background: none;
+        border: 1px solid var(--border-color);
+        padding: 0.5rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1.25rem;
+        color: var(--text-primary);
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+    }
+    
+    .theme-toggle:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        transform: scale(1.1);
+    }
+    
+    html[data-theme="dark"] .theme-toggle {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    html[data-theme="dark"] .theme-toggle:hover {
+        background: var(--primary);
+        border-color: var(--primary);
+    }
+
+    /* ========== HEADER SECTION ========== */
+    .dashboard-header {
+        background: var(--card-bg);
+        border-radius: 0;
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 60px;
+        z-index: 100;
+        backdrop-filter: blur(10px);
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .header-title {
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .header-title h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0 0 0.25rem 0;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .header-title h1 i {
+        font-size: 1.5rem;
+        color: var(--primary);
+    }
+
+    .header-title p {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        padding: 0.625rem 1.25rem;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background: var(--card-bg);
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+    
+    .action-btn:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        transform: translateY(-1px);
+    }
+
+    .btn-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* ========== CONTAINER PRINCIPAL ========== */
+    .dashboard-container { 
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 0 2rem 2rem 2rem;
+    }
+
+    /* ========== KPI CARDS ========== */
+    .section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .metrics-grid,
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .kpi-card { 
+        background: var(--card-bg);
+        border-radius: 8px; 
+        padding: 1.5rem; 
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .kpi-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--primary);
+        transition: width 0.3s ease;
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .kpi-card:hover::before {
+        width: 6px;
+    }
+
+    .kpi-card.monitorias::before {
+        background: var(--primary-light);
+    }
+
+    .kpi-card.alunos::before {
+        background: var(--success-green);
+    }
+
+    .kpi-card.horas::before {
+        background: var(--accent-gold);
+    }
+
+    .kpi-card.pendentes::before {
+        background: var(--warning-yellow);
+    }
+
+    .kpi-card.presenca::before {
+        background: var(--info-blue);
+    }
+
+    .kpi-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+    }
+
+    .kpi-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+
+    .kpi-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        opacity: 0.15;
+        color: var(--text-primary);
+    }
+
+    .kpi-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+
+    .kpi-trend {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.8125rem;
+        margin-top: 0.5rem;
+    }
+
+    .kpi-trend.up {
+        color: var(--success-green);
+    }
+
+    .kpi-trend.down {
+        color: var(--danger-red);
+    }
+
+    .kpi-trend i {
+        font-size: 0.75rem;
+    }
+
+    /* ========== CONTENT CARDS ========== */
+    .content-card {
+        background: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 1.25rem;
+        box-shadow: none; /* flat */
+        border: 1px solid var(--card-border);
+        margin-bottom: 1.5rem;
+        transition: var(--transition);
+    }
+
+    .content-card:hover {
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--gray-light);
+        margin-bottom: 1rem;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .card-icon {
+        font-size: 1.3rem;
+        color: var(--accent-gold);
+    }
+
+    /* ========== TABLE STYLING ========== */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .table thead {
+        /* Cabeçalho de tabela mais clean */
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        border-bottom: 1px solid var(--card-border);
+    }
+
+    .table thead th {
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.8rem;
+    }
+
+    .table tbody td {
+        border: none;
+        padding: 0.9rem 1rem;
+        border-bottom: 1px solid var(--gray-medium);
+        color: var(--text-primary);
+    }
+
+    .table tbody tr:hover {
+        background: var(--bg-secondary);
+    }
+
+    .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* ========== BADGE STYLING ========== */
+    .badge {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-pendente {
+        background: rgba(255, 193, 7, 0.15);
+        color: #FFA000;
+    }
+
+    .badge-aprovado {
+        background: rgba(40, 167, 69, 0.15);
+        color: var(--success-green);
+    }
+
+    .badge-validado {
+        background: rgba(23, 162, 184, 0.15);
+        color: var(--info-blue);
+    }
+
+    .badge-ativo {
+        background: rgba(40, 167, 69, 0.15);
+        color: var(--success-green);
+    }
+
+    /* ========== EMPTY STATE ========== */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--gray-dark);
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        opacity: 0.3;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state-text {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* ========== GRID LAYOUT ========== */
+    .grid-2,
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        /* Reset de espaçamentos gerais */
+        body {
+            overflow-x: hidden !important;
+        }
+        
+        * {
+            max-width: 100vw;
+        }
+        
+        /* Remover margens desnecessárias */
+        .row {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+        
+        .col, [class*="col-"] {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+        
+        /* Dashboard Header - Compacto e com espaço para navbar */
+        .dashboard-header {
+            margin-top: 3.5rem; /* Espaço para evitar navbar no mobile */
+            padding: 0.75rem 0.875rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+        }
+        
+        .dashboard-header h1 {
+            font-size: 1.25rem !important;
+            line-height: 1.3;
+            margin: 0 !important;
+            padding-top: 0.5rem;
+        }
+        
+        .dashboard-header p {
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        
+        /* Container principal */
+        .dashboard-container {
+            padding: 0 0.875rem 1rem 0.875rem !important;
+        }
+        
+        .container-fluid {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        
+        /* KPI Grid - 2 colunas compactas */
+        .kpi-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.625rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Cards de conteúdo em coluna única */
+        .grid-2 {
+            grid-template-columns: 1fr;
+            gap: 0.875rem;
+        }
+
+        /* KPI Cards - Design compacto */
+        .kpi-card {
+            padding: 0.75rem;
+            border-radius: 8px;
+            flex-direction: column;
+            align-items: flex-start;
+            min-height: auto;
+        }
+        
+        .kpi-content {
+            width: 100%;
+        }
+        
+        .kpi-label {
+            font-size: 0.6875rem;
+            margin-bottom: 0.375rem;
+            line-height: 1.2;
+        }
+        
+        .kpi-value {
+            font-size: 1.375rem;
+            line-height: 1;
+        }
+
+        .kpi-icon {
+            font-size: 1.5rem;
+            opacity: 0.2;
+            margin-top: 0.375rem;
+            align-self: flex-end;
+            text-align: right;
+        }
+        
+        /* Content Cards */
+        .content-card {
+            padding: 0.875rem;
+            margin-bottom: 0.875rem;
+            border-radius: 8px;
+        }
+        
+        .card-header {
+            padding-bottom: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .card-title {
+            font-size: 0.9375rem;
+        }
+        
+        .card-icon {
+            font-size: 1.1rem;
+        }
+        
+        /* Tabelas responsivas */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 0 -0.875rem;
+            padding: 0 0.875rem;
+        }
+        
+        .table {
+            font-size: 0.8125rem;
+            min-width: 600px;
+        }
+        
+        .table thead th {
+            padding: 0.625rem 0.5rem;
+            font-size: 0.6875rem;
+        }
+        
+        .table tbody td {
+            padding: 0.625rem 0.5rem;
+            font-size: 0.8125rem;
+        }
+        
+        .table tbody td strong {
+            font-size: 0.8125rem;
+        }
+        
+        .table tbody td small {
+            font-size: 0.6875rem;
+        }
+        
+        /* Títulos de seção */
+        .section-title {
+            font-size: 0.9375rem;
+            margin: 1.25rem 0 0.75rem 0;
+            padding-left: 0.25rem;
+        }
+        
+        .section-icon {
+            font-size: 1rem;
+        }
+        
+        /* List items */
+        .list-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+            padding: 0.75rem;
+        }
+        
+        .list-item-title {
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .list-item-meta {
+            font-size: 0.75rem;
+        }
+        
+        /* Badges */
+        .badge {
+            font-size: 0.6875rem !important;
+            padding: 0.3125rem 0.625rem !important;
+        }
+        
+        /* Empty states */
+        .empty-state {
+            padding: 2rem 1rem;
+        }
+        
+        .empty-state-icon {
+            font-size: 2.5rem;
+        }
+        
+        .empty-state-text {
+            font-size: 0.875rem;
+        }
+        
+        /* Botões */
+        .btn {
+            font-size: 0.8125rem;
+            padding: 0.5rem 0.875rem;
+        }
+        
+        .btn-sm {
+            font-size: 0.75rem;
+            padding: 0.375rem 0.75rem;
+        }
+        
+        /* Header actions mobile */
+        .header-actions {
+            width: 100%;
+            justify-content: flex-end;
+        }
+        
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+        }
+        
+        /* Prevenir zoom em inputs no iOS */
+        input, select, textarea {
+            font-size: 16px !important;
+        }
+        
+        /* Melhorar legibilidade de textos pequenos */
+        small, .small {
+            font-size: 0.75rem !important;
+        }
+    }
+    
+    /* ===== RESPONSIVO: TABLET (769px - 1024px) ===== */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .kpi-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .dashboard-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .kpi-value {
+            font-size: 1.5rem;
+        }
+    }
+
+    /* ========== LIST STYLING ========== */
+    .list-item {
+        padding: 1rem;
+        border-bottom: 1px solid var(--gray-medium);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: var(--transition);
+    }
+
+    .list-item:hover {
+        background: var(--gray-light);
+    }
+
+    .list-item:last-child {
+        border-bottom: none;
+    }
+
+    .list-item-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.3rem;
+    }
+
+    .list-item-meta {
+        font-size: 0.85rem;
+        color: var(--gray-dark);
+    }
+
+    /* ========== SECTION TITLE ========== */
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 2rem 0 1.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .section-icon {
+        color: var(--accent-gold);
+        font-size: 1.4rem;
+    }
+
+    /* ========== PROGRESS BAR ========== */
+    .progress {
+        height: 8px;
+        background: var(--gray-medium);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent-gold), var(--primary-light));
+        border-radius: 10px;
+        transition: var(--transition);
+    }
+    
+    /* ========== BADGE DARK MODE FIXES ========== */
+    [data-theme="dark"] .badge-pendente {
+        background: rgba(255, 193, 7, 0.25) !important;
+        color: #FFC107 !important;
+    }
+    
+    [data-theme="dark"] .badge-aprovado {
+        background: rgba(40, 167, 69, 0.25) !important;
+        color: #4CAF50 !important;
+    }
+    
+    [data-theme="dark"] .badge-validado {
+        background: rgba(23, 162, 184, 0.25) !important;
+        color: #26C6DA !important;
+    }
+    
+    [data-theme="dark"] .badge-ativo {
+        background: rgba(40, 167, 69, 0.25) !important;
+        color: #4CAF50 !important;
+    }
+    
+    /* Small badges inline */
+    [data-theme="dark"] .badge[style*="rgba(245, 172, 0"] {
+        background: rgba(245, 172, 0, 0.25) !important;
+        color: #FFC107 !important;
+    }
+    
+    [data-theme="dark"] .badge[style*="rgba(220, 53, 69"] {
+        background: rgba(220, 53, 69, 0.25) !important;
+        color: #FF5252 !important;
+    }
+    
+    /* ========== COMPLETE DARK MODE OVERRIDES ========== */
+    [data-theme="dark"] .kpi-card {
+        background-color: #2a2a2a !important;
+        border-color: #3a3a3a !important;
+        color: #e0e0e0 !important;
+    }
+    
+    [data-theme="dark"] .kpi-label {
+        color: #b0b0b0 !important;
+    }
+    
+    [data-theme="dark"] .kpi-value {
+        color: #e0e0e0 !important;
+    }
+    
+    [data-theme="dark"] .kpi-icon {
+        color: #e0e0e0 !important;
+    }
+    
+    [data-theme="dark"] .content-card {
+        background-color: #2a2a2a !important;
+        border-color: #3a3a3a !important;
+        color: #e0e0e0 !important;
+    }
+    
+    [data-theme="dark"] .card-header {
+        border-bottom-color: #3a3a3a !important;
+    }
+    
+    [data-theme="dark"] .card-title {
+        color: #e0e0e0 !important;
+    }
+    
+    [data-theme="dark"] .card-icon {
+        color: #FFC107 !important;
+    }
+    
+    [data-theme="dark"] .table {
+        color: #e0e0e0 !important;
+    }
+    
+    [data-theme="dark"] .table thead {
+        background-color: #1e1e1e !important;
+        color: #e0e0e0 !important;
+    }
+    
+    [data-theme="dark"] .table tbody td {
+        color: #e0e0e0 !important;
+        border-bottom-color: #3a3a3a !important;
+    }
+    
+    [data-theme="dark"] .table tbody tr:hover {
+        background-color: #1e1e1e !important;
+    }
+    
+    [data-theme="dark"] .list-item {
+        border-bottom-color: #3a3a3a !important;
+    }
+    
+    [data-theme="dark"] .list-item:hover {
+        background-color: #2a2a2a !important;
+    }
+    
+    [data-theme="dark"] .list-item-title {
+        color: #e0e0e0 !important;
+    }
+    
+    [data-theme="dark"] .list-item-meta {
+        color: #b0b0b0 !important;
+    }
+    
+    [data-theme="dark"] .section-title {
+        color: #e0e0e0 !important;
+    }
+    
+    [data-theme="dark"] .section-icon {
+        color: #FFC107 !important;
+    }
+    
+    [data-theme="dark"] .empty-state {
+        color: #b0b0b0 !important;
+    }
+    
+    [data-theme="dark"] .empty-state-icon {
+        color: #b0b0b0 !important;
+    }
+    
+    [data-theme="dark"] .btn {
+        background-color: #2a2a2a !important;
+        border-color: #3a3a3a !important;
+        color: #e0e0e0 !important;
+    }
+    
+    [data-theme="dark"] .btn:hover {
+        background-color: #3a3a3a !important;
+        border-color: #4a4a4a !important;
+    }
+    
+    [data-theme="dark"] .text-muted {
+        color: #b0b0b0 !important;
+    }
+    
+    [data-theme="dark"] small {
+        color: #b0b0b0 !important;
+    }
+    
+    [data-theme="dark"] a {
+        color: #4a90e2 !important;
+    }
+    
+    [data-theme="dark"] a:hover {
+        color: #6ba3e6 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    
+    <!-- ========== HEADER ========== -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1>
+                    <i class="fas fa-chart-line"></i>
+                    Dashboard do Monitor
+                </h1>
+                <p>
+                    <i class="fas fa-info-circle"></i>
+                    Visão geral das suas monitorias, horas e alunos
+                </p>
+            </div>
+            <div class="header-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema" aria-label="Alternar tema">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== KPI CARDS ========== -->
+    <div class="kpi-grid">
+        <!-- KPI 1: Monitorias Ativas -->
+        <div class="kpi-card monitorias">
+            <div class="kpi-header">
+                <div class="kpi-label">Monitorias Ativas</div>
+                <div class="kpi-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+            </div>
+            <div class="kpi-value">{{ total_monitorias }}</div>
+        </div>
+
+        <!-- KPI 2: Total de Alunos -->
+        <div class="kpi-card alunos">
+            <div class="kpi-header">
+                <div class="kpi-label">Total de Alunos</div>
+                <div class="kpi-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+            <div class="kpi-value">{{ total_alunos }}</div>
+        </div>
+
+        <!-- KPI 3: Horas Este Mês -->
+        <div class="kpi-card horas">
+            <div class="kpi-header">
+                <div class="kpi-label">Horas Este Mês</div>
+                <div class="kpi-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+            </div>
+            <div class="kpi-value">{{ horas_este_mes }}h</div>
+        </div>
+
+        <!-- KPI 4: Horas Pendentes -->
+        <div class="kpi-card pendentes">
+            <div class="kpi-header">
+                <div class="kpi-label">Horas Pendentes</div>
+                <div class="kpi-icon">
+                    <i class="fas fa-hourglass"></i>
+                </div>
+            </div>
+            <div class="kpi-value">{{ horas_pendentes }}</div>
+        </div>
+
+        <!-- KPI 5: Total de Horas -->
+        <div class="kpi-card horas">
+            <div class="kpi-header">
+                <div class="kpi-label">Total de Horas</div>
+                <div class="kpi-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+            </div>
+            <div class="kpi-value">{{ total_horas }}h</div>
+        </div>
+
+        <!-- KPI 6: Taxa de Presença -->
+        <div class="kpi-card presenca">
+            <div class="kpi-header">
+                <div class="kpi-label">Taxa de Presença</div>
+                <div class="kpi-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+            </div>
+            <div class="kpi-value">{{ taxa_presenca }}%</div>
+        </div>
+    </div>
+
+    <!-- ========== GRID CONTENT ========== -->
+    <div class="grid-2">
+            
+            <!-- ========== ÚLTIMOS REGISTROS DE HORAS ========== -->
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-history card-icon"></i>
+                        Últimos Registros de Horas
+                    </div>
+                    <a href="{% url 'meus_registros_horas' %}" class="btn btn-sm" style="border:1px solid #e0e6ef;color:#0b2f5c;">
+                        Ver Todos
+                    </a>
+                </div>
+
+                {% if ultimos_registros %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Monitoria</th>
+                                <th>Data</th>
+                                <th>Horas</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for registro in ultimos_registros %}
+                            <tr>
+                                <td>
+                                    <strong>{{ registro.turma.nome }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ registro.turma.vaga.disciplina|default:registro.turma.vaga.nome }}</small>
+                                </td>
+                                <td>{{ registro.data_registro|date:"d/m/Y" }}</td>
+                                <td>{{ registro.duracao_horas }}h</td>
+                                <td>
+                                    {% if registro.validado %}
+                                    <span class="badge badge-validado">
+                                        <i class="fas fa-check"></i> Validado
+                                    </span>
+                                    {% else %}
+                                    <span class="badge badge-pendente">
+                                        <i class="fas fa-clock"></i> Pendente
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <p class="empty-state-text">Nenhum registro de horas encontrado</p>
+                    <p style="font-size: 0.85rem;">
+                        <a href="{% url 'registrar_horas' %}">Registrar horas agora</a>
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- ========== MONITORIAS MAIS ATIVAS ========== -->
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-fire card-icon"></i>
+                        Monitorias Mais Ativas
+                    </div>
+                </div>
+
+                {% if monitorias_ativas %}
+                {% for monitoria in monitorias_ativas %}
+                <div class="list-item">
+                    <div style="flex: 1;">
+                        <div class="list-item-title">{{ monitoria.nome }}</div>
+                        <div class="list-item-meta">
+                            <i class="fas fa-users"></i> {{ monitoria.participacaomonitoria_set.count }} alunos
+                            • {{ monitoria.dias_da_semana }} • {{ monitoria.horario }}
+                        </div>
+                    </div>
+                    <div>
+                        <span class="badge badge-ativo">
+                            <i class="fas fa-check-circle"></i> Ativa
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <p class="empty-state-text">Nenhuma monitoria ativa no momento</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== TODAS AS MINHAS MONITORIAS ========== -->
+    <h2 class="section-title">
+        <i class="fas fa-list section-icon"></i>
+        Todas as Minhas Monitorias
+    </h2>
+
+    <div class="content-card">
+            {% if minhas_monitorias %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Monitoria</th>
+                            <th>Disciplina</th>
+                            <th>Horário</th>
+                            <th>Sala</th>
+                            <th>Alunos</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for monitoria in minhas_monitorias %}
+                        <tr>
+                            <td>
+                                <strong>{{ monitoria.nome }}</strong>
+                            </td>
+                            <td>{{ monitoria.vaga.disciplina|default:monitoria.vaga.nome }}</td>
+                            <td>
+                                <small>{{ monitoria.dias_da_semana }}<br>{{ monitoria.horario }}</small>
+                            </td>
+                            <td>{{ monitoria.sala.numero }}</td>
+                            <td>
+                                <span class="badge" style="background: rgba(245, 172, 0, 0.15); color: #F5AC00;">
+                                    {{ monitoria.participacaomonitoria_set.count }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if monitoria.ativo %}
+                                <span class="badge badge-ativo">
+                                    <i class="fas fa-circle"></i> Ativa
+                                </span>
+                                {% else %}
+                                <span class="badge" style="background: rgba(220, 53, 69, 0.15); color: #dc3545;">
+                                    <i class="fas fa-circle"></i> Inativa
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'registrar_horas' %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-plus"></i> Registrar Horas
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <p class="empty-state-text">Você ainda não tem nenhuma monitoria ativa</p>
+                <p style="font-size: 0.85rem;">
+                    Procure vagas no <a href="{% url 'portal_vagas' %}">Portal de Vagas</a>
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ========== THEME TOGGLE ==========
+    // Load theme IMMEDIATELY to prevent flash
+    (function() {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        console.log('Loading theme:', savedTheme);
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.body.setAttribute('data-theme', savedTheme);
+        
+        // Force background color immediately
+        if (savedTheme === 'dark') {
+            document.documentElement.style.backgroundColor = '#121212';
+            document.body.style.backgroundColor = '#121212';
+            document.documentElement.style.color = '#e0e0e0';
+            document.body.style.color = '#e0e0e0';
+        }
+    })();
+    
+    function toggleTheme() {
+        const html = document.documentElement;
+        const body = document.body;
+        const currentTheme = html.getAttribute('data-theme') || 'light';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        console.log('Toggling theme from', currentTheme, 'to', newTheme);
+        
+        html.setAttribute('data-theme', newTheme);
+        body.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        // Force background color change
+        if (newTheme === 'dark') {
+            html.style.backgroundColor = '#121212';
+            body.style.backgroundColor = '#121212';
+            html.style.color = '#e0e0e0';
+            body.style.color = '#e0e0e0';
+        } else {
+            html.style.backgroundColor = '#f8fafc';
+            body.style.backgroundColor = '#f8fafc';
+            html.style.color = '#002555';
+            body.style.color = '#002555';
+        }
+        
+        // Update icon
+        const icon = document.querySelector('.theme-toggle i');
+        if (icon) {
+            icon.className = newTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+        
+        console.log('Theme toggled successfully to', newTheme);
+    }
+    
+    // Set correct icon on load
+    window.addEventListener('DOMContentLoaded', function() {
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        console.log('DOM loaded, current theme:', currentTheme);
+        
+        const icon = document.querySelector('.theme-toggle i');
+        if (icon) {
+            icon.className = currentTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+            console.log('Icon set to:', icon.className);
+        }
+        
+        // Force theme application on DOM ready
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        document.body.setAttribute('data-theme', currentTheme);
+        
+        if (currentTheme === 'dark') {
+            document.documentElement.style.backgroundColor = '#121212';
+            document.body.style.backgroundColor = '#121212';
+            document.documentElement.style.color = '#e0e0e0';
+            document.body.style.color = '#e0e0e0';
+        }
+    });
+    
+    console.log('Dashboard do Monitor carregado com sucesso');
+</script>
+{% endblock %}

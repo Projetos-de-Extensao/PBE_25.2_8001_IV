@@ -1,0 +1,28 @@
+/* ============================================================================
+   FIX PARA BADGE DE STATUS - FORÇAR CLICK E HOVER
+   ============================================================================ */
+
+.candidato-status {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    z-index: 1000 !important;
+}
+
+.candidato-status:hover {
+    cursor: pointer !important;
+}
+
+.btn-abrir-modal {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    z-index: 1000 !important;
+}
+
+/* Garantir que o container não bloqueia */
+.candidato-header {
+    pointer-events: auto !important;
+}
+
+.candidato-info {
+    pointer-events: auto !important;
+}

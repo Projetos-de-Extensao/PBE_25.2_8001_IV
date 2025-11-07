@@ -291,11 +291,277 @@
         .card-detail-row { flex-direction: column; gap: 0.5rem; }
         .detail-value { text-align: left; }
     }
+
+    /* ========== MODAL DE DETALHES ========== */
+    body.modal-open {
+        overflow: hidden !important;
+    }
+    
+    body.modal-open .sidebar {
+        filter: blur(2px);
+        pointer-events: none;
+    }
+
+    .details-modal-overlay {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: rgba(0, 0, 0, 0.6) !important;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999 !important;
+        animation: fadeIn 0.2s ease;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    .details-modal-overlay.show {
+        display: flex !important;
+    }
+    
+    .details-modal {
+        background: white;
+        border-radius: 16px;
+        padding: 0;
+        width: 90%;
+        max-width: 600px;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        animation: slideUp 0.25s ease;
+        position: relative;
+        z-index: 1000000 !important;
+        pointer-events: auto !important;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    .details-modal-header {
+        background: linear-gradient(135deg, #002555, #003d7a);
+        color: white;
+        padding: 1.75rem;
+        border-radius: 16px 16px 0 0;
+        position: relative;
+    }
+    
+    .details-modal-header h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #f8f9fa !important;
+    }
+    
+    .details-modal-header p {
+        font-size: 0.9rem;
+        margin: 0;
+        opacity: 0.9;
+        color: #f8f9fa !important;
+    }
+    
+    .details-modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        font-size: 1.5rem;
+        color: white;
+        cursor: pointer !important;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        z-index: 1000001 !important;
+        pointer-events: auto !important;
+    }
+    
+    .details-modal-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: rotate(90deg);
+    }
+    
+    .details-modal-body {
+        padding: 1.75rem;
+    }
+    
+    .detail-section {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--color-gray-border);
+    }
+    
+    .detail-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    
+    .detail-section-title {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--color-primary-dark);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .detail-item-modal {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .detail-item-modal .detail-label {
+        color: var(--color-text-muted);
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex: 0 0 40%;
+    }
+    
+    .detail-item-modal .detail-value {
+        color: var(--color-primary-dark);
+        font-weight: 600;
+        text-align: right;
+        flex: 1;
+        word-break: break-word;
+    }
+    
+    .status-badge-modal {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: 2px solid;
+        display: inline-block;
+    }
+    
+    .observation-modal {
+        background: var(--color-gray-light);
+        border-left: 4px solid var(--color-accent);
+        padding: 1rem;
+        border-radius: 6px;
+        margin-top: 1rem;
+    }
+    
+    .observation-modal p {
+        margin: 0;
+        color: var(--color-primary-dark);
+        font-size: 0.875rem;
+        line-height: 1.6;
+    }
+    
+    .modal-action-buttons {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--color-gray-border);
+    }
+    
+    .btn-modal-action {
+        flex: 1;
+        padding: 0.875rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-modal-primary {
+        background: var(--color-primary-light);
+        color: white;
+    }
+    
+    .btn-modal-primary:hover {
+        background: var(--color-primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(18, 69, 255, 0.3);
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .details-modal {
+            width: 95%;
+            max-height: 90vh;
+        }
+        
+        .details-modal-header {
+            padding: 1.25rem;
+        }
+        
+        .details-modal-header h3 {
+            font-size: 1.125rem;
+        }
+        
+        .details-modal-body {
+            padding: 1.25rem;
+        }
+        
+        .detail-item-modal {
+            flex-direction: column;
+            gap: 0.25rem;
+            padding: 0.5rem 0;
+        }
+        
+        .detail-item-modal .detail-label {
+            flex: none;
+        }
+        
+        .detail-item-modal .detail-value {
+            text-align: left;
+        }
+        
+        .modal-action-buttons {
+            flex-direction: column;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
+<div class="container-fluid py-4" style="margin-top: 4rem;">
     <!-- Page Header -->
     <div class="page-header mb-5">
         <h1 class="mb-1" style="color: #002555; font-weight: 700;">
@@ -426,85 +692,21 @@
                            class="btn btn-action flex-fill">
                             <i class="fas fa-edit"></i> Processar
                         </a>
-                        <button class="btn btn-details flex-fill" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#detalhesModal{{ pagamento.id }}">
+                        <button class="btn btn-details flex-fill btn-detalhes" 
+                                data-pagamento-id="{{ pagamento.id }}"
+                                data-monitor-nome="{{ pagamento.monitor.nome }}"
+                                data-monitor-matricula="{{ pagamento.monitor.matricula }}"
+                                data-monitor-curso="{{ pagamento.monitor.curso.nome }}"
+                                data-turma="{{ pagamento.turma.vaga.disciplina|default:pagamento.turma.nome }}"
+                                data-mes-referencia="{{ pagamento.mes_referencia|date:'d/m/Y' }}"
+                                data-valor="{{ pagamento.valor_total }}"
+                                data-status="{{ pagamento.status }}"
+                                data-processado-por="{% if pagamento.processado_por %}{{ pagamento.processado_por.nome }}{% else %}Não processado{% endif %}"
+                                data-data-processamento="{% if pagamento.data_processamento %}{{ pagamento.data_processamento|date:'d/m/Y H:i' }}{% else %}—{% endif %}"
+                                data-observacao="{{ pagamento.observacao|default:'Nenhuma observação registrada' }}"
+                                data-criado-em="{{ pagamento.criado_em|date:'d/m/Y H:i' }}">
                             <i class="fas fa-eye"></i> Detalhes
                         </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal de Detalhes -->
-        <div class="modal fade" id="detalhesModal{{ pagamento.id }}" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <i class="fas fa-file-invoice-dollar" style="color: #1245FF;"></i> Detalhes do Pagamento
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Monitor</div>
-                                <div style="color: #002555; font-weight: 600;">{{ pagamento.monitor.nome }}</div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Matrícula</div>
-                                <div style="color: #002555; font-weight: 600;">{{ pagamento.monitor.matricula }}</div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Turma</div>
-                                <div style="color: #002555; font-weight: 600;">{{ pagamento.turma.vaga.disciplina|default:pagamento.turma.nome }} - {{ pagamento.turma.nome }}</div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Data Final do Semestre</div>
-                                <div style="color: #002555; font-weight: 600;">{{ pagamento.mes_referencia|date:"d \d\e F \d\e Y" }}</div>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Tipo de Pagamento</div>
-                                <div>
-                                    <span class="badge" style="background-color: #1245FF; padding: 0.5rem 0.75rem;">Valor Fixo por Semestre</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Valor Fixo</div>
-                                <div style="color: #28a745; font-weight: 700; font-size: 1.1rem;">R$ {{ pagamento.valor_total|floatformat:2 }}</div>
-                            </div>
-                            <div class="col-12 mb-3">
-                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Status</div>
-                                <span class="status-badge status-{{ pagamento.status|lower }}">
-                                    {{ pagamento.status }}
-                                </span>
-                            </div>
-                            {% if pagamento.observacao %}
-                            <div class="col-12 mb-3">
-                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Observações</div>
-                                <div style="color: #002555; padding: 0.75rem; background: #f8f9fa; border-radius: 4px; border-left: 3px solid #F5AC00;">{{ pagamento.observacao }}</div>
-                            </div>
-                            {% endif %}
-                            {% if pagamento.processado_por %}
-                            <div class="col-md-6 mb-3">
-                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Processado por</div>
-                                <div style="color: #002555; font-weight: 600;">{{ pagamento.processado_por.nome }}</div>
-                            </div>
-                            {% endif %}
-                            {% if pagamento.data_processamento %}
-                            <div class="col-md-6 mb-3">
-                                <div style="color: #6c757d; font-size: 0.875rem; font-weight: 500; text-transform: uppercase; margin-bottom: 0.5rem;">Data de Processamento</div>
-                                <div style="color: #002555; font-weight: 600;">{{ pagamento.data_processamento|date:"d/m/Y H:i:s" }}</div>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="modal-footer" style="border-top: 1px solid #e9ecef;">
-                        <button type="button" class="btn btn-clear" data-bs-dismiss="modal">Fechar</button>
-                        <a href="{% url 'processar_pagamento' pagamento.id %}" class="btn btn-action">
-                            <i class="fas fa-edit"></i> Processar Pagamento
-                        </a>
                     </div>
                 </div>
             </div>
@@ -525,12 +727,158 @@
     </div>
     {% endif %}
 </div>
+
+<!-- Modal de Detalhes do Pagamento -->
+<div class="details-modal-overlay" id="detailsModal">
+    <div class="details-modal">
+        <div class="details-modal-header">
+            <button class="details-modal-close" id="closeDetailsModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3>
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span id="modalTitle">Detalhes do Pagamento</span>
+            </h3>
+            <p id="modalSubtitle">Informações completas do pagamento</p>
+        </div>
+        
+        <div class="details-modal-body">
+            <!-- Seção: Informações do Monitor -->
+            <div class="detail-section">
+                <div class="detail-section-title">
+                    <i class="fas fa-user-graduate"></i>
+                    Informações do Monitor
+                </div>
+                <div class="detail-item-modal">
+                    <span class="detail-label">
+                        <i class="fas fa-user"></i> Nome
+                    </span>
+                    <span class="detail-value" id="detailMonitorNome">—</span>
+                </div>
+                <div class="detail-item-modal">
+                    <span class="detail-label">
+                        <i class="fas fa-id-card"></i> Matrícula
+                    </span>
+                    <span class="detail-value" id="detailMonitorMatricula">—</span>
+                </div>
+                <div class="detail-item-modal">
+                    <span class="detail-label">
+                        <i class="fas fa-graduation-cap"></i> Curso
+                    </span>
+                    <span class="detail-value" id="detailMonitorCurso">—</span>
+                </div>
+            </div>
+            
+            <!-- Seção: Informações do Pagamento -->
+            <div class="detail-section">
+                <div class="detail-section-title">
+                    <i class="fas fa-money-check-alt"></i>
+                    Informações do Pagamento
+                </div>
+                <div class="detail-item-modal">
+                    <span class="detail-label">
+                        <i class="fas fa-chalkboard-teacher"></i> Turma
+                    </span>
+                    <span class="detail-value" id="detailTurma">—</span>
+                </div>
+                <div class="detail-item-modal">
+                    <span class="detail-label">
+                        <i class="fas fa-calendar-alt"></i> Data Final do Semestre
+                    </span>
+                    <span class="detail-value" id="detailMesReferencia">—</span>
+                </div>
+                <div class="detail-item-modal">
+                    <span class="detail-label">
+                        <i class="fas fa-info-circle"></i> Tipo de Pagamento
+                    </span>
+                    <span class="detail-value">Valor Fixo de Semestre</span>
+                </div>
+                <div class="detail-item-modal">
+                    <span class="detail-label">
+                        <i class="fas fa-dollar-sign"></i> <strong>Valor Total</strong>
+                    </span>
+                    <span class="detail-value" style="font-size: 1.25rem; color: #28a745;" id="detailValor">—</span>
+                </div>
+                <div class="detail-item-modal">
+                    <span class="detail-label">
+                        <i class="fas fa-toggle-on"></i> Status
+                    </span>
+                    <span id="detailStatusContainer">—</span>
+                </div>
+            </div>
+            
+            <!-- Seção: Informações de Processamento -->
+            <div class="detail-section">
+                <div class="detail-section-title">
+                    <i class="fas fa-clipboard-check"></i>
+                    Informações de Processamento
+                </div>
+                <div class="detail-item-modal">
+                    <span class="detail-label">
+                        <i class="fas fa-user-tie"></i> Processado por
+                    </span>
+                    <span class="detail-value" id="detailProcessadoPor">—</span>
+                </div>
+                <div class="detail-item-modal">
+                    <span class="detail-label">
+                        <i class="fas fa-clock"></i> Data de Processamento
+                    </span>
+                    <span class="detail-value" id="detailDataProcessamento">—</span>
+                </div>
+                <div class="detail-item-modal">
+                    <span class="detail-label">
+                        <i class="fas fa-calendar-plus"></i> Criado em
+                    </span>
+                    <span class="detail-value" id="detailCriadoEm">—</span>
+                </div>
+            </div>
+            
+            <!-- Seção: Observações -->
+            <div class="detail-section" id="observationSection">
+                <div class="detail-section-title">
+                    <i class="fas fa-comment-alt"></i>
+                    Observações
+                </div>
+                <div class="observation-modal">
+                    <p id="detailObservacao">—</p>
+                </div>
+            </div>
+            
+            <!-- Botões de Ação -->
+            <div class="modal-action-buttons">
+                <a href="#" id="btnProcessarPagamento" class="btn-modal-action btn-modal-primary">
+                    <i class="fas fa-edit"></i> Processar Pagamento
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Animação ao carregar os cards
+    let pagamentoAtualId = null;
+
+    // Inicializa os event listeners
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('🔄 Inicializando modal de detalhes...');
+        
+        const modal = document.getElementById('detailsModal');
+        
+        if (!modal) {
+            console.error('❌ ERRO: Modal #detailsModal não encontrado no DOM!');
+            return;
+        }
+        
+        console.log('✅ Modal encontrado:', modal);
+        
+        // Move modal para o body (fora da estrutura da sidebar)
+        if (modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+            console.log('📦 Modal movido para document.body');
+        }
+        
+        // Animação ao carregar os cards
         const cards = document.querySelectorAll('.payment-card');
         cards.forEach((card, index) => {
             card.style.opacity = '0';
@@ -541,6 +889,121 @@
                 card.style.transform = 'translateY(0)';
             }, index * 50);
         });
+        
+        // Event listeners para os botões de detalhes
+        const botoesDetalhes = document.querySelectorAll('.btn-detalhes');
+        console.log(`📋 Encontrados ${botoesDetalhes.length} botões de detalhes`);
+        
+        botoesDetalhes.forEach((botao, index) => {
+            botao.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                pagamentoAtualId = this.getAttribute('data-pagamento-id');
+                console.log(`🖱️ Botão ${index + 1} clicado - Pagamento ID: ${pagamentoAtualId}`);
+                
+                // Coleta todos os dados do pagamento
+                const dados = {
+                    id: pagamentoAtualId,
+                    monitorNome: this.getAttribute('data-monitor-nome'),
+                    monitorMatricula: this.getAttribute('data-monitor-matricula'),
+                    monitorCurso: this.getAttribute('data-monitor-curso'),
+                    turma: this.getAttribute('data-turma'),
+                    mesReferencia: this.getAttribute('data-mes-referencia'),
+                    valor: this.getAttribute('data-valor'),
+                    status: this.getAttribute('data-status'),
+                    processadoPor: this.getAttribute('data-processado-por'),
+                    dataProcessamento: this.getAttribute('data-data-processamento'),
+                    observacao: this.getAttribute('data-observacao'),
+                    criadoEm: this.getAttribute('data-criado-em')
+                };
+                
+                abrirModal(dados);
+            });
+        });
+        
+        // Botão fechar
+        const closeBtn = document.getElementById('closeDetailsModal');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('❌ Botão fechar clicado');
+                fecharModal();
+            });
+        }
+        
+        // Fechar ao clicar no overlay
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                console.log('🖱️ Clicou no overlay');
+                fecharModal();
+            }
+        });
+        
+        // Fechar com ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('show')) {
+                console.log('⌨️ ESC pressionado');
+                fecharModal();
+            }
+        });
+        
+        console.log('✅ Todos os event listeners configurados com sucesso!');
     });
+
+    function abrirModal(dados) {
+        console.log('🚀 Abrindo modal com dados:', dados);
+        
+        const modal = document.getElementById('detailsModal');
+        
+        if (!modal) {
+            console.error('❌ Modal não encontrado!');
+            return;
+        }
+        
+        // Preenche os dados no modal
+        document.getElementById('modalTitle').textContent = `Pagamento - ${dados.monitorNome}`;
+        document.getElementById('modalSubtitle').textContent = `Matrícula: ${dados.monitorMatricula}`;
+        
+        document.getElementById('detailMonitorNome').textContent = dados.monitorNome;
+        document.getElementById('detailMonitorMatricula').textContent = dados.monitorMatricula;
+        document.getElementById('detailMonitorCurso').textContent = dados.monitorCurso;
+        document.getElementById('detailTurma').textContent = dados.turma;
+        document.getElementById('detailMesReferencia').textContent = dados.mesReferencia;
+        document.getElementById('detailValor').textContent = `R$ ${parseFloat(dados.valor).toFixed(2)}`;
+        document.getElementById('detailProcessadoPor').textContent = dados.processadoPor;
+        document.getElementById('detailDataProcessamento').textContent = dados.dataProcessamento;
+        document.getElementById('detailObservacao').textContent = dados.observacao;
+        document.getElementById('detailCriadoEm').textContent = dados.criadoEm;
+        
+        // Define o status com o badge apropriado
+        const statusContainer = document.getElementById('detailStatusContainer');
+        const statusClass = dados.status.toLowerCase();
+        statusContainer.innerHTML = `<span class="status-badge-modal status-${statusClass}">${dados.status}</span>`;
+        
+        // Atualiza o link do botão processar
+        const btnProcessar = document.getElementById('btnProcessarPagamento');
+        btnProcessar.href = `/gestao/pagamentos/${dados.id}/processar/`;
+        
+        // Mostra o modal
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        document.body.style.overflow = 'hidden';
+        modal.style.zIndex = '999999';
+        
+        console.log('✅ Modal aberto com sucesso');
+    }
+
+    function fecharModal() {
+        const modal = document.getElementById('detailsModal');
+        modal.classList.remove('show');
+        pagamentoAtualId = null;
+        
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        
+        console.log('✅ Modal fechado');
+    }
 </script>
 {% endblock %}

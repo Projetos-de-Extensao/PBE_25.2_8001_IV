@@ -1,0 +1,375 @@
+{% extends 'base.html' %}
+
+{% block title %}Disciplinas - Professor{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #002555 0%, #1245FF 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #F5AC00;
+    }
+    
+    .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .btn-criar {
+        background: #F5AC00;
+        color: #002555;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-left: auto;
+    }
+    
+    .btn-criar:hover {
+        background: #ffd666;
+        color: #002555;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+    
+    .filtros-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 37, 85, 0.1);
+        border-left: 4px solid #1245FF;
+    }
+    
+    .disciplina-card {
+        background: white;
+        border-radius: 12px;
+        border: 2px solid #e9ecef;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .disciplina-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #1245FF 0%, #F5AC00 100%);
+    }
+    
+    .disciplina-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(18, 69, 255, 0.15);
+        border-color: #1245FF;
+    }
+    
+    .disciplina-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .disciplina-codigo {
+        background: linear-gradient(135deg, #1245FF 0%, #002555 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.875rem;
+    }
+    
+    .disciplina-nome {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #002555;
+        margin: 0.5rem 0;
+    }
+    
+    .disciplina-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #495057;
+    }
+    
+    .info-icon {
+        color: #1245FF;
+        width: 16px;
+    }
+    
+    .disciplina-ementa {
+        background: linear-gradient(135deg, rgba(18, 69, 255, 0.05) 0%, rgba(0, 37, 85, 0.05) 100%);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+        color: #495057;
+    }
+    
+    .disciplina-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-detalhes {
+        background: #1245FF;
+        color: white;
+    }
+    
+    .btn-detalhes:hover {
+        background: #002555;
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+    
+    .btn-editar {
+        background: #F5AC00;
+        color: #002555;
+    }
+    
+    .btn-editar:hover {
+        background: #ffd666;
+        color: #002555;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+    
+    .criado-por {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .empty-state {
+        background: linear-gradient(135deg, rgba(18, 69, 255, 0.05) 0%, rgba(0, 37, 85, 0.05) 100%);
+        border: 2px dashed #1245FF;
+        border-radius: 16px;
+        padding: 4rem 2rem;
+        text-align: center;
+        margin-top: 2rem;
+    }
+    
+    .empty-state-icon {
+        font-size: 4rem;
+        color: #1245FF;
+        margin-bottom: 1.5rem;
+    }
+    
+    .empty-state-title {
+        color: #002555;
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1rem;
+        }
+        
+        .page-header h1 {
+            font-size: 1.25rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        
+        .disciplina-header {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .disciplina-info {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+        
+        .disciplina-actions {
+            flex-direction: column;
+        }
+        
+        .btn-action {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="margin-top: 4rem;">
+    <!-- Header -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-book"></i> Disciplinas
+            <a href="{% url 'criar_disciplina' %}" class="btn-criar">
+                <i class="fas fa-plus"></i> Nova Disciplina
+            </a>
+        </h1>
+        <p style="margin: 0; opacity: 0.9;">
+            Gerencie as disciplinas do sistema - {{ disciplinas|length }} disciplina{{ disciplinas|length|pluralize }} encontrada{{ disciplinas|length|pluralize }}
+        </p>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-card">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <label for="curso" class="form-label">Curso:</label>
+                <select name="curso" id="curso" class="form-select">
+                    <option value="">Todos os cursos</option>
+                    {% for curso in cursos %}
+                        <option value="{{ curso.id }}" {% if filtros.curso == curso.id|stringformat:"s" %}selected{% endif %}>
+                            {{ curso.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="periodo" class="form-label">Período:</label>
+                <select name="periodo" id="periodo" class="form-select">
+                    <option value="">Todos os períodos</option>
+                    {% for periodo in periodos %}
+                        <option value="{{ periodo }}" {% if filtros.periodo == periodo|stringformat:"s" %}selected{% endif %}>
+                            {{ periodo }}º Período
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="busca" class="form-label">Buscar:</label>
+                <input type="text" name="busca" id="busca" class="form-control" 
+                       placeholder="Nome, código ou ementa..." value="{{ filtros.busca }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    <a href="{% url 'listar_disciplinas' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de Disciplinas -->
+    {% if disciplinas %}
+        {% for disciplina in disciplinas %}
+        <div class="disciplina-card">
+            <div class="disciplina-header">
+                <div>
+                    <div class="disciplina-codigo">{{ disciplina.codigo }}</div>
+                    <h3 class="disciplina-nome">{{ disciplina.nome }}</h3>
+                </div>
+            </div>
+            
+            <div class="disciplina-info">
+                <div class="info-item">
+                    <i class="fas fa-graduation-cap info-icon"></i>
+                    <span><strong>Curso:</strong> {{ disciplina.curso.nome }}</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-clock info-icon"></i>
+                    <span><strong>Carga Horária:</strong> {{ disciplina.carga_horaria }}h</span>
+                </div>
+                {% if disciplina.periodo_sugerido %}
+                <div class="info-item">
+                    <i class="fas fa-layer-group info-icon"></i>
+                    <span><strong>Período:</strong> {{ disciplina.periodo_sugerido }}º</span>
+                </div>
+                {% endif %}
+                <div class="info-item">
+                    <i class="fas fa-calendar info-icon"></i>
+                    <span><strong>Criada em:</strong> {{ disciplina.criado_em|date:"d/m/Y" }}</span>
+                </div>
+            </div>
+            
+            {% if disciplina.ementa %}
+            <div class="disciplina-ementa">
+                <strong>Ementa:</strong> {{ disciplina.ementa|truncatewords:30 }}
+            </div>
+            {% endif %}
+            
+            <div class="disciplina-actions">
+                <a href="{% url 'detalhes_disciplina' disciplina.id %}" class="btn-action btn-detalhes">
+                    <i class="fas fa-eye"></i> Ver Detalhes
+                </a>
+                {% if disciplina.criado_por.email == request.user.email or request.user.is_staff %}
+                <a href="{% url 'editar_disciplina' disciplina.id %}" class="btn-action btn-editar">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+                {% endif %}
+            </div>
+            
+            {% if disciplina.criado_por %}
+            <div class="criado-por">
+                <i class="fas fa-user"></i>
+                Criada por: {{ disciplina.criado_por.nome }}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <div class="empty-state-title">Nenhuma disciplina encontrada</div>
+            <p style="color: #6c757d; margin-bottom: 2rem;">
+                {% if filtros.busca or filtros.curso or filtros.periodo %}
+                    Tente alterar os filtros ou criar uma nova disciplina.
+                {% else %}
+                    Comece criando sua primeira disciplina no sistema.
+                {% endif %}
+            </p>
+            <a href="{% url 'criar_disciplina' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Criar Nova Disciplina
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

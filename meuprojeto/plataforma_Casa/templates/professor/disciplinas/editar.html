@@ -1,0 +1,323 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - Professor{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #002555 0%, #1245FF 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #F5AC00;
+    }
+    
+    .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 37, 85, 0.1);
+        border-left: 4px solid #F5AC00;
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+    }
+    
+    .form-section-title {
+        color: #002555;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #F5AC00;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #002555;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #1245FF;
+        box-shadow: 0 0 0 0.2rem rgba(18, 69, 255, 0.25);
+    }
+    
+    .form-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .required::after {
+        content: ' *';
+        color: #dc3545;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #F5AC00 0%, #ffd666 100%);
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #002555;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #ffd666 0%, #F5AC00 100%);
+        color: #002555;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(245, 172, 0, 0.3);
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        color: white;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+        background: #5a6268;
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+    
+    .info-banner {
+        background: linear-gradient(135deg, rgba(245, 172, 0, 0.1) 0%, rgba(255, 214, 102, 0.1) 100%);
+        border: 1px solid #F5AC00;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .info-banner-icon {
+        color: #F5AC00;
+        font-size: 1.5rem;
+    }
+    
+    .info-banner-text {
+        color: #002555;
+        font-weight: 600;
+    }
+    
+    .pre-requisitos-help {
+        background: linear-gradient(135deg, rgba(18, 69, 255, 0.05) 0%, rgba(245, 172, 0, 0.05) 100%);
+        border: 1px solid #1245FF;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 0.5rem;
+    }
+    
+    .pre-requisitos-help strong {
+        color: #002555;
+    }
+    
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1rem;
+        }
+        
+        .page-header h1 {
+            font-size: 1.25rem;
+        }
+        
+        .form-card {
+            padding: 1rem;
+        }
+        
+        .btn-actions {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .info-banner {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid" style="margin-top: 4rem;">
+    <!-- Header -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-edit"></i> {{ title }}
+        </h1>
+        <p style="margin: 0; opacity: 0.9;">
+            Editando: {{ disciplina.codigo }} - {{ disciplina.nome }}
+        </p>
+    </div>
+
+    <!-- Info Banner -->
+    <div class="info-banner">
+        <div class="info-banner-icon">
+            <i class="fas fa-info-circle"></i>
+        </div>
+        <div class="info-banner-text">
+            Você está editando uma disciplina existente. As alterações serão salvas imediatamente após confirmar.
+        </div>
+    </div>
+
+    <!-- Formulário -->
+    <div class="form-card">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+            
+            <!-- Informações Básicas -->
+            <div class="form-section">
+                <h3 class="form-section-title">
+                    <i class="fas fa-info-circle"></i> Informações Básicas
+                </h3>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="{{ form.codigo.id_for_label }}" class="form-label required">
+                                {{ form.codigo.label }}
+                            </label>
+                            {{ form.codigo }}
+                            {% if form.codigo.help_text %}
+                                <div class="form-text">{{ form.codigo.help_text }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="{{ form.nome.id_for_label }}" class="form-label required">
+                                {{ form.nome.label }}
+                            </label>
+                            {{ form.nome }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.curso.id_for_label }}" class="form-label required">
+                                {{ form.curso.label }}
+                            </label>
+                            {{ form.curso }}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="{{ form.carga_horaria.id_for_label }}" class="form-label required">
+                                {{ form.carga_horaria.label }}
+                            </label>
+                            {{ form.carga_horaria }}
+                            {% if form.carga_horaria.help_text %}
+                                <div class="form-text">{{ form.carga_horaria.help_text }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="{{ form.periodo_sugerido.id_for_label }}" class="form-label">
+                                {{ form.periodo_sugerido.label }}
+                            </label>
+                            {{ form.periodo_sugerido }}
+                            {% if form.periodo_sugerido.help_text %}
+                                <div class="form-text">{{ form.periodo_sugerido.help_text }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ementa -->
+            <div class="form-section">
+                <h3 class="form-section-title">
+                    <i class="fas fa-file-alt"></i> Conteúdo
+                </h3>
+                
+                <div class="form-group">
+                    <label for="{{ form.ementa.id_for_label }}" class="form-label">
+                        {{ form.ementa.label }}
+                    </label>
+                    {{ form.ementa }}
+                </div>
+            </div>
+            
+            <!-- Pré-requisitos -->
+            <div class="form-section">
+                <h3 class="form-section-title">
+                    <i class="fas fa-link"></i> Pré-requisitos
+                </h3>
+                
+                <div class="form-group">
+                    <label for="{{ form.pre_requisitos.id_for_label }}" class="form-label">
+                        {{ form.pre_requisitos.label }}
+                    </label>
+                    {{ form.pre_requisitos }}
+                    {% if form.pre_requisitos.help_text %}
+                        <div class="form-text">{{ form.pre_requisitos.help_text }}</div>
+                    {% endif %}
+                    
+                    <div class="pre-requisitos-help">
+                        <strong>Dica:</strong> Mantenha pressionado Ctrl (ou Cmd no Mac) e clique nas disciplinas para selecionar múltiplos pré-requisitos. Deixe vazio se a disciplina não tiver pré-requisitos.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botões -->
+            <div class="d-flex gap-3 justify-content-end btn-actions">
+                <a href="{% url 'listar_disciplinas' %}" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvar Alterações
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

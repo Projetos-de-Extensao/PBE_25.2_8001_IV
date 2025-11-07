@@ -158,6 +158,12 @@ urlpatterns = [
     # URL: http://localhost:8000/candidatos/1/avaliar/
     path('candidatos/<int:inscricao_id>/avaliar/', views.avaliar_candidato, name='avaliar_candidato'),
     
+    # --- Atualizar Status da Inscrição (AJAX) ---
+    # Atualizar status da inscrição via mini modal
+    # Método HTTP: POST (JSON)
+    # URL: http://localhost:8000/inscricoes/1/atualizar-status/
+    path('inscricoes/<int:inscricao_id>/atualizar-status/', views.atualizar_status_inscricao, name='atualizar_status_inscricao'),
+    
     # --- Mudar Status do Candidato (AJAX) ---
     # Mudar status rapidamente com um clique
     # Método HTTP: POST
@@ -392,6 +398,10 @@ urlpatterns = [
     # Marcar presença de um aluno em uma turma
     path('monitorias/<int:turma_id>/alunos/<int:aluno_id>/presenca/', views.marcar_presenca_aluno, name='marcar_presenca_aluno'),
     
+    # --- Estatísticas de Presença (AJAX) ---
+    # Buscar estatísticas de presença de um aluno
+    path('monitorias/<int:turma_id>/alunos/<int:aluno_id>/estatisticas/', views.estatisticas_presenca_aluno, name='estatisticas_presenca_aluno'),
+    
     # --- Meus Alunos (MONITOR) ---
     # Listar alunos que estão participando das monitorias do monitor
     path('monitorias/meus-alunos/', views.meus_alunos_monitoria, name='meus_alunos_monitoria'),
@@ -462,6 +472,26 @@ urlpatterns = [
     
     # --- Relatório de Monitores Selecionados ---
     path('relatorios/monitores-selecionados/', views.relatorio_monitores_selecionados, name='relatorio_monitores_selecionados'),
+    
+    # ============================================================================
+    # 16. GERENCIAMENTO DE DISCIPLINAS (PROFESSOR)
+    # ============================================================================
+    
+    # --- Listar Disciplinas ---
+    # Lista todas as disciplinas para professor
+    path('professor/disciplinas/', views.listar_disciplinas, name='listar_disciplinas'),
+    
+    # --- Criar Nova Disciplina ---
+    # Formulário para criar disciplina
+    path('professor/disciplinas/nova/', views.criar_disciplina, name='criar_disciplina'),
+    
+    # --- Editar Disciplina ---
+    # Formulário para editar disciplina (apenas quem criou)
+    path('professor/disciplinas/<int:disciplina_id>/editar/', views.editar_disciplina, name='editar_disciplina'),
+    
+    # --- Detalhes da Disciplina ---
+    # Visualizar detalhes completos da disciplina
+    path('professor/disciplinas/<int:disciplina_id>/', views.detalhes_disciplina, name='detalhes_disciplina'),
 ]
 
 # ================================================================================
