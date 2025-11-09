@@ -2913,11 +2913,6 @@ def dashboard_gestao(request):
         status_labels = [item['status'] for item in inscricoes_por_status]
         status_values = [item['total'] for item in inscricoes_por_status]
         
-        # Taxa de aprovação
-        total_inscricoes_avaliadas = Inscricao.objects.exclude(status='Pendente').count()
-        total_aprovados = Inscricao.objects.filter(status='Aprovado').count()
-        taxa_aprovacao = round((total_aprovados / total_inscricoes_avaliadas * 100), 1) if total_inscricoes_avaliadas > 0 else 0
-        
         # ========== MONITORES POR CURSO ==========
         
         monitores_por_curso = Inscricao.objects.filter(

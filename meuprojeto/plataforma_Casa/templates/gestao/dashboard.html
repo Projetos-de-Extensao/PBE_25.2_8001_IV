@@ -823,16 +823,6 @@
     <!-- SEÇÃO 1: RESUMO GERAL -->
     <h2 class="section-title"><i class="fas fa-chart-line"></i> Resumo Geral</h2>
     <div class="metrics-grid">
-        <div class="kpi-card verde">
-            <div class="kpi-header">
-                <div class="kpi-label">Taxa de Aprovação</div>
-                <div class="kpi-icon"><i class="fas fa-check-circle"></i></div>
-            </div>
-            <div class="kpi-number">{{ taxa_aprovacao }}%</div>
-            <div class="kpi-trend up">
-                <i class="fas fa-arrow-up"></i> 5% vs mês anterior
-            </div>
-        </div>
         
         <div class="kpi-card azul">
             <div class="kpi-header">
@@ -1311,7 +1301,6 @@ function exportarExcel() {
         ['Relatório Gerado:', new Date().toLocaleString('pt-BR')],
         [],
         ['INDICADORES PRINCIPAIS'],
-        ['Taxa de Aprovação', '{{ taxa_aprovacao }}%'],
         ['Total de Inscrições', {{ total_inscricoes }}],
         ['Total de Alunos', {{ total_alunos }}],
         ['Monitores Ativos', {{ total_monitores }}],
