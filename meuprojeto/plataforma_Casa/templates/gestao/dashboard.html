@@ -962,12 +962,6 @@
                 <canvas id="chartCursos"></canvas>
             </div>
         </div>
-        <div class="chart-card" style="grid-column: span 2;">
-            <h3 class="chart-title"><i class="fas fa-chart-line"></i> Evolução de Inscrições (últimos 6 meses)</h3>
-            <div class="chart-container-large">
-                <canvas id="chartTimelineInscricoes"></canvas>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -1285,81 +1279,6 @@ new Chart(document.getElementById('chartPagamentos').getContext('2d'), {
                 },
                 ticks: {
                     font: { size: isMobile ? 8 : 11 },
-                    maxRotation: isMobile ? 45 : 0,
-                    autoSkip: true,
-                    maxTicksLimit: isMobile ? 3 : 6
-                }
-            }
-        }
-    }
-});
-
-// ===== GRÁFICO 5: EVOLUÇÃO DE INSCRIÇÕES (Linha com área) =====
-new Chart(document.getElementById('chartTimelineInscricoes').getContext('2d'), {
-    type: 'line',
-    data: { 
-        labels: {{ timeline_labels|safe }}, 
-        datasets: [{ 
-            label: 'Inscrições por Mês',
-            data: {{ timeline_values|safe }}, 
-            borderColor: CORES.azul, 
-            backgroundColor: 'rgba(59, 130, 246, 0.1)', 
-            borderWidth: isMobile ? 2 : 3, 
-            tension: 0.4, 
-            fill: true, 
-            pointRadius: isMobile ? 3 : 6,
-            pointBackgroundColor: CORES.azul,
-            pointBorderColor: 'white',
-            pointBorderWidth: isMobile ? 1 : 2,
-            pointHoverRadius: isMobile ? 5 : 8,
-            pointHoverBackgroundColor: CORES.laranja,
-            pointHoverBorderWidth: isMobile ? 2 : 3
-        }] 
-    },
-    options: { 
-        responsive: true, 
-        maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        layout: {
-            padding: isMobile ? 5 : 10
-        },
-        plugins: {
-            legend: {
-                display: false
-            },
-            tooltip: { 
-                enabled: !isMobile,
-                backgroundColor: 'rgba(0,0,0,0.9)',
-                padding: 10,
-                cornerRadius: 6,
-                titleFont: { size: 11, weight: 'bold' },
-                bodyFont: { size: 10 },
-                callbacks: {
-                    label: function(ctx) { 
-                        return ' Inscrições: ' + ctx.parsed.y.toLocaleString('pt-BR'); 
-                    }
-                }
-            }
-        },
-        scales: { 
-            y: { 
-                beginAtZero: true,
-                grace: '10%',
-                grid: {
-                    color: 'rgba(0,0,0,0.05)'
-                },
-                ticks: { 
-                    callback: function(v){ return v.toLocaleString('pt-BR'); },
-                    font: { size: isMobile ? 9 : 12 },
-                    maxTicksLimit: isMobile ? 5 : 8
-                }
-            },
-            x: {
-                grid: {
-                    display: false
-                },
-                ticks: {
-                    font: { size: isMobile ? 8 : 12 },
                     maxRotation: isMobile ? 45 : 0,
                     autoSkip: true,
                     maxTicksLimit: isMobile ? 3 : 6

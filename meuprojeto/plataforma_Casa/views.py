@@ -2927,20 +2927,6 @@ def dashboard_gestao(request):
         curso_labels = [item['aluno__curso__nome'] for item in monitores_por_curso]
         curso_values = [item['total'] for item in monitores_por_curso]
         
-        # ========== EVOLUÇÃO DE INSCRIÇÕES (ÚLTIMOS 6 MESES) ==========
-        
-        seis_meses_atras = timezone.now() - timedelta(days=180)
-        inscricoes_timeline = Inscricao.objects.filter(
-            data_inscricao__gte=seis_meses_atras
-        ).annotate(
-            mes=TruncMonth('data_inscricao')
-        ).values('mes').annotate(
-            total=Count('id')
-        ).order_by('mes')
-        
-        timeline_labels = [item['mes'].strftime('%Y-%m') if item['mes'] else '' for item in inscricoes_timeline]
-        timeline_values = [item['total'] for item in inscricoes_timeline]
-        
         # ========== HORAS TRABALHADAS (ÚLTIMOS 6 MESES) ==========
         
         horas_timeline = RegistroHoras.objects.filter(
