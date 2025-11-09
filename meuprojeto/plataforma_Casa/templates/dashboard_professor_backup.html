@@ -98,12 +98,10 @@
         
         Permissão: is_professor_dashboard (setado na view por is_professor check)
         
-        KPIs Exibidos:
-        1. Minhas Vagas Ativas: Quantas vagas estão abertas
-        2. Total de Candidatos: Soma de candidatos em todas as vagas
-        3. Monitores Aprovados: Quantos foram selecionados/aprovados
-        4. Candidatos Pendentes: Inscrições aguardando análise
-        5. Horas Pendentes: Horas de trabalho não validadas
+        1. Total de Candidatos: Soma de candidatos em todas as vagas
+        2. Monitores Aprovados: Quantos foram selecionados/aprovados
+        3. Candidatos Pendentes: Inscrições aguardando análise
+        4. Horas Pendentes: Horas de trabalho não validadas
         
         Tabelas:
         1. Últimas Inscrições: Últimas 10 inscrições (com status)
@@ -135,18 +133,8 @@
         - monitores_aprovados: Contagem de monitores com status="aprovado"
     -->
     <div class="grid-dashboard">
-        <!-- Card 1: Vagas Ativas -->
-        <div class="dashboard-card">
-            <div class="stat-item">
-                <div>
-                    <div class="stat-label">Minhas Vagas Ativas</div>
-                    <div class="stat-number">{{ total_minhas_vagas }}</div>
-                </div>
-                <div class="icon-stat"><i class="fas fa-briefcase"></i></div>
-            </div>
-        </div>
 
-        <!-- Card 2: Total de Candidatos -->
+        <!-- Card 1: Total de Candidatos -->
         <div class="dashboard-card">
             <div class="stat-item">
                 <div>
@@ -157,7 +145,7 @@
             </div>
         </div>
 
-        <!-- Card 3: Monitores Aprovados -->
+        <!-- Card 2: Monitores Aprovados -->
         <div class="dashboard-card">
             <div class="stat-item">
                 <div>
