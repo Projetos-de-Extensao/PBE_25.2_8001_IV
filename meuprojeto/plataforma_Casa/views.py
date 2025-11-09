@@ -3046,7 +3046,6 @@ def dashboard_gestao(request):
             'inscricoes_por_status': inscricoes_por_status,
             'status_labels': json.dumps(status_labels),
             'status_values': json.dumps(status_values),
-            'taxa_aprovacao': taxa_aprovacao,
             
             # Monitores por Curso
             'monitores_por_curso': monitores_por_curso,
