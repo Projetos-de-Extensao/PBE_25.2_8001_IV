@@ -2861,6 +2861,8 @@ def dashboard_gestao(request):
     
     # ✅ TRATAMENTO DE ERRO COMPLETO PARA DEBUG
     try:
+        # Definir data de seis meses atrás
+        seis_meses_atras = timezone.now() - timedelta(days=180)
         # ========== KPIs PRINCIPAIS ==========
         
         # Total de monitores ativos
@@ -3056,9 +3058,7 @@ def dashboard_gestao(request):
             'curso_labels': json.dumps(curso_labels),
             'curso_values': json.dumps(curso_values),
             
-            # Timeline de Inscrições
-            'timeline_labels': json.dumps(timeline_labels),
-            'timeline_values': json.dumps(timeline_values),
+
             
             # Timeline de Horas
             'horas_labels': json.dumps(horas_labels),
