@@ -106,3 +106,4 @@ def deletar_usuario(request, usuario_id):
     service = UsuarioService()
     nome = service.delete_user(usuario_id)
     return redirect('listar_usuarios')
+
