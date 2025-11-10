@@ -13,8 +13,9 @@ from .permission import (
             is_monitor_access, 
             is_funcionairo_access
             )
+from .service import VagaService, UsuarioService
 
-from .models import Vaga, Inscricao, Curso, Al
+from .models import Vaga, Inscricao, Curso, Usuario, TipoUsuario
 
 
 # Criado o VagaService para encapsular a lógica de negócio da view detalhe_vaga
@@ -36,3 +37,72 @@ def detalhe_vaga(request, vaga_id):
 
     return render(request, 'vagas/detalhe.html', context)
 
+
+@login_required
+@user_passes_test(is_aluno_access)
+def listar_vagas(request):
+    """
+    View para listar vagas disponíveis para alunos.
+    """
+    vagas = Vaga.objects.filter(ativa=True).order_by('-data_criacao')
+    context = {'vagas': vagas}
+    return render(request, 'vagas/listar.html', context)
+
+
+@login_required
+@user_passes_test(is_funcionairo_access)
+def listar_usuarios(request):
+    service = UsuarioService()
+    tipo_filtro = request.GET.get('tipo')
+    status_filtro = request.GET.get('status')
+
+    ativo = None
+    if status_filtro:
+        ativo = (status_filtro == 'ativo')
+
+    usuarios = service.list_users(tipo_id=tipo_filtro, ativo=ativo)
+
+    context = {'usuarios': usuarios}
+    return render(request, 'usuarios/listar.html', context)
+
+
+def criar_usuario(request):
+    service = UsuarioService()
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        email = request.POST.get('email')
+        tipo_usuario_id = request.POST.get('tipo_usuario')
+
+        try:
+            service.create_user(nome, email, tipo_usuario_id)
+            return redirect('listar_usuarios')
+        except Exception:
+            pass
+
+    tipos_usuario = TipoUsuario.objects.filter(ativo=True)
+    context = {'tipos_usuario': tipos_usuario}
+    return render(request, 'usuarios/criar.html', context)
+
+
+@login_required
+@user_passes_test(is_aluno_access)
+def editar_usuario(request, usuario_id):
+    service = UsuarioService()
+    usuario = get_object_or_404(Usuario, id=usuario_id)
+
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        email = request.POST.get('email')
+        ativo = request.POST.get('ativo') == 'on'
+        service.update_user(usuario_id, nome=nome, email=email, ativo=ativo)
+        return redirect('listar_usuarios')
+
+    context = {'usuario': usuario}
+    return render(request, 'usuarios/editar.html', context)
+
+@login_required
+@user_passes_test(is_adm)
+def deletar_usuario(request, usuario_id):
+    service = UsuarioService()
+    nome = service.delete_user(usuario_id)
+    return redirect('listar_usuarios')
