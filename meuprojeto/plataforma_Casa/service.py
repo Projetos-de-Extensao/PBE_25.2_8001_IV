@@ -3,11 +3,12 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q, Sum, Avg
 from django.utils import timezone
 from datetime import datetime, timedelta
+from django.db import IntegrityError
 
-from .models import Vaga, Inscricao, Curso, Aluno, Funcionario, Turma, RegistroHoras, Documento, StatusPagamento
+
+from .models import Vaga, Inscricao, Curso, Usuario, TipoUsuario, Aluno, Funcionario, Turma, RegistroHoras, Documento, StatusPagamento
 
 class BaseService:
-    """Classe base para services — coloque helpers comuns aqui."""
     @staticmethod
     def safe_count(qs):
         try:
@@ -60,3 +61,43 @@ class VagaService(BaseService):
         }
         return context
 
+
+class UsuarioService:
+    """Service para operações CRUD simples sobre Usuario."""
+    def list_users(self, tipo_id=None, ativo=None):
+        qs = Usuario.objects.all().select_related('tipo_usuario')
+        if tipo_id:
+            qs = qs.filter(tipo_usuario__id=tipo_id)
+        if ativo is not None:
+            qs = qs.filter(ativo=ativo)
+        return qs
+
+    def create_user(self, nome, email, tipo_usuario_id):
+        tipo = get_object_or_404(TipoUsuario, id=tipo_usuario_id)
+        try:
+            usuario = Usuario.objects.create(
+                nome=nome,
+                email=email,
+                tipo_usuario=tipo,
+                ativo=True
+            )
+            return usuario
+        except IntegrityError as e:
+            raise
+
+    def update_user(self, usuario_id, nome=None, email=None, ativo=None):
+        usuario = get_object_or_404(Usuario, id=usuario_id)
+        if nome is not None:
+            usuario.nome = nome
+        if email is not None:
+            usuario.email = email
+        if ativo is not None:
+            usuario.ativo = ativo
+        usuario.save()
+        return usuario
+
+    def delete_user(self, usuario_id):
+        usuario = get_object_or_404(Usuario, id=usuario_id)
+        nome = usuario.nome
+        usuario.delete()
+        return nome
