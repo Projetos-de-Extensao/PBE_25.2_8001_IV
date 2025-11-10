@@ -1,6 +1,14 @@
 from .models import Usuario, Funcionario, Aluno, Vaga, Turma, Inscricao, Curso, TipoUsuario, Sala, ParticipacaoMonitoria, Presenca
 
 
+class DetalheVagaRepository:
+
+    @staticmethod
+    def listar_vagas_disponiveis():
+        return Vaga.objects.filter(disponivel=True)
+    
+    
+
 def listar_usuarios():
     return Usuario.objects.all()
 
