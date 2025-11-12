@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from django.db import IntegrityError, transaction
 
 from .repository import (
+    UsuarioRepository,
     VagaRepository
 
 )
@@ -78,29 +79,20 @@ class VagaService(BaseService):
 
 class UsuarioService:
     """Service para operações CRUD simples sobre Usuario."""
+
     def list_users(self, tipo_id=None, ativo=None):
-        qs = Usuario.objects.all().select_related('tipo_usuario')
-        if tipo_id:
-            qs = qs.filter(tipo_usuario__id=tipo_id)
-        if ativo is not None:
-            qs = qs.filter(ativo=ativo)
-        return qs
+        return UsuarioRepository.list_users(tipo_id, ativo)
 
     def create_user(self, nome, email, tipo_usuario_id):
-        tipo = get_object_or_404(TipoUsuario, id=tipo_usuario_id)
+        tipo = UsuarioRepository.get_tipo_usuario_by_id(tipo_usuario_id)
         try:
-            usuario = Usuario.objects.create(
-                nome=nome,
-                email=email,
-                tipo_usuario=tipo,
-                ativo=True
-            )
+            usuario = UsuarioRepository.create_usuario(nome, email, tipo)
             return usuario
         except IntegrityError as e:
             raise
 
     def update_user(self, usuario_id, nome=None, email=None, ativo=None):
-        usuario = get_object_or_404(Usuario, id=usuario_id)
+        usuario = UsuarioRepository.get_usuario_by_id(usuario_id)
         if nome is not None:
             usuario.nome = nome
         if email is not None:
@@ -111,7 +103,7 @@ class UsuarioService:
         return usuario
 
     def delete_user(self, usuario_id):
-        usuario = get_object_or_404(Usuario, id=usuario_id)
+        usuario = UsuarioRepository.get_usuario_by_id(usuario_id)
         nome = usuario.nome
         usuario.delete()
         return nome
