@@ -5,6 +5,10 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from django.db import IntegrityError, transaction
 
+from .repository import (
+    VagaRepository
+
+)
 
 from .models import (
     Curso,
@@ -30,26 +34,25 @@ class BaseService:
 
 class VagaService(BaseService):
     def __init__(self, vaga_id, user):
-        self.vaga = get_object_or_404(Vaga, id=vaga_id)
+        self.vaga = VagaRepository.get_vaga_by_id(vaga_id)
         self.user = user
 
     def check_permission(self):
-        # admins sempre têm acesso
         if self.user.is_staff or self.user.is_superuser:
             return True
 
         try:
-            funcionario = Funcionario.objects.get(email=self.user.email)
+            funcionario = VagaRepository.get_funcionario_by_email(self.user.email)
         except Funcionario.DoesNotExist:
             raise PermissionDenied("Professor não encontrado")
 
-        if funcionario in self.vaga.coordenadores.all() or funcionario in self.vaga.professores.all():
+        if funcionario in VagaRepository.get_coordenadores(self.vaga) or funcionario in VagaRepository.get_professores(self.vaga):
             return True
 
         raise PermissionDenied("Você não tem permissão para ver esta vaga")
 
     def get_inscricoes_qs(self):
-        return Inscricao.objects.filter(vaga=self.vaga).select_related('aluno', 'aluno__curso').order_by('-data_inscricao')
+        return VagaRepository.get_inscricoes_by_vaga(self.vaga)
 
     def get_stats(self):
         qs = self.get_inscricoes_qs()
@@ -62,7 +65,6 @@ class VagaService(BaseService):
         }
 
     def vaga_service(self):
-        # valida permissão (lança PermissionDenied se não tiver)
         self.check_permission()
         inscricoes = self.get_inscricoes_qs()
         stats = self.get_stats()
