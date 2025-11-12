@@ -326,14 +326,7 @@ urlpatterns = [
     # 10. MÓDULO LEGADO - VIEW SQL
     # ============================================================================
     
-    # --- View SQL Legada ---
-    # Endpoint legado que exibe dados brutos em formato SQL
-    # Utilizado para debugging e análise de dados
-    # Método HTTP: GET
-    # URL: http://localhost:8000/sql/
-    # Nota: Este é um endpoint de desenvolvimento, não deve ser exposto em produção
-    path('sql/', views.sql_view, name='sql_view'),
-    
+
     # ============================================================================
     # 11. PORTAL DE VAGAS E CANDIDATURAS
     # ============================================================================

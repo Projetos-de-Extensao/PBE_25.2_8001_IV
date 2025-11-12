@@ -5,7 +5,7 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from django.db import IntegrityError, transaction
 
-from .repository import (
+from .repository_2 import (
     AlunoRepository,
     MonitoriaRepository,
     PresencaRepository,
