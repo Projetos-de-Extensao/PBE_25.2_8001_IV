@@ -379,3 +379,64 @@ class PerfilService:
             pass
 
 
+
+class PortalVagasService:
+    """Service para lógica do portal público de vagas."""
+
+    def get_context(self, request):
+        # Buscar todas as vagas ativas
+        vagas = Vaga.objects.filter(ativo=True).select_related(
+            'curso', 'disciplina'
+        ).prefetch_related(
+            'coordenadores', 'professores'
+        ).annotate(
+            total_inscritos=Count('inscricao')
+        )
+
+        # Filtros
+        busca = request.GET.get('busca', '').strip()
+        if busca:
+            vagas = vagas.filter(
+                Q(disciplina__nome__icontains=busca) |
+                Q(disciplina__codigo__icontains=busca) |
+                Q(nome__icontains=busca) |
+                Q(descricao__icontains=busca)
+            )
+
+        curso_filtro = request.GET.get('curso')
+        if curso_filtro:
+            vagas = vagas.filter(curso__id=curso_filtro)
+
+        tipo_filtro = request.GET.get('tipo')
+        if tipo_filtro:
+            vagas = vagas.filter(tipo_vaga=tipo_filtro)
+
+        # Estatísticas
+        total_vagas = Vaga.objects.filter(ativo=True).count()
+        total_cursos = Vaga.objects.filter(ativo=True).values('curso').distinct().count()
+        total_disciplinas = Vaga.objects.filter(ativo=True).values('disciplina').distinct().count()
+        cursos = Curso.objects.filter(ativo=True).order_by('nome')
+
+        context = {
+            'vagas': vagas,
+            'cursos': cursos,
+            'total_vagas': total_vagas,
+            'total_cursos': total_cursos,
+            'total_disciplinas': total_disciplinas,
+        }
+
+        # Dados do aluno autenticado
+        if request.user.is_authenticated:
+            try:
+                aluno = Aluno.objects.get(email=request.user.email)
+                context['aluno'] = aluno
+                perfil_incompleto = request.session.pop('perfil_incompleto', None)
+                vaga_tentada = request.session.pop('vaga_tentada', None)
+                if perfil_incompleto:
+                    context['perfil_incompleto'] = perfil_incompleto
+                if vaga_tentada:
+                    context['vaga_tentada'] = vaga_tentada
+            except Exception:
+                context['aluno'] = None
+
+        return context
