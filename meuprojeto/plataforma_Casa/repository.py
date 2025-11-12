@@ -139,3 +139,21 @@ class MonitoriaRepository:
     @staticmethod
     def get_participacao_by_id(participacao_id):
         return ParticipacaoMonitoria.objects.get(id=participacao_id)
+    
+class PresencaRepository:
+    @staticmethod
+    def list_presencas(turma_id=None, data=None):
+        presencas = Presenca.objects.all().select_related('aluno', 'turma')
+        if turma_id:
+            presencas = presencas.filter(turma__id=turma_id)
+        if data:
+            presencas = presencas.filter(data=data)
+        return presencas
+
+    @staticmethod
+    def get_turmas_ativas():
+        return Turma.objects.filter(ativo=True)
+
+    @staticmethod
+    def get_presenca_by_id(presenca_id):
+        return Presenca.objects.get(id=presenca_id)

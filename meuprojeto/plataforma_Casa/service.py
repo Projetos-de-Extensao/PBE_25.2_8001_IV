@@ -8,6 +8,7 @@ from django.db import IntegrityError, transaction
 from .repository import (
     AlunoRepository,
     MonitoriaRepository,
+    PresencaRepository,
     TurmaRepository,
     UsuarioRepository,
     VagaRepository
@@ -268,22 +269,17 @@ class PresencaService:
     """Service para operações de presenças."""
 
     def listar_presencas(self, turma_id=None, data=None):
-        presencas = Presenca.objects.all().select_related('aluno', 'turma')
-        if turma_id:
-            presencas = presencas.filter(turma__id=turma_id)
-        if data:
-            presencas = presencas.filter(data=data)
-        turmas = Turma.objects.filter(ativo=True)
+        presencas = PresencaRepository.list_presencas(turma_id, data)
+        turmas = PresencaRepository.get_turmas_ativas()
         return {
             'presencas': presencas,
             'turmas': turmas,
         }
 
     def editar_presenca(self, presenca_id, presente):
-        presenca = get_object_or_404(Presenca, id=presenca_id)
+        presenca = PresencaRepository.get_presenca_by_id(presenca_id)
         presenca.presente = presente
         presenca.save()
-
 
 class RelatorioService:
     """Service para relatórios do sistema."""
