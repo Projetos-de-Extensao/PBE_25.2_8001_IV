@@ -16,7 +16,7 @@ from .permission import (
 
 from .models import ParticipacaoMonitoria, Presenca, Sala, Turma, Vaga, Inscricao, Curso, Usuario, TipoUsuario
 
-from .service import MonitoriaService, PerfilService, PresencaService, RelatorioService, TurmaService, VagaService, UsuarioService, AlunoService, Aluno
+from .service import MonitoriaService, PerfilService, PortalVagasService, PresencaService, RelatorioService, TurmaService, VagaService, UsuarioService, AlunoService, Aluno
 
 # Criado o VagaService para encapsular a lógica de negócio da view detalhe_vaga
 @login_required
@@ -344,3 +344,34 @@ def perfil(request):
         return redirect('perfil')
     context = service.get_perfil_context(request.user)
     return render(request, 'perfil.html', context)
+
+
+
+...
+
+def portal_vagas(request):
+    """
+    ✨ View para portal PÚBLICO de vagas (Landing Page)
+    """
+    service = PortalVagasService()
+    try:
+        context = service.get_context(request)
+    except Exception as e:
+        print(f"❌ ERRO no portal_vagas: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        context = {
+            'vagas': [],
+            'cursos': Curso.objects.filter(ativo=True),
+            'total_vagas': 0,
+            'total_cursos': 0,
+            'total_disciplinas': 0,
+            'erro': str(e)
+        }
+
+    if request.user.is_authenticated:
+        template = 'vagas/portal_logged.html'
+    else:
+        template = 'vagas/portal_landing.html'
+
+    return render(request, template, context)
