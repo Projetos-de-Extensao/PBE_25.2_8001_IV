@@ -16,7 +16,7 @@ from .permission import (
 
 from .models import ParticipacaoMonitoria, Presenca, Sala, Turma, Vaga, Inscricao, Curso, Usuario, TipoUsuario
 
-from .service import MonitoriaService, PresencaService, TurmaService, VagaService, UsuarioService, AlunoService, Aluno
+from .service import MonitoriaService, PresencaService, RelatorioService, TurmaService, VagaService, UsuarioService, AlunoService, Aluno
 
 # Criado o VagaService para encapsular a lógica de negócio da view detalhe_vaga
 @login_required
@@ -299,4 +299,34 @@ def editar_presenca(request, presenca_id):
         service.editar_presenca(presenca_id, presente)
         return redirect('listar_presencas')
     context = {'presenca': presenca}
+    return render(request, 'presencas/editar.html', context)
 
+
+@login_required
+@user_passes_test(is_funcionairo_access or is_monitor_access)
+def listar_relatorios(request):
+    return render(request, 'relatorios/listar.html')
+
+@login_required
+@user_passes_test(is_funcionairo_access or is_monitor_access)
+def relatorio_desempenho(request):
+    context = RelatorioService().desempenho()
+    return render(request, 'relatorios/desempenho.html', context)
+
+@login_required
+@user_passes_test(is_funcionairo_access or is_monitor_access)
+def relatorio_frequencia(request):
+    context = RelatorioService().frequencia()
+    return render(request, 'relatorios/frequencia.html', context)
+
+@login_required
+@user_passes_test(is_funcionairo_access or is_monitor_access)
+def relatorio_inscricoes(request):
+    context = RelatorioService().inscricoes()
+    return render(request, 'relatorios/inscricoes.html', context)
+
+@login_required
+@user_passes_test(is_funcionairo_access or is_monitor_access)
+def relatorio_geral(request):
+    context = RelatorioService().geral()
+    return render(request, 'relatorios/geral.html', context)
