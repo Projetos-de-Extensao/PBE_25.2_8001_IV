@@ -343,3 +343,39 @@ class RelatorioService:
             'total_presencas': Presenca.objects.filter(presente=True).count(),
             'titulo': 'Relatório Geral',
         }
+
+class PerfilService:
+    """Service para operações de perfil do usuário."""
+
+    def get_perfil_context(self, user):
+        # Busca aluno e professor pelo email do usuário
+        try:
+            aluno = Aluno.objects.get(email=user.email)
+        except Aluno.DoesNotExist:
+            aluno = None
+        try:
+            professor = Funcionario.objects.get(email=user.email)
+        except Funcionario.DoesNotExist:
+            professor = None
+        return {
+            'usuario': user,
+            'aluno': aluno,
+            'professor': professor,
+        }
+
+    def atualizar_perfil(self, user, data):
+        nome = data.get('nome')
+        email = data.get('email')
+        user.first_name = nome
+        user.email = email
+        user.save()
+        # Atualiza também Aluno, se existir
+        try:
+            aluno = Aluno.objects.get(email=user.email)
+            aluno.nome = nome
+            aluno.email = email
+            aluno.save()
+        except Aluno.DoesNotExist:
+            pass
+
+

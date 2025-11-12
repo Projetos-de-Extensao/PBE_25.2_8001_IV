@@ -16,7 +16,7 @@ from .permission import (
 
 from .models import ParticipacaoMonitoria, Presenca, Sala, Turma, Vaga, Inscricao, Curso, Usuario, TipoUsuario
 
-from .service import MonitoriaService, PresencaService, RelatorioService, TurmaService, VagaService, UsuarioService, AlunoService, Aluno
+from .service import MonitoriaService, PerfilService, PresencaService, RelatorioService, TurmaService, VagaService, UsuarioService, AlunoService, Aluno
 
 # Criado o VagaService para encapsular a lógica de negócio da view detalhe_vaga
 @login_required
@@ -330,3 +330,17 @@ def relatorio_inscricoes(request):
 def relatorio_geral(request):
     context = RelatorioService().geral()
     return render(request, 'relatorios/geral.html', context)
+
+
+
+
+
+@login_required(login_url='login')
+def perfil(request):
+    service = PerfilService()
+    if request.method == 'POST':
+        service.atualizar_perfil(request.user, request.POST)
+        # messages.success(request, 'Perfil atualizado com sucesso!')
+        return redirect('perfil')
+    context = service.get_perfil_context(request.user)
+    return render(request, 'perfil.html', context)
