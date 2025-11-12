@@ -14,9 +14,9 @@ from .permission import (
             is_funcionairo_access
             )
 
-from .models import Sala, Turma, Vaga, Inscricao, Curso, Usuario, TipoUsuario
+from .models import ParticipacaoMonitoria, Presenca, Sala, Turma, Vaga, Inscricao, Curso, Usuario, TipoUsuario
 
-from .service import TurmaService, VagaService, UsuarioService, AlunoService, Aluno
+from .service import MonitoriaService, PresencaService, TurmaService, VagaService, UsuarioService, AlunoService, Aluno
 
 # Criado o VagaService para encapsular a lógica de negócio da view detalhe_vaga
 @login_required
@@ -253,4 +253,50 @@ def deletar_turma(request, turma_id):
     service.delete_turma(turma_id)
     return redirect('listar_turmas')
 
+
+
+@login_required
+@user_passes_test(is_funcionairo_access)
+def listar_monitorias(request):
+    service = MonitoriaService()
+    turma_filtro = request.GET.get('turma')
+    context = service.listar_monitorias(request.user, turma_id=turma_filtro)
+    return render(request, 'monitorias/listar.html', context)
+
+
+@login_required
+@user_passes_test(is_funcionairo_access or is_monitor_access)
+def editar_participacao(request, participacao_id):
+    service = MonitoriaService()
+    participacao = get_object_or_404(ParticipacaoMonitoria, id=participacao_id)
+    if request.method == 'POST':
+        ap1 = request.POST.get('ap1') or None
+        ap2 = request.POST.get('ap2') or None
+        cr = request.POST.get('cr') or None
+        service.editar_participacao(participacao_id, ap1=ap1, ap2=ap2, cr=cr)
+        return redirect('listar_monitorias')
+    context = {'participacao': participacao}
+    return render(request, 'monitorias/editar.html', context)
+
+
+@login_required
+@user_passes_test(is_funcionairo_access or is_monitor_access)
+def listar_presencas(request):
+    service = PresencaService()
+    turma_filtro = request.GET.get('turma')
+    data_filtro = request.GET.get('data')
+    context = service.listar_presencas(turma_id=turma_filtro, data=data_filtro)
+    return render(request, 'presencas/listar.html', context)
+
+
+@login_required
+@user_passes_test(is_funcionairo_access or is_monitor_access)
+def editar_presenca(request, presenca_id):
+    service = PresencaService()
+    presenca = get_object_or_404(Presenca, id=presenca_id)
+    if request.method == 'POST':
+        presente = request.POST.get('presente') == 'on'
+        service.editar_presenca(presenca_id, presente)
+        return redirect('listar_presencas')
+    context = {'presenca': presenca}
 
