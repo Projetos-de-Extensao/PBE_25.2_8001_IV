@@ -7,6 +7,7 @@ from django.db import IntegrityError, transaction
 
 from .repository import (
     AlunoRepository,
+    MonitoriaRepository,
     TurmaRepository,
     UsuarioRepository,
     VagaRepository
@@ -235,21 +236,15 @@ class TurmaService:
         turma.delete()
         return True
     
-    
 
 class MonitoriaService:
     """Service para operações de monitorias do professor."""
 
     def listar_monitorias(self, user, turma_id=None):
         try:
-            professor = Funcionario.objects.get(email=user.email)
-            turmas = Turma.objects.filter(
-                vaga__professores=professor,
-                ativo=True
-            ).select_related('vaga', 'monitor', 'curso', 'sala').order_by('-criado_em')
-            participacoes = ParticipacaoMonitoria.objects.filter(
-                turma__in=turmas
-            ).select_related('aluno', 'turma')
+            professor = MonitoriaRepository.get_professor_by_email(user.email)
+            turmas = MonitoriaRepository.get_turmas_by_professor(professor)
+            participacoes = MonitoriaRepository.get_participacoes_by_turmas(turmas)
             if turma_id:
                 participacoes = participacoes.filter(turma__id=turma_id)
                 turmas = turmas.filter(id=turma_id)
@@ -262,7 +257,7 @@ class MonitoriaService:
         }
 
     def editar_participacao(self, participacao_id, ap1=None, ap2=None, cr=None):
-        participacao = get_object_or_404(ParticipacaoMonitoria, id=participacao_id)
+        participacao = MonitoriaRepository.get_participacao_by_id(participacao_id)
         participacao.ap1 = ap1 if ap1 != '' else None
         participacao.ap2 = ap2 if ap2 != '' else None
         participacao.cr = cr if cr != '' else None

@@ -116,3 +116,26 @@ class TurmaRepository:
     @staticmethod
     def create_turma(**kwargs):
         return Turma.objects.create(**kwargs)
+    
+
+class MonitoriaRepository:
+    @staticmethod
+    def get_professor_by_email(email):
+        return Funcionario.objects.get(email=email)
+
+    @staticmethod
+    def get_turmas_by_professor(professor):
+        return Turma.objects.filter(
+            vaga__professores=professor,
+            ativo=True
+        ).select_related('vaga', 'monitor', 'curso', 'sala').order_by('-criado_em')
+
+    @staticmethod
+    def get_participacoes_by_turmas(turmas):
+        return ParticipacaoMonitoria.objects.filter(
+            turma__in=turmas
+        ).select_related('aluno', 'turma')
+
+    @staticmethod
+    def get_participacao_by_id(participacao_id):
+        return ParticipacaoMonitoria.objects.get(id=participacao_id)
