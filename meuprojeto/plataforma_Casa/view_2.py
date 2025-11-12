@@ -14,9 +14,9 @@ from .permission import (
             is_funcionairo_access
             )
 
-from .models import Vaga, Inscricao, Curso, Usuario, TipoUsuario
+from .models import Sala, Turma, Vaga, Inscricao, Curso, Usuario, TipoUsuario
 
-from .service import VagaService, UsuarioService, AlunoService, Aluno
+from .service import TurmaService, VagaService, UsuarioService, AlunoService, Aluno
 
 # Criado o VagaService para encapsular a lógica de negócio da view detalhe_vaga
 @login_required
@@ -180,3 +180,75 @@ def deletar_aluno(request, aluno_id):
     except Exception as e:
         messages.error(request, f'Erro ao deletar aluno: {e}')
     return redirect('listar_alunos')
+
+
+
+@login_required
+@user_passes_test(is_funcionairo_access or is_monitor_access)
+def listar_turmas(request):
+    service = TurmaService()
+    vaga_filtro = request.GET.get('vaga')
+    status_filtro = request.GET.get('status')
+    turmas = service.list_turmas(vaga_id=vaga_filtro, status=status_filtro)
+    context = {
+        'turmas': turmas,
+        'vagas': Vaga.objects.all(),
+    }
+    return render(request, 'turmas/listar.html', context)
+
+@login_required
+@user_passes_test(is_funcionairo_access or is_monitor_access)
+def detalhe_turma(request, turma_id):
+    service = TurmaService()
+    context = service.get_turma_detail(turma_id)
+    return render(request, 'turmas/detalhe.html', context)
+
+@login_required
+@user_passes_test(is_funcionairo_access or is_monitor_access)
+def criar_turma(request):
+    service = TurmaService()
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        vaga_id = request.POST.get('vaga')
+        sala_id = request.POST.get('sala')
+        descricao = request.POST.get('descricao')
+        data_inicio = request.POST.get('data_inicio')
+        data_fim = request.POST.get('data_fim')
+        dias_semana = request.POST.get('dias_semana')
+        horario = request.POST.get('horario')
+        monitor_id = request.POST.get('monitor')
+        curso_id = request.POST.get('curso')
+        try:
+            service.create_turma(nome, vaga_id, sala_id, descricao, data_inicio, data_fim, dias_semana, horario, monitor_id, curso_id)
+            return redirect('listar_turmas')
+        except Exception as e:
+            pass
+    context = {
+        'vagas': Vaga.objects.filter(ativo=True),
+        'salas': Sala.objects.filter(ativo=True),
+        'monitores': Aluno.objects.filter(ativo=True),
+        'cursos': Curso.objects.filter(ativo=True),
+    }
+    return render(request, 'turmas/criar.html', context)
+
+@login_required
+@user_passes_test(is_funcionairo_access or is_monitor_access)
+def editar_turma(request, turma_id):
+    service = TurmaService()
+    turma = get_object_or_404(Turma, id=turma_id)
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        descricao = request.POST.get('descricao')
+        horario = request.POST.get('horario')
+        ativo = request.POST.get('ativo') == 'on'
+        service.update_turma(turma_id, nome=nome, descricao=descricao, horario=horario, ativo=ativo)
+        return redirect('listar_turmas')
+    context = {'turma': turma}
+    return render(request, 'turmas/editar.html', context)
+
+@login_required
+@user_passes_test(is_funcionairo_access or is_monitor_access)
+def deletar_turma(request, turma_id):
+    service = TurmaService()
+    service.delete_turma(turma_id)
+    return redirect('listar_turmas')
