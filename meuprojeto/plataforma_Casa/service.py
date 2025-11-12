@@ -6,7 +6,19 @@ from datetime import datetime, timedelta
 from django.db import IntegrityError, transaction
 
 
-from .models import ParticipacaoMonitoria, Presenca, Sala, Vaga, Inscricao, Curso, Usuario, TipoUsuario, Aluno, Funcionario, Turma, RegistroHoras, Documento, StatusPagamento
+from .models import (
+    Curso,
+    ParticipacaoMonitoria, 
+    Presenca, 
+    Inscricao,
+    Sala,
+    TipoUsuario, 
+    Usuario, 
+    Aluno, 
+    Funcionario, 
+    Turma, 
+    Vaga
+)
 
 class BaseService:
     @staticmethod
@@ -296,3 +308,38 @@ class PresencaService:
         presenca.save()
 
 
+class RelatorioService:
+    """Service para relatórios do sistema."""
+
+    def desempenho(self):
+        participacoes = ParticipacaoMonitoria.objects.all().select_related('aluno', 'turma')
+        return {
+            'participacoes': participacoes,
+            'titulo': 'Relatório de Desempenho',
+        }
+
+    def frequencia(self):
+        presencas = Presenca.objects.all().select_related('aluno', 'turma')
+        return {
+            'presencas': presencas,
+            'titulo': 'Relatório de Frequência',
+        }
+
+    def inscricoes(self):
+        inscricoes = Inscricao.objects.all().select_related('aluno', 'vaga')
+        return {
+            'inscricoes': inscricoes,
+            'titulo': 'Relatório de Inscrições',
+        }
+
+    def geral(self):
+        return {
+            'total_usuarios': Usuario.objects.filter(ativo=True).count(),
+            'total_alunos': Aluno.objects.filter(ativo=True).count(),
+            'total_funcionarios': Funcionario.objects.filter(ativo=True).count(),
+            'total_turmas': Turma.objects.filter(ativo=True).count(),
+            'total_vagas': Vaga.objects.filter(ativo=True).count(),
+            'total_inscricoes': Inscricao.objects.count(),
+            'total_presencas': Presenca.objects.filter(presente=True).count(),
+            'titulo': 'Relatório Geral',
+        }
