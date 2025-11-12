@@ -252,3 +252,5 @@ def deletar_turma(request, turma_id):
     service = TurmaService()
     service.delete_turma(turma_id)
     return redirect('listar_turmas')
+
+

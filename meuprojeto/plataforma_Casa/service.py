@@ -241,3 +241,58 @@ class TurmaService:
         turma = get_object_or_404(Turma, id=turma_id)
         turma.delete()
         return True
+    
+
+class MonitoriaService:
+    """Service para operações de monitorias do professor."""
+
+    def listar_monitorias(self, user, turma_id=None):
+        try:
+            professor = Funcionario.objects.get(email=user.email)
+            turmas = Turma.objects.filter(
+                vaga__professores=professor,
+                ativo=True
+            ).select_related('vaga', 'monitor', 'curso', 'sala').order_by('-criado_em')
+            participacoes = ParticipacaoMonitoria.objects.filter(
+                turma__in=turmas
+            ).select_related('aluno', 'turma')
+            if turma_id:
+                participacoes = participacoes.filter(turma__id=turma_id)
+                turmas = turmas.filter(id=turma_id)
+        except Funcionario.DoesNotExist:
+            turmas = Turma.objects.none()
+            participacoes = ParticipacaoMonitoria.objects.none()
+        return {
+            'participacoes': participacoes,
+            'turmas': turmas,
+        }
+
+    def editar_participacao(self, participacao_id, ap1=None, ap2=None, cr=None):
+        participacao = get_object_or_404(ParticipacaoMonitoria, id=participacao_id)
+        participacao.ap1 = ap1 if ap1 != '' else None
+        participacao.ap2 = ap2 if ap2 != '' else None
+        participacao.cr = cr if cr != '' else None
+        participacao.save()
+        return participacao
+
+class PresencaService:
+    """Service para operações de presenças."""
+
+    def listar_presencas(self, turma_id=None, data=None):
+        presencas = Presenca.objects.all().select_related('aluno', 'turma')
+        if turma_id:
+            presencas = presencas.filter(turma__id=turma_id)
+        if data:
+            presencas = presencas.filter(data=data)
+        turmas = Turma.objects.filter(ativo=True)
+        return {
+            'presencas': presencas,
+            'turmas': turmas,
+        }
+
+    def editar_presenca(self, presenca_id, presente):
+        presenca = get_object_or_404(Presenca, id=presenca_id)
+        presenca.presente = presente
+        presenca.save()
+
+
