@@ -1618,40 +1618,6 @@ def alterar_senha(request):
     return redirect('perfil')
 
 
-# ==================== VIEW SQL (ORIGINAL) ====================
-def sql_view(request):
-    """
-    View original - Exibe dados SQL em template
-    Importa dados do repository.py que utiliza Django ORM para queries
-    """
-    # Importar as funções do repository para evitar conflito com views de mesmo nome
-    from . import repository as repo
-    
-    # Chamar as funções do repository (que retornam QuerySets)
-    usuarios = repo.listar_usuarios()
-    alunos = repo.listar_alunos()
-    cursos = repo.listar_cursos()
-    funcionarios = repo.listar_funcionarios()
-    inscricoes = repo.listar_inscricoes()
-    turmas = repo.listar_turmas()
-    participacoes_monitoria = repo.listar_participacoes_monitoria()
-    presencas = repo.listar_presencas()
-    salas = repo.listar_salas()
-    tipos_usuario = repo.listar_tipos_usuario()
-    
-    return render(request, 'sql_template.html', {
-        'usuarios': usuarios, 
-        'alunos': alunos, 
-        'cursos': cursos, 
-        'funcionarios': funcionarios, 
-        'inscricoes': inscricoes, 
-        'turmas': turmas, 
-        'participacoes_monitoria': participacoes_monitoria, 
-        'presencas': presencas, 
-        'salas': salas, 
-        'tipos_usuario': tipos_usuario
-    })
-
 
 # ==================== PORTAL DE VAGAS APRIMORADO ====================
 def portal_vagas(request):
