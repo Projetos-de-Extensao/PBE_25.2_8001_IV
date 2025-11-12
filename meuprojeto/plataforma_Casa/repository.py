@@ -73,3 +73,46 @@ class AlunoRepository:
     @staticmethod
     def create_aluno(**kwargs):
         return Aluno.objects.create(**kwargs)
+
+
+class TurmaRepository:
+    @staticmethod
+    def list_turmas(vaga_id=None, status=None):
+        qs = Turma.objects.all().select_related('vaga', 'monitor', 'sala', 'curso')
+        if vaga_id:
+            qs = qs.filter(vaga__id=vaga_id)
+        if status is not None:
+            qs = qs.filter(ativo=(status == 'ativa'))
+        return qs
+
+    @staticmethod
+    def get_turma_by_id(turma_id):
+        return Turma.objects.get(id=turma_id)
+
+    @staticmethod
+    def get_participacoes_by_turma(turma):
+        return ParticipacaoMonitoria.objects.filter(turma=turma).select_related('aluno')
+
+    @staticmethod
+    def get_presencas_by_turma(turma):
+        return Presenca.objects.filter(turma=turma).select_related('aluno')
+
+    @staticmethod
+    def get_vaga_by_id(vaga_id):
+        return Vaga.objects.get(id=vaga_id)
+
+    @staticmethod
+    def get_sala_by_id(sala_id):
+        return Sala.objects.get(id=sala_id)
+
+    @staticmethod
+    def get_monitor_by_id(monitor_id):
+        return Aluno.objects.get(id=monitor_id)
+
+    @staticmethod
+    def get_curso_by_id(curso_id):
+        return Curso.objects.get(id=curso_id)
+
+    @staticmethod
+    def create_turma(**kwargs):
+        return Turma.objects.create(**kwargs)

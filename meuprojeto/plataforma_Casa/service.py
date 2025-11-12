@@ -7,6 +7,7 @@ from django.db import IntegrityError, transaction
 
 from .repository import (
     AlunoRepository,
+    TurmaRepository,
     UsuarioRepository,
     VagaRepository
 
@@ -180,17 +181,12 @@ class TurmaService:
     """Service para operações CRUD de Turma."""
 
     def list_turmas(self, vaga_id=None, status=None):
-        qs = Turma.objects.all().select_related('vaga', 'monitor', 'sala', 'curso')
-        if vaga_id:
-            qs = qs.filter(vaga__id=vaga_id)
-        if status is not None:
-            qs = qs.filter(ativo=(status == 'ativa'))
-        return qs
+        return TurmaRepository.list_turmas(vaga_id, status)
 
     def get_turma_detail(self, turma_id):
-        turma = get_object_or_404(Turma, id=turma_id)
-        participacoes = ParticipacaoMonitoria.objects.filter(turma=turma).select_related('aluno')
-        presencas = Presenca.objects.filter(turma=turma).select_related('aluno')
+        turma = TurmaRepository.get_turma_by_id(turma_id)
+        participacoes = TurmaRepository.get_participacoes_by_turma(turma)
+        presencas = TurmaRepository.get_presencas_by_turma(turma)
         return {
             'turma': turma,
             'participacoes': participacoes,
@@ -200,11 +196,11 @@ class TurmaService:
     def create_turma(self, nome, vaga_id, sala_id, descricao, data_inicio, data_fim, dias_semana, horario, monitor_id, curso_id):
         try:
             with transaction.atomic():
-                vaga = Vaga.objects.get(id=vaga_id)
-                sala = Sala.objects.get(id=sala_id)
-                monitor = Aluno.objects.get(id=monitor_id)
-                curso = Curso.objects.get(id=curso_id)
-                turma = Turma.objects.create(
+                vaga = TurmaRepository.get_vaga_by_id(vaga_id)
+                sala = TurmaRepository.get_sala_by_id(sala_id)
+                monitor = TurmaRepository.get_monitor_by_id(monitor_id)
+                curso = TurmaRepository.get_curso_by_id(curso_id)
+                turma = TurmaRepository.create_turma(
                     nome=nome,
                     vaga=vaga,
                     sala=sala,
@@ -222,7 +218,7 @@ class TurmaService:
             raise
 
     def update_turma(self, turma_id, nome=None, descricao=None, horario=None, ativo=None):
-        turma = get_object_or_404(Turma, id=turma_id)
+        turma = TurmaRepository.get_turma_by_id(turma_id)
         if nome is not None:
             turma.nome = nome
         if descricao is not None:
@@ -235,9 +231,10 @@ class TurmaService:
         return turma
 
     def delete_turma(self, turma_id):
-        turma = get_object_or_404(Turma, id=turma_id)
+        turma = TurmaRepository.get_turma_by_id(turma_id)
         turma.delete()
         return True
+    
     
 
 class MonitoriaService:
