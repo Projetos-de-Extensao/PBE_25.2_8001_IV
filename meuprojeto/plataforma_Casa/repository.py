@@ -1,47 +1,26 @@
 from .models import Usuario, Funcionario, Aluno, Vaga, Turma, Inscricao, Curso, TipoUsuario, Sala, ParticipacaoMonitoria, Presenca
 
 
-class DetalheVagaRepository:
+class VagaRepository:
+    @staticmethod
+    def get_vaga_by_id(vaga_id):
+        return Vaga.objects.get(id=vaga_id)
 
     @staticmethod
-    def listar_vagas_disponiveis():
-        return Vaga.objects.filter(disponivel=True)
-    
-    
+    def get_funcionario_by_email(email):
+        return Funcionario.objects.get(email=email)
 
-def listar_usuarios():
-    return Usuario.objects.all()
+    @staticmethod
+    def get_inscricoes_by_vaga(vaga):
+        return Inscricao.objects.filter(vaga=vaga).select_related('aluno', 'aluno__curso').order_by('-data_inscricao')
 
-def listar_funcionarios():
-    return Funcionario.objects.all()
+    @staticmethod
+    def get_coordenadores(vaga):
+        return vaga.coordenadores.all()
 
-def listar_alunos():
-    return Aluno.objects.all()
-
-def listar_vagas():
-    return Vaga.objects.all()
-
-def listar_turmas():
-    return Turma.objects.all()
-
-def listar_inscricoes():
-    return Inscricao.objects.all()
-
-def listar_cursos():
-    return Curso.objects.all()
-
-def listar_tipos_usuario():
-    return TipoUsuario.objects.all()
-
-def listar_salas():
-    return Sala.objects.all()
-
-def listar_participacoes_monitoria():
-    return ParticipacaoMonitoria.objects.all()
-
-def listar_presencas():
-    return Presenca.objects.all()
-
+    @staticmethod
+    def get_professores(vaga):
+        return vaga.professores.all()
 
 
 
