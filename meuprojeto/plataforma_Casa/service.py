@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from django.db import IntegrityError, transaction
 
 
-from .models import Vaga, Inscricao, Curso, Usuario, TipoUsuario, Aluno, Funcionario, Turma, RegistroHoras, Documento, StatusPagamento
+from .models import ParticipacaoMonitoria, Presenca, Sala, Vaga, Inscricao, Curso, Usuario, TipoUsuario, Aluno, Funcionario, Turma, RegistroHoras, Documento, StatusPagamento
 
 class BaseService:
     @staticmethod
@@ -177,3 +177,67 @@ class AlunoService:
         nome = aluno.nome
         aluno.delete()
         return nome
+    
+
+class TurmaService:
+    """Service para operações CRUD de Turma."""
+
+    def list_turmas(self, vaga_id=None, status=None):
+        qs = Turma.objects.all().select_related('vaga', 'monitor', 'sala', 'curso')
+        if vaga_id:
+            qs = qs.filter(vaga__id=vaga_id)
+        if status is not None:
+            qs = qs.filter(ativo=(status == 'ativa'))
+        return qs
+
+    def get_turma_detail(self, turma_id):
+        turma = get_object_or_404(Turma, id=turma_id)
+        participacoes = ParticipacaoMonitoria.objects.filter(turma=turma).select_related('aluno')
+        presencas = Presenca.objects.filter(turma=turma).select_related('aluno')
+        return {
+            'turma': turma,
+            'participacoes': participacoes,
+            'presencas': presencas,
+        }
+
+    def create_turma(self, nome, vaga_id, sala_id, descricao, data_inicio, data_fim, dias_semana, horario, monitor_id, curso_id):
+        try:
+            with transaction.atomic():
+                vaga = Vaga.objects.get(id=vaga_id)
+                sala = Sala.objects.get(id=sala_id)
+                monitor = Aluno.objects.get(id=monitor_id)
+                curso = Curso.objects.get(id=curso_id)
+                turma = Turma.objects.create(
+                    nome=nome,
+                    vaga=vaga,
+                    sala=sala,
+                    descricao=descricao,
+                    data_inicio=data_inicio,
+                    data_fim=data_fim,
+                    dias_da_semana=dias_semana,
+                    horario=horario,
+                    monitor=monitor,
+                    curso=curso,
+                    ativo=True
+                )
+            return turma
+        except Exception as e:
+            raise
+
+    def update_turma(self, turma_id, nome=None, descricao=None, horario=None, ativo=None):
+        turma = get_object_or_404(Turma, id=turma_id)
+        if nome is not None:
+            turma.nome = nome
+        if descricao is not None:
+            turma.descricao = descricao
+        if horario is not None:
+            turma.horario = horario
+        if ativo is not None:
+            turma.ativo = ativo
+        turma.save()
+        return turma
+
+    def delete_turma(self, turma_id):
+        turma = get_object_or_404(Turma, id=turma_id)
+        turma.delete()
+        return True
