@@ -22,5 +22,25 @@ class VagaRepository:
     def get_professores(vaga):
         return vaga.professores.all()
 
+class UsuarioRepository:
+    @staticmethod
+    def list_users(tipo_id=None, ativo=None):
+        qs = Usuario.objects.all().select_related('tipo_usuario')
+        if tipo_id:
+            qs = qs.filter(tipo_usuario__id=tipo_id)
+        if ativo is not None:
+            qs = qs.filter(ativo=ativo)
+        return qs
 
+    @staticmethod
+    def get_tipo_usuario_by_id(tipo_usuario_id):
+        return TipoUsuario.objects.get(id=tipo_usuario_id)
+
+    @staticmethod
+    def get_usuario_by_id(usuario_id):
+        return Usuario.objects.get(id=usuario_id)
+
+    @staticmethod
+    def get_usuario_by_email(email):
+        return Usuario.objects.get(email=email)
 
