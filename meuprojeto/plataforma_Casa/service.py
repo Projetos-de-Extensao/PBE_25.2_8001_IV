@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from django.db import IntegrityError, transaction
 
 from .repository import (
+    AlunoRepository,
     UsuarioRepository,
     VagaRepository
 
@@ -109,26 +110,16 @@ class UsuarioService:
         return nome
     
 
+
 class AlunoService:
     """Service para operações CRUD de Aluno."""
 
     def list_alunos(self, curso_id=None, periodo=None):
-        qs = Aluno.objects.all().select_related('curso', 'tipo_usuario')
-        if curso_id:
-            qs = qs.filter(curso__id=curso_id)
-        if periodo:
-            try:
-                periodo_int = int(periodo)
-                qs = qs.filter(periodo=periodo_int)
-            except (ValueError, TypeError):
-                pass
-        return qs
+        return AlunoRepository.list_alunos(curso_id, periodo)
 
     def create_aluno(self, nome, email, matricula, curso_id, periodo=None, cr_geral=0.0):
-        # valida curso
-        curso = get_object_or_404(Curso, id=curso_id)
-        # obtém ou cria tipo_usuario 'aluno'
-        tipo_usuario, _ = TipoUsuario.objects.get_or_create(tipo='aluno', defaults={'ativo': True})
+        curso = AlunoRepository.get_curso_by_id(curso_id)
+        tipo_usuario, _ = AlunoRepository.get_or_create_tipo_usuario_aluno()
 
         try:
             periodo_val = int(periodo) if periodo is not None and periodo != '' else None
@@ -142,7 +133,7 @@ class AlunoService:
 
         try:
             with transaction.atomic():
-                aluno = Aluno.objects.create(
+                aluno = AlunoRepository.create_aluno(
                     nome=nome,
                     email=email,
                     matricula=matricula,
@@ -158,7 +149,7 @@ class AlunoService:
             raise
 
     def update_aluno(self, aluno_id, nome=None, email=None, periodo=None, cr_geral=None, ativo=None):
-        aluno = get_object_or_404(Aluno, id=aluno_id)
+        aluno = AlunoRepository.get_aluno_by_id(aluno_id)
         if nome is not None:
             aluno.nome = nome
         if email is not None:
@@ -179,7 +170,7 @@ class AlunoService:
         return aluno
 
     def delete_aluno(self, aluno_id):
-        aluno = get_object_or_404(Aluno, id=aluno_id)
+        aluno = AlunoRepository.get_aluno_by_id(aluno_id)
         nome = aluno.nome
         aluno.delete()
         return nome

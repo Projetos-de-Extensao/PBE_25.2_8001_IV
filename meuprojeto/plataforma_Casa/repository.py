@@ -44,3 +44,32 @@ class UsuarioRepository:
     def get_usuario_by_email(email):
         return Usuario.objects.get(email=email)
 
+class AlunoRepository:
+    @staticmethod
+    def list_alunos(curso_id=None, periodo=None):
+        qs = Aluno.objects.all().select_related('curso', 'tipo_usuario')
+        if curso_id:
+            qs = qs.filter(curso__id=curso_id)
+        if periodo:
+            try:
+                periodo_int = int(periodo)
+                qs = qs.filter(periodo=periodo_int)
+            except (ValueError, TypeError):
+                pass
+        return qs
+
+    @staticmethod
+    def get_aluno_by_id(aluno_id):
+        return Aluno.objects.get(id=aluno_id)
+
+    @staticmethod
+    def get_curso_by_id(curso_id):
+        return Curso.objects.get(id=curso_id)
+
+    @staticmethod
+    def get_or_create_tipo_usuario_aluno():
+        return TipoUsuario.objects.get_or_create(tipo='aluno', defaults={'ativo': True})
+
+    @staticmethod
+    def create_aluno(**kwargs):
+        return Aluno.objects.create(**kwargs)
