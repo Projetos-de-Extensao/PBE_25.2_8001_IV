@@ -72,7 +72,12 @@ Requires core.js and SelectBox.js.
                 selector_available,
                 interpolate(gettext('Choose all %s'), [field_name]),
                 'id', field_id + '_add_all',
+<<<<<<< HEAD
                 'class', 'selector-chooseall'
+=======
+                'class', 'selector-chooseall',
+                'type', 'button'
+>>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
             );
 
             // <ul class="selector-chooser">
@@ -83,14 +88,24 @@ Requires core.js and SelectBox.js.
                 quickElement('li', selector_chooser),
                 interpolate(gettext('Choose selected %s'), [field_name]),
                 'id', field_id + '_add',
+<<<<<<< HEAD
                 'class', 'selector-add'
+=======
+                'class', 'selector-add',
+                'type', 'button'
+>>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
             );
             const remove_button = quickElement(
                 'button',
                 quickElement('li', selector_chooser),
                 interpolate(gettext('Remove selected %s'), [field_name]),
                 'id', field_id + '_remove',
+<<<<<<< HEAD
                 'class', 'selector-remove'
+=======
+                'class', 'selector-remove',
+                'type', 'button'
+>>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
             );
 
             // <div class="selector-chosen">
@@ -142,7 +157,12 @@ Requires core.js and SelectBox.js.
                 selector_chosen,
                 interpolate(gettext('Remove all %s'), [field_name]),
                 'id', field_id + '_remove_all',
+<<<<<<< HEAD
                 'class', 'selector-clearall'
+=======
+                'class', 'selector-clearall',
+                'type', 'button'
+>>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
             );
 
             from_box.name = from_box.name + '_old';

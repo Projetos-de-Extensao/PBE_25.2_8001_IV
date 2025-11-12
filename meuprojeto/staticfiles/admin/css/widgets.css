@@ -49,7 +49,11 @@
     padding: 8px;
 }
 
+<<<<<<< HEAD
 .aligned .selector-chosen-title label {
+=======
+.selector-chosen-title label {
+>>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
     color: var(--header-link-color);
     width: 100%;
 }
@@ -60,7 +64,11 @@
     padding: 8px;
 }
 
+<<<<<<< HEAD
 .aligned .selector-available-title label {
+=======
+.selector-available-title label {
+>>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
     width: 100%;
 }
 
