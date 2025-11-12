@@ -1745,20 +1745,24 @@
                     <!-- Link: Registrar Horas -->
                     <!-- Lançar horas trabalhadas de monitoria -->
                     <!-- Permissão: add_registrohoras -->
-                    <a href="{% url 'registrar_horas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'registrar_horas' %}active{% endif %}">
+                    <a href="{% url 'registrar_horas' %}" 
+                    class="sidebar-item {% if request.resolver_match.url_name == 'registrar_horas' %}active{% endif %}" 
+                    title="Registrar horas de monitoria" 
+                    data-bs-toggle="tooltip">
                         <i class="fas fa-clock"></i>
                         <span class="sidebar-text">Registrar Horas</span>
                     </a>
-                    
                     <!-- Link: Meus Registros -->
                     <!-- Visualizar histórico de horas registradas -->
                     <!-- Ver status de validação pelo professor -->
                     <!-- Permissão: view_registrohoras, change_registrohoras -->
-                    <a href="{% url 'meus_registros_horas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'meus_registros_horas' %}active{% endif %}">
+                    <a href="{% url 'meus_registros_horas' %}" 
+                    class="sidebar-item {% if request.resolver_match.url_name == 'meus_registros_horas' %}active{% endif %}" 
+                    title="Ver histórico de horas registradas" 
+                    data-bs-toggle="tooltip">
                         <i class="fas fa-history"></i>
                         <span class="sidebar-text">Meus Registros</span>
                     </a>
-                    
                     <hr class="sidebar-divider">
                     
                     <!-- Link: Minhas Monitorias -->
@@ -1874,11 +1878,14 @@
                     <!-- Link: Dashboard do Professor -->
                     <!-- Painel com KPIs e estatísticas personalizadas -->
                     <!-- Últimas inscrições, vagas populares, turmas ativas -->
-                    <a href="{% url 'dashboard' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <a href="{% url 'dashboard' %}" 
+                    class="sidebar-item {% if request.resolver_match.url_name == 'dashboard' and is_monitor %}active{% endif %}" 
+                    title="Painel com estatísticas do monitor" 
+                    data-bs-toggle="tooltip">
                         <i class="fas fa-chart-line"></i>
                         <span class="sidebar-text">Dashboard</span>
                     </a>
-                    
+
                     <hr class="sidebar-divider">
                     
                     <!-- Link: Minhas Vagas -->
@@ -2410,6 +2417,18 @@
                 console.log('Resize para desktop: sidebar ajustado');
             }
         });
+
+        /* ===================================================
+           INICIALIZAÇÃO DOS TOOLTIPS DO BOOTSTRAP
+           ===================================================
+           Ativa tooltips para elementos com data-bs-toggle="tooltip"
+        */
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    });
     </script>
     
     {% block extra_js %}{% endblock %}
