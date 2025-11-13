@@ -32,7 +32,8 @@ from .service import (
     MonitoriaService, 
     PerfilService, 
     PortalVagasService, 
-    PresencaService, 
+    PresencaService,
+    RegistroHorasService, 
     RelatorioService, 
     TurmaService, 
     VagaMonitoriaService, 
@@ -533,12 +534,109 @@ def candidatar_vaga(request, vaga_id):
     context = {'vaga': vaga, 'aluno': aluno}
     return render(request, 'vagas/candidatar.html', context)
 
+
+
+
 # 13. REGISTRO E VALIDAÇÃO DE HORAS
-# registrar_horas
-# meus_registros_horas
-# detalhes_registro
-# validar_horas
-# aprovar_horas
+@requer_monitor
+def registrar_horas(request):
+    service = RegistroHorasService()
+    try:
+        aluno = service.get_monitor_by_email(request.user.email)
+        if not aluno:
+            raise Exception("Monitor não encontrado")
+        turmas = service.get_turmas_do_monitor(aluno)
+    except Exception:
+        if request.user.groups.filter(name='Aluno').exists():
+            return redirect('portal_vagas')
+        else:
+            return redirect('dashboard')
+
+    if request.method == 'POST':
+        from datetime import datetime
+        turma_id = request.POST.get('turma')
+        data_str = request.POST.get('data')
+        hora_inicio_str = request.POST.get('hora_inicio')
+        hora_fim_str = request.POST.get('hora_fim')
+        descricao = request.POST.get('descricao_atividade')
+        try:
+            data = datetime.strptime(data_str, '%Y-%m-%d').date()
+            hora_inicio = datetime.strptime(hora_inicio_str, '%H:%M').time()
+            hora_fim = datetime.strptime(hora_fim_str, '%H:%M').time()
+            if hora_fim <= hora_inicio:
+                messages.error(request, '❌ Hora de fim deve ser maior que a hora de início.')
+                context = {'turmas': turmas}
+                return render(request, 'horas/registrar.html', context)
+            service.criar_registro(turma_id, aluno, data, hora_inicio, hora_fim, descricao)
+            return redirect('meus_registros_horas')
+        except Turma.DoesNotExist:
+            messages.error(request, '❌ Turma não encontrada ou você não é o monitor dela.')
+        except ValueError:
+            messages.error(request, '❌ Formato de data/hora inválido. Use formatos: data (YYYY-MM-DD), horário (HH:MM).')
+        except Exception as e:
+            messages.error(request, f'❌ Erro ao registrar horas: {str(e)}')
+
+    context = {'turmas': turmas}
+    return render(request, 'horas/registrar.html', context)
+
+@requer_monitor
+def meus_registros_horas(request):
+    service = RegistroHorasService()
+    try:
+        aluno = get_monitor_by_email(request.user.email)
+        if not aluno:
+            registros = []
+        else:
+            registros = service.get_registros_do_monitor(aluno)
+    except Exception:
+        registros = []
+    context = {'registros': registros}
+    return render(request, 'horas/meus_registros.html', context)
+
+@requer_monitor
+def detalhes_registro(request, registro_id):
+    service = RegistroHorasService()
+    try:
+        aluno = get_monitor_by_email(request.user.email)
+        if not aluno:
+            raise Exception("Monitor não encontrado")
+        registro = service.get_registro_by_id_monitor(registro_id, aluno)
+    except RegistroHoras.DoesNotExist:
+        messages.error(request, '❌ Registro não encontrado ou você não tem permissão para acessá-lo.')
+        return redirect('meus_registros_horas')
+    except Exception:
+        messages.error(request, '❌ Acesso negado: Você não é um monitor registrado.')
+        return redirect('portal_vagas')
+    context = {'registro': registro}
+    return render(request, 'horas/detalhes_registro.html', context)
+
+@requer_professor
+def validar_horas(request):
+    service = RegistroHorasService()
+    try:
+        registros = service.get_registros_pendentes()
+    except Exception:
+        registros = []
+    context = {'registros': registros}
+    return render(request, 'horas/validar.html', context)
+
+@requer_professor
+def aprovar_horas(request, registro_id):
+    service = RegistroHorasService()
+    registro = service.get_registro_by_id(registro_id)
+    if request.method == 'POST':
+        status = request.POST.get('status')
+        observacao = request.POST.get('observacao')
+        try:
+            funcionario = service.get_funcionario_by_email(request.user.email)
+            service.aprovar_registro(registro, funcionario, status, observacao)
+        except Exception:
+            pass
+        return redirect('validar_horas')
+    context = {'registro': registro}
+    return render(request, 'horas/aprovar.html', context)
+
+
 # 14. DASHBOARD DE GESTÃO
 # dashboard_gestao
 # gerenciar_pagamentos

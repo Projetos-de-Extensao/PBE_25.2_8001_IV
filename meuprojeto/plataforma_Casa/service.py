@@ -11,6 +11,7 @@ from .repository_2 import (
     PerfilRepository,
     PortalVagasRepository,
     PresencaRepository,
+    RegistroHorasRepository,
     RelatorioRepository,
     TurmaRepository,
     UsuarioRepository,
@@ -587,3 +588,39 @@ class PortalVagasService:
             if arquivo:
                 PortalVagasRepository.criar_documento(inscricao, tipo_doc, arquivo, arquivo.name)
         return inscricao, None
+    
+
+class RegistroHorasService:
+    def get_turmas_do_monitor(self, monitor):
+        return RegistroHorasRepository.get_turmas_do_monitor(monitor)
+
+    def criar_registro(self, turma_id, monitor, data, hora_inicio, hora_fim, descricao_atividade):
+        turma = Turma.objects.get(id=turma_id, monitor=monitor, ativo=True)
+        return RegistroHorasRepository.criar_registro(turma, monitor, data, hora_inicio, hora_fim, descricao_atividade)
+
+    def get_registros_do_monitor(self, monitor):
+        return RegistroHorasRepository.get_registros_do_monitor(monitor)
+
+    def get_registro_by_id_monitor(self, registro_id, monitor):
+        return RegistroHorasRepository.get_registro_by_id_monitor(registro_id, monitor)
+
+    def get_funcionario_by_email(self, email):
+        return RegistroHorasRepository.get_funcionario_by_email(email)
+
+    def get_registros_pendentes(self):
+        return RegistroHorasRepository.get_registros_pendentes()
+
+    def get_registro_by_id(self, registro_id):
+        return RegistroHorasRepository.get_registro_by_id(registro_id)
+    
+    def get_monitor_by_email(self, email):
+        return RegistroHorasRepository.get_monitor_by_email(email)
+
+
+    def aprovar_registro(self, registro, funcionario, status, observacao):
+        registro.status = status
+        registro.observacao_validador = observacao
+        registro.validado_por = funcionario
+        registro.data_validacao = timezone.now()
+        registro.save()
+        return registro

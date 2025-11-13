@@ -1,6 +1,7 @@
 from django.db.models import Count
 from .models import ( 
     Documento,
+    RegistroHoras,
     Usuario,
     Funcionario, 
     Aluno, 
@@ -410,3 +411,45 @@ class PortalVagasRepository:
     @staticmethod
     def criar_documento(inscricao, tipo, arquivo, nome_arquivo):
         return Documento.objects.create(inscricao=inscricao, tipo=tipo, arquivo=arquivo, nome_arquivo=nome_arquivo)
+    
+
+class RegistroHorasRepository:
+    @staticmethod
+    def get_turmas_do_monitor(monitor):
+        return Turma.objects.filter(monitor=monitor, ativo=True)
+
+    @staticmethod
+    def criar_registro(turma, monitor, data, hora_inicio, hora_fim, descricao_atividade):
+        return RegistroHoras.objects.create(
+            turma=turma,
+            monitor=monitor,
+            data=data,
+            hora_inicio=hora_inicio,
+            hora_fim=hora_fim,
+            descricao_atividade=descricao_atividade,
+            status='Pendente'
+        )
+
+    @staticmethod
+    def get_registros_do_monitor(monitor):
+        return RegistroHoras.objects.filter(monitor=monitor).select_related('turma', 'validado_por').order_by('-data')
+
+    @staticmethod
+    def get_registro_by_id_monitor(registro_id, monitor):
+        return RegistroHoras.objects.get(id=registro_id, monitor=monitor)
+
+    @staticmethod
+    def get_funcionario_by_email(email):
+        return Funcionario.objects.get(email=email)
+
+    @staticmethod
+    def get_registros_pendentes():
+        return RegistroHoras.objects.filter(status='Pendente').select_related('monitor', 'turma')
+
+    @staticmethod
+    def get_registro_by_id(registro_id):
+        return RegistroHoras.objects.get(id=registro_id)
+    
+    @staticmethod
+    def get_monitor_by_email(email):
+        return Aluno.objects.get(email=email)
