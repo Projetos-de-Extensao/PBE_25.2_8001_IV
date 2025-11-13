@@ -14,9 +14,34 @@ from .permission import (
             is_funcionairo_access
             )
 
-from .models import Disciplina, Funcionario, ParticipacaoMonitoria, Presenca, Sala, Turma, Vaga, Inscricao, Curso, Usuario, TipoUsuario
+from .models import (
+    Disciplina, 
+    Funcionario, 
+    ParticipacaoMonitoria, 
+    Presenca, 
+    Sala, 
+    Turma, 
+    Vaga, 
+    Inscricao, 
+    Curso, 
+    Usuario, 
+    TipoUsuario
+)
 
-from .service import MonitoriaService, PerfilService, PortalVagasService, PresencaService, RelatorioService, TurmaService, VagaMonitoriaService, VagaMonitoriaService, VagaService, UsuarioService, AlunoService, Aluno
+from .service import (
+    MonitoriaService, 
+    PerfilService, 
+    PortalVagasService, 
+    PresencaService, 
+    RelatorioService, 
+    TurmaService, 
+    VagaMonitoriaService, 
+    VagaMonitoriaService, 
+    VagaService, 
+    UsuarioService, 
+    AlunoService, 
+    Aluno
+    )
 
 
 
@@ -310,7 +335,7 @@ def criar_vaga_monitoria(request):
 @login_required
 def editar_vaga_monitoria(request, vaga_id):
     service = VagaMonitoriaService()
-    vaga = VagaRepository.get_vaga_by_id(vaga_id)
+    vaga = get_object_or_404(Vaga, id=vaga_id)
     if request.method == 'POST':
         nome = request.POST.get('nome')
         descricao = request.POST.get('descricao')
