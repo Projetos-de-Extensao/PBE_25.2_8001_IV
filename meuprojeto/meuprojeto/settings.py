@@ -225,6 +225,9 @@ REST_FRAMEWORK = {
     'TIME_FORMAT': '%H:%M:%S',
 }
 
+# Define a URL de login personalizada para o sistema de autenticação
+LOGIN_URL = 'login'
+
 SWAGGER_SETTINGS = {
     # Permite testar endpoints autenticados usando sessão do Django
     'USE_SESSION_AUTH': True,

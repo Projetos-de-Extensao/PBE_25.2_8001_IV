@@ -11,5 +11,9 @@ def is_aluno_access(user):
 def is_monitor_access(user):
     return user.groups.filter(name__in=['Admin', 'dev', 'user_monitor']).exists()
 
+def is_professor_access(user):
+    return user.groups.filter(name__in=['Admin', 'dev', 'user_professor', 'user_coordenador']).exists()
+
+
 def is_funcionairo_access(user):
     return user.groups.filter(name__in=['Admin', 'dev', 'user_funcionairo', 'user_professor','user_coordenador']).exists()
