@@ -1,7 +1,9 @@
 from django.db.models import Count
+from pytz import timezone
 from .models import ( 
     Documento,
     RegistroHoras,
+    StatusPagamento,
     Usuario,
     Funcionario, 
     Aluno, 
@@ -453,3 +455,159 @@ class RegistroHorasRepository:
     @staticmethod
     def get_monitor_by_email(email):
         return Aluno.objects.get(email=email)
+    
+class DashboardGestaoRepository:
+    @staticmethod
+    def total_monitores():
+        return Aluno.objects.filter(monitorias__ativo=True).distinct().count()
+
+    @staticmethod
+    def total_alunos():
+        return Aluno.objects.filter(ativo=True).count()
+
+    @staticmethod
+    def total_professores():
+        from django.contrib.auth.models import Group
+        try:
+            grupo_professor = Group.objects.get(name='Professor')
+            return grupo_professor.user_set.count()
+        except:
+            return 0
+
+    @staticmethod
+    def total_vagas():
+        return Vaga.objects.filter(ativo=True).count()
+
+    @staticmethod
+    def total_turmas():
+        return Turma.objects.filter(ativo=True).count()
+
+    @staticmethod
+    def total_inscricoes():
+        return Inscricao.objects.all().count()
+
+    @staticmethod
+    def total_horas_mes():
+        now = timezone.now()
+        return RegistroHoras.objects.filter(
+            status='Aprovado',
+            data__month=now.month,
+            data__year=now.year
+        ).aggregate(total=Sum('total_horas'))['total'] or 0
+
+    @staticmethod
+    def valor_total_mes():
+        now = timezone.now()
+        return StatusPagamento.objects.filter(
+            status='Pago',
+            mes_referencia__month=now.month,
+            mes_referencia__year=now.year
+        ).aggregate(total=Sum('valor_total'))['total'] or 0
+
+    @staticmethod
+    def inscricoes_por_status():
+        return list(Inscricao.objects.values('status').annotate(total=Count('id')).order_by('-total'))
+
+    @staticmethod
+    def taxa_aprovacao():
+        total_avaliadas = Inscricao.objects.exclude(status='Pendente').count()
+        total_aprovados = Inscricao.objects.filter(status='Aprovado').count()
+        return round((total_aprovados / total_avaliadas * 100), 1) if total_avaliadas > 0 else 0
+
+    @staticmethod
+    def monitores_por_curso():
+        return list(Inscricao.objects.filter(status='Aprovado').values('aluno__curso__nome').annotate(total=Count('id', distinct=True)).order_by('-total')[:10])
+
+    @staticmethod
+    def inscricoes_timeline(seis_meses_atras):
+        return list(Inscricao.objects.filter(
+            data_inscricao__gte=seis_meses_atras
+        ).annotate(
+            mes=TruncMonth('data_inscricao')
+        ).values('mes').annotate(
+            total=Count('id')
+        ).order_by('mes'))
+
+    @staticmethod
+    def horas_timeline(seis_meses_atras):
+        return list(RegistroHoras.objects.filter(
+            status='Aprovado',
+            data__gte=seis_meses_atras
+        ).annotate(
+            mes=TruncMonth('data')
+        ).values('mes').annotate(
+            total_horas=Sum('total_horas')
+        ).order_by('mes'))
+
+    @staticmethod
+    def pagamentos_timeline(seis_meses_atras):
+        return list(StatusPagamento.objects.filter(
+            mes_referencia__gte=seis_meses_atras
+        ).annotate(
+            mes=TruncMonth('mes_referencia')
+        ).values('mes').annotate(
+            total_valor=Sum('valor_total')
+        ).order_by('mes'))
+
+    @staticmethod
+    def horas_por_status():
+        return list(RegistroHoras.objects.values('status').annotate(
+            total=Count('id'),
+            horas=Sum('total_horas')
+        ).order_by('-total'))
+
+    @staticmethod
+    def pagamentos_pendentes():
+        return StatusPagamento.objects.filter(status='Pendente').count()
+
+    @staticmethod
+    def avaliacoes_pendentes():
+        return Inscricao.objects.filter(status='Pendente').count()
+
+    @staticmethod
+    def horas_pendentes():
+        return RegistroHoras.objects.filter(status='Pendente').count()
+
+    @staticmethod
+    def documentos_pendentes():
+        return Documento.objects.filter(inscricao__status='Pendente').count()
+
+    @staticmethod
+    def vagas_ativas():
+        return Vaga.objects.filter(ativo=True).annotate(
+            total_inscritos=Count('inscricao'),
+            aprovados=Count('inscricao', filter=Q(inscricao__status='Aprovado'))
+        ).select_related('curso', 'disciplina').prefetch_related('coordenadores').order_by('-criado_em')[:10]
+
+    @staticmethod
+    def cr_medio_monitores():
+        return Inscricao.objects.filter(status='Aprovado').aggregate(media=Avg('aluno__cr_geral'))['media'] or 0
+
+    @staticmethod
+    def media_horas_monitor():
+        return RegistroHoras.objects.filter(status='Aprovado').aggregate(media=Avg('total_horas'))['media'] or 0
+
+    @staticmethod
+    def total_pago_ano():
+        ano_atual = timezone.now().year
+        return StatusPagamento.objects.filter(
+            status='Pago',
+            mes_referencia__year=ano_atual
+        ).aggregate(total=sum('valor_total'))['total'] or 0
+
+    @staticmethod
+    def dados_exportacao():
+        return {
+            'monitores': Inscricao.objects.filter(status='Aprovado').select_related('aluno', 'vaga').values(
+                'aluno__nome', 'aluno__matricula', 'aluno__curso__nome', 
+                'vaga__disciplina', 'aluno__cr_geral'
+            ),
+            'horas': RegistroHoras.objects.filter(status='Aprovado').select_related('monitor').values(
+                'monitor__nome', 'data', 'total_horas', 'descricao_atividade'
+            ),
+            'vagas': Vaga.objects.filter(ativo=True).select_related('curso', 'disciplina').prefetch_related('coordenadores').values(
+                'disciplina__nome', 'curso__nome', 'numero_vagas'
+            ),
+        }
+    
+

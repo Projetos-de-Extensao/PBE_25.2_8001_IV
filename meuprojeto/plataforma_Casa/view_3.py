@@ -29,6 +29,7 @@ from .models import (
 )
 
 from .service import (
+    DashboardGestaoService,
     MonitoriaService, 
     PerfilService, 
     PortalVagasService, 
@@ -638,9 +639,24 @@ def aprovar_horas(request, registro_id):
 
 
 # 14. DASHBOARD DE GESTÃO
-# dashboard_gestao
-# gerenciar_pagamentos
-# processar_pagamento
+@requer_admin_ou_coordenador
+def dashboard_gestao(request):
+    """
+    Dashboard com análises completas do sistema (perfil admin)
+    ⚠️ APENAS ADMINS OU COORDENADORES podem acessar
+    """
+    try:
+        context = DashboardGestaoService().get_dashboard_context()
+        return render(request, 'gestao/dashboard.html', context)
+    except Exception as e:
+        import traceback
+        from django.contrib import messages
+        messages.error(request, f'Erro ao carregar dashboard de gestão: {str(e)}')
+        print(f"ERRO DASHBOARD_GESTAO: {str(e)}")
+        print(traceback.format_exc())
+        return redirect('plataforma_Casa:dashboard')
+    
+
 # 16. GERENCIAMENTO DE DISCIPLINAS (PROFESSOR)
 # listar_disciplinas
 # criar_disciplina

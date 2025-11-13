@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q, Sum, Avg
@@ -7,6 +8,7 @@ from django.db import IntegrityError, transaction
 
 from .repository_2 import (
     AlunoRepository,
+    DashboardGestaoRepository,
     MonitoriaRepository,
     PerfilRepository,
     PortalVagasRepository,
@@ -624,3 +626,70 @@ class RegistroHorasService:
         registro.data_validacao = timezone.now()
         registro.save()
         return registro
+    
+
+class DashboardGestaoService:
+    def get_dashboard_context(self):
+        seis_meses_atras = timezone.now() - timedelta(days=180)
+        inscricoes_timeline = DashboardGestaoRepository.inscricoes_timeline(seis_meses_atras)
+        horas_timeline = DashboardGestaoRepository.horas_timeline(seis_meses_atras)
+        pagamentos_timeline = DashboardGestaoRepository.pagamentos_timeline(seis_meses_atras)
+
+        # Preparar labels e valores para gráficos
+        timeline_labels = [item['mes'].strftime('%Y-%m') if item['mes'] else '' for item in inscricoes_timeline]
+        timeline_values = [item['total'] for item in inscricoes_timeline]
+        horas_labels = [item['mes'].strftime('%Y-%m') if item['mes'] else '' for item in horas_timeline]
+        horas_values = [float(item['total_horas']) for item in horas_timeline]
+        pagamentos_dict = {item['mes'].strftime('%Y-%m') if item['mes'] else '': float(item['total_valor']) for item in pagamentos_timeline}
+        valores_pagamento = [pagamentos_dict.get(mes, 0) for mes in horas_labels]
+
+        inscricoes_por_status = DashboardGestaoRepository.inscricoes_por_status()
+        status_labels = [item['status'] for item in inscricoes_por_status]
+        status_values = [item['total'] for item in inscricoes_por_status]
+
+        monitores_por_curso = DashboardGestaoRepository.monitores_por_curso()
+        curso_labels = [item['aluno__curso__nome'] for item in monitores_por_curso]
+        curso_values = [item['total'] for item in monitores_por_curso]
+
+        horas_por_status = DashboardGestaoRepository.horas_por_status()
+        horas_status_labels = [item['status'] for item in horas_por_status]
+        horas_status_values = [item['total'] for item in horas_por_status]
+
+        total_pago_ano = DashboardGestaoRepository.total_pago_ano()
+        media_mensal = total_pago_ano / timezone.now().month if timezone.now().month > 0 else 0
+
+        context = {
+            'total_monitores': DashboardGestaoRepository.total_monitores(),
+            'total_alunos': DashboardGestaoRepository.total_alunos(),
+            'total_professores': DashboardGestaoRepository.total_professores(),
+            'total_vagas': DashboardGestaoRepository.total_vagas(),
+            'total_turmas': DashboardGestaoRepository.total_turmas(),
+            'total_inscricoes': DashboardGestaoRepository.total_inscricoes(),
+            'total_horas_mes': round(DashboardGestaoRepository.total_horas_mes(), 2),
+            'valor_total_mes': round(DashboardGestaoRepository.valor_total_mes(), 2),
+            'inscricoes_por_status': inscricoes_por_status,
+            'status_labels': json.dumps(status_labels),
+            'status_values': json.dumps(status_values),
+            'taxa_aprovacao': DashboardGestaoRepository.taxa_aprovacao(),
+            'monitores_por_curso': monitores_por_curso,
+            'curso_labels': json.dumps(curso_labels),
+            'curso_values': json.dumps(curso_values),
+            'timeline_labels': json.dumps(timeline_labels),
+            'timeline_values': json.dumps(timeline_values),
+            'horas_labels': json.dumps(horas_labels),
+            'horas_values': json.dumps(horas_values),
+            'valores_pagamento': json.dumps(valores_pagamento),
+            'horas_status_labels': json.dumps(horas_status_labels),
+            'horas_status_values': json.dumps(horas_status_values),
+            'pagamentos_pendentes': DashboardGestaoRepository.pagamentos_pendentes(),
+            'avaliacoes_pendentes': DashboardGestaoRepository.avaliacoes_pendentes(),
+            'horas_pendentes': DashboardGestaoRepository.horas_pendentes(),
+            'documentos_pendentes': DashboardGestaoRepository.documentos_pendentes(),
+            'vagas_ativas': DashboardGestaoRepository.vagas_ativas(),
+            'cr_medio_monitores': round(DashboardGestaoRepository.cr_medio_monitores(), 2),
+            'media_horas_monitor': round(DashboardGestaoRepository.media_horas_monitor(), 2),
+            'total_pago_ano': round(total_pago_ano, 2),
+            'media_mensal': round(media_mensal, 2),
+            'now': timezone.now(),
+        }
+        return context
