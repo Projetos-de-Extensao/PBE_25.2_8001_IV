@@ -9,6 +9,7 @@ from .repository_2 import (
     AlunoRepository,
     MonitoriaRepository,
     PresencaRepository,
+    RelatorioRepository,
     TurmaRepository,
     UsuarioRepository,
     VagaRepository
@@ -285,21 +286,21 @@ class RelatorioService:
     """Service para relatórios do sistema."""
 
     def desempenho(self):
-        participacoes = ParticipacaoMonitoria.objects.all().select_related('aluno', 'turma')
+        participacoes = RelatorioRepository.get_participacoes()
         return {
             'participacoes': participacoes,
             'titulo': 'Relatório de Desempenho',
         }
 
     def frequencia(self):
-        presencas = Presenca.objects.all().select_related('aluno', 'turma')
+        presencas = RelatorioRepository.get_presencas()
         return {
             'presencas': presencas,
             'titulo': 'Relatório de Frequência',
         }
 
     def inscricoes(self):
-        inscricoes = Inscricao.objects.all().select_related('aluno', 'vaga')
+        inscricoes = RelatorioRepository.get_inscricoes()
         return {
             'inscricoes': inscricoes,
             'titulo': 'Relatório de Inscrições',
@@ -307,13 +308,13 @@ class RelatorioService:
 
     def geral(self):
         return {
-            'total_usuarios': Usuario.objects.filter(ativo=True).count(),
-            'total_alunos': Aluno.objects.filter(ativo=True).count(),
-            'total_funcionarios': Funcionario.objects.filter(ativo=True).count(),
-            'total_turmas': Turma.objects.filter(ativo=True).count(),
-            'total_vagas': Vaga.objects.filter(ativo=True).count(),
-            'total_inscricoes': Inscricao.objects.count(),
-            'total_presencas': Presenca.objects.filter(presente=True).count(),
+            'total_usuarios': RelatorioRepository.get_total_usuarios(),
+            'total_alunos': RelatorioRepository.get_total_alunos(),
+            'total_funcionarios': RelatorioRepository.get_total_funcionarios(),
+            'total_turmas': RelatorioRepository.get_total_turmas(),
+            'total_vagas': RelatorioRepository.get_total_vagas(),
+            'total_inscricoes': RelatorioRepository.get_total_inscricoes(),
+            'total_presencas': RelatorioRepository.get_total_presencas(),
             'titulo': 'Relatório Geral',
         }
 

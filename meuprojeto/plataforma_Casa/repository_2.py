@@ -157,3 +157,45 @@ class PresencaRepository:
     @staticmethod
     def get_presenca_by_id(presenca_id):
         return Presenca.objects.get(id=presenca_id)
+    
+
+class RelatorioRepository:
+    @staticmethod
+    def get_participacoes():
+        return ParticipacaoMonitoria.objects.all().select_related('aluno', 'turma')
+
+    @staticmethod
+    def get_presencas():
+        return Presenca.objects.all().select_related('aluno', 'turma')
+
+    @staticmethod
+    def get_inscricoes():
+        return Inscricao.objects.all().select_related('aluno', 'vaga')
+
+    @staticmethod
+    def get_total_usuarios():
+        return Usuario.objects.filter(ativo=True).count()
+
+    @staticmethod
+    def get_total_alunos():
+        return Aluno.objects.filter(ativo=True).count()
+
+    @staticmethod
+    def get_total_funcionarios():
+        return Funcionario.objects.filter(ativo=True).count()
+
+    @staticmethod
+    def get_total_turmas():
+        return Turma.objects.filter(ativo=True).count()
+
+    @staticmethod
+    def get_total_vagas():
+        return Vaga.objects.filter(ativo=True).count()
+
+    @staticmethod
+    def get_total_inscricoes():
+        return Inscricao.objects.count()
+
+    @staticmethod
+    def get_total_presencas():
+        return Presenca.objects.filter(presente=True).count()
