@@ -502,3 +502,100 @@ class VagaMonitoriaService:
         nome = vaga.nome
         VagaRepository.delete_vaga(vaga)
         return nome
+    
+
+
+class TurmaService:
+    """Service para operações de turmas."""
+
+    def listar_turmas(self, vaga_filtro=None, status_filtro=None):
+        turmas = TurmaRepository.get_all_turmas()
+        if vaga_filtro:
+            turmas = turmas.filter(vaga__id=vaga_filtro)
+        if status_filtro:
+            turmas = turmas.filter(ativo=(status_filtro == 'ativa'))
+        return turmas
+
+    def detalhe_turma(self, turma_id):
+        turma = TurmaRepository.get_turma_by_id(turma_id)
+        participacoes = TurmaRepository.get_participacoes_by_turma(turma)
+        presencas = TurmaRepository.get_presencas_by_turma(turma)
+        return {
+            'turma': turma,
+            'participacoes': participacoes,
+            'presencas': presencas,
+        }
+
+    def criar_turma(self, nome, vaga_id, sala_id, descricao, data_inicio, data_fim, dias_semana, horario, monitor_id, curso_id):
+        try:
+            vaga = VagaRepository.get_vaga_by_id(vaga_id)
+            sala = Sala.objects.get(id=sala_id)
+            monitor = Aluno.objects.get(id=monitor_id)
+            curso = Curso.objects.get(id=curso_id)
+            turma = TurmaRepository.create_turma(
+                nome=nome,
+                vaga=vaga,
+                sala=sala,
+                descricao=descricao,
+                data_inicio=data_inicio,
+                data_fim=data_fim,
+                dias_da_semana=dias_semana,
+                horario=horario,
+                monitor=monitor,
+                curso=curso,
+                ativo=True
+            )
+            return turma
+        except Exception:
+            return None
+
+    def editar_turma(self, turma_id, nome, descricao, horario, ativo):
+        turma = TurmaRepository.get_turma_by_id(turma_id)
+        turma.nome = nome
+        turma.descricao = descricao
+        turma.horario = horario
+        turma.ativo = ativo
+        turma.save()
+        return turma
+
+    def deletar_turma(self, turma_id):
+        turma = TurmaRepository.get_turma_by_id(turma_id)
+        nome = turma.nome
+        TurmaRepository.delete_turma(turma)
+        return nome
+    
+class RelatorioService:
+    """Service para relatórios do sistema."""
+
+    def desempenho(self):
+        participacoes = RelatorioRepository.get_participacoes()
+        return {
+            'participacoes': participacoes,
+            'titulo': 'Relatório de Desempenho',
+        }
+
+    def frequencia(self):
+        presencas = RelatorioRepository.get_presencas()
+        return {
+            'presencas': presencas,
+            'titulo': 'Relatório de Frequência',
+        }
+
+    def inscricoes(self):
+        inscricoes = RelatorioRepository.get_inscricoes()
+        return {
+            'inscricoes': inscricoes,
+            'titulo': 'Relatório de Inscrições',
+        }
+
+    def geral(self):
+        return {
+            'total_usuarios': RelatorioRepository.get_total_usuarios(),
+            'total_alunos': RelatorioRepository.get_total_alunos(),
+            'total_funcionarios': RelatorioRepository.get_total_funcionarios(),
+            'total_turmas': RelatorioRepository.get_total_turmas(),
+            'total_vagas': RelatorioRepository.get_total_vagas(),
+            'total_inscricoes': RelatorioRepository.get_total_inscricoes(),
+            'total_presencas': RelatorioRepository.get_total_presencas(),
+            'titulo': 'Relatório Geral',
+        }

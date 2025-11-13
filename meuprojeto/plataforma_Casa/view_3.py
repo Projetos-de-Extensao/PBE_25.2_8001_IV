@@ -365,3 +365,113 @@ def deletar_vaga_monitoria(request, vaga_id):
     else:
         messages.error(request, 'Erro ao deletar vaga ou permissão negada.')
     return redirect('listar_vagas_monitoria')
+
+
+## 5. MÓDULO DE TURMAS - CRUD + DETALHE
+@user_passes_test(lambda u: u.is_staff or u.is_superuser)
+@login_required
+def listar_turmas(request):
+    service = TurmaService()
+    vaga_filtro = request.GET.get('vaga')
+    status_filtro = request.GET.get('status')
+    turmas = service.listar_turmas(vaga_filtro, status_filtro)
+    context = {
+        'turmas': turmas,
+        'vagas': Vaga.objects.all(),
+    }
+    return render(request, 'turmas/listar.html', context)
+
+@user_passes_test(lambda u: u.is_staff or u.is_superuser)
+@login_required
+def detalhe_turma(request, turma_id):
+    service = TurmaService()
+    context = service.detalhe_turma(turma_id)
+    return render(request, 'turmas/detalhe.html', context)
+
+@user_passes_test(lambda u: u.is_staff or u.is_superuser)
+@login_required
+def criar_turma(request):
+    service = TurmaService()
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        vaga_id = request.POST.get('vaga')
+        sala_id = request.POST.get('sala')
+        descricao = request.POST.get('descricao')
+        data_inicio = request.POST.get('data_inicio')
+        data_fim = request.POST.get('data_fim')
+        dias_semana = request.POST.get('dias_semana')
+        horario = request.POST.get('horario')
+        monitor_id = request.POST.get('monitor')
+        curso_id = request.POST.get('curso')
+        turma = service.criar_turma(nome, vaga_id, sala_id, descricao, data_inicio, data_fim, dias_semana, horario, monitor_id, curso_id)
+        if turma:
+            messages.success(request, f'Turma "{nome}" criada com sucesso!')
+            return redirect('listar_turmas')
+        else:
+            messages.error(request, 'Erro ao criar turma.')
+    context = {
+        'vagas': Vaga.objects.filter(ativo=True),
+        'salas': Sala.objects.filter(ativo=True),
+        'monitores': Aluno.objects.filter(ativo=True),
+        'cursos': Curso.objects.filter(ativo=True),
+    }
+    return render(request, 'turmas/criar.html', context)
+
+@user_passes_test(lambda u: u.is_staff or u.is_superuser)
+@login_required
+def editar_turma(request, turma_id):
+    service = TurmaService()
+    turma = get_object_or_404(Turma, id=turma_id)
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        descricao = request.POST.get('descricao')
+        horario = request.POST.get('horario')
+        ativo = request.POST.get('ativo') == 'on'
+        turma_editada = service.editar_turma(turma_id, nome, descricao, horario, ativo)
+        if turma_editada:
+            messages.success(request, 'Turma atualizada com sucesso!')
+            return redirect('listar_turmas')
+        else:
+            messages.error(request, 'Erro ao atualizar turma.')
+    context = {'turma': turma}
+    return render(request, 'turmas/editar.html', context)
+
+@user_passes_test(lambda u: u.is_staff or u.is_superuser)
+@login_required
+def deletar_turma(request, turma_id):
+    service = TurmaService()
+    nome = service.deletar_turma(turma_id)
+    if nome:
+        messages.success(request, f'Turma "{nome}" deletada com sucesso!')
+    else:
+        messages.error(request, 'Erro ao deletar turma.')
+    return redirect('listar_turmas')
+
+## 8. MÓDULO DE RELATÓRIOS - ANÁLISE E CONSULTORIA
+@login_required
+def listar_relatorios(request):
+    return render(request, 'relatorios/listar.html')
+
+@login_required
+def relatorio_desempenho(request):
+    service = RelatorioService()
+    context = service.desempenho()
+    return render(request, 'relatorios/desempenho.html', context)
+
+@login_required
+def relatorio_frequencia(request):
+    service = RelatorioService()
+    context = service.frequencia()
+    return render(request, 'relatorios/frequencia.html', context)
+
+@login_required
+def relatorio_inscricoes(request):
+    service = RelatorioService()
+    context = service.inscricoes()
+    return render(request, 'relatorios/inscricoes.html', context)
+
+@login_required
+def relatorio_geral(request):
+    service = RelatorioService()
+    context = service.geral()
+    return render(request, 'relatorios/geral.html', context)
