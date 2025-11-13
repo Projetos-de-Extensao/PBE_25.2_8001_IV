@@ -1,4 +1,19 @@
-from .models import Usuario, Funcionario, Aluno, Vaga, Turma, Inscricao, Curso, TipoUsuario, Sala, ParticipacaoMonitoria, Presenca
+from django.db.models import Count
+from .models import ( 
+    Usuario,
+    Funcionario, 
+    Aluno, 
+    Vaga, 
+    Turma, 
+    Inscricao, 
+    Curso, 
+    TipoUsuario, 
+    Sala, 
+    ParticipacaoMonitoria, 
+    Presenca,
+    Disciplina
+
+    )
 
 
 class VagaRepository:
@@ -215,3 +230,49 @@ class PerfilRepository:
             return Funcionario.objects.get(email=email)
         except Funcionario.DoesNotExist:
             return None
+        
+class VagaRepository:
+    @staticmethod
+    def get_all_vagas():
+        return Vaga.objects.all().select_related('curso', 'disciplina').prefetch_related('coordenadores', 'professores', 'monitores').annotate(
+            total_inscritos=Count('inscricao')
+        )
+
+    @staticmethod
+    def get_vagas_by_coordenador(funcionario):
+        return Vaga.objects.filter(coordenadores=funcionario).select_related('curso', 'disciplina').prefetch_related('coordenadores', 'professores', 'monitores').annotate(
+            total_inscritos=Count('inscricao')
+        )
+
+    @staticmethod
+    def get_vaga_by_id(vaga_id):
+        return Vaga.objects.get(id=vaga_id)
+
+    @staticmethod
+    def get_inscricoes_by_vaga(vaga):
+        return Inscricao.objects.filter(vaga=vaga).select_related('aluno', 'aluno__curso').order_by('-data_inscricao')
+
+    @staticmethod
+    def get_tipo_usuario_by_id(tipo_usuario_id):
+        return TipoUsuario.objects.get(id=tipo_usuario_id)
+
+    @staticmethod
+    def get_curso_by_id(curso_id):
+        return Curso.objects.get(id=curso_id)
+
+    @staticmethod
+    def get_disciplina_by_id(disciplina_id):
+        return Disciplina.objects.get(id=disciplina_id)
+
+    @staticmethod
+    def get_funcionario_by_id(funcionario_id):
+        return Funcionario.objects.get(id=funcionario_id)
+
+    @staticmethod
+    def create_vaga(**kwargs):
+        vaga = Vaga.objects.create(**kwargs)
+        return vaga
+
+    @staticmethod
+    def delete_vaga(vaga):
+        vaga.delete()

@@ -404,3 +404,101 @@ class PortalVagasService:
                 context['aluno'] = None
 
         return context
+
+
+
+class VagaMonitoriaService:
+    """Service para operações de vagas."""
+
+    def listar_vagas(self, user, curso_filtro=None, status_filtro=None):
+        if user.is_staff or user.is_superuser:
+            vagas = VagaRepository.get_all_vagas()
+        else:
+            try:
+                funcionario = Funcionario.objects.get(email=user.email)
+                vagas = VagaRepository.get_vagas_by_coordenador(funcionario)
+            except Funcionario.DoesNotExist:
+                vagas = Vaga.objects.none()
+        if curso_filtro:
+            vagas = vagas.filter(curso__id=curso_filtro)
+        if status_filtro:
+            vagas = vagas.filter(ativo=(status_filtro == 'ativa'))
+        return vagas
+
+    def detalhe_vaga(self, vaga_id, user):
+        vaga = VagaRepository.get_vaga_by_id(vaga_id)
+        if not (user.is_staff or user.is_superuser):
+            try:
+                funcionario = Funcionario.objects.get(email=user.email)
+                if funcionario not in vaga.coordenadores.all() and funcionario not in vaga.professores.all():
+                    return None
+            except Funcionario.DoesNotExist:
+                return None
+        inscricoes = VagaRepository.get_inscricoes_by_vaga(vaga)
+        stats = {
+            'total_inscricoes': inscricoes.count(),
+            'pendentes': inscricoes.filter(status='Pendente').count(),
+            'entrevista': inscricoes.filter(status='Entrevista').count(),
+            'aprovados': inscricoes.filter(status='Aprovado').count(),
+            'rejeitados': inscricoes.filter(status='Não Aprovado').count(),
+        }
+        return {'vaga': vaga, 'inscricoes': inscricoes, **stats}
+
+    def criar_vaga(self, nome, curso_id, disciplina_id, coordenador_id, descricao, requisitos, numero_vagas, user):
+        if not (user.is_staff or user.is_superuser):
+            try:
+                funcionario = Funcionario.objects.get(email=user.email)
+                if str(funcionario.id) != str(coordenador_id):
+                    return None
+            except Funcionario.DoesNotExist:
+                return None
+        try:
+            curso = VagaRepository.get_curso_by_id(curso_id)
+            disciplina = VagaRepository.get_disciplina_by_id(disciplina_id)
+            coordenador = VagaRepository.get_funcionario_by_id(coordenador_id)
+            vaga = VagaRepository.create_vaga(
+                nome=nome,
+                curso=curso,
+                disciplina=disciplina,
+                descricao=descricao,
+                requisitos=requisitos,
+                numero_vagas=int(numero_vagas) if numero_vagas else 1,
+                ativo=True
+            )
+            vaga.coordenadores.add(coordenador)
+            return vaga
+        except Exception:
+            return None
+
+    def editar_vaga(self, vaga_id, user, nome, descricao, requisitos, ativo, coordenadores_ids=None, professores_ids=None):
+        vaga = VagaRepository.get_vaga_by_id(vaga_id)
+        if not (user.is_staff or user.is_superuser):
+            try:
+                funcionario = Funcionario.objects.get(email=user.email)
+                if funcionario not in vaga.coordenadores.all() and funcionario not in vaga.professores.all():
+                    return None
+            except Funcionario.DoesNotExist:
+                return None
+        vaga.nome = nome
+        vaga.descricao = descricao
+        vaga.requisitos = requisitos
+        vaga.ativo = ativo
+        if coordenadores_ids:
+            vaga.coordenadores.set(coordenadores_ids)
+        if professores_ids:
+            vaga.professores.set(professores_ids)
+        vaga.save()
+        return vaga
+
+    def deletar_vaga(self, vaga_id, user):
+        vaga = VagaRepository.get_vaga_by_id(vaga_id)
+        if not (user.is_staff or user.is_superuser):
+            try:
+                funcionario = Funcionario.objects.get(email=user.email)
+                if funcionario not in vaga.coordenadores.all():
+                    return None
+            except Funcionario.DoesNotExist:
+                return None
+        nome = vaga.nome
+        VagaRepository.delete_vaga(vaga)
+        return nome
