@@ -9,6 +9,7 @@ from .repository_2 import (
     AlunoRepository,
     MonitoriaRepository,
     PerfilRepository,
+    PortalVagasRepository,
     PresencaRepository,
     RelatorioRepository,
     TurmaRepository,
@@ -344,67 +345,6 @@ class PerfilService:
             aluno.save()
 
 
-class PortalVagasService:
-    """Service para lógica do portal público de vagas."""
-
-    def get_context(self, request):
-        # Buscar todas as vagas ativas
-        vagas = Vaga.objects.filter(ativo=True).select_related(
-            'curso', 'disciplina'
-        ).prefetch_related(
-            'coordenadores', 'professores'
-        ).annotate(
-            total_inscritos=Count('inscricao')
-        )
-
-        # Filtros
-        busca = request.GET.get('busca', '').strip()
-        if busca:
-            vagas = vagas.filter(
-                Q(disciplina__nome__icontains=busca) |
-                Q(disciplina__codigo__icontains=busca) |
-                Q(nome__icontains=busca) |
-                Q(descricao__icontains=busca)
-            )
-
-        curso_filtro = request.GET.get('curso')
-        if curso_filtro:
-            vagas = vagas.filter(curso__id=curso_filtro)
-
-        tipo_filtro = request.GET.get('tipo')
-        if tipo_filtro:
-            vagas = vagas.filter(tipo_vaga=tipo_filtro)
-
-        # Estatísticas
-        total_vagas = Vaga.objects.filter(ativo=True).count()
-        total_cursos = Vaga.objects.filter(ativo=True).values('curso').distinct().count()
-        total_disciplinas = Vaga.objects.filter(ativo=True).values('disciplina').distinct().count()
-        cursos = Curso.objects.filter(ativo=True).order_by('nome')
-
-        context = {
-            'vagas': vagas,
-            'cursos': cursos,
-            'total_vagas': total_vagas,
-            'total_cursos': total_cursos,
-            'total_disciplinas': total_disciplinas,
-        }
-
-        # Dados do aluno autenticado
-        if request.user.is_authenticated:
-            try:
-                aluno = Aluno.objects.get(email=request.user.email)
-                context['aluno'] = aluno
-                perfil_incompleto = request.session.pop('perfil_incompleto', None)
-                vaga_tentada = request.session.pop('vaga_tentada', None)
-                if perfil_incompleto:
-                    context['perfil_incompleto'] = perfil_incompleto
-                if vaga_tentada:
-                    context['vaga_tentada'] = vaga_tentada
-            except Exception:
-                context['aluno'] = None
-
-        return context
-
 
 
 class VagaMonitoriaService:
@@ -599,3 +539,51 @@ class RelatorioService:
             'total_presencas': RelatorioRepository.get_total_presencas(),
             'titulo': 'Relatório Geral',
         }
+    
+
+class PortalVagasService:
+    def listar_vagas(self, busca=None, curso=None, tipo=None):
+        vagas = PortalVagasRepository.vagas_ativas()
+        vagas = PortalVagasRepository.filtrar_vagas(vagas, busca, curso, tipo)
+        return vagas
+
+    def estatisticas(self):
+        return {
+            'total_vagas': PortalVagasRepository.total_vagas(),
+            'total_cursos': PortalVagasRepository.total_cursos(),
+            'total_disciplinas': PortalVagasRepository.total_disciplinas(),
+            'cursos': PortalVagasRepository.cursos_ativos(),
+        }
+
+    def get_aluno(self, email):
+        return PortalVagasRepository.get_aluno_by_email(email)
+
+    def pode_candidatar(self, aluno, vaga):
+        perfil_incompleto = []
+        if not aluno.curso:
+            perfil_incompleto.append('Curso não cadastrado')
+        if not aluno.periodo or aluno.periodo <= 0:
+            perfil_incompleto.append('Período não informado')
+        if not aluno.cr_geral or aluno.cr_geral <= 0:
+            perfil_incompleto.append('CR (Coeficiente de Rendimento) não informado')
+        if not aluno.celular:
+            perfil_incompleto.append('Celular não informado')
+        return perfil_incompleto
+
+    def candidatar(self, aluno, vaga, arquivos):
+        if PortalVagasRepository.inscricao_exists(aluno, vaga):
+            return None, 'Já inscrito'
+        if PortalVagasRepository.vagas_disponiveis(vaga) <= 0:
+            return None, 'Sem vagas disponíveis'
+        inscricao = PortalVagasRepository.criar_inscricao(aluno, vaga)
+        # Histórico Escolar obrigatório
+        historico = arquivos.get('documento_histórico_escolar')
+        if not historico:
+            return None, 'Histórico Escolar obrigatório'
+        PortalVagasRepository.criar_documento(inscricao, 'Histórico Escolar', historico, historico.name)
+        # Opcionais
+        for field, tipo_doc in {'documento_currículo': 'Currículo', 'documento_carta_de_motivação': 'Carta de Motivação'}.items():
+            arquivo = arquivos.get(field)
+            if arquivo:
+                PortalVagasRepository.criar_documento(inscricao, tipo_doc, arquivo, arquivo.name)
+        return inscricao, None

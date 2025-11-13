@@ -475,3 +475,77 @@ def relatorio_geral(request):
     service = RelatorioService()
     context = service.geral()
     return render(request, 'relatorios/geral.html', context)
+
+
+
+def portal_vagas(request):
+    service = PortalVagasService()
+    busca = request.GET.get('busca', '').strip()
+    curso_filtro = request.GET.get('curso')
+    tipo_filtro = request.GET.get('tipo')
+    vagas = service.listar_vagas(busca, curso_filtro, tipo_filtro)
+    stats = service.estatisticas()
+    context = {
+        'vagas': vagas,
+        **stats,
+    }
+    if request.user.is_authenticated:
+        aluno = service.get_aluno(request.user.email)
+        context['aluno'] = aluno
+        perfil_incompleto = request.session.pop('perfil_incompleto', None)
+        vaga_tentada = request.session.pop('vaga_tentada', None)
+        if perfil_incompleto:
+            context['perfil_incompleto'] = perfil_incompleto
+        if vaga_tentada:
+            context['vaga_tentada'] = vaga_tentada
+    template = 'vagas/portal_logged.html' if request.user.is_authenticated else 'vagas/portal_landing.html'
+    return render(request, template, context)
+
+
+## 11. PORTAL DE VAGAS E CANDIDATURAS
+@login_required(login_url='login')
+def candidatar_vaga(request, vaga_id):
+    service = PortalVagasService()
+    vaga = service.get_vaga(vaga_id)
+    aluno = service.get_aluno(request.user.email)
+    if not aluno:
+        messages.error(request, '❌ Apenas alunos podem se candidatar a vagas de monitoria!')
+        return redirect('portal_vagas')
+    perfil_incompleto = service.pode_candidatar(aluno, vaga)
+    if perfil_incompleto:
+        request.session['perfil_incompleto'] = perfil_incompleto
+        request.session['vaga_tentada'] = vaga_id
+        messages.warning(request, '⚠️ Complete seu perfil para se candidatar a esta vaga!')
+        return redirect('portal_vagas')
+    if service.inscricao_exists(aluno, vaga):
+        messages.warning(request, '⚠️ Você já se candidatou a esta vaga!')
+        return redirect('minhas_inscricoes')
+    if service.vagas_disponiveis(vaga) <= 0:
+        messages.error(request, '❌ Esta vaga não possui mais vagas disponíveis.')
+        return redirect('portal_vagas')
+    if request.method == 'POST':
+        inscricao, erro = service.candidatar(aluno, vaga, request.FILES)
+        if inscricao:
+            messages.success(request, f'✅ Candidatura enviada com sucesso para a vaga de {vaga.disciplina.nome}!')
+            return redirect('minhas_inscricoes')
+        else:
+            messages.error(request, f'❌ Erro ao processar candidatura: {erro}')
+    context = {'vaga': vaga, 'aluno': aluno}
+    return render(request, 'vagas/candidatar.html', context)
+
+# 13. REGISTRO E VALIDAÇÃO DE HORAS
+# registrar_horas
+# meus_registros_horas
+# detalhes_registro
+# validar_horas
+# aprovar_horas
+# 14. DASHBOARD DE GESTÃO
+# dashboard_gestao
+# gerenciar_pagamentos
+# processar_pagamento
+# 16. GERENCIAMENTO DE DISCIPLINAS (PROFESSOR)
+# listar_disciplinas
+# criar_disciplina
+# editar_disciplina
+# detalhes_disciplina
+

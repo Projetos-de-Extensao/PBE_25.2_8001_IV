@@ -1,5 +1,6 @@
 from django.db.models import Count
 from .models import ( 
+    Documento,
     Usuario,
     Funcionario, 
     Aluno, 
@@ -276,3 +277,136 @@ class VagaRepository:
     @staticmethod
     def delete_vaga(vaga):
         vaga.delete()
+
+
+class TurmaRepository:
+    @staticmethod
+    def get_all_turmas():
+        return Turma.objects.all().select_related('vaga', 'monitor', 'sala', 'curso')
+
+    @staticmethod
+    def get_turma_by_id(turma_id):
+        return Turma.objects.get(id=turma_id)
+
+    @staticmethod
+    def get_participacoes_by_turma(turma):
+        return ParticipacaoMonitoria.objects.filter(turma=turma).select_related('aluno')
+
+    @staticmethod
+    def get_presencas_by_turma(turma):
+        return Presenca.objects.filter(turma=turma).select_related('aluno')
+
+    @staticmethod
+    def create_turma(**kwargs):
+        return Turma.objects.create(**kwargs)
+
+    @staticmethod
+    def delete_turma(turma):
+        turma.delete()
+
+class RelatorioRepository:
+    @staticmethod
+    def get_participacoes():
+        return ParticipacaoMonitoria.objects.all().select_related('aluno', 'turma')
+
+    @staticmethod
+    def get_presencas():
+        return Presenca.objects.all().select_related('aluno', 'turma')
+
+    @staticmethod
+    def get_inscricoes():
+        return Inscricao.objects.all().select_related('aluno', 'vaga')
+
+    @staticmethod
+    def get_total_usuarios():
+        return Usuario.objects.filter(ativo=True).count()
+
+    @staticmethod
+    def get_total_alunos():
+        return Aluno.objects.filter(ativo=True).count()
+
+    @staticmethod
+    def get_total_funcionarios():
+        return Funcionario.objects.filter(ativo=True).count()
+
+    @staticmethod
+    def get_total_turmas():
+        return Turma.objects.filter(ativo=True).count()
+
+    @staticmethod
+    def get_total_vagas():
+        return Vaga.objects.filter(ativo=True).count()
+
+    @staticmethod
+    def get_total_inscricoes():
+        return Inscricao.objects.count()
+
+    @staticmethod
+    def get_total_presencas():
+        return Presenca.objects.filter(presente=True).count()
+    
+
+class PortalVagasRepository:
+    @staticmethod
+    def vagas_ativas():
+        return Vaga.objects.filter(ativo=True).select_related('curso', 'disciplina').prefetch_related('coordenadores', 'professores').annotate(total_inscritos=Count('inscricao'))
+
+    @staticmethod
+    def filtrar_vagas(vagas, busca=None, curso=None, tipo=None):
+        if busca:
+            vagas = vagas.filter(
+                Q(disciplina__nome__icontains=busca) |
+                Q(disciplina__codigo__icontains=busca) |
+                Q(nome__icontains=busca) |
+                Q(descricao__icontains=busca)
+            )
+        if curso:
+            vagas = vagas.filter(curso__id=curso)
+        if tipo:
+            vagas = vagas.filter(tipo_vaga=tipo)
+        return vagas
+
+    @staticmethod
+    def total_vagas():
+        return Vaga.objects.filter(ativo=True).count()
+
+    @staticmethod
+    def total_cursos():
+        return Vaga.objects.filter(ativo=True).values('curso').distinct().count()
+
+    @staticmethod
+    def total_disciplinas():
+        return Vaga.objects.filter(ativo=True).values('disciplina').distinct().count()
+
+    @staticmethod
+    def cursos_ativos():
+        return Curso.objects.filter(ativo=True).order_by('nome')
+
+    @staticmethod
+    def get_vaga(vaga_id):
+        return Vaga.objects.get(id=vaga_id, ativo=True)
+
+    @staticmethod
+    def get_aluno_by_email(email):
+        try:
+            return Aluno.objects.get(email=email)
+        except Aluno.MultipleObjectsReturned:
+            return Aluno.objects.filter(email=email).first()
+        except Aluno.DoesNotExist:
+            return None
+
+    @staticmethod
+    def inscricao_exists(aluno, vaga):
+        return Inscricao.objects.filter(aluno=aluno, vaga=vaga).exists()
+
+    @staticmethod
+    def vagas_disponiveis(vaga):
+        return vaga.vagas_disponiveis()
+
+    @staticmethod
+    def criar_inscricao(aluno, vaga):
+        return Inscricao.objects.create(aluno=aluno, vaga=vaga, status='Pendente')
+
+    @staticmethod
+    def criar_documento(inscricao, tipo, arquivo, nome_arquivo):
+        return Documento.objects.create(inscricao=inscricao, tipo=tipo, arquivo=arquivo, nome_arquivo=nome_arquivo)
