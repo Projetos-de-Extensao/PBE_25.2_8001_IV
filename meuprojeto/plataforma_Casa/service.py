@@ -6,14 +6,17 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from django.db import IntegrityError, transaction
 
-from .repository_2 import (
+from .repository import (
     AlunoRepository,
+    AuthRepository,
     DashboardGestaoRepository,
+    DisciplinaRepository,
     MonitoriaRepository,
     PerfilRepository,
     PortalVagasRepository,
     PresencaRepository,
     RegistroHorasRepository,
+    RegistroRepository,
     RelatorioRepository,
     TurmaRepository,
     UsuarioRepository,
@@ -693,3 +696,85 @@ class DashboardGestaoService:
             'now': timezone.now(),
         }
         return context
+    
+
+class DisciplinaService:
+    def listar_disciplinas(self, curso=None, periodo=None, busca=None):
+        return DisciplinaRepository.listar_disciplinas(
+            ativo=True,
+            curso_id=curso,
+            periodo=periodo,
+            busca=busca
+        )
+
+    def get_cursos_ativos(self):
+        return DisciplinaRepository.get_cursos_ativos()
+
+    def get_disciplina(self, disciplina_id):
+        return DisciplinaRepository.get_disciplina_by_id(disciplina_id)
+
+    def pode_editar(self, disciplina, user):
+        if user.is_staff or user.is_superuser:
+            return True
+        funcionario = DisciplinaRepository.get_funcionario_by_email(user.email)
+        return funcionario and disciplina.criado_por == funcionario
+    
+
+
+class RegistroService:
+    def validar_dados(self, nome, email, matricula, curso_id, password, password_confirm, terms):
+        erros = []
+        if not all([nome, email, matricula, curso_id, password]):
+            erros.append('Por favor, preencha todos os campos obrigatórios.')
+        if not terms:
+            erros.append('Você deve aceitar os Termos de Serviço e Política de Privacidade.')
+        if password != password_confirm:
+            erros.append('As senhas não correspondem!')
+        if len(password) < 8:
+            erros.append('A senha deve ter no mínimo 8 caracteres.')
+        if not any(c.isupper() for c in password):
+            erros.append('A senha deve conter pelo menos 1 letra maiúscula.')
+        if not any(c.islower() for c in password):
+            erros.append('A senha deve conter pelo menos 1 letra minúscula.')
+        if not any(c.isdigit() for c in password):
+            erros.append('A senha deve conter pelo menos 1 número.')
+        if RegistroRepository.email_existe(email):
+            erros.append('Este email já está cadastrado.')
+        if RegistroRepository.matricula_existe(matricula):
+            erros.append('Esta matrícula já está cadastrada.')
+        try:
+            RegistroRepository.get_curso(curso_id)
+        except:
+            erros.append('Curso inválido.')
+        return erros
+
+    def gerar_username_unico(self, email):
+        username = email.split('@')[0] if email else ''
+        base_username = username
+        counter = 1
+        while RegistroRepository.username_existe(username):
+            username = f"{base_username}{counter}"
+            counter += 1
+        return username
+
+    def registrar_usuario_aluno(self, nome, email, matricula, curso_id, password):
+        username = self.gerar_username_unico(email)
+        user = RegistroRepository.criar_usuario(username, email, password, nome)
+        grupo_aluno = RegistroRepository.get_grupo_aluno()
+        RegistroRepository.adicionar_grupo(user, grupo_aluno)
+        tipo_usuario = RegistroRepository.get_tipo_usuario_aluno()
+        curso = RegistroRepository.get_curso(curso_id)
+        periodo = 1
+        cr_geral = 0.0
+        aluno = RegistroRepository.criar_aluno(
+            nome, email, tipo_usuario, matricula, curso, periodo, cr_geral
+        )
+        return user, aluno
+    
+
+class AuthService:
+    def autenticar_usuario(self, request, username, password):
+        return AuthRepository.autenticar(request, username, password)
+
+    def logout(self, request):
+        AuthRepository.logout_usuario(request)
