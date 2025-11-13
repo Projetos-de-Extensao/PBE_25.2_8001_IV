@@ -199,3 +199,19 @@ class RelatorioRepository:
     @staticmethod
     def get_total_presencas():
         return Presenca.objects.filter(presente=True).count()
+    
+
+class PerfilRepository:
+    @staticmethod
+    def get_aluno_by_email(email):
+        try:
+            return Aluno.objects.get(email=email)
+        except Aluno.DoesNotExist:
+            return None
+
+    @staticmethod
+    def get_professor_by_email(email):
+        try:
+            return Funcionario.objects.get(email=email)
+        except Funcionario.DoesNotExist:
+            return None

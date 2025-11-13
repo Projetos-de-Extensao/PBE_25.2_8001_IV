@@ -8,6 +8,7 @@ from django.db import IntegrityError, transaction
 from .repository_2 import (
     AlunoRepository,
     MonitoriaRepository,
+    PerfilRepository,
     PresencaRepository,
     RelatorioRepository,
     TurmaRepository,
@@ -322,15 +323,8 @@ class PerfilService:
     """Service para operações de perfil do usuário."""
 
     def get_perfil_context(self, user):
-        # Busca aluno e professor pelo email do usuário
-        try:
-            aluno = Aluno.objects.get(email=user.email)
-        except Aluno.DoesNotExist:
-            aluno = None
-        try:
-            professor = Funcionario.objects.get(email=user.email)
-        except Funcionario.DoesNotExist:
-            professor = None
+        aluno = PerfilRepository.get_aluno_by_email(user.email)
+        professor = PerfilRepository.get_professor_by_email(user.email)
         return {
             'usuario': user,
             'aluno': aluno,
@@ -343,15 +337,11 @@ class PerfilService:
         user.first_name = nome
         user.email = email
         user.save()
-        # Atualiza também Aluno, se existir
-        try:
-            aluno = Aluno.objects.get(email=user.email)
+        aluno = PerfilRepository.get_aluno_by_email(user.email)
+        if aluno:
             aluno.nome = nome
             aluno.email = email
             aluno.save()
-        except Aluno.DoesNotExist:
-            pass
-
 
 
 class PortalVagasService:
