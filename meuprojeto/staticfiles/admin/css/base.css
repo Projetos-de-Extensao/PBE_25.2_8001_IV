@@ -773,10 +773,6 @@ a.deletelink:focus, a.deletelink:hover {
     padding-left: 0;
     float: right;
     position: relative;
-<<<<<<< HEAD
-=======
-    margin-top: -48px;
->>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
 }
 
 .object-tools li {
@@ -824,13 +820,10 @@ a.deletelink:focus, a.deletelink:hover {
     background-image: url(../img/tooltag-add.svg);
 }
 
-<<<<<<< HEAD
 .object-tools:has(a.addlink) {
     margin-top: -48px;
 }
 
-=======
->>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
 /* OBJECT HISTORY */
 
 #change-history table {

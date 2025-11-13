@@ -465,13 +465,10 @@ input[type="submit"], button {
         margin-left: 15px;
     }
 
-<<<<<<< HEAD
     .object-tools:has(a.addlink) {
         margin-top: 0px;
     }
 
-=======
->>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
     /* Forms */
 
     .form-row {

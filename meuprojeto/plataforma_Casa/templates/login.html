@@ -641,8 +641,12 @@
             <p style="text-align: center; color: #7f8c8d; font-size: 0.85rem;">
                 <!-- Link para página de registro com tooltip -->
                 Não tem conta? 
-                <a href="{% url 'register' %}" style="color: #0097a7; text-decoration: none; font-weight: 600;">
+                <a href="{% url 'register' %}" style="color: #0097a7; text-decoration: none; font-weight: 600; display: block;">
                     <i class="fas fa-user-plus"></i> Crie aqui
+                </a>
+                <br/>Esqueceu a senha? 
+                    <a href="{% url 'recuperar' %}"  style="color: #0097a7; text-decoration: none; font-weight: 600; display: block;">
+                    <i class="fas fa-user-plus"></i> Recupere aqui
                 </a>
             </p>
         </div>

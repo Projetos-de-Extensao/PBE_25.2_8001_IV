@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Senha - Plataforma Casa</title>
+    <!-- Bootstrap 5.3.0 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Font Awesome 6.4.0 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f5f5f2; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 1rem; }
+        .register-container { width: 100%; max-width: 430px; padding: 2rem 1.5rem; background: #fafaf8; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); border-top: 5px solid #F5AC00; }
+        .register-header { text-align: center; margin-bottom: 2rem; }
+        .register-header i { font-size: 3rem; color: #F5AC00; margin-bottom: 1rem; }
+        .register-header h1 { color: #002555; font-size: 1.65rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .register-header p { color: #6d6e71; font-size: 0.92rem; }
+        .form-group { margin-bottom: 1.6rem; }
+        .form-group label { color: #002555; font-weight: 600; margin-bottom: 0.45rem; display: block; }
+        .input-group { position: relative; }
+        .input-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6d6e71; z-index: 10; }
+        .input-group input { width: 100%; padding: 0.8rem 1rem 0.8rem 2.4rem; border: 2px solid #d1d3d4; border-radius: 8px; font-size: 0.95rem; background: #fff; color: #6d6e71; transition: border .3s }
+        .input-group input:focus { border-color: #002555; box-shadow: 0 0 0 3px rgba(0,37,85,0.09); background: #fff; }
+        .alert { margin-bottom: 1rem; border-radius: 8px; border: none; padding: 1rem;}
+        .register-btn { width: 100%; padding: 0.9rem 1rem; background: linear-gradient(135deg, #002555 0%, #1245FF 100%); color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-top: 0.5rem;}
+        .register-btn:hover { transform: translateY(-2px); box-shadow:0 5px 20px rgba(0,37,85,0.23);}
+        .register-footer { text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #d1d3d4; color: #6d6e71; font-size: 0.9rem;}
+        .register-footer a { color: #002555; text-decoration: none; font-weight: 600;}
+        .register-footer a:hover { color: #F5AC00;}
+        @media (max-width: 768px) {
+            .register-container { padding: 1.1rem; border-radius: 11px;}
+            .register-header { margin-bottom: 1.2rem;}
+            .register-header i { font-size: 2rem; margin-bottom: 0.84rem;}
+            .register-header h1 { font-size: 1.15rem; margin-bottom: 0.35rem;}
+            .form-group { margin-bottom: 1rem;}
+        }
+    </style>
+</head>
+<body>
+<div class="register-container">
+    <div class="register-header">
+        <i class="fas fa-unlock-alt"></i>
+        <h1>Recuperar Senha</h1>
+        <p>Receba um link para redefinir sua senha no seu e-mail cadastrado.</p>
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <i class="fas fa-info-circle"></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    <form method="POST" class="register-form" id="passwordResetForm">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="email"><i class="fas fa-envelope"></i> Email associado à conta</label>
+            <div class="input-group">
+                <i class="fas fa-envelope input-icon"></i>
+                <input type="email" id="email" name="email" placeholder="Digite seu e-mail cadastrado" required autofocus value="{{ form.email.value|default:'' }}">
+            </div>
+            {% if form.email.errors %}
+                <div class="text-danger" style="font-size: 0.85rem; margin-top: 0.25rem;">
+                    {{ form.email.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+        <button type="submit" class="register-btn">
+            <i class="fas fa-paper-plane"></i> Enviar link de redefinição
+        </button>
+    </form>
+    <div class="register-footer">
+        <a href="{% url 'login' %}">
+            <i class="fas fa-sign-in-alt"></i> Voltar ao login
+        </a>
+    </div>
+</div>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

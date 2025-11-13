@@ -42,6 +42,12 @@ urlpatterns = [
     # URL: http://localhost:8000/register/
     # Todo novo usuário recebe automaticamente o role "Aluno"
     path('register/', views.register_view, name='register'),
+
+        # Rota para recuperação de senha
+    # Método HTTP: GET (exibe formulário), POST (cria nova senha do usuário)
+    # URL: http://localhost:8000/recuperar/
+    # Todo novo usuário recebe automaticamente o role "Aluno"
+    path('recuperar/', views.recuperar_view, name='recuperar'),
     
     # ============================================================================
     # 1. PÁGINA INICIAL - PORTAL DE VAGAS (LANDING PAGE)

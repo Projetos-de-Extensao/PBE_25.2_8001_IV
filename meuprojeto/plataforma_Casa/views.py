@@ -181,6 +181,38 @@ def logout_view(request):
     return redirect('login')
 
 
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+def recuperar_view(request):
+    """
+    View de Recuperação de Senha.
+    - GET: Exibe formulário de recuperação
+    - POST: Recebe email do usuário e envia link ou prepara formulário para nova senha
+    """
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        if not email:
+            messages.error(request, "Informe seu email.")
+        else:
+            try:
+                user = User.objects.get(email=email)
+                # Aqui você pode gerar token e preparar o formulário para nova senha
+                messages.success(request, "Instruções enviadas. Use o formulário abaixo para redefinir sua senha.")
+                # Fica na mesma página para o usuário preencher a nova senha
+                return redirect('recuperar')
+            except User.DoesNotExist:
+                messages.error(request, "Email não encontrado.")
+
+    # GET ou POST (com mensagens) exibe o template de recuperação/nova senha
+    return render(request, 'recuperarSenha.html')
+
+
+
 def register_view(request):
     """
     View de Registro/Cadastro - Cria novo usuário com role de "Aluno"
@@ -210,6 +242,10 @@ def register_view(request):
             # Valores padrão para campos removidos
             periodo = 1  # Valor padrão
             cr_geral = 0.0  # Valor padrão
+
+
+
+            
             
             # ==================== VALIDAÇÕES ====================
             

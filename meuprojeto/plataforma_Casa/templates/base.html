@@ -148,6 +148,12 @@
             overflow-x: hidden;       
         }
         
+         .caixa-topicos {
+             border: 1px solid var(--cor-amarelo-institucional); 
+             padding: 1rem;
+                      /        
+         }
+
         /* 
          * ========================================================================
          * SEÇÃO: NAVBAR SUPERIOR FIXA
@@ -314,6 +320,8 @@
             overflow-x: hidden; /* Previne scroll horizontal */
             max-width: 100%;
         }
+
+        
         
         /* 
          * ========== SIDEBAR (MENU LATERAL) ==========
@@ -337,6 +345,10 @@
             overflow-y: auto; /* Scroll vertical se necessário */
             overflow-x: hidden; /* Sem scroll horizontal */
             border-right: 4px solid #F5AC00; /* Borda amarela à direita */
+        }
+
+        .validacao-horas-monitoria{
+            margin-bottom: 1rem;
         }
         
         /* 
@@ -602,13 +614,6 @@
             overflow: hidden;
         }
         
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-        /* Responsividade */
-    @media (max-width: 576px) {
-=======
->>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
         /* ============================================================================
          * RESPONSIVIDADE MOBILE FIRST
          * ============================================================================
@@ -616,7 +621,6 @@
         
         /* MOBILE (base - até 768px) */
         @media (max-width: 768px) {
-<<<<<<< HEAD
             /* Navbar fixo menor no mobile */
             .navbar {
                 position: fixed !important;
@@ -642,23 +646,6 @@
                 z-index: 1049; /* Abaixo do navbar */
             }
             
-=======
-            /* Sidebar oculta por padrão no mobile */
->>>>>>> ecf042e0 (feat: Melhorias de responsividade mobile e ajustes de espaçamento)
-            .sidebar {
-                width: 280px;
-                max-width: 85vw; /* Não ultrapassa 85% da tela */
-                box-shadow: 2px 0 20px rgba(0,0,0,0.4);
-                transform: translateX(-100%);
-                transition: transform 0.3s ease-in-out, width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-                position: fixed;
-                left: 0;
-                top: 0;
-                height: 100vh;
-                z-index: 999;
-            }
-            
->>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
             /* Sidebar visível quando tem classe show (mobile) */
             .sidebar.show {
                 transform: translateX(0);
@@ -669,17 +656,11 @@
                 margin-left: 0 !important;
                 max-width: 100% !important;
                 width: 100% !important;
-<<<<<<< HEAD
                 padding: 0.5rem !important; /* ainda mais reduzido */
                 padding-top: 75px !important; /* Espaço ainda maior - 56px navbar + 19px margem */
                 min-height: 100vh;
                 position: relative;
                 z-index: 1; /* Abaixo do navbar */
-=======
-                padding: 1rem;
-                padding-top: calc(56px + 1rem); /* Navbar height + padding */
-                min-height: 100vh;
->>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
             }
             
             .main-content.sidebar-collapsed {
@@ -746,7 +727,6 @@
                 font-size: 1.25rem;
             }
             
-<<<<<<< HEAD
             /* Títulos de página menores - OTIMIZADO PARA MOBILE */
             .page-title h1 {
                 font-size: 1.375rem !important; /* reduzido */
@@ -810,42 +790,10 @@
             }
             
             /* Tabelas scroll horizontal - otimizadas */
-=======
-            /* Títulos de página menores */
-            .page-title h1 {
-                font-size: 1.5rem;
-            }
-            
-            /* Cards responsivos */
-            .card {
-                margin-bottom: 1rem;
-                border-radius: 0.75rem;
-            }
-            
-            .card-body {
-                padding: 1rem;
-            }
-            
-            /* Botões maiores (touch-friendly) */
-            .btn {
-                min-height: 44px;
-                padding: 0.75rem 1.25rem;
-            }
-            
-            /* Forms touch-friendly */
-            .form-control,
-            .form-select {
-                min-height: 44px;
-                font-size: 1rem;
-            }
-            
-            /* Tabelas scroll horizontal */
->>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
             .table-responsive {
                 -webkit-overflow-scrolling: touch;
             }
             
-<<<<<<< HEAD
             .table {
                 font-size: 0.8125rem !important; /* reduzido */
             }
@@ -859,17 +807,11 @@
             .dashboard-card {
                 margin-bottom: 0.75rem !important; /* reduzido */
                 padding: 0.75rem !important; /* reduzido */
-=======
-            /* Dashboard cards stack */
-            .dashboard-card {
-                margin-bottom: 1rem;
->>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
             }
             
             /* Container padding reduzido */
             .container,
             .container-fluid {
-<<<<<<< HEAD
                 padding-left: 0.625rem !important; /* reduzido */
                 padding-right: 0.625rem !important; /* reduzido */
             }
@@ -1027,10 +969,6 @@
             .col, [class*="col-"] {
                 padding-left: 0.375rem !important;
                 padding-right: 0.375rem !important;
-=======
-                padding-left: 0.75rem;
-                padding-right: 0.75rem;
->>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
             }
         }
         
@@ -1067,7 +1005,6 @@
             /* Remover classe show no desktop (não é necessária) */
             .sidebar.show {
                 width: 250px;
-<<<<<<< HEAD
             }
             
             /* Títulos maiores no desktop */
@@ -1389,10 +1326,6 @@
         }
         
         .main-content {
-=======
-            }
-        }        .main-content {
->>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
             padding: 1.25rem; /* Espaçamento confortável - não muito apertado */
             background-color: #fafaf8;
             margin-left: 250px;
@@ -1444,24 +1377,6 @@
         
 
         
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-        /* Responsividade */
-    @media (max-width: 576px) {
-            .sidebar {
-                width: 250px;
-                box-shadow: 2px 0 10px rgba(0,0,0,0.3);
-                transform: translateX(-250px);
-            }
-            
-            .sidebar:not(.collapsed) {
-                transform: translateX(0);
-            }
-            
-            .sidebar-close-btn {
-=======
->>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
         /* Sidebar overlay para mobile */
         .sidebar-overlay {
             position: fixed;
@@ -1582,10 +1497,6 @@
         /* Mostrar navbar mobile apenas em telas pequenas */
         @media (max-width: 768px) {
             .navbar-mobile {
-<<<<<<< HEAD
-=======
->>>>>>> ecf042e0 (feat: Melhorias de responsividade mobile e ajustes de espaçamento)
->>>>>>> d47f2c18 (removendo tudo relacionado a pagamentos do dashboard do admin)
                 display: block;
             }
             
@@ -1718,6 +1629,8 @@
             max-width: 100%;
             box-sizing: border-box;
         }
+
+        
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -1846,11 +1759,13 @@
                     <!-- Link: Registrar Horas -->
                     <!-- Lançar horas trabalhadas de monitoria -->
                     <!-- Permissão: add_registrohoras -->
+
+                
                     <a href="{% url 'registrar_horas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'registrar_horas' %}active{% endif %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Registrar Horas de Monitoria">
                         <i class="fas fa-clock"></i>
                         <span class="sidebar-text">Registrar Horas</span>
                     </a>
-                    
+                
                     <!-- Link: Meus Registros -->
                     <!-- Visualizar histórico de horas registradas -->
                     <!-- Ver status de validação pelo professor -->
@@ -1859,11 +1774,13 @@
                         <i class="fas fa-history"></i>
                         <span class="sidebar-text">Meus Registros</span>
                     </a>
-                    
+                       
                     <hr class="sidebar-divider">
                     
                     <!-- Link: Minhas Monitorias -->
                     <!-- Ver monitorias que está dando em formato de cards -->
+
+                   
                     <a href="{% url 'minhas_monitorias_cards' %}" class="sidebar-item {% if request.resolver_match.url_name == 'minhas_monitorias_cards' or request.resolver_match.url_name == 'alunos_da_monitoria' %}active{% endif %}" data-bs-toggle="tooltip"  data-bs-placement="right" title="Minhas Monitorias">
                         <i class="fas fa-chalkboard-user"></i>
                         <span class="sidebar-text">Minhas Monitorias</span>
@@ -1884,7 +1801,7 @@
                         <i class="fas fa-users"></i>
                         <span class="sidebar-text">Participando</span>
                     </a>
-                    
+                   
                     <hr class="sidebar-divider">
                     
                     <!-- Link: Portal de Vagas -->
@@ -1981,26 +1898,35 @@
                     </a>
                     
                     <hr class="sidebar-divider">
+
+
+
+                     <!-- Link: Validar Horas -->
+                    <!-- Aprovar/reprovar registros de horas dos monitores -->
+                    <!-- Verificar cumprimento de carga horária -->
+                    <!-- Permissão: change_registrohoras -->
+
+                    <div class="validacao-horas-monitoria">
+
+                    <a href="{% url 'validar_horas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'validar_horas' %}active{% endif %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Validar Horas de Monitoria">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="sidebar-text">Validar Horas</span>
+                    </a>
+                    </div>
                     
                     <!-- Link: Minhas Vagas -->
                     <!-- Criar, editar e gerenciar vagas de monitoria -->
                     <!-- Avaliar candidatos é feito dentro de cada vaga -->
                     <!-- Permissões: view_vaga, add_vaga, change_vaga, delete_vaga -->
+
+
+                <div class="caixa-topicos">    
                     <a href="{% url 'listar_vagas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_vagas' %}active{% endif %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Minhas Vagas de Monitoria">
                         <i class="fas fa-briefcase"></i>
                         <span class="sidebar-text">Minhas Vagas</span>
                     </a>
                     
                     <hr class="sidebar-divider">
-                    
-                    <!-- Link: Validar Horas -->
-                    <!-- Aprovar/reprovar registros de horas dos monitores -->
-                    <!-- Verificar cumprimento de carga horária -->
-                    <!-- Permissão: change_registrohoras -->
-                    <a href="{% url 'validar_horas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'validar_horas' %}active{% endif %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Validar Horas de Monitoria">
-                        <i class="fas fa-check-circle"></i>
-                        <span class="sidebar-text">Validar Horas</span>
-                    </a>
                     
                     <!-- Link: Minhas Monitorias -->
                     <!-- Visualizar todas as monitorias sob coordenação -->
@@ -2010,14 +1936,22 @@
                         <i class="fas fa-book"></i>
                         <span class="sidebar-text">Minhas Monitorias</span>
                     </a>
-                    
+
+
+
+
                     <!-- Link: Turmas -->
                     <!-- Gerenciar turmas vinculadas às monitorias -->
                     <!-- Permissão: view_turma, change_turma -->
                     <a href="{% url 'listar_turmas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_turmas' %}active{% endif %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Gerenciar Turmas">
                         <i class="fas fa-chalkboard"></i>
-                        <span class="sidebar-text">Turmas</span>
+                        <span class="sidebar-text">Minhas Turmas</span>
                     </a>
+                </div>
+
+
+                    
+
                     
                     <!-- 
                         ====================================================================
@@ -2063,6 +1997,7 @@
                     <!-- Link: Gerenciar Usuários -->
                     <!-- CRUD de usuários do sistema -->
                     <!-- Atribuir permissões e grupos -->
+                <div class="caixa-topicos">
                     <a href="{% url 'listar_usuarios' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_usuarios' %}active{% endif %}" data-bs-google = "tooltip" data-bs-placement="right" title="Gerenciar Usuários do Sistema">
                         <i class="fas fa-users"></i>
                         <span class="sidebar-text">Usuários</span>
@@ -2083,10 +2018,12 @@
                         <i class="fas fa-briefcase"></i>
                         <span class="sidebar-text">Vagas</span>
                     </a>
-                    
+                </div>    
                     <!-- Link: Gerenciar Turmas -->
                     <!-- CRUD de turmas -->
                     <!-- Associar disciplinas e professores -->
+
+           <div class="caixa-topicos">
                     <a href="{% url 'listar_turmas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_turmas' %}active{% endif %}" data-bs-google="tooltip" data-bs-placement="right" title="Gerenciar Turmas">
                         <i class="fas fa-chalkboard"></i>
                         <span class="sidebar-text">Turmas</span>
@@ -2095,18 +2032,23 @@
                     <!-- Link: Gerenciar Monitorias -->
                     <!-- CRUD de monitorias -->
                     <!-- Visão global de todas as monitorias ativas -->
-                    <a href="{% url 'listar_monitorias' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_monitorias' %}active{% endif %}" data-bs-google="tooltip" data-bs-placement="right" title="Gerenciar Monitorias">
-                        <i class="fas fa-book"></i>
-                        <span class="sidebar-text">Monitorias</span>
-                    </a>
-                    
-                    <!-- Link: Gerenciar Presenças -->
-                    <!-- CRUD de registro de presença -->
-                    <!-- Controle de frequência dos monitores -->
-                    <a href="{% url 'listar_presencas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_presencas' %}active{% endif %}" data-bs-google="tooltip" data-bs-placement="right" title="Gerenciar Presenças dos Monitores">
-                        <i class="fas fa-clipboard-check"></i>
-                        <span class="sidebar-text">Presenças</span>
-                    </a>
+                    <!-- Agrupamento: Atividades de Monitoria -->
+
+
+            
+                <a href="{% url 'listar_monitorias' %}" 
+                class="sidebar-item {% if request.resolver_match.url_name == 'listar_monitorias' %}active{% endif %}" data-bs-google="tooltip" data-bs-placement="right" title="Gerenciar Monitorias">
+                <i class="fas fa-book"></i>
+                <span class="sidebar-text">Monitorias</span>
+            </a>
+
+            <a href="{% url 'listar_presencas' %}" 
+               class="sidebar-item {% if request.resolver_match.url_name == 'listar_presencas' %}active{% endif %}" data-bs-google="tooltip" data-bs-placement="right" title="Gerenciar Presenças">
+                <i class="fas fa-clipboard-check"></i>
+                <span class="sidebar-text">Presenças</span>
+            </a>
+            </div>
+
                     
                     <hr class="sidebar-divider">
                     

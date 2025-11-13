@@ -94,7 +94,7 @@ ROOT_URLCONF = 'meuprojeto.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': DEBUG,  # APP_DIRS só quando DEBUG=True e sem loaders customizado
         'OPTIONS': {
             'context_processors': [
