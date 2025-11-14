@@ -1,19 +1,36 @@
 
+def _user_groups_lower(user):
+    try:
+        return {g.name.lower() for g in user.groups.all()}
+    except Exception:
+        return set()
+
+
 def is_adm(user):
-    return user.groups.filter(name='admin').exists()
+    groups = _user_groups_lower(user)
+    return 'admin' in groups or 'adm' in groups
+
 
 def is_admin_user(user):
-    return user.groups.filter(name='admin_user').exists()
+    groups = _user_groups_lower(user)
+    return 'admin_user' in groups or 'adminuser' in groups
+
 
 def is_aluno_access(user):
-    return user.groups.filter(name__in=['Admin', 'dev', 'user_aluno']).exists()
+    groups = _user_groups_lower(user)
+    return bool(groups & {'admin', 'dev', 'user_aluno', 'aluno'})
+
 
 def is_monitor_access(user):
-    return user.groups.filter(name__in=['Admin', 'dev', 'user_monitor']).exists()
+    groups = _user_groups_lower(user)
+    return bool(groups & {'admin', 'dev', 'user_monitor', 'monitor'})
+
 
 def is_professor_access(user):
-    return user.groups.filter(name__in=['Admin', 'dev', 'user_professor', 'user_coordenador']).exists()
+    groups = _user_groups_lower(user)
+    return bool(groups & {'admin', 'dev', 'user_professor', 'user_coordenador', 'professor', 'coordenador'})
 
 
 def is_funcionairo_access(user):
-    return user.groups.filter(name__in=['Admin', 'dev', 'user_funcionairo', 'user_professor','user_coordenador']).exists()
+    groups = _user_groups_lower(user)
+    return bool(groups & {'admin', 'dev', 'user_funcionairo', 'user_professor', 'user_coordenador', 'funcionario'})

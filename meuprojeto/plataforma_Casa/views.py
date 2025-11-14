@@ -1111,17 +1111,40 @@ def perfil(request):
     Usa PerfilService quando disponível para montar o contexto.
     """
     service = PerfilService()
-    context = {}
-    try:
-        # tenta obter perfil via service
-        perfil_obj = service.get_perfil_por_email(request.user.email)
-        context['perfil'] = perfil_obj
-    except Exception:
-        # fallback: expõe dados básicos do user
-        context['perfil'] = {
-            'nome': getattr(request.user, 'get_full_name', lambda: str(request.user))(),
-            'email': getattr(request.user, 'email', ''),
-        }
+    # Preferir API do service que monta o contexto completo
+    if hasattr(service, 'get_perfil_context'):
+        try:
+            context = service.get_perfil_context(request.user) or {}
+        except Exception:
+            context = {}
+    else:
+        # Tenta compatibilidade com implementações antigas
+        context = {}
+        try:
+            if hasattr(service, 'get_perfil_por_email'):
+                perfil_obj = service.get_perfil_por_email(request.user.email)
+                # Se o service retornar um dict já com chaves, usa-o
+                if isinstance(perfil_obj, dict):
+                    context.update(perfil_obj)
+                else:
+                    context['perfil'] = perfil_obj
+        except Exception:
+            # fallback básico
+            context['perfil'] = {
+                'nome': getattr(request.user, 'get_full_name', lambda: str(request.user))(),
+                'email': getattr(request.user, 'email', ''),
+            }
+
+    # Garantir chaves mínimas esperadas pelos templates
+    if 'usuario' not in context:
+        context['usuario'] = request.user
+    if 'aluno' not in context:
+        context.setdefault('aluno', None)
+    if 'professor' not in context:
+        context.setdefault('professor', None)
+    # Flag conveniente para templates
+    context['is_professor'] = request.user.groups.filter(name='Professor').exists()
+
     return render(request, 'perfil.html', context)
 
 @login_required

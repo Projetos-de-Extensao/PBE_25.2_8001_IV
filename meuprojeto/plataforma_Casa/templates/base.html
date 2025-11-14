@@ -1735,7 +1735,7 @@
                     <!-- Link: Dashboard do Monitor -->
                     <!-- Painel com KPIs e estatísticas personalizadas -->
                     <!-- Monitorias ativas, horas, alunos, etc -->
-                    <a href="{% url 'dashboard' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard' and is_monitor %}active{% endif %}">
+                    <a href="{% url 'dashboard_monitor' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard_monitor' %}active{% endif %}">
                         <i class="fas fa-chart-line"></i>
                         <span class="sidebar-text">Dashboard</span>
                     </a>
@@ -1878,9 +1878,9 @@
                     <!-- Link: Dashboard do Professor -->
                     <!-- Painel com KPIs e estatísticas personalizadas -->
                     <!-- Últimas inscrições, vagas populares, turmas ativas -->
-                    <a href="{% url 'dashboard' %}" 
-                    class="sidebar-item {% if request.resolver_match.url_name == 'dashboard' and is_monitor %}active{% endif %}" 
-                    title="Painel com estatísticas do monitor" 
+                    <a href="{% url 'dashboard_professor' %}" 
+                    class="sidebar-item {% if request.resolver_match.url_name == 'dashboard_professor' %}active{% endif %}" 
+                    title="Painel com estatísticas do professor" 
                     data-bs-toggle="tooltip">
                         <i class="fas fa-chart-line"></i>
                         <span class="sidebar-text">Dashboard</span>
