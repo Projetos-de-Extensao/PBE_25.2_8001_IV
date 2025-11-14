@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Dashboard do Professor - Plataforma Casa{% endblock %}
+{% block title %}{% if is_monitor_dashboard %}Dashboard do Monitor - Plataforma Casa{% elif is_professor_dashboard %}Dashboard do Professor - Plataforma Casa{% else %}Dashboard - Plataforma Casa{% endif %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -833,8 +833,16 @@
 <div class="dashboard-header">
     <div class="header-content">
         <div class="header-title">
-            <h1><i class="fas fa-chart-bar"></i> Dashboard do Professor</h1>
-            <p>Painel de controle de suas vagas e inscrições</p>
+            {% if is_monitor_dashboard %}
+                <h1><i class="fas fa-user-tie"></i> Dashboard do Monitor</h1>
+                <p>Painel de controle das suas turmas e registros</p>
+            {% elif is_professor_dashboard %}
+                <h1><i class="fas fa-chart-bar"></i> Dashboard do Professor</h1>
+                <p>Painel de controle de suas vagas e inscrições</p>
+            {% else %}
+                <h1><i class="fas fa-cogs"></i> Dashboard</h1>
+                <p>Painel de gestão do sistema</p>
+            {% endif %}
         </div>
         <div class="header-actions">
             <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">
@@ -845,8 +853,69 @@
 </div>
 
 <div class="dashboard-container">
-    
-    {% if is_professor_dashboard %}
+
+    {% if is_monitor_dashboard %}
+    <!-- ===== DASHBOARD DO MONITOR ===== -->
+    <div class="metrics-grid">
+        <div class="kpi-card blue">
+            <div class="kpi-header"><div class="kpi-label">Minhas Turmas</div></div>
+            <div class="kpi-value">{{ turmas|length }}</div>
+        </div>
+        <div class="kpi-card green">
+            <div class="kpi-header"><div class="kpi-label">Registros</div></div>
+            <div class="kpi-value">{{ registros|length }}</div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <div class="content-card">
+            <div class="card-header"><div class="card-title"><i class="fas fa-book"></i> Minhas Turmas</div></div>
+            {% if turmas %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead><tr><th>Disciplina</th><th>Semestre</th><th>Horário</th></tr></thead>
+                    <tbody>
+                        {% for turma in turmas %}
+                        <tr>
+                            <td>{{ turma.disciplina }}</td>
+                            <td>{{ turma.semestre }}</td>
+                            <td>{{ turma.horario }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state"><p>Nenhuma turma ativa</p></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="content-section">
+        <div class="content-card">
+            <div class="card-header"><div class="card-title"><i class="fas fa-clock"></i> Meus Registros</div></div>
+            {% if registros %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead><tr><th>Data</th><th>Turma</th><th>Horas</th></tr></thead>
+                    <tbody>
+                        {% for registro in registros %}
+                        <tr>
+                            <td>{{ registro.data }}</td>
+                            <td>{{ registro.turma }}</td>
+                            <td>{{ registro.horas }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state"><p>Nenhum registro encontrado</p></div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% elif is_professor_dashboard %}
     <!-- ===== DASHBOARD DO PROFESSOR ===== -->
     
     <!-- KPI CARDS PRINCIPAIS -->
