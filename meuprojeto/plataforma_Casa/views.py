@@ -909,6 +909,36 @@ def dashboard_professor(request):
     }
     return render(request, 'dashboard.html', context)
 
+
+@login_required
+@user_passes_test(is_monitor_access)
+def dashboard_monitor(request):
+    """
+    Dashboard do Monitor — mostra turmas e registros relacionados ao monitor.
+    Rota acessível apenas para usuários com permissão de monitor.
+    """
+    service = RegistroHorasService()
+    try:
+        monitor = service.get_monitor_by_email(request.user.email)
+        if not monitor:
+            messages.error(request, 'Monitor não encontrado.')
+            return redirect('portal_vagas')
+        turmas = service.get_turmas_do_monitor(monitor)
+        # tenta buscar registros do monitor, pode retornar []
+        registros = []
+        if hasattr(service, 'get_registros_do_monitor'):
+            registros = service.get_registros_do_monitor(monitor)
+    except Exception:
+        messages.error(request, 'Erro ao carregar dados do dashboard do monitor.')
+        return redirect('portal_vagas')
+
+    context = {
+        'is_monitor_dashboard': True,
+        'turmas': turmas,
+        'registros': registros,
+    }
+    return render(request, 'dashboard.html', context)
+
 @login_required
 def listar_monitorias(request):
     """

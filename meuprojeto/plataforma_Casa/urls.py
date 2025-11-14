@@ -91,6 +91,8 @@ urlpatterns = [
 
     # 15. DASHBOARD DO PROFESSOR (NOVO)
     path('professor/dashboard/', views.dashboard_professor, name='dashboard_professor'),
+    # DASHBOARD DO MONITOR
+    path('monitor/dashboard/', views.dashboard_monitor, name='dashboard_monitor'),
 
     path('monitorias/', views.listar_monitorias, name='listar_monitorias'),
 
