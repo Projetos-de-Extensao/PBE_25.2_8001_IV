@@ -107,9 +107,8 @@ urlpatterns = [
     # ROTAS PRINCIPAIS DA APLICAÇÃO PLATAFORMA CASA
     # ---------------------------------------------------------------------------
     # Inclui todas as URLs definidas no arquivo urls.py da aplicação plataforma_Casa
-    # Isso centraliza o roteamento da aplicação em um único lugar
+    # Registra namespace para permitir reversing com 'plataforma_Casa:<name>'
     # As rotas são prefixadas com uma string vazia '', ou seja, começam na raiz
-    # 
     # Exemplo de rotas incluídas:
     # - http://localhost:8000/              (dashboard)
     # - http://localhost:8000/usuarios/     (listar usuários)

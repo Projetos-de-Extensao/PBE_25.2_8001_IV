@@ -65,6 +65,7 @@ urlpatterns = [
     path('portal-vagas/', views.portal_vagas, name='portal_vagas'),
     path('vagas/<int:vaga_id>/candidatar/', views.candidatar_vaga, name='candidatar_vaga'),
     # path('minhas-inscricoes/', views.minhas_inscricoes, name='minhas_inscricoes'), # Adicionar se a view existir
+    path('minhas-inscricoes/', views.minhas_inscricoes, name='minhas_inscricoes'),
 
     # 13. REGISTRO E VALIDAÇÃO DE HORAS (MONITOR/PROFESSOR)
     path('horas/registrar/', views.registrar_horas, name='registrar_horas'),
@@ -75,6 +76,10 @@ urlpatterns = [
     
     # 14. DASHBOARD DE GESTÃO (ADMIN)
     path('gestao/dashboard/', views.dashboard_gestao, name='dashboard_gestao'),
+    # Rota genérica 'dashboard' usada por vários redirects
+    path('dashboard/', views.dashboard, name='dashboard'),
+    # Link de atalho para visualizar minhas monitorias no formato de cards
+    path('monitorias/minhas/cards/', views.minhas_monitorias_cards, name='minhas_monitorias_cards'),
     
     # 16. GERENCIAMENTO DE DISCIPLINAS (PROFESSOR)
     path('professor/disciplinas/', views.listar_disciplinas, name='listar_disciplinas'),
@@ -95,6 +100,12 @@ urlpatterns = [
     path('monitor/dashboard/', views.dashboard_monitor, name='dashboard_monitor'),
 
     path('monitorias/', views.listar_monitorias, name='listar_monitorias'),
+    # Alias para compatibilidade com templates antigos
+    path('monitorias/disponiveis/', views.listar_monitorias, name='monitorias_disponiveis'),
+    # Compatibilidade: rota que lista monitorias em que o usuário participa
+    path('monitorias/participando/', views.listar_monitorias, name='participando_monitorias'),
+    # Rota para participar de uma monitoria (compatibilidade com templates)
+    path('monitorias/<int:turma_id>/participar/', views.participar_monitoria, name='participar_monitoria'),
 
 
     path('presencas/', views.listar_presencas, name='listar_presencas'),

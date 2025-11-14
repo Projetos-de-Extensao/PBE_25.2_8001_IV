@@ -964,6 +964,45 @@ def dashboard(request):
     # Fallback: home
     return redirect('home')
 
+
+@login_required
+def minhas_monitorias_cards(request):
+    """
+    View de atalho usada pelas templates para voltar ao espaço do monitor.
+    Redireciona para o dashboard apropriado do monitor/professor ou para o
+    portal de vagas quando o usuário não for monitor/professor.
+    """
+    user = request.user
+    if user.groups.filter(name='Monitor').exists():
+        return redirect('dashboard_monitor')
+    if user.groups.filter(name='Professor').exists():
+        return redirect('dashboard_professor')
+    # Fallback: enviar ao portal de vagas (página pública/aluno)
+    return redirect('portal_vagas')
+
+
+@login_required
+def participar_monitoria(request, turma_id):
+    """
+    Handler simples para links de 'participar' usados em templates.
+    Atualmente redireciona para a página de detalhe da turma se existir,
+    senão envia para a listagem de monitorias.
+    """
+    try:
+        return redirect('detalhe_turma', turma_id=turma_id)
+    except Exception:
+        return redirect('listar_monitorias')
+
+
+@login_required
+def minhas_inscricoes(request):
+    """
+    Rota de compatibilidade para 'minhas_inscricoes' usada em templates.
+    Atualmente redireciona para o portal de vagas; pode ser expandida para
+    listar as inscrições do usuário quando necessário.
+    """
+    return redirect('portal_vagas')
+
 @login_required
 def listar_monitorias(request):
     """
