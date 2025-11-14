@@ -69,3 +69,6 @@ gunicorn==23.0.0
 whitenoise==6.8.2
 dj-database-url==2.2.0
 python-decouple==3.8
+
+# PDF Processing
+pdfplumber==0.11.4

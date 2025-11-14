@@ -53,6 +53,18 @@
             background: linear-gradient(135deg, var(--primary-blue) 0%, #003a7a 100%);
             box-shadow: 0 4px 20px rgba(0, 37, 85, 0.15);
             padding: 1rem 0;
+            position: relative;
+            z-index: 1000;
+        }
+        
+        .navbar-toggler {
+            border: 2px solid white !important;
+            padding: 0.5rem;
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: none;
+            outline: none;
         }
         
         .navbar-brand {
@@ -69,12 +81,25 @@
             font-size: 1.8rem;
         }
         
+        /* Evitar duplicação de itens */
+        .navbar-nav {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .navbar-nav .nav-item {
+            list-style: none;
+        }
+        
         .nav-link-custom {
             color: rgba(255, 255, 255, 0.9) !important;
             font-weight: 500;
             padding: 0.5rem 1rem !important;
             border-radius: 8px;
             transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
         }
         
         .nav-link-custom:hover {
@@ -114,63 +139,73 @@
             border-color: #ffc107;
         }
         
-        /* Espaçamento entre botões no desktop */
+        /* Desktop: Espaçamento entre itens */
         @media (min-width: 992px) {
-            .navbar-nav .nav-item:has(.btn-login) {
-                margin-right: 1rem;
+            .navbar-nav {
+                gap: 0.5rem;
+            }
+            
+            .navbar-nav .nav-item {
+                margin: 0;
+            }
+            
+            .btn-login,
+            .btn-register {
+                margin-left: 0.5rem !important;
             }
         }
         
-        /* Mobile menu improvements */
+        /* Mobile: Menu colapsável */
         @media (max-width: 991px) {
             .navbar-collapse {
-                padding: 1.5rem 0 1rem 0;
-                background: var(--primary-blue);
+                padding: 1rem;
+                background: rgba(0, 37, 85, 0.95);
                 margin-top: 1rem;
                 border-radius: 12px;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             }
             
             .navbar-nav {
-                gap: 0;
-                padding: 0 1rem;
+                gap: 0.5rem;
             }
             
             .navbar-nav .nav-item {
                 width: 100%;
+                margin: 0;
             }
             
             .navbar-nav .nav-link-custom {
                 padding: 0.875rem 1rem !important;
-                margin-bottom: 0.5rem;
                 display: block;
                 width: 100%;
                 text-align: left;
+                margin: 0;
             }
             
             .navbar-nav .nav-link-custom:hover {
                 background: rgba(255, 255, 255, 0.15);
             }
             
-            /* Separator between links and buttons */
+            /* Separator entre links e botões */
             .navbar-nav .nav-item:nth-child(3) {
                 border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-                padding-bottom: 1rem;
-                margin-bottom: 1rem !important;
+                padding-bottom: 0.75rem;
+                margin-bottom: 0.75rem !important;
             }
             
-            .navbar-nav .btn-login,
-            .navbar-nav .btn-register {
+            .btn-login,
+            .btn-register {
                 width: 100%;
-                padding: 0.875rem;
-                margin: 0 0 0.75rem 0 !important;
+                padding: 0.875rem !important;
+                margin: 0 !important;
                 font-size: 1rem;
                 min-height: 48px;
                 display: block;
                 text-align: center;
             }
             
-            .navbar-nav .nav-item:last-child .btn-register {
-                margin-bottom: 0 !important;
+            .navbar-nav .nav-item:nth-child(4) {
+                margin-bottom: 0.75rem !important;
             }
         }
         

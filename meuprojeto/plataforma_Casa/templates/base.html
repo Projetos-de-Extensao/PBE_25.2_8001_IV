@@ -1735,7 +1735,7 @@
                     <!-- Link: Dashboard do Monitor -->
                     <!-- Painel com KPIs e estatísticas personalizadas -->
                     <!-- Monitorias ativas, horas, alunos, etc -->
-                    <a href="{% url 'dashboard' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard' and is_monitor %}active{% endif %}">
+                    <a href="{% url 'dashboard' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard' and is_monitor %}active{% endif %}" data-bs-toggle="tooltip" title="Dashboard com estatísticas e KPIs">
                         <i class="fas fa-chart-line"></i>
                         <span class="sidebar-text">Dashboard</span>
                     </a>
@@ -1745,7 +1745,7 @@
                     <!-- Link: Registrar Horas -->
                     <!-- Lançar horas trabalhadas de monitoria -->
                     <!-- Permissão: add_registrohoras -->
-                    <a href="{% url 'registrar_horas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'registrar_horas' %}active{% endif %}">
+                    <a href="{% url 'registrar_horas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'registrar_horas' %}active{% endif %}" data-bs-toggle="tooltip" title="Lançar horas trabalhadas de monitoria">
                         <i class="fas fa-clock"></i>
                         <span class="sidebar-text">Registrar Horas</span>
                     </a>
@@ -1754,7 +1754,7 @@
                     <!-- Visualizar histórico de horas registradas -->
                     <!-- Ver status de validação pelo professor -->
                     <!-- Permissão: view_registrohoras, change_registrohoras -->
-                    <a href="{% url 'meus_registros_horas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'meus_registros_horas' %}active{% endif %}">
+                    <a href="{% url 'meus_registros_horas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'meus_registros_horas' %}active{% endif %}" data-bs-toggle="tooltip" title="Visualizar histórico de horas registradas">
                         <i class="fas fa-history"></i>
                         <span class="sidebar-text">Meus Registros</span>
                     </a>
@@ -1763,7 +1763,7 @@
                     
                     <!-- Link: Minhas Monitorias -->
                     <!-- Ver monitorias que está dando em formato de cards -->
-                    <a href="{% url 'minhas_monitorias_cards' %}" class="sidebar-item {% if request.resolver_match.url_name == 'minhas_monitorias_cards' or request.resolver_match.url_name == 'alunos_da_monitoria' %}active{% endif %}">
+                    <a href="{% url 'minhas_monitorias_cards' %}" class="sidebar-item {% if request.resolver_match.url_name == 'minhas_monitorias_cards' or request.resolver_match.url_name == 'alunos_da_monitoria' %}active{% endif %}" data-bs-toggle="tooltip" title="Ver monitorias que estou dando">
                         <i class="fas fa-chalkboard-user"></i>
                         <span class="sidebar-text">Minhas Monitorias</span>
                     </a>
@@ -2410,6 +2410,87 @@
                 console.log('Resize para desktop: sidebar ajustado');
             }
         });
+        
+        /* ===================================================
+           INICIALIZAÇÃO DOS TOOLTIPS
+           ===================================================
+           Inicializa tooltips Bootstrap para todos os itens do sidebar
+           Os tooltips aparecem quando o sidebar está colapsado
+        */
+        // Mapeamento de textos para títulos de tooltip
+        const tooltipTitles = {
+            'Dashboard': 'Dashboard com estatísticas e KPIs',
+            'Registrar Horas': 'Lançar horas trabalhadas de monitoria',
+            'Meus Registros': 'Visualizar histórico de horas registradas',
+            'Minhas Monitorias': 'Ver monitorias que estou dando',
+            'Monitorias': 'Ver todas as monitorias disponíveis',
+            'Participando': 'Monitorias que estou participando como aluno',
+            'Portal de Vagas': 'Visualizar todas as vagas disponíveis',
+            'Minhas Inscrições': 'Ver status das minhas candidaturas',
+            'Gerenciar Vagas': 'Criar e gerenciar vagas de monitoria',
+            'Avaliar Candidatos': 'Avaliar e selecionar candidatos',
+            'Validar Horas': 'Validar horas dos monitores',
+            'Gerenciar Turmas': 'Criar e administrar turmas',
+            'Gestão': 'Painel administrativo completo',
+            'Usuários': 'Gerenciar usuários do sistema',
+            'Disciplinas': 'Cadastrar e gerenciar disciplinas',
+            'Pagamentos': 'Controlar pagamentos de bolsas',
+            'Relatórios': 'Gerar relatórios e análises',
+            'Sair': 'Fazer logout do sistema'
+        };
+        
+        // Adicionar tooltips a todos os itens do sidebar
+        const sidebarItems = document.querySelectorAll('.sidebar-item');
+        sidebarItems.forEach(item => {
+            const textElement = item.querySelector('.sidebar-text');
+            if (textElement) {
+                const text = textElement.textContent.trim();
+                const title = tooltipTitles[text] || text;
+                
+                // Adicionar atributos para tooltip
+                item.setAttribute('data-bs-toggle', 'tooltip');
+                item.setAttribute('data-bs-placement', 'right');
+                item.setAttribute('title', title);
+            }
+        });
+        
+        // Inicializar tooltips do Bootstrap
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl, {
+            placement: 'right',
+            trigger: 'hover',
+            delay: { show: 300, hide: 100 }
+        }));
+        
+        // Atualizar tooltips quando sidebar colapsa/expande
+        const sidebar = document.getElementById('sidebar');
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === 'class') {
+                    const isCollapsed = sidebar.classList.contains('collapsed');
+                    tooltipTriggerList.forEach(element => {
+                        const tooltipInstance = bootstrap.Tooltip.getInstance(element);
+                        if (tooltipInstance) {
+                            if (isCollapsed) {
+                                tooltipInstance.enable();
+                            } else {
+                                tooltipInstance.disable();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+        
+        if (sidebar) {
+            observer.observe(sidebar, { attributes: true });
+            
+            // Desabilitar tooltips inicialmente se sidebar não está colapsado
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            if (!isCollapsed) {
+                tooltipList.forEach(tooltip => tooltip.disable());
+            }
+        }
     </script>
     
     {% block extra_js %}{% endblock %}
