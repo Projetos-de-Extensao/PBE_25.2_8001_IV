@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 from django.contrib.auth import login
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib import messages
 from .permission import (
             is_adm, 
@@ -65,13 +66,22 @@ def login_view(request):
     Backend customizado (EmailOrUsernameModelBackend) permite ambos
     """
     service = AuthService()
+    # Preserve 'next' param for redirect after login
+    next_param = request.POST.get('next') or request.GET.get('next')
+
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
         user = service.autenticar_usuario(request, username, password)
         if user is not None:
             login(request, user)
-            
+
+            # If next is provided and safe, redirect there
+            if next_param:
+                allowed = {request.get_host()}
+                if url_has_allowed_host_and_scheme(next_param, allowed_hosts=allowed, require_https=request.is_secure()):
+                    return redirect(next_param)
+
             # Lógica de redirecionamento por grupo
             if user.groups.filter(name='Aluno').exists():
                 # Se for Aluno, verifica se também é Monitor

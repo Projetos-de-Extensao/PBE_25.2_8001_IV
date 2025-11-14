@@ -520,6 +520,9 @@
         <form method="POST" class="login-form">
             <!-- CSRF Token - proteção contra cross-site request forgery -->
             {% csrf_token %}
+            {% if request.GET.next %}
+                <input type="hidden" name="next" value="{{ request.GET.next }}">
+            {% endif %}
             
             <!-- 
                 CAMPO: USERNAME OU EMAIL
