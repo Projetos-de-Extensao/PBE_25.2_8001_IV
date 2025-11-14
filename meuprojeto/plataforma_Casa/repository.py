@@ -59,6 +59,7 @@ class RegistroRepository:
 
     @staticmethod
     def get_grupo_aluno():
+        from django.contrib.auth.models import Group
         return Group.objects.get_or_create(name='Aluno')[0]
 
     @staticmethod

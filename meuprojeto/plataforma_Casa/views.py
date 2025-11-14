@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+import logging
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q, Sum, Avg
@@ -54,6 +55,8 @@ from .service import (
     UsuarioService, 
     AlunoService
     )
+
+logger = logging.getLogger(__name__)
 
 from .forms import DisciplinaForm, MaterialApoioForm
 
@@ -666,8 +669,8 @@ def relatorio_monitores_selecionados(request):
     }
     return render(request, 'relatorios/monitores_selecionados.html', context)
 
-@login_required
 def portal_vagas(request):
+    logger.info("portal_vagas called - authenticated=%s user=%s path=%s", request.user.is_authenticated, getattr(request.user, 'email', request.user), request.path)
     service = PortalVagasService()
     busca = request.GET.get('busca', '').strip()
     curso_filtro = request.GET.get('curso')
