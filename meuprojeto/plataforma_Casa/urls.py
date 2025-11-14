@@ -42,6 +42,7 @@ urlpatterns = [
     # 4. MÓDULO DE VAGAS (PROFESSOR/COORDENADOR)
     path('vagas/', views.listar_vagas_monitoria, name='listar_vagas_monitoria'),
     path('vagas/criar/', views.criar_vaga_monitoria, name='criar_vaga_monitoria'),
+    path('vagas/gerenciar/', views.listar_vagas_monitoria, name='listar_vagas'),
     path('vagas/<int:vaga_id>/', views.detalhe_vaga_monitoria, name='detalhe_vaga_monitoria'),
     path('vagas/<int:vaga_id>/editar/', views.editar_vaga_monitoria, name='editar_vaga_monitoria'),
     path('vagas/<int:vaga_id>/deletar/', views.deletar_vaga_monitoria, name='deletar_vaga_monitoria'),
@@ -80,4 +81,24 @@ urlpatterns = [
     path('professor/disciplinas/nova/', views.criar_disciplina, name='criar_disciplina'),
     path('professor/disciplinas/<int:disciplina_id>/', views.detalhes_disciplina, name='detalhes_disciplina'),
     path('professor/disciplinas/<int:disciplina_id>/editar/', views.editar_disciplina, name='editar_disciplina'),
+
+    # 14. DASHBOARD DE GESTÃO 
+    path('gestao/dashboard/', views.dashboard_gestao, name='dashboard_gestao'),
+
+    # Pagamentos - Gestão
+    path('gestao/pagamentos/', views.gerenciar_pagamentos, name='gerenciar_pagamentos'),
+    path('gestao/pagamentos/<int:pagamento_id>/processar/', views.processar_pagamento, name='processar_pagamento'),
+
+    # 15. DASHBOARD DO PROFESSOR (NOVO)
+    path('professor/dashboard/', views.dashboard_professor, name='dashboard_professor'),
+
+    path('monitorias/', views.listar_monitorias, name='listar_monitorias'),
+
+
+    path('presencas/', views.listar_presencas, name='listar_presencas'),
+
+    path('perfil/', views.perfil, name='perfil'),
+    path('perfil/atualizar/', views.atualizar_perfil_rapido, name='atualizar_perfil_rapido'),
+
+
 ]

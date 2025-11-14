@@ -1,4 +1,5 @@
 from django.db.models import Count
+from django.shortcuts import get_object_or_404
 from pytz import timezone
 from .models import ( 
     Documento,
@@ -720,6 +721,29 @@ class DisciplinaRepository:
 
     @staticmethod
     def get_funcionario_by_email(email):
+        try:
+            return Funcionario.objects.get(email=email)
+        except Funcionario.DoesNotExist:
+            return None
+        
+
+class PagamentoRepository:
+    """Acesso a dados para StatusPagamento."""
+
+    def listar_pagamentos(self, status=None):
+        qs = StatusPagamento.objects.all().select_related('monitor', 'turma').order_by('-mes_referencia')
+        if status:
+            qs = qs.filter(status=status)
+        return qs
+
+    def get_pagamento(self, pagamento_id):
+        return get_object_or_404(StatusPagamento, id=pagamento_id)
+
+    def salvar(self, pagamento):
+        pagamento.save()
+        return pagamento
+
+    def get_funcionario_por_email(self, email):
         try:
             return Funcionario.objects.get(email=email)
         except Funcionario.DoesNotExist:
