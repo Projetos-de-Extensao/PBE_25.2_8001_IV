@@ -12,6 +12,7 @@ from .repository import (
     DashboardGestaoRepository,
     DisciplinaRepository,
     MonitoriaRepository,
+    PagamentoRepository,
     PerfilRepository,
     PortalVagasRepository,
     PresencaRepository,
@@ -778,3 +779,31 @@ class AuthService:
 
     def logout(self, request):
         AuthRepository.logout_usuario(request)
+
+
+
+class PagamentoService:
+    """Lógica de negócio para pagamentos de monitores."""
+
+    def __init__(self):
+        self.repo = PagamentoRepository()
+
+    def listar_pagamentos(self, status=None):
+        return self.repo.listar_pagamentos(status=status)
+
+    def obter_pagamento(self, pagamento_id):
+        return self.repo.get_pagamento(pagamento_id)
+
+    def processar_pagamento(self, pagamento_id, status, observacao, processado_por_email=None):
+        pagamento = self.repo.get_pagamento(pagamento_id)
+        pagamento.status = status
+        pagamento.observacao = observacao
+        pagamento.data_processamento = timezone.now()
+
+        if processado_por_email:
+            funcionario = self.repo.get_funcionario_por_email(processado_por_email)
+            if funcionario:
+                pagamento.processado_por = funcionario
+
+        self.repo.salvar(pagamento)
+        return pagamento

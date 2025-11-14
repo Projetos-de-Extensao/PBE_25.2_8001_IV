@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q, Sum, Avg
@@ -35,7 +36,8 @@ from .service import (
     AuthService,
     DashboardGestaoService,
     DisciplinaService,
-    MonitoriaService, 
+    MonitoriaService,
+    PagamentoService, 
     PerfilService, 
     PortalVagasService, 
     PresencaService,
@@ -53,6 +55,9 @@ from .service import (
 from .forms import DisciplinaForm
 
 
+from django.contrib.auth import login, get_user_model
+
+
 def login_view(request):
     """
     View de Login - Autentica usuários com username ou email
@@ -65,10 +70,21 @@ def login_view(request):
         user = service.autenticar_usuario(request, username, password)
         if user is not None:
             login(request, user)
+            
+            # Lógica de redirecionamento por grupo
             if user.groups.filter(name='Aluno').exists():
+                # Se for Aluno, verifica se também é Monitor
+                if user.groups.filter(name='Monitor').exists():
+                    return redirect('dashboard_monitor')
                 return redirect('portal_vagas')
+            elif user.groups.filter(name='Professor').exists():
+                return redirect('dashboard_professor') # Rota que vamos criar
+            elif user.groups.filter(name__in=['Admin', 'Coordenador']).exists():
+                return redirect('dashboard_gestao')
             else:
-                return redirect('dashboard')
+                # Um fallback, caso o usuário não tenha um grupo esperado
+                return redirect('home') 
+                
         else:
             messages.error(request, 'Usuário ou senha inválidos!')
     return render(request, 'login.html')
@@ -840,3 +856,232 @@ def detalhes_disciplina(request, disciplina_id):
         messages.error(request, f'Erro ao carregar disciplina: {str(e)}')
         return redirect('listar_disciplinas')
 
+
+@login_required
+@user_passes_test(is_funcionairo_access)
+def gerenciar_pagamentos(request):
+    """
+    View para gerenciar pagamentos dos monitores
+    """
+    service = PagamentoService()
+    status_filtro = request.GET.get('status')
+    pagamentos = service.listar_pagamentos(status=status_filtro)
+    context = {'pagamentos': pagamentos}
+    return render(request, 'gestao/pagamentos.html', context)
+
+
+@login_required
+@user_passes_test(is_funcionairo_access)
+def processar_pagamento(request, pagamento_id):
+    """
+    View para processar um pagamento
+    """
+    service = PagamentoService()
+    pagamento = service.obter_pagamento(pagamento_id)
+
+    if request.method == 'POST':
+        status = request.POST.get('status')
+        observacao = request.POST.get('observacao')
+        try:
+            service.processar_pagamento(
+                pagamento_id=pagamento_id,
+                status=status,
+                observacao=observacao,
+                processado_por_email=request.user.email
+            )
+        except Exception:
+            # silêncio (mensagens podem ser adicionadas se desejar)
+            pass
+        return redirect('gerenciar_pagamentos')
+
+    context = {'pagamento': pagamento}
+    return render(request, 'gestao/processar_pagamento.html', context)
+
+@login_required
+@user_passes_test(is_professor_access)
+def dashboard_professor(request):
+    """
+    Dashboard do Professor — usa template dashboard.html.
+    """
+    # Substitua pelo service adequado se existir (ex: ProfessorDashboardService)
+    context = {
+        'is_professor_dashboard': True
+    }
+    return render(request, 'dashboard.html', context)
+
+@login_required
+def listar_monitorias(request):
+    """
+    Lista monitorias (página pública/gestão conforme permissões).
+    Renderiza templates/monitorias/listar.html
+    """
+    service = MonitoriaService()
+    curso_filtro = request.GET.get('curso')
+    status_filtro = request.GET.get('status')
+    busca = request.GET.get('busca', '').strip()
+
+    # tenta usar a API do service de forma robusta
+    try:
+        monitorias = service.listar_monitorias(curso_id=curso_filtro, status=status_filtro, busca=busca)
+    except Exception:
+        try:
+            monitorias = service.listar(curso_id=curso_filtro, status=status_filtro, busca=busca)
+        except Exception:
+            monitorias = []
+
+    context = {
+        'monitorias': monitorias,
+        'cursos': Curso.objects.filter(ativo=True),
+        'filtros': {'curso': curso_filtro, 'status': status_filtro, 'busca': busca},
+    }
+    return render(request, 'monitorias/listar.html', context)
+
+
+
+@login_required
+def listar_monitorias(request):
+    """
+    Lista monitorias e renderiza templates/monitorias/listar.html
+    """
+    service = MonitoriaService()
+    curso_filtro = request.GET.get('curso')
+    status_filtro = request.GET.get('status')
+    busca = request.GET.get('busca', '').strip()
+
+    try:
+        # tenta método mais específico do service
+        monitorias = service.listar_monitorias(curso_id=curso_filtro, status=status_filtro, busca=busca)
+    except AttributeError:
+        # fallback para métodos com outro nome
+        try:
+            monitorias = service.listar(curso_id=curso_filtro, status=status_filtro, busca=busca)
+        except Exception:
+            monitorias = []
+    except Exception:
+        monitorias = []
+
+    context = {
+        'monitorias': monitorias,
+        'cursos': Curso.objects.filter(ativo=True),
+        'filtros': {'curso': curso_filtro, 'status': status_filtro, 'busca': busca},
+    }
+    return render(request, 'monitorias/listar.html', context)
+
+
+def listar_presencas(request):
+    """
+    Lista presenças com filtros simples (turma, aluno, data, status).
+    Usa PresencaService quando disponível, senão faz fallback direto no model.
+    """
+    service = PresencaService()
+    turma_id = request.GET.get('turma')
+    aluno_id = request.GET.get('aluno')
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    status = request.GET.get('status')
+
+    try:
+        presencas = service.listar_presencas(
+            turma_id=turma_id or None,
+            aluno_id=aluno_id or None,
+            data_inicio=data_inicio or None,
+            data_fim=data_fim or None,
+            status=status or None
+        )
+    except AttributeError:
+        # fallback direto no model caso o service não implemente o método
+        qs = Presenca.objects.all().select_related('aluno', 'turma')
+        if turma_id:
+            qs = qs.filter(turma_id=turma_id)
+        if aluno_id:
+            qs = qs.filter(aluno_id=aluno_id)
+        if status:
+            qs = qs.filter(status=status)
+        if data_inicio:
+            qs = qs.filter(data__gte=data_inicio)
+        if data_fim:
+            qs = qs.filter(data__lte=data_fim)
+        presencas = qs.order_by('-data')
+
+    context = {
+        'presencas': presencas,
+        'turmas': Turma.objects.filter(ativo=True),
+    }
+    return render(request, 'presencas/listar.html', context)
+
+
+@login_required
+def perfil(request):
+    """
+    Exibe o perfil do usuário logado.
+    Usa PerfilService quando disponível para montar o contexto.
+    """
+    service = PerfilService()
+    context = {}
+    try:
+        # tenta obter perfil via service
+        perfil_obj = service.get_perfil_por_email(request.user.email)
+        context['perfil'] = perfil_obj
+    except Exception:
+        # fallback: expõe dados básicos do user
+        context['perfil'] = {
+            'nome': getattr(request.user, 'get_full_name', lambda: str(request.user))(),
+            'email': getattr(request.user, 'email', ''),
+        }
+    return render(request, 'perfil.html', context)
+
+@login_required
+def atualizar_perfil_rapido(request):
+    """
+    Atualiza campos básicos do perfil do usuário.
+    - Se PerfilService implementar update_perfil_por_email, usa-o.
+    - Fallback: atualiza User (first_name, last_name, email) diretamente.
+    Aceita também upload simples em 'avatar' (passa para o service se suportado).
+    Retorna JSON quando requisitado via AJAX, caso contrário redireciona para 'perfil'.
+    """
+    service = PerfilService()
+    data = {
+        'nome': request.POST.get('nome', '').strip(),
+        'email': request.POST.get('email', '').strip(),
+        'telefone': request.POST.get('telefone', '').strip(),
+        'curso_id': request.POST.get('curso') or None,
+    }
+    avatar = request.FILES.get('avatar')
+
+    try:
+        # tenta usar API do service
+        if hasattr(service, 'update_perfil_por_email'):
+            service.update_perfil_por_email(request.user.email, data, avatar=avatar)
+        elif hasattr(service, 'atualizar_perfil'):
+            service.atualizar_perfil(request.user.email, data, avatar=avatar)
+        else:
+            # fallback direto no User model
+            User = get_user_model()
+            try:
+                user = User.objects.get(email=request.user.email)
+            except User.DoesNotExist:
+                user = request.user
+            # divide nome em first/last se possível
+            nome = data.get('nome') or ''
+            parts = nome.split(None, 1)
+            user.first_name = parts[0] if parts else ''
+            user.last_name = parts[1] if len(parts) > 1 else ''
+            if data.get('email'):
+                user.email = data['email']
+            user.save()
+            # se houver service que possa associar avatar, tenta chamar
+            if avatar and hasattr(service, 'salvar_avatar_por_email'):
+                try:
+                    service.salvar_avatar_por_email(request.user.email, avatar)
+                except Exception:
+                    pass
+    except Exception as e:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'ok': False, 'error': str(e)}, status=400)
+        messages.error(request, f'Erro ao atualizar perfil: {str(e)}')
+        return redirect('perfil')
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'ok': True})
+    messages.success(request, 'Perfil atualizado com sucesso.')
+    return redirect('perfil')
