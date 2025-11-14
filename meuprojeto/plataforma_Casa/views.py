@@ -22,7 +22,8 @@ from .models import (
     Funcionario, 
     ParticipacaoMonitoria, 
     Presenca,
-    RegistroHoras, 
+    RegistroHoras,
+    Aluno, 
     Sala, 
     Turma, 
     Vaga, 
@@ -938,6 +939,30 @@ def dashboard_monitor(request):
         'registros': registros,
     }
     return render(request, 'dashboard.html', context)
+
+
+
+@login_required
+def dashboard(request):
+    """
+    Rota genérica `dashboard` usada em templates como link "Home".
+    Redireciona o usuário para o dashboard apropriado conforme seu grupo.
+    """
+    user = request.user
+    # Admin / Coordenador -> dashboard de gestão
+    if user.groups.filter(name__in=['Admin', 'Coordenador']).exists():
+        return redirect('dashboard_gestao')
+    # Professor -> dashboard do professor
+    if user.groups.filter(name='Professor').exists():
+        return redirect('dashboard_professor')
+    # Monitor -> dashboard do monitor
+    if user.groups.filter(name='Monitor').exists():
+        return redirect('dashboard_monitor')
+    # Aluno -> portal de vagas (página inicial para alunos)
+    if user.groups.filter(name='Aluno').exists():
+        return redirect('portal_vagas')
+    # Fallback: home
+    return redirect('home')
 
 @login_required
 def listar_monitorias(request):
