@@ -994,11 +994,13 @@
             {% if minhas_turmas %}
             {% for turma in minhas_turmas %}
             <div class="list-item">
-                <div>
-                    <div class="list-item-title">{{ turma.disciplina }}</div>
-                    <div class="list-item-meta">{{ turma.horario }}</div>
-                </div>
-                <span class="badge badge-info">{{ turma.semestre }}</span>
+                <a href="{% url 'detalhe_turma' turma.id %}" class="text-decoration-none text-body d-flex justify-content-between w-100">
+                    <div>
+                        <div class="list-item-title">{{ turma.disciplina }}</div>
+                        <div class="list-item-meta">{{ turma.horario }}</div>
+                    </div>
+                    <span class="badge badge-info">{{ turma.semestre }}</span>
+                </a>
             </div>
             {% endfor %}
             {% else %}

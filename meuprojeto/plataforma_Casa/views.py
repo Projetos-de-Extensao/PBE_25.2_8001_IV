@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test, per
 from django.contrib.auth import login
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib import messages
+from django.urls import resolve, Resolver404
 from .permission import (
             is_adm, 
             is_admin_user, 
@@ -80,7 +81,30 @@ def login_view(request):
             if next_param:
                 allowed = {request.get_host()}
                 if url_has_allowed_host_and_scheme(next_param, allowed_hosts=allowed, require_https=request.is_secure()):
-                    return redirect(next_param)
+                    # Resolve the path to obtain the target route name and
+                    # ensure we don't redirect a user to a role-specific
+                    # dashboard that they don't have access to.
+                    try:
+                        path = next_param if str(next_param).startswith('/') else f'/{next_param}'
+                        try:
+                            resolver = resolve(path)
+                            target_name = resolver.url_name
+                        except Resolver404:
+                            target_name = None
+
+                        # If the target is a professor-only dashboard but the
+                        # user is not a Professor, ignore the `next` param.
+                        if target_name == 'dashboard_professor' and not user.groups.filter(name='Professor').exists():
+                            pass
+                        # If the target is a monitor-only dashboard but the
+                        # user is not a Monitor, ignore the `next` param.
+                        elif target_name == 'dashboard_monitor' and not user.groups.filter(name='Monitor').exists():
+                            pass
+                        else:
+                            return redirect(next_param)
+                    except Exception:
+                        # If any error occurs resolving, fall back to safe redirect
+                        return redirect(next_param)
 
             # Lógica de redirecionamento por grupo
             if user.groups.filter(name='Aluno').exists():
@@ -670,7 +694,7 @@ def registrar_horas(request):
 
 
 @login_required
-@user_passes_test(is_professor_access)
+@user_passes_test(is_monitor_access)
 def meus_registros_horas(request):
     service = RegistroHorasService()
     try:
@@ -685,7 +709,7 @@ def meus_registros_horas(request):
     return render(request, 'horas/meus_registros.html', context)
 
 @login_required
-@user_passes_test(is_professor_access)
+@user_passes_test(is_monitor_access)
 def detalhes_registro(request, registro_id):
     service = RegistroHorasService()
     try:
@@ -945,6 +969,7 @@ def dashboard_monitor(request):
 
     context = {
         'is_monitor_dashboard': True,
+        'minhas_turmas': turmas,
         'turmas': turmas,
         'registros': registros,
     }
