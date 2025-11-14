@@ -107,6 +107,11 @@ urlpatterns = [
     # Rota para participar de uma monitoria (compatibilidade com templates)
     path('monitorias/<int:turma_id>/participar/', views.participar_monitoria, name='participar_monitoria'),
 
+    # Rota para exibir alunos de uma monitoria (usada por cartões do monitor)
+    path('monitorias/<int:turma_id>/alunos/', views.alunos_da_monitoria, name='alunos_da_monitoria'),
+    # Página de materiais para uma turma (listagem e upload por monitor)
+    path('monitorias/<int:turma_id>/materiais/', views.materiais_monitoria, name='materiais_monitoria'),
+
 
     path('presencas/', views.listar_presencas, name='listar_presencas'),
 

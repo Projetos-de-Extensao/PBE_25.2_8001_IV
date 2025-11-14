@@ -55,7 +55,7 @@ from .service import (
     AlunoService
     )
 
-from .forms import DisciplinaForm
+from .forms import DisciplinaForm, MaterialApoioForm
 
 
 from django.contrib.auth import login, get_user_model
@@ -1008,10 +1008,42 @@ def minhas_monitorias_cards(request):
     portal de vagas quando o usuário não for monitor/professor.
     """
     user = request.user
+    # Se for Monitor, renderiza a página de cards com suas turmas
     if user.groups.filter(name='Monitor').exists():
-        return redirect('dashboard_monitor')
+        # tenta mapear o user para o registro de Aluno/Monitor
+        portal_service = PortalVagasService()
+        registro_service = RegistroHorasService()
+        try:
+            monitor = portal_service.get_aluno(request.user.email)
+        except Exception:
+            monitor = None
+
+        if not monitor:
+            messages.warning(request, 'Perfil de monitor não encontrado.')
+            return redirect('portal_vagas')
+
+        try:
+            turmas = registro_service.get_turmas_do_monitor(monitor)
+        except Exception:
+            turmas = []
+
+        # Para cada turma, conta participantes
+        from .models import ParticipacaoMonitoria
+        turmas_com_alunos = []
+        for turma in turmas:
+            try:
+                total = ParticipacaoMonitoria.objects.filter(turma=turma).count()
+            except Exception:
+                total = 0
+            turmas_com_alunos.append({'turma': turma, 'total_alunos': total})
+
+        context = {'turmas_com_alunos': turmas_com_alunos}
+        return render(request, 'monitorias/minhas_monitorias_cards.html', context)
+
+    # Professores seguem para seu dashboard
     if user.groups.filter(name='Professor').exists():
         return redirect('dashboard_professor')
+
     # Fallback: enviar ao portal de vagas (página pública/aluno)
     return redirect('portal_vagas')
 
@@ -1033,10 +1065,29 @@ def participar_monitoria(request, turma_id):
 def minhas_inscricoes(request):
     """
     Rota de compatibilidade para 'minhas_inscricoes' usada em templates.
-    Atualmente redireciona para o portal de vagas; pode ser expandida para
-    listar as inscrições do usuário quando necessário.
+    Atualmente renderiza as inscrições do usuário (se for aluno/monitor).
     """
-    return redirect('portal_vagas')
+    service = PortalVagasService()
+    try:
+        aluno = service.get_aluno(request.user.email)
+    except Exception:
+        aluno = None
+
+    if not aluno:
+        # Se não for um aluno cadastrado, redireciona ao portal de vagas
+        messages.warning(request, 'Perfil de aluno não encontrado. Acesse o portal de vagas.')
+        return redirect('portal_vagas')
+
+    # Busca todas as inscrições do aluno
+    try:
+        inscricoes = Inscricao.objects.filter(aluno=aluno).select_related('vaga', 'vaga__curso').order_by('-data_inscricao')
+    except Exception:
+        inscricoes = []
+
+    context = {
+        'inscricoes': inscricoes,
+    }
+    return render(request, 'inscricoes/minhas.html', context)
 
 @login_required
 def listar_monitorias(request):
@@ -1181,6 +1232,148 @@ def perfil(request):
     context['is_professor'] = request.user.groups.filter(name='Professor').exists()
 
     return render(request, 'perfil.html', context)
+
+
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name__in=['Monitor', 'Professor']).exists())
+def alunos_da_monitoria(request, turma_id):
+    """
+    Exibe a lista de alunos participando de uma turma/monitoria.
+    Rota acessível para Monitores e Professores.
+    """
+    service = TurmaService()
+    turma = None
+    participacoes = []
+    try:
+        # Tenta usar o service para obter detalhes da turma
+        context = service.get_turma_detail(turma_id)
+        turma = context.get('turma') if isinstance(context, dict) else None
+        participacoes = context.get('participacoes') if isinstance(context, dict) else None
+    except Exception:
+        # fallback silencioso — usaremos consultas diretas
+        turma = None
+        participacoes = None
+
+    if not turma:
+        try:
+            turma = get_object_or_404(Turma, id=turma_id)
+        except Exception:
+            messages.error(request, 'Monitoria não encontrada ou você não tem permissão para acessá-la.')
+            return redirect('minhas_monitorias_cards')
+
+    if participacoes is None:
+        try:
+            participacoes = ParticipacaoMonitoria.objects.filter(turma=turma).select_related('aluno')
+        except Exception:
+            participacoes = []
+
+    try:
+        hoje = timezone.localdate()
+    except Exception:
+        hoje = datetime.now().date()
+
+    try:
+        presencas_hoje_qs = Presenca.objects.filter(turma=turma, data=hoje).values_list('aluno_id', flat=True)
+        presencas_hoje = set(presencas_hoje_qs)
+    except Exception:
+        presencas_hoje = set()
+
+    total_participantes = participacoes.count() if hasattr(participacoes, 'count') else len(participacoes)
+
+    context = {
+        'turma': turma,
+        'participacoes': participacoes,
+        'total_participantes': total_participantes,
+        'presencas_hoje': presencas_hoje,
+        'hoje': hoje,
+    }
+    return render(request, 'monitorias/alunos_monitoria.html', context)
+
+
+@login_required
+def materiais_monitoria(request, turma_id):
+    """
+    Lista e gerencia materiais de apoio de uma turma.
+    - GET: exibe materiais disponíveis
+    - POST: cria novo material (se for o monitor) ou remove material (action=delete)
+    A página é visível para usuários autenticados; apenas o monitor responsável
+    (ou professores) podem gerenciar (upload/delete).
+    """
+    portal_service = PortalVagasService()
+    turma = get_object_or_404(Turma, id=turma_id)
+
+    # Tenta mapear o usuário logado a um registro de Aluno (monitor)
+    try:
+        usuario_aluno = portal_service.get_aluno(request.user.email)
+    except Exception:
+        usuario_aluno = None
+
+    # Pode gerenciar se for o monitor dessa turma ou for professor/funcionário
+    pode_gerenciar = False
+    if request.user.groups.filter(name='Professor').exists() or request.user.is_staff:
+        pode_gerenciar = True
+    elif usuario_aluno and turma.monitor and usuario_aluno.id == turma.monitor.id:
+        pode_gerenciar = True
+
+    # Import MaterialApoio model lazily to avoid changing top imports here
+    from .models import MaterialApoio
+
+    # POST: criação ou exclusão
+    if request.method == 'POST':
+        # Exclusão de material
+        if request.POST.get('action') == 'delete':
+            material_id = request.POST.get('material_id')
+            try:
+                material = get_object_or_404(MaterialApoio, id=material_id, turma=turma)
+                # Apenas o monitor autor ou professor/staff pode deletar
+                if not (request.user.groups.filter(name='Professor').exists() or (usuario_aluno and material.monitor_id == getattr(usuario_aluno, 'id', None)) or request.user.is_staff):
+                    messages.error(request, 'Acesso negado: você não pode remover este material.')
+                else:
+                    try:
+                        # remove arquivo físico (se existir) e o registro
+                        if material.arquivo:
+                            material.arquivo.delete(save=False)
+                    except Exception:
+                        pass
+                    material.delete()
+                    messages.success(request, 'Material removido com sucesso.')
+            except Exception:
+                messages.error(request, 'Material não encontrado ou erro ao remover.')
+            return redirect('materiais_monitoria', turma_id=turma.id)
+
+        # Upload de material
+        if not pode_gerenciar:
+            messages.error(request, 'Acesso negado: apenas o monitor responsável pode enviar materiais.')
+            return redirect('materiais_monitoria', turma_id=turma.id)
+
+        form = MaterialApoioForm(request.POST, request.FILES)
+        if form.is_valid():
+            material = form.save(commit=False)
+            material.turma = turma
+            # Se usuário identificado como Aluno, define como monitor responsável pelo upload
+            if usuario_aluno:
+                material.monitor = usuario_aluno
+            else:
+                # fallback: atribui ao monitor da turma
+                material.monitor = turma.monitor
+            material.save()
+            messages.success(request, 'Material enviado com sucesso.')
+            return redirect('materiais_monitoria', turma_id=turma.id)
+        else:
+            messages.error(request, 'Erro ao enviar material. Verifique os campos.')
+
+    else:
+        form = MaterialApoioForm()
+
+    materiais = MaterialApoio.objects.filter(turma=turma, publicado=True).order_by('-criado_em')
+
+    context = {
+        'turma': turma,
+        'materiais': materiais,
+        'pode_gerenciar': pode_gerenciar,
+        'form': form,
+    }
+    return render(request, 'monitorias/materiais_monitoria.html', context)
 
 @login_required
 def atualizar_perfil_rapido(request):

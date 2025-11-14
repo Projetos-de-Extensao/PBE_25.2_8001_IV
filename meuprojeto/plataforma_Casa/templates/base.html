@@ -1798,7 +1798,7 @@
                     </a>
                     
                     <!-- Link: Minhas Inscrições -->
-                    <!-- Acompanhar candidaturas em andamento -->
+                    <!-- Leva para a página de inscrições do usuário (compatível com alunos e monitores) -->
                     <a href="{% url 'minhas_inscricoes' %}" class="sidebar-item {% if request.resolver_match.url_name == 'minhas_inscricoes' %}active{% endif %}">
                         <i class="fas fa-file-signature"></i>
                         <span class="sidebar-text">Minhas Inscrições</span>
@@ -1830,9 +1830,8 @@
                         <span class="sidebar-text">Portal de Vagas</span>
                     </a>
                     
-                    <!-- Link: Minhas Inscrições -->
-                    <!-- Ver status das candidaturas submetidas -->
-                    <!-- Permissão necessária: view_inscricao, add_inscricao -->
+                    <!-- Link: Minhas Inscrições (alunos) - mantido para compatibilidade -->
+                    <!-- Alunos continuam a usar a rota de inscrições; monitores foram redirecionados acima -->
                     <a href="{% url 'minhas_inscricoes' %}" class="sidebar-item {% if request.resolver_match.url_name == 'minhas_inscricoes' %}active{% endif %}">
                         <i class="fas fa-file-signature"></i>
                         <span class="sidebar-text">Minhas Inscrições</span>
