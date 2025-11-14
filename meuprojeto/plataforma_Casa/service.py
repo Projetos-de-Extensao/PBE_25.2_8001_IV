@@ -276,10 +276,43 @@ class MonitoriaService:
         return participacao
 
 class PresencaService:
-    """Service para operações de presenças."""
+    """Service para operações de presenças.
 
-    def listar_presencas(self, turma_id=None, data=None):
-        presencas = PresencaRepository.list_presencas(turma_id, data)
+    Amplia a API do repository para aceitar filtros mais ricos (aluno_id,
+    data_inicio, data_fim, status) usados pela view `listar_presencas`.
+    """
+
+    def listar_presencas(self, turma_id=None, aluno_id=None, data_inicio=None, data_fim=None, status=None, data=None):
+        # Obtém queryset base via repository (aceita apenas turma_id e data)
+        presencas = PresencaRepository.list_presencas(turma_id=turma_id, data=None if data is None else data)
+
+        # Aplica filtros adicionais localmente
+        if aluno_id:
+            try:
+                presencas = presencas.filter(aluno_id=aluno_id)
+            except Exception:
+                pass
+
+        if data_inicio:
+            try:
+                presencas = presencas.filter(data__gte=data_inicio)
+            except Exception:
+                pass
+
+        if data_fim:
+            try:
+                presencas = presencas.filter(data__lte=data_fim)
+            except Exception:
+                pass
+
+        # status pode mapear para presença booleana ('Presente'/'Ausente')
+        if status:
+            status_norm = str(status).strip().lower()
+            if status_norm in ('presente', 'true', '1'):
+                presencas = presencas.filter(presente=True)
+            elif status_norm in ('ausente', 'false', '0'):
+                presencas = presencas.filter(presente=False)
+
         turmas = PresencaRepository.get_turmas_ativas()
         return {
             'presencas': presencas,
@@ -748,6 +781,10 @@ class RegistroService:
         except:
             erros.append('Curso inválido.')
         return erros
+
+    def get_cursos_ativos(self):
+        from .repository import RegistroRepository
+        return RegistroRepository.get_cursos_ativos()
 
     def gerar_username_unico(self, email):
         username = email.split('@')[0] if email else ''

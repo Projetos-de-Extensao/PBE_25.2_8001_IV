@@ -1,6 +1,6 @@
-from django.db.models import Count
+from django.db.models import Count, Sum, Avg, Q
 from django.shortcuts import get_object_or_404
-from pytz import timezone
+from django.utils import timezone
 from .models import ( 
     Documento,
     RegistroHoras,
@@ -577,7 +577,7 @@ class DashboardGestaoRepository:
             status='Aprovado',
             data__month=now.month,
             data__year=now.year
-        ).aggregate(total=sum('total_horas'))['total'] or 0
+        ).aggregate(total=Sum('total_horas'))['total'] or 0
 
     @staticmethod
     def valor_total_mes():
@@ -586,7 +586,7 @@ class DashboardGestaoRepository:
             status='Pago',
             mes_referencia__month=now.month,
             mes_referencia__year=now.year
-        ).aggregate(total=sum('valor_total'))['total'] or 0
+        ).aggregate(total=Sum('valor_total'))['total'] or 0
 
     @staticmethod
     def inscricoes_por_status():
@@ -620,7 +620,7 @@ class DashboardGestaoRepository:
         ).annotate(
             mes=TruncMonth('data')
         ).values('mes').annotate(
-            total_horas=sum('total_horas')
+            total_horas=Sum('total_horas')
         ).order_by('mes'))
 
     @staticmethod
@@ -630,14 +630,14 @@ class DashboardGestaoRepository:
         ).annotate(
             mes=TruncMonth('mes_referencia')
         ).values('mes').annotate(
-            total_valor=sum('valor_total')
+            total_valor=Sum('valor_total')
         ).order_by('mes'))
 
     @staticmethod
     def horas_por_status():
         return list(RegistroHoras.objects.values('status').annotate(
             total=Count('id'),
-            horas=sum('total_horas')
+            horas=Sum('total_horas')
         ).order_by('-total'))
 
     @staticmethod
@@ -665,18 +665,18 @@ class DashboardGestaoRepository:
 
     @staticmethod
     def cr_medio_monitores():
-        return Inscricao.objects.filter(status='Aprovado').aggregate(media=avg('aluno__cr_geral'))['media'] or 0
+        return Inscricao.objects.filter(status='Aprovado').aggregate(media=Avg('aluno__cr_geral'))['media'] or 0
 
     @staticmethod
     def media_horas_monitor():
-        return RegistroHoras.objects.filter(status='Aprovado').aggregate(media=avg('total_horas'))['media'] or 0
+        return RegistroHoras.objects.filter(status='Aprovado').aggregate(media=Avg('total_horas'))['media'] or 0
     @staticmethod
     def total_pago_ano():
         ano_atual = timezone.now().year
         return StatusPagamento.objects.filter(
             status='Pago',
             mes_referencia__year=ano_atual
-        ).aggregate(total=sum('valor_total'))['total'] or 0
+        ).aggregate(total=Sum('valor_total'))['total'] or 0
 
     @staticmethod
     def dados_exportacao():

@@ -56,6 +56,8 @@ urlpatterns = [
     
     # 8. MÓDULO DE RELATÓRIOS (ADMIN)
     path('relatorios/', views.listar_relatorios, name='listar_relatorios'),
+    path('relatorios/candidatos-vaga/', views.relatorio_candidatos_vaga, name='relatorio_candidatos_vaga'),
+    path('relatorios/monitores-selecionados/', views.relatorio_monitores_selecionados, name='relatorio_monitores_selecionados'),
     path('relatorios/desempenho/', views.relatorio_desempenho, name='relatorio_desempenho'),
     path('relatorios/frequencia/', views.relatorio_frequencia, name='relatorio_frequencia'),
     path('relatorios/inscricoes/', views.relatorio_inscricoes, name='relatorio_inscricoes'),
@@ -114,6 +116,7 @@ urlpatterns = [
 
 
     path('presencas/', views.listar_presencas, name='listar_presencas'),
+    path('presencas/<int:presenca_id>/editar/', views.editar_presenca, name='editar_presenca'),
 
     path('perfil/', views.perfil, name='perfil'),
     path('perfil/atualizar/', views.atualizar_perfil_rapido, name='atualizar_perfil_rapido'),

@@ -154,7 +154,7 @@ def register_view(request):
         except Exception as e:
             messages.error(request, f'❌ Erro ao registrar: {str(e)}')
             return redirect('register')
-    cursos = RegistroService.get_cursos_ativos()
+    cursos = service.get_cursos_ativos()
     context = {'cursos': cursos}
     return render(request, 'register.html', context)
 
@@ -197,7 +197,7 @@ def criar_usuario(request):
 
 
 @login_required
-@user_passes_test(is_aluno_access)
+@user_passes_test(is_funcionairo_access)
 def editar_usuario(request, usuario_id):
     service = UsuarioService()
     usuario = get_object_or_404(Usuario, id=usuario_id)
@@ -221,7 +221,7 @@ def deletar_usuario(request, usuario_id):
 
 ##### 3. MÓDULO DE ALUNOS - CRUD COMPLETO ###
 @login_required
-@user_passes_test(is_aluno_access)
+@user_passes_test(is_funcionairo_access)
 def listar_alunos(request):
     service = AlunoService()
     curso_filtro = request.GET.get('curso')
@@ -237,7 +237,7 @@ def listar_alunos(request):
 
 
 @login_required
-@user_passes_test(is_aluno_access )
+@user_passes_test(is_funcionairo_access)
 def criar_aluno(request):
     service = AlunoService()
     if request.method == 'POST':
@@ -481,7 +481,7 @@ def deletar_vaga_monitoria(request, vaga_id):
 
 
 ## 5. MÓDULO DE TURMAS - CRUD + DETALHE
-@user_passes_test(lambda u: u.is_staff or u.is_superuser)
+@user_passes_test(lambda u: u.is_staff or u.is_superuser or u.groups.filter(name='Professor').exists())
 @login_required
 def listar_turmas(request):
     service = TurmaService()
@@ -494,14 +494,14 @@ def listar_turmas(request):
     }
     return render(request, 'turmas/listar.html', context)
 
-@user_passes_test(lambda u: u.is_staff or u.is_superuser)
+@user_passes_test(lambda u: u.is_staff or u.is_superuser or u.groups.filter(name='Professor').exists())
 @login_required
 def detalhe_turma(request, turma_id):
     service = TurmaService()
     context = service.detalhe_turma(turma_id)
     return render(request, 'turmas/detalhe.html', context)
 
-@user_passes_test(lambda u: u.is_staff or u.is_superuser)
+@user_passes_test(lambda u: u.is_staff or u.is_superuser or u.groups.filter(name='Professor').exists())
 @login_required
 def criar_turma(request):
     service = TurmaService()
@@ -530,7 +530,7 @@ def criar_turma(request):
     }
     return render(request, 'turmas/criar.html', context)
 
-@user_passes_test(lambda u: u.is_staff or u.is_superuser)
+@user_passes_test(lambda u: u.is_staff or u.is_superuser or u.groups.filter(name='Professor').exists())
 @login_required
 def editar_turma(request, turma_id):
     service = TurmaService()
@@ -549,7 +549,7 @@ def editar_turma(request, turma_id):
     context = {'turma': turma}
     return render(request, 'turmas/editar.html', context)
 
-@user_passes_test(lambda u: u.is_staff or u.is_superuser)
+@user_passes_test(lambda u: u.is_staff or u.is_superuser or u.groups.filter(name='Professor').exists())
 @login_required
 def deletar_turma(request, turma_id):
     service = TurmaService()
@@ -589,6 +589,82 @@ def relatorio_geral(request):
     context = service.geral()
     return render(request, 'relatorios/geral.html', context)
 
+
+@login_required
+@user_passes_test(is_funcionairo_access)
+def relatorio_candidatos_vaga(request):
+    """Relatório: lista de candidatos por vaga (filtros por vaga)."""
+    portal = PortalVagasService()
+    # Usa o service para obter vagas ativas; aceita filtro por GET
+    curso_filtro = request.GET.get('curso')
+    vaga_filtro = request.GET.get('vaga')
+    vagas = portal.listar_vagas(busca=None, curso=curso_filtro, tipo=None)
+    if vaga_filtro:
+        vagas = vagas.filter(id=vaga_filtro)
+    context = {
+        'vagas': vagas,
+        'now': timezone.now(),
+    }
+    return render(request, 'relatorios/candidatos_vaga.html', context)
+
+
+@login_required
+@user_passes_test(is_funcionairo_access)
+def relatorio_monitores_selecionados(request):
+    """Relatório: monitores aprovados com filtros e estatísticas simples."""
+    curso_filtro = request.GET.get('curso')
+    vaga_filtro = request.GET.get('vaga')
+    ordem = request.GET.get('ordem', 'nome')
+
+    inscricoes = Inscricao.objects.filter(status='Aprovado').select_related('aluno', 'vaga', 'vaga__curso')
+    if curso_filtro:
+        inscricoes = inscricoes.filter(aluno__curso__id=curso_filtro)
+    if vaga_filtro:
+        inscricoes = inscricoes.filter(vaga__id=vaga_filtro)
+
+    if ordem == 'cr':
+        inscricoes = inscricoes.order_by('-aluno__cr_geral')
+    else:
+        inscricoes = inscricoes.order_by('aluno__nome')
+
+    total_vagas_preenchidas = Vaga.objects.filter(inscricao__status='Aprovado').distinct().count()
+    media_cr = inscricoes.aggregate(media=Avg('aluno__cr_geral'))['media'] or 0
+    total_disciplinas = Disciplina.objects.count()
+
+    cursos = Curso.objects.filter(ativo=True)
+    vagas = Vaga.objects.filter(ativo=True)
+
+    # Dados para os gráficos
+    cursos_agg = (
+        inscricoes.values('aluno__curso__nome')
+        .annotate(total=Count('id'))
+        .order_by('-total')
+    )
+    cursos_labels = [c['aluno__curso__nome'] for c in cursos_agg]
+    cursos_data = [c['total'] for c in cursos_agg]
+
+    disciplinas_agg = (
+        inscricoes.values('vaga__disciplina__nome')
+        .annotate(total=Count('id'))
+        .order_by('-total')[:5]
+    )
+    disciplinas_labels = [d.get('vaga__disciplina__nome') or '' for d in disciplinas_agg]
+    disciplinas_data = [d['total'] for d in disciplinas_agg]
+
+    context = {
+        'inscricoes': inscricoes,
+        'total_vagas_preenchidas': total_vagas_preenchidas,
+        'media_cr': media_cr,
+        'total_disciplinas': total_disciplinas,
+        'cursos': cursos,
+        'vagas': vagas,
+        'cursos_labels': cursos_labels,
+        'cursos_data': cursos_data,
+        'disciplinas_labels': disciplinas_labels,
+        'disciplinas_data': disciplinas_data,
+        'now': timezone.now(),
+    }
+    return render(request, 'relatorios/monitores_selecionados.html', context)
 
 @login_required
 def portal_vagas(request):
@@ -773,7 +849,7 @@ def dashboard_gestao(request):
         messages.error(request, f'Erro ao carregar dashboard de gestão: {str(e)}')
         print(f"ERRO DASHBOARD_GESTAO: {str(e)}")
         print(traceback.format_exc())
-        return redirect('plataforma_Casa:dashboard')
+        return redirect('dashboard')
     
 
 # 16. GERENCIAMENTO DE DISCIPLINAS (PROFESSOR)
@@ -1161,13 +1237,20 @@ def listar_presencas(request):
     status = request.GET.get('status')
 
     try:
-        presencas = service.listar_presencas(
+        result = service.listar_presencas(
             turma_id=turma_id or None,
             aluno_id=aluno_id or None,
             data_inicio=data_inicio or None,
             data_fim=data_fim or None,
             status=status or None
         )
+        # Service may return a dict with keys 'presencas' and 'turmas'.
+        if isinstance(result, dict):
+            presencas = result.get('presencas', [])
+            turmas_service = result.get('turmas')
+        else:
+            presencas = result
+            turmas_service = None
     except AttributeError:
         # fallback direto no model caso o service não implemente o método
         qs = Presenca.objects.all().select_related('aluno', 'turma')
@@ -1183,11 +1266,63 @@ def listar_presencas(request):
             qs = qs.filter(data__lte=data_fim)
         presencas = qs.order_by('-data')
 
+    # Prefer turmas provided by the service when available
+    turmas_list = turmas_service if 'turmas_service' in locals() and turmas_service is not None else Turma.objects.filter(ativo=True)
+
     context = {
         'presencas': presencas,
-        'turmas': Turma.objects.filter(ativo=True),
+        'turmas': turmas_list,
     }
     return render(request, 'presencas/listar.html', context)
+
+
+@login_required
+@user_passes_test(lambda u: u.is_staff or u.groups.filter(name__in=['Professor', 'Monitor']).exists())
+def editar_presenca(request, presenca_id):
+    """
+    Edita o campo `presente` de uma Presenca. Pode ser usado por Staff, Professor ou Monitor.
+    - GET: exibe um formulário simples para alterar o status
+    - POST: aplica a alteração e redireciona para a listagem
+    """
+    service = PresencaService()
+    presenca = get_object_or_404(Presenca, id=presenca_id)
+
+    if request.method == 'POST':
+        presente = request.POST.get('presente') in ('on', '1', 'true', 'True')
+        try:
+            service.editar_presenca(presenca_id, presente)
+            messages.success(request, 'Presença atualizada com sucesso.')
+        except Exception as e:
+            messages.error(request, f'Erro ao atualizar presença: {str(e)}')
+        return redirect('listar_presencas')
+
+    # For compatibility with the existing template which expects a 'form' and 'monitorias'
+    class _DummyField:
+        def __init__(self):
+            self.errors = []
+
+    class _DummyForm:
+        monitoria = _DummyField()
+        data = _DummyField()
+        hora_entrada = _DummyField()
+        hora_saida = _DummyField()
+        horas_cumpridas = _DummyField()
+        status = _DummyField()
+        observacoes = _DummyField()
+
+    monitorias = []
+    try:
+        # tenta obter monitorias relacionadas à turma da presença, se aplicável
+        monitorias = ParticipacaoMonitoria.objects.filter(turma=presenca.turma).select_related('aluno', 'turma')
+    except Exception:
+        monitorias = []
+
+    context = {
+        'presenca': presenca,
+        'form': _DummyForm(),
+        'monitorias': monitorias,
+    }
+    return render(request, 'presencas/editar.html', context)
 
 
 @login_required

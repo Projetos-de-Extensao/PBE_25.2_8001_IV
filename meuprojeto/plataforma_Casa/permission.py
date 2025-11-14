@@ -32,5 +32,11 @@ def is_professor_access(user):
 
 
 def is_funcionairo_access(user):
+    # Allow Django staff/superuser accounts as funcionarios as well
+    try:
+        if getattr(user, 'is_staff', False) or getattr(user, 'is_superuser', False):
+            return True
+    except Exception:
+        pass
     groups = _user_groups_lower(user)
     return bool(groups & {'admin', 'dev', 'user_funcionairo', 'user_professor', 'user_coordenador', 'funcionario'})
