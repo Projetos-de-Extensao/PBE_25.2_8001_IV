@@ -347,10 +347,7 @@
             border-right: 4px solid #F5AC00; /* Borda amarela à direita */
         }
 
-        .validacao-horas-monitoria{
-            margin-bottom: 1rem;
-        }
-        
+
         /* 
          * Estado colapsado do sidebar
          * Reduz largura para mostrar apenas ícones
@@ -1746,21 +1743,36 @@
                         ====================================================================
                     -->
                     {% if is_monitor %}
-                    <!-- Link: Dashboard do Monitor -->
-                    <!-- Painel com KPIs e estatísticas personalizadas -->
-                    <!-- Monitorias ativas, horas, alunos, etc -->
-                    <a href="{% url 'dashboard' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard' and is_monitor %}active{% endif %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Dashboard do Monitor">
-                        <i class="fas fa-chart-line"></i>
-                        <span class="sidebar-text">Dashboard</span>
+
+                     <a href="{% url 'portal_vagas' %}" class="sidebar-item portal-vagas {% if request.resolver_match.url_name == 'portal_vagas' %}active{% endif %}" data-bs-toggle="tooltip"  data-bs-placement="right" title="Portal de Vagas de Monitoria">
+                        <i class="fas fa-briefcase"></i>
+                        <span class="sidebar-text">Portal de Vagas</span>
                     </a>
+
+
                     
-                    <hr class="sidebar-divider">
-                    
+                <div class = "caixa-topicos">
+                     <!-- Link: Monitorias Disponíveis -->
+                    <!-- Ver todas as monitorias disponíveis para participar como aluno -->
+                    <a href="{% url 'monitorias_disponiveis' %}" class="sidebar-item {% if request.resolver_match.url_name == 'monitorias_disponiveis' %}active{% endif %}" data-bs-toggle="tooltip"  data-bs-placement="right" title="Monitorias Disponíveis">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span class="sidebar-text">Turmas abertas</span>
+                    </a>
+                
+
+                                        <!-- Link: Participando -->
+                    <!-- Ver monitorias que está participando como aluno -->
+                    <a href="{% url 'participando_monitorias' %}" class="sidebar-item {% if request.resolver_match.url_name == 'participando_monitorias' %}active{% endif %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Monitorias que Estou Participando">
+                        <i class="fas fa-users"></i>
+                        <span class="sidebar-text">Participando</span>
+                    </a>
+
+                </div>      
                     <!-- Link: Registrar Horas -->
                     <!-- Lançar horas trabalhadas de monitoria -->
                     <!-- Permissão: add_registrohoras -->
 
-                
+                <div class = "caixa-topicos">
                     <a href="{% url 'registrar_horas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'registrar_horas' %}active{% endif %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Registrar Horas de Monitoria">
                         <i class="fas fa-clock"></i>
                         <span class="sidebar-text">Registrar Horas</span>
@@ -1774,41 +1786,17 @@
                         <i class="fas fa-history"></i>
                         <span class="sidebar-text">Meus Registros</span>
                     </a>
-                       
-                    <hr class="sidebar-divider">
+                </div>       
+                    
                     
                     <!-- Link: Minhas Monitorias -->
                     <!-- Ver monitorias que está dando em formato de cards -->
 
                    
+                <div class = "caixa-topicos">  
                     <a href="{% url 'minhas_monitorias_cards' %}" class="sidebar-item {% if request.resolver_match.url_name == 'minhas_monitorias_cards' or request.resolver_match.url_name == 'alunos_da_monitoria' %}active{% endif %}" data-bs-toggle="tooltip"  data-bs-placement="right" title="Minhas Monitorias">
                         <i class="fas fa-chalkboard-user"></i>
                         <span class="sidebar-text">Minhas Monitorias</span>
-                    </a>
-                    
-                    <hr class="sidebar-divider">
-                    
-                    <!-- Link: Monitorias Disponíveis -->
-                    <!-- Ver todas as monitorias disponíveis para participar como aluno -->
-                    <a href="{% url 'monitorias_disponiveis' %}" class="sidebar-item {% if request.resolver_match.url_name == 'monitorias_disponiveis' %}active{% endif %}" data-bs-toggle="tooltip"  data-bs-placement="right" title="Monitorias Disponíveis">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span class="sidebar-text">Monitorias</span>
-                    </a>
-                    
-                    <!-- Link: Participando -->
-                    <!-- Ver monitorias que está participando como aluno -->
-                    <a href="{% url 'participando_monitorias' %}" class="sidebar-item {% if request.resolver_match.url_name == 'participando_monitorias' %}active{% endif %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Monitorias que Estou Participando">
-                        <i class="fas fa-users"></i>
-                        <span class="sidebar-text">Participando</span>
-                    </a>
-                   
-                    <hr class="sidebar-divider">
-                    
-                    <!-- Link: Portal de Vagas -->
-                    <!-- Monitores podem se candidatar a novas vagas -->
-                    <a href="{% url 'portal_vagas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'portal_vagas' %}active{% endif %}" data-bs-toggle="tooltip"  data-bs-placement="right" title="Portal de Vagas de Monitoria">
-                        <i class="fas fa-briefcase"></i>
-                        <span class="sidebar-text">Portal de Vagas</span>
                     </a>
                     
                     <!-- Link: Minhas Inscrições -->
@@ -1817,6 +1805,26 @@
                         <i class="fas fa-file-signature"></i>
                         <span class="sidebar-text">Minhas Inscrições</span>
                     </a>
+                    
+
+                    
+
+                </div>   
+                    
+
+                     <!-- Link: Dashboard do Monitor -->
+                    <!-- Painel com KPIs e estatísticas personalizadas -->
+                    <!-- Monitorias ativas, horas, alunos, etc -->
+                    <a href="{% url 'dashboard' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard' and is_monitor %}active{% endif %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Dashboard do Monitor">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="sidebar-text">Dashboard do monitor</span>
+                    </a>
+                    <hr class="sidebar-divider">
+                    <!-- Link: Portal de Vagas -->
+                    <!-- Monitores podem se candidatar a novas vagas -->
+
+                    
+
                     
                     <!-- 
                         ====================================================================
@@ -1867,7 +1875,8 @@
                         <i class="fas fa-users"></i>
                         <span class="sidebar-text">Participando</span>
                     </a>
-                    
+
+
                     <!-- 
                         ====================================================================
                         MENU: PROFESSOR (Coordenador de Monitoria)
@@ -1889,32 +1898,8 @@
                         ====================================================================
                     -->
                     {% elif is_professor %}
-                    <!-- Link: Dashboard do Professor -->
-                    <!-- Painel com KPIs e estatísticas personalizadas -->
-                    <!-- Últimas inscrições, vagas populares, turmas ativas -->
-                    <a href="{% url 'dashboard' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" data-bs-toggle="tooltip"  data-bs-placement="right" title="Dashboard do Professor">
-                        <i class="fas fa-chart-line"></i>
-                        <span class="sidebar-text">Dashboard</span>
-                    </a>
-                    
-                    <hr class="sidebar-divider">
 
-
-
-                     <!-- Link: Validar Horas -->
-                    <!-- Aprovar/reprovar registros de horas dos monitores -->
-                    <!-- Verificar cumprimento de carga horária -->
-                    <!-- Permissão: change_registrohoras -->
-
-                    <div class="validacao-horas-monitoria">
-
-                    <a href="{% url 'validar_horas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'validar_horas' %}active{% endif %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Validar Horas de Monitoria">
-                        <i class="fas fa-check-circle"></i>
-                        <span class="sidebar-text">Validar Horas</span>
-                    </a>
-                    </div>
-                    
-                    <!-- Link: Minhas Vagas -->
+                     <!-- Link: Minhas Vagas -->
                     <!-- Criar, editar e gerenciar vagas de monitoria -->
                     <!-- Avaliar candidatos é feito dentro de cada vaga -->
                     <!-- Permissões: view_vaga, add_vaga, change_vaga, delete_vaga -->
@@ -1926,7 +1911,7 @@
                         <span class="sidebar-text">Minhas Vagas</span>
                     </a>
                     
-                    <hr class="sidebar-divider">
+                    
                     
                     <!-- Link: Minhas Monitorias -->
                     <!-- Visualizar todas as monitorias sob coordenação -->
@@ -1948,6 +1933,16 @@
                         <span class="sidebar-text">Minhas Turmas</span>
                     </a>
                 </div>
+
+                                    <!-- Link: Dashboard do Professor -->
+                    <!-- Painel com KPIs e estatísticas personalizadas -->
+                    <!-- Últimas inscrições, vagas populares, turmas ativas -->
+                    <a href="{% url 'dashboard' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" data-bs-toggle="tooltip"  data-bs-placement="right" title="Dashboard do Professor">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="sidebar-text">Dashboard do professor</span>
+                    </a>
+
+                    <hr class="sidebar-divider">
 
 
                     
@@ -1974,12 +1969,7 @@
                         ====================================================================
                     -->
                     {% elif is_admin %}
-                    <!-- Link: Dashboard de Gestão -->
-                    <!-- Métricas globais, KPIs, relatórios executivos -->
-                    <a href="{% url 'dashboard_gestao' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard_gestao' %}active{% endif %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Dashboard de Gestão">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span class="sidebar-text">Dashboard Gestão</span>
-                    </a>
+
                     
                     <!-- Link: Gerenciar Pagamentos -->
                     <!-- Processar folha de pagamento dos monitores -->
@@ -1992,7 +1982,7 @@
                     </a> 
                      Comentado pois nao faz sentido usar pagamentos no momento -->
                     
-                    <hr class="sidebar-divider">
+                   
                     
                     <!-- Link: Gerenciar Usuários -->
                     <!-- CRUD de usuários do sistema -->
@@ -2050,16 +2040,35 @@
             </div>
 
                     
-                    <hr class="sidebar-divider">
+                    
                     
                     <!-- Link: Todos os Relatórios -->
                     <!-- Central de relatórios do sistema com PDF/Excel -->
+                <div class="caixa-topicos">    
                     <a href="{% url 'listar_relatorios' %}" class="sidebar-item {% if request.resolver_match.url_name == 'listar_relatorios' %}active{% endif %}" data-bs-google="tooltip" data-bs-placement="right" title="Relatórios das Monitorias">
                         <i class="fas fa-chart-bar"></i>
-                        <span class="sidebar-text">Todos Relatórios</span>
+                        <span class="sidebar-text">Todos os Relatórios</span>
                     </a>
-                    
-                    <hr class="sidebar-divider">
+
+                                         <!-- Link: Validar Horas -->
+                    <!-- Aprovar/reprovar registros de horas dos monitores -->
+                    <!-- Verificar cumprimento de carga horária -->
+                    <!-- Permissão: change_registrohoras -->
+
+                    <a href="{% url 'validar_horas' %}" class="sidebar-item {% if request.resolver_match.url_name == 'validar_horas' %}active{% endif %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Validar Horas de Monitoria">
+                        <i class="fas fa-check-circle"></i>
+                        <span class="sidebar-text">Validar Horas</span>
+                    </a>
+                   
+
+                     <!-- Link: Dashboard de Gestão -->
+                    <!-- Métricas globais, KPIs, relatórios executivos -->
+                    <a href="{% url 'dashboard_gestao' %}" class="sidebar-item {% if request.resolver_match.url_name == 'dashboard_gestao' %}active{% endif %}" data-bs-toggle="tooltip" data-bs-placement="right" title="Dashboard de Gestão">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span class="sidebar-text">Dashboard Gestão</span>
+                    </a>
+                </div>    
+                   
                     {% endif %}
                     
                     <!-- 
